@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model permissions {
+  id                                  String              @id(map: "PK_920331560282b8bd21bb02290df") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                                String              @unique(map: "UQ_d090ad82a0e97ce764c06c7b312") @db.VarChar(160)
+  description                         String              @db.VarChar(60)
+  active                              Boolean             @default(true)
+  created_at                          DateTime            @default(now()) @db.Timestamptz(5)
+  updated_at                          DateTime            @default(now()) @db.Timestamptz(5)
+  created_by                          String?             @db.Uuid
+  updated_by                          String?             @db.Uuid
+  users_permissions_created_byTousers users?              @relation("permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_c398f7100db3e0d9b6a6cd6beaf")
+  users_permissions_updated_byTousers users?              @relation("permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_58fae278276b7c2c6dde2bc19a5")
+  roles_permissions                   roles_permissions[]
+  users_permissions                   users_permissions[]
+}
+
+model roles {
+  id                            String              @id(map: "PK_c1433d71a4838793a49dcad46ab") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                          String              @unique(map: "UQ_648e3f5447f725579d7d4ffdfb7") @db.VarChar(50)
+  code                          String?             @unique(map: "UQ_0e2c0e1b4b0b0b0b0b0b0b0b0b0") @db.VarChar(50)
+  active                        Boolean             @default(true)
+  created_at                    DateTime            @default(now()) @db.Timestamptz(5)
+  updated_at                    DateTime            @default(now()) @db.Timestamptz(5)
+  created_by                    String?             @db.Uuid
+  updated_by                    String?             @db.Uuid
+  users_roles_created_byTousers users?              @relation("roles_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_4a39f3095781cdd9d6061afaae5")
+  users_roles_updated_byTousers users?              @relation("roles_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_747b580d73db0ad78963d78b076")
+  roles_permissions             roles_permissions[]
+  users_roles                   users_roles[]
+}
+
+model roles_permissions {
+  role_id                                   String      @db.Uuid
+  permission_id                             String      @db.Uuid
+  created_by                                String?     @db.Uuid
+  updated_by                                String?     @db.Uuid
+  users_roles_permissions_created_byTousers users?      @relation("roles_permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_a3f5b9874c55ee69fdd01531e14")
+  permissions                               permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_337aa8dba227a1fe6b73998307b")
+  roles                                     roles       @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_7d2dad9f14eddeb09c256fea719")
+  users_roles_permissions_updated_byTousers users?      @relation("roles_permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_d1ba552f47d08621fdd2bbb0124")
+
+  @@id([role_id, permission_id], map: "PK_0cd11f0b35c4d348c6ebb9b36b7")
+}
+
+model users {
+  id                                                    String                           @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone                                                 String                           @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar(20)
+  first_name                                            String?                          @db.VarChar(100)
+  last_name                                             String?                          @db.VarChar(100)
+  password                                              String?                          @db.VarChar
+  is_super_user                                         Boolean                          @default(false)
+  status                                                user_status
+  // drive_type                                            drive_type?
+  card_name                                             String?                          @db.VarChar(100)
+  card_number                                           String?                          @db.VarChar(100)
+  birth_date                                            DateTime?                        @db.Timestamptz(5)
+  car_model                                             String?                          @db.VarChar(100)
+  car_number                                            String?                          @db.VarChar(100)
+  is_online                                             Boolean                          @default(false)
+  latitude                                              Float?                           @default(0)
+  longitude                                             Float?                           @default(0)
+  fcm_token                                             String?                          @db.VarChar(250)
+  wallet_balance                                        Float                            @default(0)
+  max_active_order_count                                Int?
+  doc_files                                             String[]
+  order_start_date                                      DateTime?                        @db.Timestamptz(5)
+  app_version                                           String?                          @db.VarChar(100)
+  created_at                                            DateTime                         @default(now()) @db.Timestamptz(5)
+  updated_at                                            DateTime                         @default(now()) @db.Timestamptz(5)
+  // otp                                                   otp[]
+  api_token                                             String?                          @db.VarChar(250)
+  tg_id                                                 String?                          @db.VarChar(250)
+  permissions_permissions_created_byTousers             permissions[]                    @relation("permissions_created_byTousers")
+  permissions_permissions_updated_byTousers             permissions[]                    @relation("permissions_updated_byTousers")
+  // post_post_created_byTousers                           post[]                           @relation("post_created_byTousers")
+  // post_updated_byTousers                                post[]                           @relation("post_updated_byTousers")
+  // post_post_user_idTousers                              post[]                           @relation("post_user_idTousers")
+  roles_roles_created_byTousers                         roles[]                          @relation("roles_created_byTousers")
+  roles_roles_updated_byTousers                         roles[]                          @relation("roles_updated_byTousers")
+  roles_permissions_roles_permissions_created_byTousers roles_permissions[]              @relation("roles_permissions_created_byTousers")
+  roles_permissions_roles_permissions_updated_byTousers roles_permissions[]              @relation("roles_permissions_updated_byTousers")
+  users_permissions_usersTousers_permissions_created_by users_permissions[]              @relation("usersTousers_permissions_created_by")
+  users_permissions_usersTousers_permissions_updated_by users_permissions[]              @relation("usersTousers_permissions_updated_by")
+  users_permissions_usersTousers_permissions_user_id    users_permissions[]              @relation("usersTousers_permissions_user_id")
+  users_roles_usersTousers_roles_created_by             users_roles[]                    @relation("usersTousers_roles_created_by")
+  users_roles_usersTousers_roles_updated_by             users_roles[]                    @relation("usersTousers_roles_updated_by")
+  users_roles_usersTousers_roles_user_id                users_roles[]                    @relation("usersTousers_roles_user_id")
+  // post_prop_types_created_byTousers                     post_prop_types[]                @relation("post_prop_types_created_byTousers")
+  // post_prop_types_updated_byTousers                     post_prop_types[]                @relation("post_prop_types_updated_byTousers")
+  // delivery_pricing_created_byTousers                    delivery_pricing[]               @relation("delivery_pricing_created_byTousers")
+  // delivery_pricing_updated_byTousers                    delivery_pricing[]               @relation("delivery_pricing_updated_byTousers")
+  // city_created_byTousers                                city[]                           @relation("city_created_byTousers")
+  // city_updated_byTousers                                city[]                           @relation("city_updated_byTousers")
+  // organization_created_byTousers                        organization[]                   @relation("organization_created_byTousers")
+  // organization_updated_byTousers                        organization[]                   @relation("organization_updated_byTousers")
+  // work_schedules_created_byTousers                      work_schedules[]                 @relation("work_schedules_created_byTousers")
+  // work_schedules_updated_byTousers                      work_schedules[]                 @relation("work_schedules_updated_byTousers")
+  // users_terminals                                       users_terminals[]
+  // users_work_schedules                                  users_work_schedules[]
+  // work_schedule_entries_created_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_created_byTousers")
+  // work_schedule_entries_updated_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_updated_byTousers")
+  // work_schedule_entries_users                           work_schedule_entries[]          @relation("work_schedule_entries_users")
+  // customers_comments_created_byTousers                  customers_comments[]             @relation("customers_comments_created_byTousers")
+  // orders_created_byTousers                              orders[]                         @relation("orders_created_byTousers")
+  // orders_updated_byTousers                              orders[]                         @relation("orders_updated_byTousers")
+  // orders_couriers                                       orders[]                         @relation("orders_couriers")
+  // order_actions_created_byTousers                       order_actions[]                  @relation("order_actions_created_byTousers")
+  // order_locations_created_byTousers                     order_locations[]                @relation("order_locations_created_byTousers")
+  // order_locations_couriers                              order_locations[]                @relation("order_locations_couriers")
+  // api_tokens_created_byTousers                          api_tokens[]                     @relation("api_tokens_created_byTousers")
+  // api_tokens_updated_byTousers                          api_tokens[]                     @relation("api_tokens_updated_byTousers")
+  // order_votes_created_byTousers                         order_votes[]                    @relation("order_votes_created_byTousers")
+  // order_votes_couriers                                  order_votes[]                    @relation("order_votes_couriers")
+  // order_transactions_created_byTousers                  order_transactions[]             @relation("order_transactions_created_byTousers")
+  // order_transactions_couriers                           order_transactions[]             @relation("order_transactions_couriers")
+  // outside_requests_created_byTousers                    outside_requests[]               @relation("outside_requests_created_byTousers")
+  // outside_requests_updated_byTousers                    outside_requests[]               @relation("outside_requests_updated_byTousers")
+  // courier_terminal_balance_couriers                     courier_terminal_balance[]       @relation("courier_terminal_balance_couriers")
+  // courier_terminal_balance_created_byTousers            courier_terminal_balance[]       @relation("courier_terminal_balance_created_byTousers")
+  // manager_withdraw_created_byTousers                    manager_withdraw[]               @relation("manager_withdraw_created_byTousers")
+  // manager_withdraw_managers                             manager_withdraw[]               @relation("manager_withdraw_managers")
+  // manager_withdraw_couriers                             manager_withdraw[]               @relation("manager_withdraw_couriers")
+  // timesheet_users                                       timesheet[]
+  // scheduled_reports_subscription_users                  scheduled_reports_subscription[]
+  // order_bonus_pricing_created_byTousers                 order_bonus_pricing[]            @relation("order_bonus_pricing_created_byTousers")
+  // order_bonus_pricing_updated_byTousers                 order_bonus_pricing[]            @relation("order_bonus_pricing_updated_byTousers")
+  // order_bonus_pricing_courier_idTusers                  order_bonus_pricing[]            @relation("order_bonus_pricing_courier_idTusers")
+}
+
+model users_permissions {
+  user_id                                   String      @db.Uuid
+  permission_id                             String      @db.Uuid
+  created_by                                String?     @db.Uuid
+  updated_by                                String?     @db.Uuid
+  users_usersTousers_permissions_created_by users?      @relation("usersTousers_permissions_created_by", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_1139f007de51cfe686c4b2abb43")
+  permissions                               permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_b09b9a210c60f41ec7b453758e9")
+  users_usersTousers_permissions_updated_by users?      @relation("usersTousers_permissions_updated_by", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_997b44464224900ee2727190813")
+  users_usersTousers_permissions_user_id    users       @relation("usersTousers_permissions_user_id", fields: [user_id], references: [id], onDelete: NoAction, map: "FK_4de7d0b175f702be3be55270023")
+
+  @@id([user_id, permission_id], map: "PK_7f3736984cd8546a1e418005561")
+}
+
+model users_roles {
+  user_id                             String  @db.Uuid
+  role_id                             String  @db.Uuid
+  created_by                          String? @db.Uuid
+  updated_by                          String? @db.Uuid
+  users_usersTousers_roles_created_by users?  @relation("usersTousers_roles_created_by", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_471c7c874c2a37052f53d920803")
+  roles                               roles   @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_1cf664021f00b9cc1ff95e17de4")
+  users_usersTousers_roles_updated_by users?  @relation("usersTousers_roles_updated_by", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_88da3fa85d1220b0ac18b08ce47")
+  users_usersTousers_roles_user_id    users   @relation("usersTousers_roles_user_id", fields: [user_id], references: [id], onDelete: NoAction, map: "FK_e4435209df12bc1f001e5360174")
+
+  @@id([user_id, role_id], map: "PK_c525e9373d63035b9919e578a9c")
+}
+
+
+enum user_status {
+  active
+  blocked
+  inactive
+}

@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.44",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^0.5.2",
+    "@elysiajs/trpc": "^0.5.2",
+    "@elysiajs/websocket": "^0.2.8",
+    "@prisma/client": "5.1.0",
+    "@trpc/server": "^10.36.0",
+    "elysia": "^0.5.25",
+    "prisma-extension-pagination": "^0.4.2",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "prisma": "5.1.0"
+  },
+  "module": "src/index.js"
+}
