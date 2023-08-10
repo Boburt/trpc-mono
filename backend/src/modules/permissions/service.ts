@@ -1,57 +1,58 @@
 import { PrismaClient, permissions } from "@prisma/client";
-import {
-  permissionsCreateInput,
-  permissionsFindManyZod,
-} from "./dto/permissions.dto";
 import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
+import {
+  permissionsAdd,
+  permissionsList,
+  permissionsOne,
+  permissionsRenew,
+} from "@lib/zod_objects/permissions/z_objects";
+
 export class PermissionsService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: permissionsCreateInput): Promise<permissions> {
+  async create(input: z.infer<typeof permissionsAdd>): Promise<permissions> {
     return await this.prisma.permissions.create({
       data: input,
     });
   }
 
   async findMany(
-    input: z.infer<typeof permissionsFindManyZod>
+    input: z.infer<typeof permissionsList>
   ): Promise<permissions[]> {
     const [permissions] = await this.prisma.permissions.paginate({}).withPages({
       limit: input.take ?? 20,
     });
+
     return permissions;
   }
 
-  async findOne(id: string): Promise<permissions | null> {
+  async findOne(input: z.infer<typeof permissionsOne>): Promise<permissions> {
     const permission = await this.prisma.permissions.findUnique({
       where: {
-        id: id,
+        id: input.id,
       },
     });
 
     if (!permission) {
-      throw new Error(`Permission with id ${id} not found.`);
+      throw new Error(`Permission with id ${input.id} not found.`);
     }
 
     return permission;
   }
 
-  async update(
-    id: string,
-    input: permissionsCreateInput
-  ): Promise<permissions | null> {
+  async update(input: z.infer<typeof permissionsRenew>): Promise<permissions> {
     return await this.prisma.permissions.update({
       where: {
-        id: id,
+        id: input.id,
       },
       data: input,
     });
   }
 
-  async remove(id: string, input: permissionsCreateInput) {
+  async remove(id: string) {
     return `This action removes a #${id} permission`;
   }
 }

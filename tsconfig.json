@@ -13,7 +13,9 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@backend/*": ["./backend/src/*"],
-      "@frontend/*": ["./frontend/src/*"]
+      "@frontend/*": ["./frontend/*"],
+      "@lib/*": ["./lib/*"],
+      "@components/*": ["./frontend/components/*"]
     }
   }
 }

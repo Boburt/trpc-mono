@@ -2,50 +2,34 @@ import { RootConfig, TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { publicProcedure, publicRouter } from "@backend/trpc";
 import { PermissionsService } from "./service";
-import { permissionsFindManyZod } from "./dto/permissions.dto";
+import {
+  permissionsAdd,
+  permissionsList,
+  permissionsOne,
+  permissionsRenew,
+} from "@lib/zod_objects/permissions/z_objects";
 
 export const permissionsRouter = publicRouter({
-  create: publicProcedure
-    .input(
-      z.object({
-        slug: z.string(),
-        description: z.string(),
-        active: z.boolean(),
-      })
-    )
-    .mutation(({ input, ctx }) => {
-      let permissionsService = new PermissionsService(ctx.prisma);
+  add: publicProcedure.input(permissionsAdd).mutation(({ input, ctx }) => {
+    let permissionsService = new PermissionsService(ctx.prisma);
 
-      return permissionsService.create(input);
-    }),
+    return permissionsService.create(input);
+  }),
 
-  findMany: publicProcedure
-    .input(permissionsFindManyZod)
-    .query(({ input, ctx }) => {
-      let permissionsService = new PermissionsService(ctx.prisma);
+  list: publicProcedure.input(permissionsList).query(({ input, ctx }) => {
+    let permissionsService = new PermissionsService(ctx.prisma);
 
-      return permissionsService.findMany(input);
-    }),
+    return permissionsService.findMany(input);
+  }),
 
-  findOne: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(({ input, ctx }) => {
-      let permissionsService = new PermissionsService(ctx.prisma);
-      return permissionsService.findOne(input.id);
-    }),
+  one: publicProcedure.input(permissionsOne).query(({ input, ctx }) => {
+    let permissionsService = new PermissionsService(ctx.prisma);
+    return permissionsService.findOne(input);
+  }),
 
-  update: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        slug: z.string(),
-        description: z.string(),
-        active: z.boolean(),
-      })
-    )
-    .mutation(({ input, ctx }) => {
-      let permissionsService = new PermissionsService(ctx.prisma);
+  renew: publicProcedure.input(permissionsRenew).mutation(({ input, ctx }) => {
+    let permissionsService = new PermissionsService(ctx.prisma);
 
-      return permissionsService.update(input.id, input);
-    }),
+    return permissionsService.update(input);
+  }),
 });
