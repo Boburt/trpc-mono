@@ -6,10 +6,6 @@
     "dev": "pnpm run --parallel dev"
   },
   "dependencies": {
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.265.0",
-    "tailwind-merge": "^1.14.0",
-    "tailwindcss-animate": "^1.0.6"
+    "zod": "^3.21.4"
   }
 }

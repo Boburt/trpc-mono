@@ -5,21 +5,22 @@ import { PermissionsService } from "./service";
 import {
   permissionsAdd,
   permissionsList,
+  permissionsMutation,
   permissionsOne,
   permissionsRenew,
 } from "@lib/zod_objects/permissions/z_objects";
 
 export const permissionsRouter = publicRouter({
-  add: publicProcedure.input(permissionsAdd).mutation(({ input, ctx }) => {
+  add: publicProcedure.input(permissionsMutation).mutation(({ input, ctx }) => {
     let permissionsService = new PermissionsService(ctx.prisma);
 
     return permissionsService.create(input);
   }),
 
-  list: publicProcedure.input(permissionsList).query(({ input, ctx }) => {
+  list: publicProcedure.input(permissionsList).query(async ({ input, ctx }) => {
     let permissionsService = new PermissionsService(ctx.prisma);
-
-    return permissionsService.findMany(input);
+    console.log("input", input);
+    return await permissionsService.findMany(input);
   }),
 
   one: publicProcedure.input(permissionsOne).query(({ input, ctx }) => {
@@ -27,9 +28,11 @@ export const permissionsRouter = publicRouter({
     return permissionsService.findOne(input);
   }),
 
-  renew: publicProcedure.input(permissionsRenew).mutation(({ input, ctx }) => {
-    let permissionsService = new PermissionsService(ctx.prisma);
+  renew: publicProcedure
+    .input(permissionsMutation)
+    .mutation(async ({ input, ctx }) => {
+      let permissionsService = new PermissionsService(ctx.prisma);
 
-    return permissionsService.update(input);
-  }),
+      return await permissionsService.update(input);
+    }),
 });
