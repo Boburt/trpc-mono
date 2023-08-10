@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { paginatedZodObj } from "../pagination/z_objects";
 export const permissionsAdd = z.object({
   slug: z.string(),
   description: z.string(),
@@ -12,10 +13,24 @@ export const permissionsRenew = z.object({
   active: z.boolean(),
 });
 
-export const permissionsList = z.object({
-  take: z.number().optional(),
-});
+export const permissionsList = paginatedZodObj.extend({});
 
 export const permissionsOne = z.object({
   id: z.string(),
+});
+
+export const permissionsModel = z.object({
+  id: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  active: z.boolean(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+export const permissionsMutation = z.object({
+  id: z.string().optional(),
+  slug: z.string(),
+  description: z.string(),
+  active: z.boolean(),
 });
