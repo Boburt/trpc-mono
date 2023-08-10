@@ -16,7 +16,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "bun-types": "latest",
+    "bun-types": "^0.7.3",
     "prisma": "5.1.0"
   },
   "module": "src/index.js"
