@@ -5,6 +5,24 @@ export const trpc = createTRPCProxyClient<Router>({
   links: [
     httpBatchLink({
       url: "http://localhost:3000/trpc", // you should update this to use env variables
+      headers(opts) {
+        const { opList } = opts;
+        console.log("opList", opList);
+        // if (clientErrors.length) {
+        //   // propagate http first error from API calls
+        //   return {
+        //     status: clientErrors[0].data?.httpStatus ?? 500,
+        //   };
+        // }
+        // cache request for 1 day + revalidate once every second
+        const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+        return {
+          "cache-control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
+        };
+        return {
+          // authorization: getAuthCookie(),
+        };
+      },
     }),
   ],
 });
@@ -35,7 +53,7 @@ export const trpc = createTRPCProxyClient<Router>({
 //            * If you want to use SSR, you need to use the server's full URL
 //            * @link https://trpc.io/docs/ssr
 //            **/
-//           url: `${getBaseUrl()}/trpc`,
+//           url: `http://localhost:3000/trpc`,
 //           // You can pass any HTTP headers you wish here
 //           async headers() {
 //             return {
