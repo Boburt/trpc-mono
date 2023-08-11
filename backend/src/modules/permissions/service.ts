@@ -4,16 +4,17 @@ import { DB } from "@backend/trpc";
 import { z } from "zod";
 
 import {
-  permissionsAdd,
   permissionsList,
+  permissionsMutation,
   permissionsOne,
-  permissionsRenew,
 } from "@lib/zod_objects/permissions/z_objects";
 
 export class PermissionsService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: z.infer<typeof permissionsAdd>): Promise<permissions> {
+  async create(
+    input: z.infer<typeof permissionsMutation>
+  ): Promise<permissions> {
     return await this.prisma.permissions.create({
       data: input,
     });
@@ -25,7 +26,6 @@ export class PermissionsService {
     const [permissions] = await this.prisma.permissions.paginate({}).withPages({
       limit: input.take ?? 20,
     });
-
     return permissions;
   }
 
@@ -43,7 +43,9 @@ export class PermissionsService {
     return permission;
   }
 
-  async update(input: z.infer<typeof permissionsRenew>): Promise<permissions> {
+  async update(
+    input: z.infer<typeof permissionsMutation>
+  ): Promise<permissions> {
     return await this.prisma.permissions.update({
       where: {
         id: input.id,
