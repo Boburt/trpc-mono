@@ -13,7 +13,7 @@ export default async function PermissionListPage() {
   return (
     <div>
       <div className="flex justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Permission List</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Permissions List</h2>
         <div className="flex items-center space-x-2">
           <PermissionsForm>
             <Button>
