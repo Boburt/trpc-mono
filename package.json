@@ -5,5 +5,7 @@
   "scripts": {
     "dev": "pnpm run --parallel dev"
   },
-  "dependencies": {}
+  "dependencies": {
+    "zod": "^3.21.1"
+  }
 }

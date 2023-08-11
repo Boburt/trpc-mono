@@ -3,9 +3,6 @@ import { trpc } from "../utils/trpc";
 import { Button } from "@components/ui/button";
 
 export default async function Home() {
-  const data = await trpc.permissions.list.query({});
-  console.log(data);
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Button>Button</Button>
