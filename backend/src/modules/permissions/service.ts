@@ -3,26 +3,24 @@ import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
-import {
-  permissionsList,
-  permissionsMutation,
-  permissionsOne,
-} from "@lib/zod_objects/permissions/z_objects";
+import { permissionsCreateInputSchema } from "@lib/zodGeneratedFiles/zod/inputTypeSchemas";
+import { permissionsOptionalDefaults } from "@lib/zodGeneratedFiles/zod/modelSchema";
+import { permissionsFindManyArgsSchema } from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 
 export class PermissionsService {
   constructor(private readonly prisma: DB) {}
 
   async create(
-    input: z.infer<typeof permissionsMutation>
-  ): Promise<permissions> {
+    input: z.infer<typeof permissionsCreateInputSchema>
+  ): Promise<permissionsOptionalDefaults> {
     return await this.prisma.permissions.create({
       data: input,
     });
   }
 
   async findMany(
-    input: z.infer<typeof permissionsList>
-  ): Promise<permissions[]> {
+    input: z.infer<typeof permissionsFindManyArgsSchema>
+  ): Promise<permissionsOptionalDefaults[]> {
     const [permissions] = await this.prisma.permissions.paginate({}).withPages({
       limit: input.take ?? 20,
     });

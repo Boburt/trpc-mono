@@ -5,7 +5,7 @@ export const trpc = createTRPCProxyClient<Router>({
   links: [
     httpBatchLink({
       url: "http://localhost:3000/trpc", // you should update this to use env variables
-      headers(opts) {
+      async headers(opts) {
         const { opList } = opts;
         console.log("opList", opList);
         // if (clientErrors.length) {
