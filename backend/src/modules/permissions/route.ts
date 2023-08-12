@@ -1,15 +1,22 @@
 import { publicProcedure, publicRouter } from "@backend/trpc";
 import { permissionsFindManyArgsSchema } from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 import {
-  permissionsList,
-  permissionsMutation,
-  permissionsOne,
-} from "@lib/zod_objects/permissions/z_objects";
+  permissionsCreateInputSchema,
+  permissionsUpdateInputSchema,
+} from "@lib/zodGeneratedFiles/zod/inputTypeSchemas";
+import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
+import {
+  permissionsFindManyArgsSchema,
+  permissionsFindUniqueArgsSchema,
+  permissionsUpdateArgsSchema,
+} from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 
 export const permissionsRouter = publicRouter({
-  add: publicProcedure.input(permissionsMutation).mutation(({ input, ctx }) => {
-    return ctx.permissionsService.create(input);
-  }),
+  add: publicProcedure
+    .input(permissionsCreateInputSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.permissionsService.create(input);
+    }),
 
   list: publicProcedure
     .input(permissionsFindManyArgsSchema)
@@ -18,12 +25,14 @@ export const permissionsRouter = publicRouter({
       return [];
     }),
 
-  one: publicProcedure.input(permissionsOne).query(({ input, ctx }) => {
-    return ctx.permissionsService.findOne(input);
-  }),
+  one: publicProcedure
+    .input(permissionsFindUniqueArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.permissionsService.findOne(input);
+    }),
 
   renew: publicProcedure
-    .input(permissionsMutation)
+    .input(permissionsUpdateArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.permissionsService.update(input);
     }),

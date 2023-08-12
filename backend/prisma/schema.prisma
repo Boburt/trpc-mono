@@ -18,6 +18,7 @@ generator zod {
   writeBarrelFiles = true
   createInputTypes = true
   createModelTypes = true
+  createPartialTypes = true
   createOptionalDefaultValuesTypes = true
   writeNullishInModelTypes = true
 }
