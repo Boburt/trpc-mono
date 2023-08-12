@@ -24,7 +24,7 @@ export default function PermissionListPage() {
         </div>
       </div>
       <div className="py-10">
-        {/* <DataTable columns={permissionsColumns} data={data} /> */}
+        <DataTable columns={permissionsColumns} data={data ?? []} />
       </div>
     </div>
   );

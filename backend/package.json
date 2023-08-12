@@ -13,7 +13,8 @@
     "@trpc/server": "^10.36.0",
     "elysia": "^0.5.25",
     "prisma-extension-pagination": "^0.4.2",
-    "zod": "^3.21.4"
+    "zod": "^3.21.1",
+    "zod-prisma-types": "^2.7.9"
   },
   "devDependencies": {
     "bun-types": "^0.7.3",

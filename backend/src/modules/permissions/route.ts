@@ -1,4 +1,5 @@
 import { publicProcedure, publicRouter } from "@backend/trpc";
+import { permissionsFindManyArgsSchema } from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 import {
   permissionsList,
   permissionsMutation,
@@ -10,10 +11,12 @@ export const permissionsRouter = publicRouter({
     return ctx.permissionsService.create(input);
   }),
 
-  list: publicProcedure.input(permissionsList).query(async ({ input, ctx }) => {
-    return await ctx.permissionsService.findMany(input);
-    return [];
-  }),
+  list: publicProcedure
+    .input(permissionsFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.permissionsService.findMany(input);
+      return [];
+    }),
 
   one: publicProcedure.input(permissionsOne).query(({ input, ctx }) => {
     return ctx.permissionsService.findOne(input);

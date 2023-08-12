@@ -1,6 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +9,17 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator zod {
+  provider       = "npx zod-prisma-types"
+  output = "../../lib/zodGeneratedFiles/zod"
+  useMultipleFiles = true
+  writeBarrelFiles = true
+  createInputTypes = true
+  createModelTypes = true
+  createOptionalDefaultValuesTypes = true
+  writeNullishInModelTypes = true
 }
 
 model permissions {
