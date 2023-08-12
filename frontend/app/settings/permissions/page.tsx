@@ -4,9 +4,10 @@ import { permissionsColumns } from "./columns";
 import { Button } from "@frontend/components/ui/button";
 import { Plus } from "lucide-react";
 import PermissionsForm from "./form";
+import { usePermissions_ListQuery } from "@frontend/store/api";
 
-export default async function PermissionListPage() {
-  const data = await trpc.permissions.list.query({
+export default function PermissionListPage() {
+  const { data, isLoading } = usePermissions_ListQuery({
     take: 10,
   });
   console.log(data);
@@ -23,7 +24,7 @@ export default async function PermissionListPage() {
         </div>
       </div>
       <div className="py-10">
-        <DataTable columns={permissionsColumns} data={data} />
+        {/* <DataTable columns={permissionsColumns} data={data} /> */}
       </div>
     </div>
   );
