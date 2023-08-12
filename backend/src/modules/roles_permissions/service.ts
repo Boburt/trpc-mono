@@ -1,18 +1,18 @@
 import { DB } from "@backend/trpc";
 import { z } from "zod";
-import { roles_permissions } from "@prisma/client";
+import { Prisma, roles_permissions } from "@prisma/client";
 import {
   rolesPermissionsCreateInput,
   rolesPermissionsFindManyZod,
 } from "./dto/roles_permissions.dto";
 
-export class RolesService {
+export class RolesPermissionsService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: rolesPermissionsCreateInput): Promise<roles_permissions> {
-    return await this.prisma.roles_permissions.create({
-      data: input,
-    });
+  async create(
+    input: Prisma.roles_permissionsCreateArgs
+  ): Promise<roles_permissions> {
+    return await this.prisma.roles_permissions.create(input);
   }
 
   async findMany(
