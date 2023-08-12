@@ -5,24 +5,6 @@ export const trpc = createTRPCProxyClient<Router>({
   links: [
     httpBatchLink({
       url: "http://localhost:3000/trpc", // you should update this to use env variables
-      async headers(opts) {
-        const { opList } = opts;
-        console.log("opList", opList);
-        // if (clientErrors.length) {
-        //   // propagate http first error from API calls
-        //   return {
-        //     status: clientErrors[0].data?.httpStatus ?? 500,
-        //   };
-        // }
-        // cache request for 1 day + revalidate once every second
-        const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
-        return {
-          "cache-control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
-        };
-        return {
-          // authorization: getAuthCookie(),
-        };
-      },
     }),
   ],
 });
