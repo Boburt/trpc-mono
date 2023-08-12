@@ -21,12 +21,12 @@ import { Switch } from "@frontend/components/ui/switch";
 import { trpc } from "@frontend/utils/trpc";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { permissionsMutation } from "@lib/zod_objects/permissions/z_objects";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { set, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
+import { permissionsCreateInputSchema } from "@backend/lib/zod";
 
 export default function PermissionsForm({
   children,
@@ -38,8 +38,8 @@ export default function PermissionsForm({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
-  const form = useForm<z.infer<typeof permissionsMutation>>({
-    resolver: zodResolver(permissionsMutation),
+  const form = useForm<z.infer<typeof permissionsCreateInputSchema>>({
+    resolver: zodResolver(permissionsCreateInputSchema),
     defaultValues: {
       active: true,
       slug: "",
@@ -47,7 +47,9 @@ export default function PermissionsForm({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof permissionsMutation>) {
+  async function onSubmit(
+    values: z.infer<typeof permissionsCreateInputSchema>
+  ) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -89,9 +91,9 @@ export default function PermissionsForm({
       setOpen(true);
       if (recordId) {
         const record = await trpc.permissions.one.query({ id: recordId });
-        form.setValue("active", record.active);
-        form.setValue("slug", record.slug);
-        form.setValue("description", record.description);
+        // form.setValue("active", record.active);
+        // form.setValue("slug", record.slug);
+        // form.setValue("description", record.description);
       }
     } else {
       form.reset();
