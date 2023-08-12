@@ -12,7 +12,7 @@ datasource db {
 }
 
 generator zod {
-  provider       = "bunx zod-prisma-types"
+  provider       = "npx zod-prisma-types"
   output = "../src/lib/zod"
   useMultipleFiles = false
   writeBarrelFiles = true
