@@ -2,14 +2,14 @@ import { publicProcedure, publicRouter } from "@backend/trpc";
 import {
   permissionsCreateInputSchema,
   permissionsUpdateInputSchema,
-} from "@lib/zodGeneratedFiles/zod/inputTypeSchemas";
-import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
+} from "@lib/zodGeneratedFiles/zod";
+import { permissions } from "@lib/zodGeneratedFiles/zod";
 import {
   permissionsCreateArgsSchema,
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
   permissionsUpdateArgsSchema,
-} from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
+} from "@lib/zodGeneratedFiles/zod";
 
 export const permissionsRouter = publicRouter({
   add: publicProcedure
