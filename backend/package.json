@@ -9,7 +9,7 @@
     "@elysiajs/cors": "^0.5.2",
     "@elysiajs/trpc": "^0.5.2",
     "@elysiajs/websocket": "^0.2.8",
-    "@prisma/client": "5.1.0",
+    "@prisma/client": "^5.1.1",
     "@trpc/server": "^10.36.0",
     "elysia": "^0.5.25",
     "prisma-extension-pagination": "^0.4.2",
@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "bun-types": "^0.7.3",
-    "prisma": "5.1.0"
+    "prisma": "^5.1.1"
   },
   "module": "src/index.js"
 }
