@@ -12,7 +12,14 @@ datasource db {
 }
 
 generator zod {
-  provider       = "zod-prisma-types"
+  provider       = "npx zod-prisma-types"
+  output = "../../lib/zodGeneratedFiles/zod"
+  useMultipleFiles = true
+  writeBarrelFiles = false
+  createInputTypes = true
+  createModelTypes = true
+  createOptionalDefaultValuesTypes = true
+  writeNullishInModelTypes = true
 }
 
 model permissions {
