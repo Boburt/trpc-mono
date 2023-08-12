@@ -15,7 +15,7 @@ generator zod {
   provider       = "npx zod-prisma-types"
   output = "../../lib/zodGeneratedFiles/zod"
   useMultipleFiles = true
-  writeBarrelFiles = false
+  writeBarrelFiles = true
   createInputTypes = true
   createModelTypes = true
   createOptionalDefaultValuesTypes = true
