@@ -36,14 +36,6 @@ export const usersSchema = z.object({
 export type users = z.infer<typeof usersSchema>
 
 /////////////////////////////////////////
-// USERS PARTIAL SCHEMA
-/////////////////////////////////////////
-
-export const usersPartialSchema = usersSchema.partial()
-
-export type usersPartial = z.infer<typeof usersPartialSchema>
-
-/////////////////////////////////////////
 // USERS OPTIONAL DEFAULTS SCHEMA
 /////////////////////////////////////////
 

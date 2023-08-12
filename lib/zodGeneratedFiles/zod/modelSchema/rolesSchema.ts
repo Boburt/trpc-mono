@@ -18,14 +18,6 @@ export const rolesSchema = z.object({
 export type roles = z.infer<typeof rolesSchema>
 
 /////////////////////////////////////////
-// ROLES PARTIAL SCHEMA
-/////////////////////////////////////////
-
-export const rolesPartialSchema = rolesSchema.partial()
-
-export type rolesPartial = z.infer<typeof rolesPartialSchema>
-
-/////////////////////////////////////////
 // ROLES OPTIONAL DEFAULTS SCHEMA
 /////////////////////////////////////////
 

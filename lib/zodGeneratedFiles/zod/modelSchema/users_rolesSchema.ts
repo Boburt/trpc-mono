@@ -14,14 +14,6 @@ export const users_rolesSchema = z.object({
 export type users_roles = z.infer<typeof users_rolesSchema>
 
 /////////////////////////////////////////
-// USERS ROLES PARTIAL SCHEMA
-/////////////////////////////////////////
-
-export const users_rolesPartialSchema = users_rolesSchema.partial()
-
-export type users_rolesPartial = z.infer<typeof users_rolesPartialSchema>
-
-/////////////////////////////////////////
 // USERS ROLES OPTIONAL DEFAULTS SCHEMA
 /////////////////////////////////////////
 
