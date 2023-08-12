@@ -1,24 +1,20 @@
-import { PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
 import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
 import {
-  permissionsCreateArgsSchema,
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
-  permissionsUpdateArgsSchema,
 } from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 
 export class PermissionsService {
   constructor(private readonly prisma: DB) {}
 
-  // async create(
-  //   input: z.infer<typeof permissionsCreateArgsSchema>
-  // ): Promise<permissions> {
-  //   return await this.prisma.permissions.create(input);
-  // }
+  async create(input: Prisma.permissionsCreateArgs): Promise<permissions> {
+    return await this.prisma.permissions.create(input);
+  }
 
   async findMany(
     input: z.infer<typeof permissionsFindManyArgsSchema>
@@ -36,9 +32,7 @@ export class PermissionsService {
     return permission;
   }
 
-  async update(
-    input: z.infer<typeof permissionsUpdateArgsSchema>
-  ): Promise<permissions> {
+  async update(input: Prisma.permissionsUpdateArgs): Promise<permissions> {
     return await this.prisma.permissions.update(input);
   }
 
