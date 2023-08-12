@@ -5,10 +5,8 @@ import { z } from "zod";
 
 import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
 import {
-  permissionsCreateArgsSchema,
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
-  permissionsUpdateArgsSchema,
 } from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
 
 export class PermissionsService {
