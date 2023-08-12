@@ -15,4 +15,10 @@ export const api = createApi({
   //   },
 });
 
-export const { useLazyPermissions_ListQuery, usePermissions_ListQuery } = api;
+export const {
+  useLazyPermissions_ListQuery,
+  usePermissions_ListQuery,
+  usePermissions_AddMutation,
+  usePermissions_OneQuery,
+  usePermissions_RenewMutation,
+} = api;

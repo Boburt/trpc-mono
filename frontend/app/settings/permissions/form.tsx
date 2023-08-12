@@ -47,6 +47,8 @@ export default function PermissionsForm({
     },
   });
 
+  usePermissions_AddMutation();
+
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
   ) {
