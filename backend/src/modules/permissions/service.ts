@@ -4,11 +4,9 @@ import { DB } from "@backend/trpc";
 import { z } from "zod";
 
 import {
-  permissionsAdd,
   permissionsList,
   permissionsMutation,
   permissionsOne,
-  permissionsRenew,
 } from "@lib/zod_objects/permissions/z_objects";
 
 export class PermissionsService {
