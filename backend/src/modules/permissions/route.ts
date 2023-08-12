@@ -6,6 +6,7 @@ import {
 } from "@lib/zodGeneratedFiles/zod/inputTypeSchemas";
 import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
 import {
+  permissionsCreateArgsSchema,
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
   permissionsUpdateArgsSchema,
@@ -13,7 +14,7 @@ import {
 
 export const permissionsRouter = publicRouter({
   add: publicProcedure
-    .input(permissionsCreateInputSchema)
+    .input(permissionsCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.permissionsService.create(input);
     }),
