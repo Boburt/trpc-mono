@@ -18,14 +18,6 @@ export const permissionsSchema = z.object({
 export type permissions = z.infer<typeof permissionsSchema>
 
 /////////////////////////////////////////
-// PERMISSIONS PARTIAL SCHEMA
-/////////////////////////////////////////
-
-export const permissionsPartialSchema = permissionsSchema.partial()
-
-export type permissionsPartial = z.infer<typeof permissionsPartialSchema>
-
-/////////////////////////////////////////
 // PERMISSIONS OPTIONAL DEFAULTS SCHEMA
 /////////////////////////////////////////
 
