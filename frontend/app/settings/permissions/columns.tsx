@@ -1,22 +1,10 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { permissionsModel } from "@lib/zod_objects/permissions/z_objects";
-import { MoreHorizontal, Edit2Icon } from "lucide-react";
+import { Edit2Icon } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu";
 import PermissionsForm from "./form";
-import {
-  permissions,
-  permissionsSchema,
-} from "@lib/zodGeneratedFiles/zod/modelSchema";
+import { permissions, permissionsSchema } from "@backend/lib/zod";
 
 export const permissionsColumns: ColumnDef<permissions>[] = [
   {
