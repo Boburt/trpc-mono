@@ -25,8 +25,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Providers>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="flex-col">
               <div className="border-b">
                 <div className="flex h-16 items-center px-4">
@@ -41,8 +41,8 @@ export default function RootLayout({
               <div className="mx-4 mt-10 mb-4">{children}</div>
             </div>
             <Toaster />
-          </Providers>
-        </ThemeProvider>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
