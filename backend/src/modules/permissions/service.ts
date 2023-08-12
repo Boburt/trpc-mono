@@ -3,11 +3,11 @@ import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
-import { permissions } from "@lib/zodGeneratedFiles/zod/modelSchema";
+import { permissions } from "@lib/zodGeneratedFiles/zod";
 import {
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
-} from "@lib/zodGeneratedFiles/zod/outputTypeSchemas";
+} from "@lib/zodGeneratedFiles/zod";
 
 export class PermissionsService {
   constructor(private readonly prisma: DB) {}
