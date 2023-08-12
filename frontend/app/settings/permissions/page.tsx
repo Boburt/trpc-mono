@@ -1,3 +1,4 @@
+"use client";
 import { trpc } from "@frontend/utils/trpc";
 import { DataTable } from "./data-table";
 import { permissionsColumns } from "./columns";
@@ -24,7 +25,11 @@ export default function PermissionListPage() {
         </div>
       </div>
       <div className="py-10">
-        <DataTable columns={permissionsColumns} data={data ?? []} />
+        <DataTable
+          columns={permissionsColumns}
+          data={data ?? []}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );
