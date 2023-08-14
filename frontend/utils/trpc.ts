@@ -1,13 +1,25 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+// import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 // import { AppRouter } from "@server/trpc/trpc.router";
 import { Router } from "@backend/_routes";
-export const trpc = createTRPCProxyClient<Router>({
-  links: [
-    httpBatchLink({
-      url: "http://localhost:3000/trpc", // you should update this to use env variables
-    }),
-  ],
-});
+import {
+  createTRPCReact,
+  inferReactQueryProcedureOptions,
+} from "@trpc/react-query";
+import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+
+export type ReactQueryOptions = inferReactQueryProcedureOptions<Router>;
+export type RouterInputs = inferRouterInputs<Router>;
+export type RouterOutputs = inferRouterOutputs<Router>;
+
+export const trpc = createTRPCReact<Router>();
+
+// export const trpc = createTRPCProxyClient<Router>({
+//   links: [
+//     httpBatchLink({
+//       url: "http://localhost:3000/trpc", // you should update this to use env variables
+//     }),
+//   ],
+// });
 
 // import { httpBatchLink } from "@trpc/client";
 // import type { Router } from "../../../backend/src/_routes";

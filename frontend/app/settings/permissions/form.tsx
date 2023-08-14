@@ -28,10 +28,9 @@ import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
 import { permissionsCreateInputSchema } from "@backend/lib/zod";
 import {
-  usePermissions_AddMutation,
-  usePermissions_RenewMutation,
-  usePermissions_OneQuery,
-} from "@frontend/store/api";
+  usePermissionsCreate,
+  usePermissionsUpdate,
+} from "@frontend/store/permission";
 
 export default function PermissionsForm({
   children,
@@ -51,22 +50,29 @@ export default function PermissionsForm({
     },
   });
 
-  const [addPermission, { data, error, isLoading: isAddLoading }] =
-    usePermissions_AddMutation();
+  const {
+    mutateAsync: createPermission,
+    isLoading: isAddLoading,
+    data,
+    error,
+  } = usePermissionsCreate({});
 
-  const [
-    updatePermission,
-    { data: updateData, error: updateError, isLoading: isUpdateLoading },
-  ] = usePermissions_RenewMutation();
+  const {
+    mutateAsync: updatePermission,
+    isLoading: isUpdateLoading,
+    error: updateError,
+  } = usePermissionsUpdate({});
 
-  const { data: record, isLoading: isRecordLoading } = usePermissions_OneQuery(
-    {
-      where: { id: recordId },
-    },
-    {
-      skip: !recordId,
-    }
-  );
+  const { data: record, isLoading: isRecordLoading } =
+    trpc.permissions.one.useQuery(
+      {
+        where: { id: recordId },
+      },
+      {
+        enabled: recordId && open,
+        refetchOnMountOrArgChange: true,
+      }
+    );
 
   const isLoading = useMemo(() => {
     return isAddLoading || isUpdateLoading;
@@ -77,7 +83,6 @@ export default function PermissionsForm({
       toast({
         title: "Success",
         description: "Permission added",
-        variant: "success",
         duration: 5000,
       });
       form.reset();
@@ -107,7 +112,11 @@ export default function PermissionsForm({
       form.setValue("slug", record.slug);
       form.setValue("description", record.description);
     }
-  }, [data, error, updateError, record]);
+
+    return () => {
+      form.reset();
+    };
+  }, [data, error, updateError, record, open]);
 
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
@@ -123,7 +132,7 @@ export default function PermissionsForm({
     if (recordId) {
       updatePermission({ data: values, where: { id: recordId } });
     } else {
-      addPermission({ data: values });
+      createPermission({ data: values });
     }
   }
 
