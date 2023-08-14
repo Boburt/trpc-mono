@@ -6,6 +6,7 @@
     "dev": "pnpm run --parallel dev"
   },
   "dependencies": {
+    "typescript": "4.6.2-insiders.20220225",
     "zod": "^3.21.1"
   }
 }

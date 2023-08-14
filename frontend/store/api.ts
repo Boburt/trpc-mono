@@ -8,11 +8,11 @@ export const api = createApi({
   reducerPath: "trpcApi",
 
   //   // pass in any endpoint specific options, such as providesTags or onQueryStarted for optimistic updates
-  //   endpointOptions: {
-  //     permissions_List: {
-  //       providesTags: ["PermissionsList"],
-  //     },
+  // endpointOptions: {
+  //   permissions_List: {
+  //     providesTags: ["PermissionsList"],
   //   },
+  // },
 });
 
 export const {
