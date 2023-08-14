@@ -1,14 +1,12 @@
-import { publicProcedure, publicRouter } from "@backend/trpc";
 import {
-  permissionsCreateInputSchema,
-  permissionsUpdateInputSchema,
-  permissionsFindManyArgsSchema,
-  permissions,
   permissionsCreateArgsSchema,
   permissionsFindManyArgsSchema,
   permissionsFindUniqueArgsSchema,
   permissionsUpdateArgsSchema,
 } from "@backend/lib/zod";
+import { publicProcedure, publicRouter } from "@backend/trpc";
+
+import { Prisma } from "@prisma/client";
 
 export const permissionsRouter = publicRouter({
   add: publicProcedure
