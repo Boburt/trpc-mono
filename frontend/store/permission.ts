@@ -11,7 +11,11 @@ export function usePermissionsCreate(
   const utils = trpc.useContext();
   return trpc.permissions.add.useMutation({
     ...options,
-    onSuccess: () => utils.permissions.list.invalidate(),
+    onSuccess: (post) => {
+      utils.permissions.list.invalidate();
+      
+      options?.onSuccess?.(post);
+    },
   });
 }
 
@@ -21,6 +25,10 @@ export function usePermissionsUpdate(
   const utils = trpc.useContext();
   return trpc.permissions.renew.useMutation({
     ...options,
-    onSuccess: () => utils.permissions.list.invalidate(),
+    onSuccess: (post) => {
+      utils.permissions.list.invalidate();
+      
+      options?.onSuccess?.(post);
+    },
   });
 }

@@ -50,18 +50,43 @@ export default function PermissionsForm({
     },
   });
 
+  const onAddSuccess = (actionText: string) => {
+      toast({
+        title: "Success",
+        description: `Permission ${actionText}`,
+        duration: 5000,
+      });
+      form.reset();
+    setOpen(false);
+  }
+
+  const onError = (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+        duration: 5000,
+      });
+  }
+
   const {
     mutateAsync: createPermission,
     isLoading: isAddLoading,
     data,
     error,
-  } = usePermissionsCreate({});
+  } = usePermissionsCreate({
+    onSuccess: () => onAddSuccess('added'),
+    onError
+  });
 
   const {
     mutateAsync: updatePermission,
     isLoading: isUpdateLoading,
     error: updateError,
-  } = usePermissionsUpdate({});
+  } = usePermissionsUpdate({
+    onSuccess: () => onAddSuccess('updated'),
+    onError
+  });
 
   const { data: record, isLoading: isRecordLoading } =
     trpc.permissions.one.useQuery(
@@ -69,7 +94,7 @@ export default function PermissionsForm({
         where: { id: recordId },
       },
       {
-        enabled: recordId && open,
+        enabled: !!recordId && open,
         refetchOnMountOrArgChange: true,
       }
     );
@@ -79,33 +104,6 @@ export default function PermissionsForm({
   }, [isAddLoading, isUpdateLoading]);
 
   useEffect(() => {
-    if (data) {
-      toast({
-        title: "Success",
-        description: "Permission added",
-        duration: 5000,
-      });
-      form.reset();
-      setOpen(false);
-    }
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-        duration: 5000,
-      });
-    }
-
-    if (updateError) {
-      toast({
-        title: "Error",
-        description: updateError.message,
-        variant: "destructive",
-        duration: 5000,
-      });
-    }
 
     if (record) {
       form.setValue("active", record.active);
@@ -116,19 +114,11 @@ export default function PermissionsForm({
     return () => {
       form.reset();
     };
-  }, [data, error, updateError, record, open]);
+  }, [record, open]);
 
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
   ) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-
-    setTimeout(() => {
-      setOpen(false);
-    }, 1000);
-
     if (recordId) {
       updatePermission({ data: values, where: { id: recordId } });
     } else {
@@ -147,7 +137,6 @@ export default function PermissionsForm({
         // form.setValue("description", record.description);
       }
     } else {
-      form.reset();
       setOpen(false);
     }
   };
