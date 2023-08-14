@@ -22,11 +22,16 @@ import { trpc } from "@frontend/utils/trpc";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
 import { permissionsCreateInputSchema } from "@backend/lib/zod";
+import {
+  usePermissions_AddMutation,
+  usePermissions_RenewMutation,
+  usePermissions_OneQuery,
+} from "@frontend/store/api";
 
 export default function PermissionsForm({
   children,
@@ -35,7 +40,6 @@ export default function PermissionsForm({
   children: React.ReactNode;
   recordId?: string;
 }) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof permissionsCreateInputSchema>>({
@@ -47,7 +51,63 @@ export default function PermissionsForm({
     },
   });
 
-  usePermissions_AddMutation();
+  const [addPermission, { data, error, isLoading: isAddLoading }] =
+    usePermissions_AddMutation();
+
+  const [
+    updatePermission,
+    { data: updateData, error: updateError, isLoading: isUpdateLoading },
+  ] = usePermissions_RenewMutation();
+
+  const { data: record, isLoading: isRecordLoading } = usePermissions_OneQuery(
+    {
+      where: { id: recordId },
+    },
+    {
+      skip: !recordId,
+    }
+  );
+
+  const isLoading = useMemo(() => {
+    return isAddLoading || isUpdateLoading;
+  }, [isAddLoading, isUpdateLoading]);
+
+  useEffect(() => {
+    if (data) {
+      toast({
+        title: "Success",
+        description: "Permission added",
+        variant: "success",
+        duration: 5000,
+      });
+      form.reset();
+      setOpen(false);
+    }
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+
+    if (updateError) {
+      toast({
+        title: "Error",
+        description: updateError.message,
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+
+    if (record) {
+      form.setValue("active", record.active);
+      form.setValue("slug", record.slug);
+      form.setValue("description", record.description);
+    }
+  }, [data, error, updateError, record]);
 
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
@@ -56,34 +116,14 @@ export default function PermissionsForm({
     // ✅ This will be type-safe and validated.
     console.log(values);
 
-    setIsLoading(true);
-
     setTimeout(() => {
-      setIsLoading(false);
       setOpen(false);
     }, 1000);
 
-    try {
-      if (recordId) {
-        const res = await trpc.permissions.renew.mutate({
-          ...values,
-          id: recordId,
-        });
-        console.log(res);
-      } else {
-        const res = await trpc.permissions.add.mutate(values);
-      }
-      form.reset();
-      setIsLoading(false);
-      setOpen(false);
-    } catch (error: any) {
-      setIsLoading(false);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-        duration: 5000,
-      });
+    if (recordId) {
+      updatePermission({ data: values, where: { id: recordId } });
+    } else {
+      addPermission({ data: values });
     }
   }
 
@@ -92,7 +132,7 @@ export default function PermissionsForm({
       // Do something before the sheet opens.
       setOpen(true);
       if (recordId) {
-        const record = await trpc.permissions.one.query({ id: recordId });
+        // const record = await trpc.permissions.one.query({ id: recordId });
         // form.setValue("active", record.active);
         // form.setValue("slug", record.slug);
         // form.setValue("description", record.description);
