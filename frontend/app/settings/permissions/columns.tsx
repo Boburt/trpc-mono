@@ -5,8 +5,11 @@ import { z } from "zod";
 import { Button } from "@components/ui/button";
 import PermissionsForm from "./form";
 import { permissions, permissionsSchema } from "@backend/lib/zod";
+import { RouterInputs, RouterOutputs } from "@frontend/utils/trpc";
 
-export const permissionsColumns: ColumnDef<permissions>[] = [
+export const permissionsColumns: ColumnDef<
+  RouterOutputs["permissions"]["list"][0]
+>[] = [
   {
     accessorKey: "active",
     header: "Активен",
