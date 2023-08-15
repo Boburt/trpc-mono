@@ -74,7 +74,6 @@ model users {
   password                                              String?                          @db.VarChar
   is_super_user                                         Boolean                          @default(false)
   status                                                user_status
-  // drive_type                                            drive_type?
   card_name                                             String?                          @db.VarChar(100)
   card_number                                           String?                          @db.VarChar(100)
   birth_date                                            DateTime?                        @db.Timestamptz(5)
@@ -91,14 +90,10 @@ model users {
   app_version                                           String?                          @db.VarChar(100)
   created_at                                            DateTime                         @default(now()) @db.Timestamptz(5)
   updated_at                                            DateTime                         @default(now()) @db.Timestamptz(5)
-  // otp                                                   otp[]
   api_token                                             String?                          @db.VarChar(250)
   tg_id                                                 String?                          @db.VarChar(250)
   permissions_permissions_created_byTousers             permissions[]                    @relation("permissions_created_byTousers")
   permissions_permissions_updated_byTousers             permissions[]                    @relation("permissions_updated_byTousers")
-  // post_post_created_byTousers                           post[]                           @relation("post_created_byTousers")
-  // post_updated_byTousers                                post[]                           @relation("post_updated_byTousers")
-  // post_post_user_idTousers                              post[]                           @relation("post_user_idTousers")
   roles_roles_created_byTousers                         roles[]                          @relation("roles_created_byTousers")
   roles_roles_updated_byTousers                         roles[]                          @relation("roles_updated_byTousers")
   roles_permissions_roles_permissions_created_byTousers roles_permissions[]              @relation("roles_permissions_created_byTousers")
@@ -109,46 +104,19 @@ model users {
   users_roles_usersTousers_roles_created_by             users_roles[]                    @relation("usersTousers_roles_created_by")
   users_roles_usersTousers_roles_updated_by             users_roles[]                    @relation("usersTousers_roles_updated_by")
   users_roles_usersTousers_roles_user_id                users_roles[]                    @relation("usersTousers_roles_user_id")
-  // post_prop_types_created_byTousers                     post_prop_types[]                @relation("post_prop_types_created_byTousers")
-  // post_prop_types_updated_byTousers                     post_prop_types[]                @relation("post_prop_types_updated_byTousers")
-  // delivery_pricing_created_byTousers                    delivery_pricing[]               @relation("delivery_pricing_created_byTousers")
-  // delivery_pricing_updated_byTousers                    delivery_pricing[]               @relation("delivery_pricing_updated_byTousers")
-  // city_created_byTousers                                city[]                           @relation("city_created_byTousers")
-  // city_updated_byTousers                                city[]                           @relation("city_updated_byTousers")
-  // organization_created_byTousers                        organization[]                   @relation("organization_created_byTousers")
-  // organization_updated_byTousers                        organization[]                   @relation("organization_updated_byTousers")
-  // work_schedules_created_byTousers                      work_schedules[]                 @relation("work_schedules_created_byTousers")
-  // work_schedules_updated_byTousers                      work_schedules[]                 @relation("work_schedules_updated_byTousers")
-  // users_terminals                                       users_terminals[]
-  // users_work_schedules                                  users_work_schedules[]
-  // work_schedule_entries_created_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_created_byTousers")
-  // work_schedule_entries_updated_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_updated_byTousers")
-  // work_schedule_entries_users                           work_schedule_entries[]          @relation("work_schedule_entries_users")
-  // customers_comments_created_byTousers                  customers_comments[]             @relation("customers_comments_created_byTousers")
-  // orders_created_byTousers                              orders[]                         @relation("orders_created_byTousers")
-  // orders_updated_byTousers                              orders[]                         @relation("orders_updated_byTousers")
-  // orders_couriers                                       orders[]                         @relation("orders_couriers")
-  // order_actions_created_byTousers                       order_actions[]                  @relation("order_actions_created_byTousers")
-  // order_locations_created_byTousers                     order_locations[]                @relation("order_locations_created_byTousers")
-  // order_locations_couriers                              order_locations[]                @relation("order_locations_couriers")
-  // api_tokens_created_byTousers                          api_tokens[]                     @relation("api_tokens_created_byTousers")
-  // api_tokens_updated_byTousers                          api_tokens[]                     @relation("api_tokens_updated_byTousers")
-  // order_votes_created_byTousers                         order_votes[]                    @relation("order_votes_created_byTousers")
-  // order_votes_couriers                                  order_votes[]                    @relation("order_votes_couriers")
-  // order_transactions_created_byTousers                  order_transactions[]             @relation("order_transactions_created_byTousers")
-  // order_transactions_couriers                           order_transactions[]             @relation("order_transactions_couriers")
-  // outside_requests_created_byTousers                    outside_requests[]               @relation("outside_requests_created_byTousers")
-  // outside_requests_updated_byTousers                    outside_requests[]               @relation("outside_requests_updated_byTousers")
-  // courier_terminal_balance_couriers                     courier_terminal_balance[]       @relation("courier_terminal_balance_couriers")
-  // courier_terminal_balance_created_byTousers            courier_terminal_balance[]       @relation("courier_terminal_balance_created_byTousers")
-  // manager_withdraw_created_byTousers                    manager_withdraw[]               @relation("manager_withdraw_created_byTousers")
-  // manager_withdraw_managers                             manager_withdraw[]               @relation("manager_withdraw_managers")
-  // manager_withdraw_couriers                             manager_withdraw[]               @relation("manager_withdraw_couriers")
-  // timesheet_users                                       timesheet[]
-  // scheduled_reports_subscription_users                  scheduled_reports_subscription[]
-  // order_bonus_pricing_created_byTousers                 order_bonus_pricing[]            @relation("order_bonus_pricing_created_byTousers")
-  // order_bonus_pricing_updated_byTousers                 order_bonus_pricing[]            @relation("order_bonus_pricing_updated_byTousers")
-  // order_bonus_pricing_courier_idTusers                  order_bonus_pricing[]            @relation("order_bonus_pricing_courier_idTusers")
+  organization_created_byTousers                        organization[]                   @relation("organization_created_byTousers")
+  organization_updated_byTousers                        organization[]                   @relation("organization_updated_byTousers")
+  work_schedules_created_byTousers                      work_schedules[]                 @relation("work_schedules_created_byTousers")
+  work_schedules_updated_byTousers                      work_schedules[]                 @relation("work_schedules_updated_byTousers")
+  users_terminals                                       users_terminals[]
+  users_work_schedules                                  users_work_schedules[]
+  work_schedule_entries_created_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_created_byTousers")
+  work_schedule_entries_updated_byTousers               work_schedule_entries[]          @relation("work_schedule_entries_updated_byTousers")
+  work_schedule_entries_users                           work_schedule_entries[]          @relation("work_schedule_entries_users")
+  api_tokens_created_byTousers                          api_tokens[]                     @relation("api_tokens_created_byTousers")
+  api_tokens_updated_byTousers                          api_tokens[]                     @relation("api_tokens_updated_byTousers")
+  timesheet_users                                       timesheet[]
+  scheduled_reports_subscription_users                  scheduled_reports_subscription[]
 }
 
 model users_permissions {
@@ -182,4 +150,205 @@ enum user_status {
   active
   blocked
   inactive
+}
+
+model work_schedules {
+  id                               String       @id(map: "PK_work_schedules_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                             String
+  active                           Boolean      @default(true)
+  organization_id                  String       @db.Uuid
+  organization                     organization @relation("work_schedules_organization_idTorganization", fields: [organization_id], references: [id], onDelete: NoAction, map: "FK_work_schedules_organization_id")
+  days                             String[]
+  start_time                       DateTime     @db.Timetz(5)
+  end_time                         DateTime     @db.Timetz(5)
+  max_start_time                   DateTime     @db.Timetz(5)
+  bonus_price                      Int          @default(0)
+  created_at                       DateTime     @default(now()) @db.Timestamptz(5)
+  updated_at                       DateTime     @default(now()) @db.Timestamptz(5)
+  created_by                       String?      @db.Uuid
+  updated_by                       String?      @db.Uuid
+  work_schedules_created_byTousers users?       @relation("work_schedules_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_work_schedules_created_by")
+  work_schedules_updated_byTousers users?       @relation("work_schedules_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_work_schedules_updated_by")
+
+  users_work_schedules                 users_work_schedules[]
+  work_schedule_entries_work_schedules work_schedule_entries[] @relation("work_schedule_entries_work_schedules")
+}
+
+model terminals {
+  id              String       @id(map: "PK_terminals_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  active          Boolean      @default(true)
+  phone           String?
+  address         String?
+  latitude        Float        @default(0)
+  longitude       Float        @default(0)
+  external_id     String       @unique
+  organization_id String       @db.Uuid
+  manager_name    String?
+  organization    organization @relation("terminals_organization_idTorganization", fields: [organization_id], references: [id], onDelete: NoAction, map: "FK_terminals_organization_id")
+
+  created_at DateTime @default(now()) @db.Timestamptz(5)
+  updated_at DateTime @default(now()) @db.Timestamptz(5)
+
+  users_terminals                       users_terminals[]
+}
+
+model organization {
+  id                       String                     @id(map: "PK_organization_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                     String
+  external_id              String?
+  active                   Boolean                    @default(true)
+  system_type              organization_system_type   @default(iiko)
+  phone                    String
+  iiko_login               String?
+  webhook                  String?
+  group_id                 String?
+  apelsin_login            String?
+  apelsin_password         String?
+  sender_name              String?
+  sender_number            String?
+  description              String?
+  max_distance             Int                        @default(0)
+  max_active_order_count   Int                        @default(0)
+  max_order_close_distance Int                        @default(0)
+  payment_type             organization_payment_types @default(client)
+  support_chat_url         String?
+  icon_url                 String?
+  allow_yandex_delivery    Boolean                    @default(false)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(5)
+  updated_at               DateTime                   @default(now()) @db.Timestamptz(5)
+  created_by               String?                    @db.Uuid
+  updated_by               String?                    @db.Uuid
+
+  work_schedules_organization_idTorganization   work_schedules[]           @relation("work_schedules_organization_idTorganization")
+  organization_created_byTousers                users?                     @relation("organization_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_organization_created_by")
+  organization_updated_byTousers                users?                     @relation("organization_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_organization_updated_by")
+  terminals_organization_idTorganization        terminals[]                @relation("terminals_organization_idTorganization")
+  api_tokens_organization                       api_tokens[]
+}
+
+model users_terminals {
+  user_id     String    @db.Uuid
+  terminal_id String    @db.Uuid
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_users_terminals_user_id")
+  terminals   terminals @relation(fields: [terminal_id], references: [id], onDelete: NoAction, map: "FK_users_terminals_terminal_id")
+
+  @@id([user_id, terminal_id], map: "PK_users_terminals_id")
+}
+
+model users_work_schedules {
+  user_id          String         @db.Uuid
+  work_schedule_id String         @db.Uuid
+  users            users          @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_users_work_schedules_user_id")
+  work_schedules   work_schedules @relation(fields: [work_schedule_id], references: [id], onDelete: NoAction, map: "FK_users_work_schedules_work_schedule_id")
+
+  @@id([user_id, work_schedule_id], map: "PK_users_work_schedules_id")
+}
+
+model work_schedule_entries {
+  id               String                     @id(map: "PK_work_schedule_entries_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String                     @db.Uuid
+  work_schedule_id String                     @db.Uuid
+  date_start       DateTime                   @db.Timestamptz(5)
+  date_finish      DateTime?                  @db.Timestamptz(5)
+  duration         Int                        @default(0)
+  ip_open          String?
+  ip_close         String?
+  lat_open         Float                      @default(0)
+  lat_close        Float?                     @default(0)
+  lon_open         Float                      @default(0)
+  lon_close        Float?                     @default(0)
+  current_status   work_schedule_entry_status @default(open)
+  late             Boolean                    @default(false)
+
+  created_at DateTime @default(now()) @db.Timestamp(5)
+  updated_at DateTime @default(now()) @db.Timestamp(5)
+  created_by String?  @db.Uuid
+  updated_by String?  @db.Uuid
+
+  work_schedule_entries_created_byTousers users? @relation("work_schedule_entries_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_work_schedule_entries_created_by")
+  work_schedule_entries_updated_byTousers users? @relation("work_schedule_entries_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_work_schedule_entries_updated_by")
+
+  work_schedule_entries_users users @relation("work_schedule_entries_users", fields: [user_id], references: [id], onDelete: NoAction, map: "FK_work_schedule_entries_user_id")
+
+  work_schedule_entries_work_schedules work_schedules @relation("work_schedule_entries_work_schedules", fields: [work_schedule_id], references: [id], onDelete: NoAction, map: "FK_work_schedule_entries_work_schedule_id")
+
+  @@index([current_status], map: "fki_work_schedule_entries_current_status")
+  @@index([user_id], map: "fki_work_schedule_entries_user_id")
+}
+
+model api_tokens {
+  id              String   @id(map: "PK_api_tokens_id") @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  active          Boolean  @default(false)
+  token           String   @unique
+  organization_id String   @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamptz(5)
+  updated_at      DateTime @default(now()) @db.Timestamptz(5)
+  created_by      String?  @db.Uuid
+  updated_by      String?  @db.Uuid
+
+  api_tokens_created_byTousers users? @relation("api_tokens_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_api_tokens_created_by")
+  api_tokens_updated_byTousers users? @relation("api_tokens_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_api_tokens_updated_by")
+
+  api_tokens_organization organization @relation(fields: [organization_id], references: [id], onDelete: NoAction, map: "FK_api_tokens_organization_id")
+}
+
+model brands {
+  id         String   @id(map: "PK_brands_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  api_url    String
+  logo_path  String?
+  created_at DateTime @default(now()) @db.Timestamptz(5)
+  updated_at DateTime @default(now()) @db.Timestamptz(5)
+}
+
+model timesheet {
+  id         String   @id(map: "PK_timesheet_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @db.Uuid
+  is_late    Boolean  @default(false)
+  date       DateTime @db.Timestamptz(5)
+  created_at DateTime @default(now()) @db.Timestamptz(5)
+  updated_at DateTime @default(now()) @db.Timestamptz(5)
+
+  timesheet_users users @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_timesheet_user_id")
+}
+
+model scheduled_reports {
+  id         String   @id(map: "PK_scheduled_reports_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  code       String
+  cron       String
+  created_at DateTime @default(now()) @db.Timestamptz(5)
+  updated_at DateTime @default(now()) @db.Timestamptz(5)
+
+  scheduled_reports_scheduled_reports_subscriptions scheduled_reports_subscription[]
+}
+
+model scheduled_reports_subscription {
+  id         String   @id(map: "PK_scheduled_reports_subscription_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  report_id  String   @db.Uuid
+  user_id    String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(5)
+  updated_at DateTime @default(now()) @db.Timestamptz(5)
+
+  scheduled_reports_subscription_reports scheduled_reports @relation(fields: [report_id], references: [id], onDelete: NoAction, map: "FK_scheduled_reports_subscription_report_id")
+  scheduled_reports_subscription_users   users             @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_scheduled_reports_subscription_user_id")
+}
+
+enum organization_system_type {
+  iiko
+  r_keeper
+  jowi
+}
+
+enum work_schedule_entry_status {
+  open
+  closed
+}
+
+
+enum organization_payment_types {
+  cash
+  card
+  client
 }

@@ -9,6 +9,7 @@ import {
   roles_permissionsFindManyArgsSchema,
   roles_permissionsFindUniqueArgsSchema,
 } from "@backend/lib/zod";
+import { createManyPermissionsForOneRole } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneRole";
 
 export class RolesPermissionsService {
   constructor(private readonly prisma: DB) {}
@@ -43,5 +44,17 @@ export class RolesPermissionsService {
     input: Prisma.roles_permissionsUpdateArgs
   ): Promise<roles_permissions | null> {
     return await this.prisma.roles_permissions.update(input);
+  }
+
+  async createManyPermissions(
+    input: z.infer<typeof createManyPermissionsForOneRole>
+  ): Promise<number> {
+    const res = await this.prisma.roles_permissions.createMany({
+      data: input.permissions_ids.map((permission_id) => ({
+        permission_id,
+        role_id: input.role_id,
+      })),
+    });
+    return res.count;
   }
 }
