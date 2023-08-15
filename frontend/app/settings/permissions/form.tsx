@@ -28,10 +28,9 @@ import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
 import { permissionsCreateInputSchema } from "@backend/lib/zod";
 import {
-  usePermissions_AddMutation,
-  usePermissions_RenewMutation,
-  usePermissions_OneQuery,
-} from "@frontend/store/api";
+  usePermissionsCreate,
+  usePermissionsUpdate,
+} from "@frontend/store/permission";
 
 export default function PermissionsForm({
   children,
@@ -51,79 +50,79 @@ export default function PermissionsForm({
     },
   });
 
-  const [addPermission, { data, error, isLoading: isAddLoading }] =
-    usePermissions_AddMutation();
-
-  const [
-    updatePermission,
-    { data: updateData, error: updateError, isLoading: isUpdateLoading },
-  ] = usePermissions_RenewMutation();
-
-  const { data: record, isLoading: isRecordLoading } = usePermissions_OneQuery(
-    {
-      where: { id: recordId },
-    },
-    {
-      skip: !recordId,
-    }
-  );
-
-  const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
-
-  useEffect(() => {
-    if (data) {
+  const onAddSuccess = (actionText: string) => {
       toast({
         title: "Success",
-        description: "Permission added",
-        variant: "success",
+        description: `Permission ${actionText}`,
         duration: 5000,
       });
       form.reset();
-      setOpen(false);
-    }
+    setOpen(false);
+  }
 
-    if (error) {
+  const onError = (error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
         duration: 5000,
       });
-    }
+  }
 
-    if (updateError) {
-      toast({
-        title: "Error",
-        description: updateError.message,
-        variant: "destructive",
-        duration: 5000,
-      });
-    }
+  const {
+    mutateAsync: createPermission,
+    isLoading: isAddLoading,
+    data,
+    error,
+  } = usePermissionsCreate({
+    onSuccess: () => onAddSuccess('added'),
+    onError
+  });
+
+  const {
+    mutateAsync: updatePermission,
+    isLoading: isUpdateLoading,
+    error: updateError,
+  } = usePermissionsUpdate({
+    onSuccess: () => onAddSuccess('updated'),
+    onError
+  });
+
+  const { data: record, isLoading: isRecordLoading } =
+    trpc.permissions.one.useQuery(
+      {
+        where: { id: recordId },
+      },
+      {
+        enabled: !!recordId && open,
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
+  const isLoading = useMemo(() => {
+    return isAddLoading || isUpdateLoading;
+  }, [isAddLoading, isUpdateLoading]);
+
+  useEffect(() => {
 
     if (record) {
       form.setValue("active", record.active);
       form.setValue("slug", record.slug);
       form.setValue("description", record.description);
     }
-  }, [data, error, updateError, record]);
+
+    return () => {
+      form.reset();
+    };
+  }, [record, open]);
 
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
   ) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-
-    setTimeout(() => {
-      setOpen(false);
-    }, 1000);
-
     if (recordId) {
       updatePermission({ data: values, where: { id: recordId } });
     } else {
-      addPermission({ data: values });
+      createPermission({ data: values });
     }
   }
 
@@ -138,7 +137,6 @@ export default function PermissionsForm({
         // form.setValue("description", record.description);
       }
     } else {
-      form.reset();
       setOpen(false);
     }
   };
