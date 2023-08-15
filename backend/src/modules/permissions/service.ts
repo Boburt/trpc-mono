@@ -21,6 +21,7 @@ export class PermissionsService {
   ): Promise<permissions[]> {
     const [permissions] = await this.prisma.permissions.paginate({}).withPages({
       limit: input.take ?? 20,
+      page: input.skip ?? 0,
     });
     return permissions;
   }
