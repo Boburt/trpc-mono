@@ -293,14 +293,7 @@ model api_tokens {
   api_tokens_organization organization @relation(fields: [organization_id], references: [id], onDelete: NoAction, map: "FK_api_tokens_organization_id")
 }
 
-model brands {
-  id         String   @id(map: "PK_brands_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String
-  api_url    String
-  logo_path  String?
-  created_at DateTime @default(now()) @db.Timestamptz(5)
-  updated_at DateTime @default(now()) @db.Timestamptz(5)
-}
+
 
 model timesheet {
   id         String   @id(map: "PK_timesheet_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
