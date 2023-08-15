@@ -38,8 +38,6 @@ export const Work_schedule_entriesScalarFieldEnumSchema = z.enum(['id','user_id'
 
 export const Api_tokensScalarFieldEnumSchema = z.enum(['id','active','token','organization_id','created_at','updated_at','created_by','updated_by']);
 
-export const BrandsScalarFieldEnumSchema = z.enum(['id','name','api_url','logo_path','created_at','updated_at']);
-
 export const TimesheetScalarFieldEnumSchema = z.enum(['id','user_id','is_late','date','created_at','updated_at']);
 
 export const Scheduled_reportsScalarFieldEnumSchema = z.enum(['id','name','code','cron','created_at','updated_at']);
@@ -321,21 +319,6 @@ export const api_tokensSchema = z.object({
 })
 
 export type api_tokens = z.infer<typeof api_tokensSchema>
-
-/////////////////////////////////////////
-// BRANDS SCHEMA
-/////////////////////////////////////////
-
-export const brandsSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  api_url: z.string(),
-  logo_path: z.string().nullish(),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
-})
-
-export type brands = z.infer<typeof brandsSchema>
 
 /////////////////////////////////////////
 // TIMESHEET SCHEMA
@@ -923,18 +906,6 @@ export const api_tokensSelectSchema: z.ZodType<Prisma.api_tokensSelect> = z.obje
   api_tokens_created_byTousers: z.union([z.boolean(),z.lazy(() => usersArgsSchema)]).optional(),
   api_tokens_updated_byTousers: z.union([z.boolean(),z.lazy(() => usersArgsSchema)]).optional(),
   api_tokens_organization: z.union([z.boolean(),z.lazy(() => organizationArgsSchema)]).optional(),
-}).strict()
-
-// BRANDS
-//------------------------------------------------------
-
-export const brandsSelectSchema: z.ZodType<Prisma.brandsSelect> = z.object({
-  id: z.boolean().optional(),
-  name: z.boolean().optional(),
-  api_url: z.boolean().optional(),
-  logo_path: z.boolean().optional(),
-  created_at: z.boolean().optional(),
-  updated_at: z.boolean().optional(),
 }).strict()
 
 // TIMESHEET
@@ -2352,66 +2323,6 @@ export const api_tokensScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ap
   updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   created_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-}).strict();
-
-export const brandsWhereInputSchema: z.ZodType<Prisma.brandsWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => brandsWhereInputSchema),z.lazy(() => brandsWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => brandsWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => brandsWhereInputSchema),z.lazy(() => brandsWhereInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  api_url: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  logo_path: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-}).strict();
-
-export const brandsOrderByWithRelationInputSchema: z.ZodType<Prisma.brandsOrderByWithRelationInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  name: z.lazy(() => SortOrderSchema).optional(),
-  api_url: z.lazy(() => SortOrderSchema).optional(),
-  logo_path: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  created_at: z.lazy(() => SortOrderSchema).optional(),
-  updated_at: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const brandsWhereUniqueInputSchema: z.ZodType<Prisma.brandsWhereUniqueInput> = z.object({
-  id: z.string()
-})
-.and(z.object({
-  id: z.string().optional(),
-  AND: z.union([ z.lazy(() => brandsWhereInputSchema),z.lazy(() => brandsWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => brandsWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => brandsWhereInputSchema),z.lazy(() => brandsWhereInputSchema).array() ]).optional(),
-  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  api_url: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  logo_path: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-}).strict());
-
-export const brandsOrderByWithAggregationInputSchema: z.ZodType<Prisma.brandsOrderByWithAggregationInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  name: z.lazy(() => SortOrderSchema).optional(),
-  api_url: z.lazy(() => SortOrderSchema).optional(),
-  logo_path: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  created_at: z.lazy(() => SortOrderSchema).optional(),
-  updated_at: z.lazy(() => SortOrderSchema).optional(),
-  _count: z.lazy(() => brandsCountOrderByAggregateInputSchema).optional(),
-  _max: z.lazy(() => brandsMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => brandsMinOrderByAggregateInputSchema).optional()
-}).strict();
-
-export const brandsScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.brandsScalarWhereWithAggregatesInput> = z.object({
-  AND: z.union([ z.lazy(() => brandsScalarWhereWithAggregatesInputSchema),z.lazy(() => brandsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  OR: z.lazy(() => brandsScalarWhereWithAggregatesInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => brandsScalarWhereWithAggregatesInputSchema),z.lazy(() => brandsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
-  name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  api_url: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  logo_path: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
-  created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
-  updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
 export const timesheetWhereInputSchema: z.ZodType<Prisma.timesheetWhereInput> = z.object({
@@ -3912,69 +3823,6 @@ export const api_tokensUncheckedUpdateManyInputSchema: z.ZodType<Prisma.api_toke
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const brandsCreateInputSchema: z.ZodType<Prisma.brandsCreateInput> = z.object({
-  id: z.string().optional(),
-  name: z.string(),
-  api_url: z.string(),
-  logo_path: z.string().optional().nullable(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional()
-}).strict();
-
-export const brandsUncheckedCreateInputSchema: z.ZodType<Prisma.brandsUncheckedCreateInput> = z.object({
-  id: z.string().optional(),
-  name: z.string(),
-  api_url: z.string(),
-  logo_path: z.string().optional().nullable(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional()
-}).strict();
-
-export const brandsUpdateInputSchema: z.ZodType<Prisma.brandsUpdateInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  api_url: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  logo_path: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
-export const brandsUncheckedUpdateInputSchema: z.ZodType<Prisma.brandsUncheckedUpdateInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  api_url: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  logo_path: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
-export const brandsCreateManyInputSchema: z.ZodType<Prisma.brandsCreateManyInput> = z.object({
-  id: z.string().optional(),
-  name: z.string(),
-  api_url: z.string(),
-  logo_path: z.string().optional().nullable(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional()
-}).strict();
-
-export const brandsUpdateManyMutationInputSchema: z.ZodType<Prisma.brandsUpdateManyMutationInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  api_url: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  logo_path: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
-export const brandsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.brandsUncheckedUpdateManyInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  api_url: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  logo_path: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
 export const timesheetCreateInputSchema: z.ZodType<Prisma.timesheetCreateInput> = z.object({
   id: z.string().optional(),
   is_late: z.boolean().optional(),
@@ -5300,33 +5148,6 @@ export const api_tokensMinOrderByAggregateInputSchema: z.ZodType<Prisma.api_toke
   updated_at: z.lazy(() => SortOrderSchema).optional(),
   created_by: z.lazy(() => SortOrderSchema).optional(),
   updated_by: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const brandsCountOrderByAggregateInputSchema: z.ZodType<Prisma.brandsCountOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  name: z.lazy(() => SortOrderSchema).optional(),
-  api_url: z.lazy(() => SortOrderSchema).optional(),
-  logo_path: z.lazy(() => SortOrderSchema).optional(),
-  created_at: z.lazy(() => SortOrderSchema).optional(),
-  updated_at: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const brandsMaxOrderByAggregateInputSchema: z.ZodType<Prisma.brandsMaxOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  name: z.lazy(() => SortOrderSchema).optional(),
-  api_url: z.lazy(() => SortOrderSchema).optional(),
-  logo_path: z.lazy(() => SortOrderSchema).optional(),
-  created_at: z.lazy(() => SortOrderSchema).optional(),
-  updated_at: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const brandsMinOrderByAggregateInputSchema: z.ZodType<Prisma.brandsMinOrderByAggregateInput> = z.object({
-  id: z.lazy(() => SortOrderSchema).optional(),
-  name: z.lazy(() => SortOrderSchema).optional(),
-  api_url: z.lazy(() => SortOrderSchema).optional(),
-  logo_path: z.lazy(() => SortOrderSchema).optional(),
-  created_at: z.lazy(() => SortOrderSchema).optional(),
-  updated_at: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const timesheetCountOrderByAggregateInputSchema: z.ZodType<Prisma.timesheetCountOrderByAggregateInput> = z.object({
@@ -18667,63 +18488,6 @@ export const api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.api_to
   where: api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const brandsFindFirstArgsSchema: z.ZodType<Omit<Prisma.brandsFindFirstArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereInputSchema.optional(),
-  orderBy: z.union([ brandsOrderByWithRelationInputSchema.array(),brandsOrderByWithRelationInputSchema ]).optional(),
-  cursor: brandsWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ BrandsScalarFieldEnumSchema,BrandsScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const brandsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.brandsFindFirstOrThrowArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereInputSchema.optional(),
-  orderBy: z.union([ brandsOrderByWithRelationInputSchema.array(),brandsOrderByWithRelationInputSchema ]).optional(),
-  cursor: brandsWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ BrandsScalarFieldEnumSchema,BrandsScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const brandsFindManyArgsSchema: z.ZodType<Omit<Prisma.brandsFindManyArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereInputSchema.optional(),
-  orderBy: z.union([ brandsOrderByWithRelationInputSchema.array(),brandsOrderByWithRelationInputSchema ]).optional(),
-  cursor: brandsWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-  distinct: z.union([ BrandsScalarFieldEnumSchema,BrandsScalarFieldEnumSchema.array() ]).optional(),
-}).strict()
-
-export const brandsAggregateArgsSchema: z.ZodType<Prisma.brandsAggregateArgs> = z.object({
-  where: brandsWhereInputSchema.optional(),
-  orderBy: z.union([ brandsOrderByWithRelationInputSchema.array(),brandsOrderByWithRelationInputSchema ]).optional(),
-  cursor: brandsWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict()
-
-export const brandsGroupByArgsSchema: z.ZodType<Prisma.brandsGroupByArgs> = z.object({
-  where: brandsWhereInputSchema.optional(),
-  orderBy: z.union([ brandsOrderByWithAggregationInputSchema.array(),brandsOrderByWithAggregationInputSchema ]).optional(),
-  by: BrandsScalarFieldEnumSchema.array(),
-  having: brandsScalarWhereWithAggregatesInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict()
-
-export const brandsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.brandsFindUniqueArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereUniqueInputSchema,
-}).strict()
-
-export const brandsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.brandsFindUniqueOrThrowArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereUniqueInputSchema,
-}).strict()
-
 export const timesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.timesheetFindFirstArgs, "include">> = z.object({
   select: timesheetSelectSchema.optional(),
   where: timesheetWhereInputSchema.optional(),
@@ -19374,43 +19138,6 @@ export const api_tokensUpdateManyArgsSchema: z.ZodType<Prisma.api_tokensUpdateMa
 
 export const api_tokensDeleteManyArgsSchema: z.ZodType<Prisma.api_tokensDeleteManyArgs> = z.object({
   where: api_tokensWhereInputSchema.optional(),
-}).strict()
-
-export const brandsCreateArgsSchema: z.ZodType<Omit<Prisma.brandsCreateArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  data: z.union([ brandsCreateInputSchema,brandsUncheckedCreateInputSchema ]),
-}).strict()
-
-export const brandsUpsertArgsSchema: z.ZodType<Omit<Prisma.brandsUpsertArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereUniqueInputSchema,
-  create: z.union([ brandsCreateInputSchema,brandsUncheckedCreateInputSchema ]),
-  update: z.union([ brandsUpdateInputSchema,brandsUncheckedUpdateInputSchema ]),
-}).strict()
-
-export const brandsCreateManyArgsSchema: z.ZodType<Prisma.brandsCreateManyArgs> = z.object({
-  data: z.union([ brandsCreateManyInputSchema,brandsCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict()
-
-export const brandsDeleteArgsSchema: z.ZodType<Omit<Prisma.brandsDeleteArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  where: brandsWhereUniqueInputSchema,
-}).strict()
-
-export const brandsUpdateArgsSchema: z.ZodType<Omit<Prisma.brandsUpdateArgs, >> = z.object({
-  select: brandsSelectSchema.optional(),
-  data: z.union([ brandsUpdateInputSchema,brandsUncheckedUpdateInputSchema ]),
-  where: brandsWhereUniqueInputSchema,
-}).strict()
-
-export const brandsUpdateManyArgsSchema: z.ZodType<Prisma.brandsUpdateManyArgs> = z.object({
-  data: z.union([ brandsUpdateManyMutationInputSchema,brandsUncheckedUpdateManyInputSchema ]),
-  where: brandsWhereInputSchema.optional(),
-}).strict()
-
-export const brandsDeleteManyArgsSchema: z.ZodType<Prisma.brandsDeleteManyArgs> = z.object({
-  where: brandsWhereInputSchema.optional(),
 }).strict()
 
 export const timesheetCreateArgsSchema: z.ZodType<Omit<Prisma.timesheetCreateArgs, "include">> = z.object({
