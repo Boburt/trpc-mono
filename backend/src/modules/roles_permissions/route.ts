@@ -5,6 +5,8 @@ import {
   roles_permissionsFindUniqueArgsSchema,
   roles_permissionsUpdateArgsSchema,
 } from "@backend/lib/zod";
+import { createManyPermissionsForOneRole } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneRole";
+import { z } from "zod";
 
 export const rolesPermissionsRouter = publicRouter({
   add: publicProcedure
@@ -29,5 +31,12 @@ export const rolesPermissionsRouter = publicRouter({
     .input(roles_permissionsUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.rolesPermissionsService.update(input);
+    }),
+
+  // create roles_permissions router with one role and many permissions
+  addManyPermissionsForRole: publicProcedure
+    .input(createManyPermissionsForOneRole)
+    .mutation(({ input, ctx }) => {
+      return ctx.rolesPermissionsService.createManyPermissions(input);
     }),
 });
