@@ -10,6 +10,10 @@ import { RolesPermissionsService } from "./modules/roles_permissions/service";
 import { UsersService } from "./modules/users/service";
 import { UsersPermissionsService } from "./modules/users_permissions/service";
 import { UsersRolesService } from "./modules/users_roles/service";
+import { WorkSchedulesService } from "./modules/work_schedules/service";
+import { TerminalsService } from "./modules/terminals/service";
+import { OrganizationService } from "./modules/organization/service";
+import { UsersTerminalsService } from "./modules/users_terminals/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
@@ -23,6 +27,10 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
   let usersService = new UsersService(db);
   let usersPermissionsService = new UsersPermissionsService(db);
   let usersRolesService = new UsersRolesService(db);
+  let workSchedulesService = new WorkSchedulesService(db);
+  let terminalsService = new TerminalsService(db);
+  let organizationService = new OrganizationService(db);
+  let usersTerminalsService = new UsersTerminalsService(db);
   return {
     name: "elysia",
     prisma: db,
@@ -32,6 +40,10 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     usersService,
     usersPermissionsService,
     usersRolesService,
+    workSchedulesService,
+    terminalsService,
+    organizationService,
+    usersTerminalsService,
   };
 };
 
