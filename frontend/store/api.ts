@@ -4,9 +4,9 @@ import { createApi } from "trpc-rtk-query";
 export const api = createApi({
   client: trpc, // <- your typed client from step 1
   // pass in any api options you want, such as tagTypes or reducerPath
-  //   tagTypes: ["Permissions"],
-  reducerPath: "trpcApi",
+  tagTypes: ["Permissions"],
 
+  // reducerPath: "trpcApi",
   //   // pass in any endpoint specific options, such as providesTags or onQueryStarted for optimistic updates
   // endpointOptions: {
   //   permissions_List: {
@@ -21,4 +21,5 @@ export const {
   usePermissions_AddMutation,
   usePermissions_OneQuery,
   usePermissions_RenewMutation,
+  util,
 } = api;

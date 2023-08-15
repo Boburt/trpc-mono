@@ -6,12 +6,12 @@ import { Button } from "@frontend/components/ui/button";
 import { Plus } from "lucide-react";
 import PermissionsForm from "./form";
 import { usePermissions_ListQuery } from "@frontend/store/api";
+import { usePermissionsQuery } from "@frontend/store/permission";
 
 export default function PermissionListPage() {
-  const { data, isLoading } = usePermissions_ListQuery({
+  const { data, isLoading } = usePermissionsQuery({
     take: 10,
   });
-  console.log(data);
   return (
     <div>
       <div className="flex justify-between">
