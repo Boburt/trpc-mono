@@ -9,7 +9,7 @@ import { RouterInputs, RouterOutputs } from "@frontend/utils/trpc";
 import { Switch } from "@components/ui/switch";
 
 export const permissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"][0]
+  RouterOutputs["permissions"]["list"]["data"]["items"][0]
 >[] = [
   {
     accessorKey: "active",

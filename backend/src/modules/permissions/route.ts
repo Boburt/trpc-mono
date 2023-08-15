@@ -6,8 +6,6 @@ import {
 } from "@backend/lib/zod";
 import { publicProcedure, publicRouter } from "@backend/trpc";
 
-import { Prisma } from "@prisma/client";
-
 export const permissionsRouter = publicRouter({
   add: publicProcedure
     .input(permissionsCreateArgsSchema)
@@ -18,7 +16,8 @@ export const permissionsRouter = publicRouter({
   list: publicProcedure
     .input(permissionsFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
-      return await ctx.permissionsService.findMany(input);
+      let res = await ctx.permissionsService.findMany(input);
+      return res;
       return [];
     }),
 
@@ -32,5 +31,17 @@ export const permissionsRouter = publicRouter({
     .input(permissionsUpdateArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.permissionsService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(permissionsFindUniqueArgsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.permissionsService.delete(input);
+    }),
+
+  cachedPermissions: publicProcedure
+    .input(permissionsFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.permissionsService.cachedPermissions(input);
     }),
 });
