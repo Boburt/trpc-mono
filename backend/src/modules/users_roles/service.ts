@@ -15,7 +15,9 @@ export class UsersRolesService {
   }
 
   async findMany(input: z.infer<typeof users_rolesFindManyArgsSchema>) {
-    return await this.prisma.users_roles.findMany(input);
+    return await this.prisma.users_roles.paginate({}).withPages({
+      limit: input.take ?? 20,
+    });
   }
 
   async findOne(input: z.infer<typeof users_rolesFindUniqueArgsSchema>) {
