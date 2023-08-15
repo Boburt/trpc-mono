@@ -1,6 +1,7 @@
 // trpc.ts
 import { initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { createClient } from "redis";
 
 import { PrismaClient } from "@prisma/client";
 import pagination from "prisma-extension-pagination";
@@ -10,19 +11,26 @@ import { RolesPermissionsService } from "./modules/roles_permissions/service";
 import { UsersService } from "./modules/users/service";
 import { UsersPermissionsService } from "./modules/users_permissions/service";
 import { UsersRolesService } from "./modules/users_roles/service";
+import { CacheControlService } from "./modules/cache_control/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
 // export return type of db
 export type DB = typeof db;
 
+const client = createClient();
+export type RedisClientType = typeof client;
+
+await client.connect();
+const cacheControlService = new CacheControlService(db, client);
+const permissionsService = new PermissionsService(db, cacheControlService);
+const rolesService = new RolesService(db);
+const rolesPermissionsService = new RolesPermissionsService(db);
+const usersService = new UsersService(db);
+const usersPermissionsService = new UsersPermissionsService(db);
+const usersRolesService = new UsersRolesService(db);
+
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
-  let permissionsService = new PermissionsService(db);
-  let rolesService = new RolesService(db);
-  let rolesPermissionsService = new RolesPermissionsService(db);
-  let usersService = new UsersService(db);
-  let usersPermissionsService = new UsersPermissionsService(db);
-  let usersRolesService = new UsersRolesService(db);
   return {
     name: "elysia",
     prisma: db,
@@ -32,6 +40,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     usersService,
     usersPermissionsService,
     usersRolesService,
+    cacheControlService,
   };
 };
 
