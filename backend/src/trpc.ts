@@ -1,6 +1,7 @@
 // trpc.ts
 import { initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { createClient } from "redis";
 
 import { PrismaClient } from "@prisma/client";
 import pagination from "prisma-extension-pagination";
@@ -14,23 +15,30 @@ import { WorkSchedulesService } from "./modules/work_schedules/service";
 import { TerminalsService } from "./modules/terminals/service";
 import { OrganizationService } from "./modules/organization/service";
 import { UsersTerminalsService } from "./modules/users_terminals/service";
+import { CacheControlService } from "./modules/cache_control/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
 // export return type of db
 export type DB = typeof db;
 
+const client = createClient();
+export type RedisClientType = typeof client;
+
+await client.connect();
+const cacheControlService = new CacheControlService(db, client);
+const permissionsService = new PermissionsService(db, cacheControlService);
+const rolesService = new RolesService(db);
+const rolesPermissionsService = new RolesPermissionsService(db);
+const usersService = new UsersService(db);
+const usersPermissionsService = new UsersPermissionsService(db);
+const usersRolesService = new UsersRolesService(db);
+const workSchedulesService = new WorkSchedulesService(db);
+const terminalsService = new TerminalsService(db);
+const organizationService = new OrganizationService(db);
+const usersTerminalsService = new UsersTerminalsService(db);
+
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
-  let permissionsService = new PermissionsService(db);
-  let rolesService = new RolesService(db);
-  let rolesPermissionsService = new RolesPermissionsService(db);
-  let usersService = new UsersService(db);
-  let usersPermissionsService = new UsersPermissionsService(db);
-  let usersRolesService = new UsersRolesService(db);
-  let workSchedulesService = new WorkSchedulesService(db);
-  let terminalsService = new TerminalsService(db);
-  let organizationService = new OrganizationService(db);
-  let usersTerminalsService = new UsersTerminalsService(db);
   return {
     name: "elysia",
     prisma: db,
@@ -44,6 +52,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     terminalsService,
     organizationService,
     usersTerminalsService,
+    cacheControlService,
   };
 };
 

@@ -33,9 +33,16 @@ const app = new Elysia()
       },
     })
   )
+  .onStop(() => {
+    console.log("🦊 Elysia is stopping...");
+  })
   .listen(3000);
 
 export type App = typeof app;
+
+app.onStop(() => {
+  console.log("🦊 Elysia is stopping...");
+});
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

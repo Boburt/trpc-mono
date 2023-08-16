@@ -5,13 +5,8 @@ import { permissionsColumns } from "./columns";
 import { Button } from "@frontend/components/ui/button";
 import { Plus } from "lucide-react";
 import PermissionsForm from "./form";
-import { usePermissions_ListQuery } from "@frontend/store/api";
-import { usePermissionsQuery } from "@frontend/store/permission";
 
 export default function PermissionListPage() {
-  const { data, isLoading } = usePermissionsQuery({
-    take: 10,
-  });
   return (
     <div>
       <div className="flex justify-between">
@@ -25,11 +20,7 @@ export default function PermissionListPage() {
         </div>
       </div>
       <div className="py-10">
-        <DataTable
-          columns={permissionsColumns}
-          data={data ?? []}
-          isLoading={isLoading}
-        />
+        <DataTable columns={permissionsColumns} />
       </div>
     </div>
   );
