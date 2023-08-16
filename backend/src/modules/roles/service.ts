@@ -1,18 +1,22 @@
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 import { Prisma, roles } from "@prisma/client";
-import { rolesCreateInput, rolesFindManyZod } from "./dto/roles.dto";
 import {
-  rolesAggregateArgsSchema,
   rolesFindManyArgsSchema,
   rolesFindUniqueArgsSchema,
 } from "@backend/lib/zod";
+import { CacheControlService } from "../cache_control/service";
 
 export class RolesService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly cacheControl: CacheControlService
+  ) {}
 
   async create(input: Prisma.rolesCreateArgs): Promise<roles> {
-    return await this.prisma.roles.create(input);
+    const roles = await this.prisma.roles.create(input);
+    await this.cacheControl.cacheRoles();
+    return roles;
   }
 
   async findMany(
@@ -36,7 +40,7 @@ export class RolesService {
     return await this.prisma.roles.update(input);
   }
 
-  async remove(id: string, input: rolesCreateInput) {
-    return `This action removes a #${id} role`;
+  async delete(input: Prisma.rolesDeleteArgs) {
+    return await this.prisma.roles.delete(input);
   }
 }

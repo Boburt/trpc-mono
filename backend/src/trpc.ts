@@ -28,14 +28,14 @@ export type RedisClientType = typeof client;
 await client.connect();
 const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
-const rolesService = new RolesService(db);
+const rolesService = new RolesService(db, cacheControlService);
 const rolesPermissionsService = new RolesPermissionsService(db);
 const usersService = new UsersService(db);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const workSchedulesService = new WorkSchedulesService(db);
 const terminalsService = new TerminalsService(db);
-const organizationService = new OrganizationService(db);
+const organizationService = new OrganizationService(db, cacheControlService);
 const usersTerminalsService = new UsersTerminalsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
