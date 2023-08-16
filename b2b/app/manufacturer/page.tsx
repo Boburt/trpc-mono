@@ -15,7 +15,7 @@ export default function Manufacturer() {
               width={500}
               height={500}
             />
-            <h4>{manufacturer.name}</h4>
+            <h4>{manufacturer.name}sdfsdf</h4>
             <p>{manufacturer.derc}</p>
           </div>
         ))}
