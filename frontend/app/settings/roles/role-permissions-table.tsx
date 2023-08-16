@@ -2,10 +2,8 @@
 
 import {
   ColumnDef,
-  PaginationState,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -20,9 +18,7 @@ import {
 
 import { Button } from "@components/ui/button";
 
-import { DataTablePagination } from "@components/ui/data-table-pagination";
-import { usePermissionsQuery } from "@frontend/store/api/permission";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -36,45 +32,45 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
+import { useRolesStore } from "@frontend/store/states/roles";
+import { trpc } from "@frontend/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
 }
 
-export function DataTable<TData, TValue>({
+export function RolesPermissionsDataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
-  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const rowSelection = useRolesStore((state) => state.selectedRows);
 
-  const { data, isLoading } = usePermissionsQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
-  });
+  const selectedRoleId = useMemo(() => {
+    return Object.keys(rowSelection)[0];
+  }, [rowSelection]);
 
-  const defaultData = useMemo(() => [], []);
-
-  const pagination = useMemo(
-    () => ({
-      pageIndex,
-      pageSize,
-    }),
-    [pageIndex, pageSize]
+  const { data, isLoading } = trpc.rolesPermissions.list.useQuery(
+    {
+      where: {
+        role_id: {
+          equals: selectedRoleId,
+        },
+      },
+    },
+    {
+      enabled: Object.keys(rowSelection).length > 0,
+    }
   );
 
+  const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
-    state: {
-      pagination,
-    },
-    onPaginationChange: setPagination,
+    // onRowSelectionChange: function (stateUpdater) {
+    //   console.log(arguments);
+    //   // setRowSelection(stateUpdater)
+    // },
+
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
@@ -100,7 +96,7 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {isLoading && selectedRoleId ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}

@@ -6,8 +6,8 @@ import {
   rolesFindUniqueArgsSchema,
   roles,
 } from "@backend/lib/zod";
-import { CacheControlService } from "../cache_control/service";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { CacheControlService } from "../cache_control/service";
 
 export class RolesService {
   constructor(
