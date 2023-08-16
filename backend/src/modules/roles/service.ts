@@ -8,12 +8,18 @@ import {
   roles,
 } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { CacheControlService } from "../cache_control/service";
 
 export class RolesService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly cacheControl: CacheControlService
+  ) {}
 
   async create(input: Prisma.rolesCreateArgs): Promise<roles> {
-    return await this.prisma.roles.create(input);
+    const roles = await this.prisma.roles.create(input);
+    await this.cacheControl.cacheRoles();
+    return roles;
   }
 
   async findMany(
