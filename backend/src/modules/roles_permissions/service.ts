@@ -2,12 +2,9 @@ import { DB } from "@backend/trpc";
 import { z } from "zod";
 import { Prisma, roles_permissions } from "@prisma/client";
 import {
-  rolesPermissionsCreateInput,
-  rolesPermissionsFindManyZod,
-} from "./dto/roles_permissions.dto";
-import {
   roles_permissionsFindManyArgsSchema,
   roles_permissionsFindUniqueArgsSchema,
+  roles_permissionsWithRelations,
 } from "@backend/lib/zod";
 import { createManyPermissionsForOneRole } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneRole";
 
@@ -22,7 +19,7 @@ export class RolesPermissionsService {
 
   async findMany(
     input: z.infer<typeof roles_permissionsFindManyArgsSchema>
-  ): Promise<roles_permissions[]> {
+  ): Promise<roles_permissionsWithRelations[]> {
     const [roles_permissions] = await this.prisma.roles_permissions
       .paginate({
         ...input,
