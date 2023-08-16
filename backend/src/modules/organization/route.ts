@@ -3,6 +3,7 @@ import {
   organizationUpdateArgsSchema,
   organizationFindUniqueArgsSchema,
   organizationFindManyArgsSchema,
+  organizationDeleteArgsSchema,
 } from "@backend/lib/zod";
 import { publicProcedure, publicRouter } from "@backend/trpc";
 
@@ -29,5 +30,11 @@ export const organizationRouter = publicRouter({
     .input(organizationUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.organizationService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(organizationDeleteArgsSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.organizationService.delete(input);
     }),
 });
