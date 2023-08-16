@@ -20,7 +20,8 @@ generator zod {
   createModelTypes = true
   // createOptionalDefaultValuesTypes = true
   writeNullishInModelTypes = true
-  addIncludeType = false
+  addIncludeType = true
+  createRelationValuesTypes = true
 }
 
 model permissions {

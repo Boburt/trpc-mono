@@ -43,4 +43,10 @@ export class RolesService {
   async delete(input: Prisma.rolesDeleteArgs) {
     return await this.prisma.roles.delete(input);
   }
+
+  async getCachedRoles(
+    input: z.infer<typeof rolesFindManyArgsSchema>
+  ): Promise<roles[]> {
+    return await this.cacheControl.getCachedRoles(input);
+  }
 }
