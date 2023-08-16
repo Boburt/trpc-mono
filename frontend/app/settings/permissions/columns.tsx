@@ -1,12 +1,11 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit2Icon } from "lucide-react";
-import { z } from "zod";
 import { Button } from "@components/ui/button";
 import PermissionsForm from "./form";
-import { permissions, permissionsSchema } from "@backend/lib/zod";
-import { RouterInputs, RouterOutputs } from "@frontend/utils/trpc";
+import { RouterOutputs } from "@frontend/utils/trpc";
 import { Switch } from "@components/ui/switch";
+import DeleteAction from "./delete-action";
 
 export const permissionsColumns: ColumnDef<
   RouterOutputs["permissions"]["list"]["data"]["items"][0]
@@ -40,10 +39,11 @@ export const permissionsColumns: ColumnDef<
       return (
         <div className="flex items-center space-x-2">
           <PermissionsForm recordId={record.id}>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="sm">
               <Edit2Icon className="h-4 w-4" />
             </Button>
           </PermissionsForm>
+          <DeleteAction recordId={record.id} />
         </div>
       );
     },
