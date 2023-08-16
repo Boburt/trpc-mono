@@ -1,8 +1,8 @@
 import { DeleteButton } from "@frontend/components/ui/delete-button";
-import { usePermissionsDestroy } from "@frontend/store/api/permission";
+import { useRolesDestroy } from "@frontend/store/api/roles";
 
 export default function DeleteAction({ recordId }: { recordId: string }) {
-  const { mutateAsync: deletePermission } = usePermissionsDestroy({});
+  const { mutateAsync: deletePermission } = useRolesDestroy({});
 
   return <DeleteButton recordId={recordId} deleteRecord={deletePermission} />;
 }

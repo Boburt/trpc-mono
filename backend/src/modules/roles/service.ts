@@ -1,12 +1,13 @@
 import { DB } from "@backend/trpc";
 import { z } from "zod";
-import { Prisma, roles } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { rolesCreateInput, rolesFindManyZod } from "./dto/roles.dto";
 import {
-  rolesAggregateArgsSchema,
   rolesFindManyArgsSchema,
   rolesFindUniqueArgsSchema,
+  roles,
 } from "@backend/lib/zod";
+import { PaginationType } from "@backend/lib/pagination_interface";
 
 export class RolesService {
   constructor(private readonly prisma: DB) {}
@@ -17,11 +18,24 @@ export class RolesService {
 
   async findMany(
     input: z.infer<typeof rolesFindManyArgsSchema>
-  ): Promise<roles[]> {
-    const [roles] = await this.prisma.roles.paginate({}).withPages({
-      limit: input.take ?? 20,
+  ): Promise<PaginationType<roles>> {
+    let take = input.take ?? 20;
+    let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    if (input.skip && input.skip > 0) {
+      skip++;
+    }
+    delete input.take;
+    delete input.skip;
+    const [roles, meta] = await this.prisma.roles.paginate(input).withPages({
+      limit: take,
+      page: skip,
+      includePageCount: true,
     });
-    return roles;
+
+    return {
+      items: roles,
+      meta,
+    };
   }
 
   async findOne(
