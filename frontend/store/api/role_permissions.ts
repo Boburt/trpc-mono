@@ -1,8 +1,5 @@
-import { ReactQueryOptions, trpc } from "@frontend/utils/trpc";
-
-export function useRolePermissionsQuery(filter: any) {
-  return trpc.rolesPermissions.list.useQuery(filter);
-}
+import { ReactQueryOptions, RouterInputs, trpc } from "@frontend/utils/trpc";
+import { UseTRPCQueryOptions } from "@trpc/react-query/dist/shared";
 
 export function useRolePermissionsCreate(
   options: ReactQueryOptions["rolesPermissions"]["add"]
@@ -23,6 +20,20 @@ export function useRolePermissionsUpdate(
 ) {
   const utils = trpc.useContext();
   return trpc.rolesPermissions.renew.useMutation({
+    ...options,
+    onSuccess: (post) => {
+      utils.rolesPermissions.list.invalidate();
+
+      options?.onSuccess?.(post);
+    },
+  });
+}
+
+export function useCreateManyRolePermissions(
+  options: ReactQueryOptions["rolesPermissions"]["addManyPermissionsForRole"]
+) {
+  const utils = trpc.useContext();
+  return trpc.rolesPermissions.addManyPermissionsForRole.useMutation({
     ...options,
     onSuccess: (post) => {
       utils.rolesPermissions.list.invalidate();

@@ -1,9 +1,10 @@
 import { DB } from "@backend/trpc";
 import { z } from "zod";
-import { Prisma, roles_permissions } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   roles_permissionsFindManyArgsSchema,
   roles_permissionsFindUniqueArgsSchema,
+  roles_permissions,
   roles_permissionsWithRelations,
 } from "@backend/lib/zod";
 import { createManyPermissionsForOneRole } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneRole";
@@ -20,17 +21,13 @@ export class RolesPermissionsService {
   async findMany(
     input: z.infer<typeof roles_permissionsFindManyArgsSchema>
   ): Promise<roles_permissionsWithRelations[]> {
-    const [roles_permissions] = await this.prisma.roles_permissions
-      .paginate({
-        ...input,
-        include: {
-          permissions: true,
-        },
-      })
-      .withPages({
-        limit: input.take ?? 20,
-      });
-    return roles_permissions;
+    const roles_permissions = await this.prisma.roles_permissions.findMany({
+      ...input,
+      include: {
+        permissions: true,
+      },
+    });
+    return roles_permissions as roles_permissionsWithRelations[];
   }
 
   async findOne(
@@ -51,6 +48,12 @@ export class RolesPermissionsService {
   async createManyPermissions(
     input: z.infer<typeof createManyPermissionsForOneRole>
   ): Promise<number> {
+    await this.prisma.roles_permissions.deleteMany({
+      where: {
+        role_id: input.role_id,
+      },
+    });
+
     const res = await this.prisma.roles_permissions.createMany({
       data: input.permissions_ids.map((permission_id) => ({
         permission_id,
