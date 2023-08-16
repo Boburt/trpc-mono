@@ -1,5 +1,4 @@
 import type { Prisma } from "@prisma/client";
-import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
