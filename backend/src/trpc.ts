@@ -34,7 +34,7 @@ const usersService = new UsersService(db);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const workSchedulesService = new WorkSchedulesService(db);
-const terminalsService = new TerminalsService(db);
+const terminalsService = new TerminalsService(db, cacheControlService);
 const organizationService = new OrganizationService(db, cacheControlService);
 const usersTerminalsService = new UsersTerminalsService(db);
 

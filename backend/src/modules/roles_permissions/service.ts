@@ -30,7 +30,7 @@ export class RolesPermissionsService {
       .withPages({
         limit: input.take ?? 20,
       });
-    return roles_permissions;
+    return roles_permissions as roles_permissionsWithRelations[];
   }
 
   async findOne(

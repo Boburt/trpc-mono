@@ -1,3 +1,4 @@
+import { terminals } from "@backend/lib/zod";
 import { DB, RedisClientType } from "@backend/trpc";
 import { organization, permissions, roles } from "@prisma/client";
 
@@ -68,9 +69,30 @@ export class CacheControlService {
     );
   }
 
-  async getCachedRoles({ take }: { take?: number }): Promise<roles[]> {
+  async getСachedRoles({ take }: { take?: number }): Promise<roles[]> {
     const roles = await this.redis.get(`${process.env.PROJECT_PREFIX}roles`);
     let res = JSON.parse(roles ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheTerminals() {
+    const terminals = await this.prisma.terminals.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}terminals`,
+      JSON.stringify(terminals)
+    );
+  }
+
+  async getCachedTerminals({ take }: { take?: number }): Promise<terminals[]> {
+    const terminals = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}terminals`
+    );
+    let res = JSON.parse(terminals ?? "[]");
 
     if (take && res.length > take) {
       res = res.slice(0, take);
