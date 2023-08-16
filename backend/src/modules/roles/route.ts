@@ -30,4 +30,10 @@ export const rolesRouter = publicRouter({
     .mutation(async ({ input, ctx }) => {
       return await ctx.rolesService.update(input);
     }),
+
+  delete: publicProcedure
+    .input(rolesFindUniqueArgsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.rolesService.delete(input);
+    }),
 });

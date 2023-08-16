@@ -36,7 +36,7 @@ export class RolesService {
     return await this.prisma.roles.update(input);
   }
 
-  async remove(id: string, input: rolesCreateInput) {
-    return `This action removes a #${id} role`;
+  async delete(input: Prisma.rolesDeleteArgs): Promise<roles | null> {
+    return await this.prisma.roles.delete(input);
   }
 }
