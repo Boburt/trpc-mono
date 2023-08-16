@@ -1,11 +1,13 @@
 import { DB } from "@backend/trpc";
 import { z } from "zod";
-import { Prisma, roles } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   rolesFindManyArgsSchema,
   rolesFindUniqueArgsSchema,
+  roles,
 } from "@backend/lib/zod";
 import { CacheControlService } from "../cache_control/service";
+import { PaginationType } from "@backend/lib/pagination_interface";
 
 export class RolesService {
   constructor(
@@ -21,11 +23,23 @@ export class RolesService {
 
   async findMany(
     input: z.infer<typeof rolesFindManyArgsSchema>
-  ): Promise<roles[]> {
-    const [roles] = await this.prisma.roles.paginate({}).withPages({
-      limit: input.take ?? 20,
+  ): Promise<PaginationType<roles>> {
+    let take = input.take ?? 20;
+    let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    if (input.skip && input.skip > 0) {
+      skip++;
+    }
+    delete input.take;
+    delete input.skip;
+    const [roles, meta] = await this.prisma.roles.paginate(input).withPages({
+      limit: take,
+      page: skip,
+      includePageCount: true,
     });
-    return roles;
+    return {
+      items: roles,
+      meta,
+    };
   }
 
   async findOne(
@@ -37,16 +51,20 @@ export class RolesService {
   }
 
   async update(input: Prisma.rolesUpdateArgs): Promise<roles | null> {
-    return await this.prisma.roles.update(input);
+    const res = await this.prisma.roles.update(input);
+    await this.cacheControl.cacheRoles();
+    return res;
   }
 
   async delete(input: Prisma.rolesDeleteArgs) {
-    return await this.prisma.roles.delete(input);
+    const res = await this.prisma.roles.delete(input);
+    await this.cacheControl.cacheRoles();
+    return res;
   }
 
-  async getCachedRoles(
+  async CachedRoles(
     input: z.infer<typeof rolesFindManyArgsSchema>
   ): Promise<roles[]> {
-    return await this.cacheControl.getCachedRoles(input);
+    return await this.cacheControl.getСachedRoles(input);
   }
 }

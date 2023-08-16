@@ -7,6 +7,7 @@ import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
 import { usersRolesRouter } from "./modules/users_roles/route";
 import { usersTerminalsRouter } from "./modules/users_terminals/route";
+import { workSchedulesRouter } from "./modules/work_schedules/route";
 import { publicRouter } from "./trpc";
 
 export const router = publicRouter({
@@ -19,6 +20,7 @@ export const router = publicRouter({
   usersPermissions: usersPermissionsRouter,
   usersRoles: usersRolesRouter,
   usersTerminals: usersTerminalsRouter,
+  workSchedules: workSchedulesRouter,
 });
 
 export type Router = typeof router;

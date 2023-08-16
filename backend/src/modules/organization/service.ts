@@ -53,11 +53,13 @@ export class OrganizationService {
 
   async update(input: Prisma.organizationUpdateArgs): Promise<organization> {
     const organization = await this.prisma.organization.update(input);
+    await this.cacheControl.cacheOrganization();
     return organization;
   }
 
   async delete(input: Prisma.organizationDeleteArgs) {
     const organization = await this.prisma.organization.delete(input);
+    await this.cacheControl.cacheOrganization();
     return organization;
   }
 
