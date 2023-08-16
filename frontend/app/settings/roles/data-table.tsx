@@ -37,6 +37,7 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { useRolesStore } from "@frontend/store/states/roles";
+import { RouterOutputs } from "@frontend/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -76,6 +77,7 @@ export function DataTable<TData, TValue>({
       pagination,
       rowSelection,
     },
+    getRowId: (row) => row.id,
     enableRowSelection: true,
     // onRowSelectionChange: function (stateUpdater) {
     //   console.log(arguments);

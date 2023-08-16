@@ -12,13 +12,15 @@ export const useRolesStore = create<IRolesStore>((set, get) => ({
     set((state) => {
       const selectedRows = { ...state.selectedRows };
       if (selectedRows[index]) {
-        delete selectedRows[index];
+        return {
+          selectedRows: {},
+        };
       } else {
-        selectedRows[index] = true;
+        return {
+          selectedRows: {
+            [index]: true,
+          },
+        };
       }
-      return {
-        ...state,
-        selectedRows,
-      };
     }),
 }));
