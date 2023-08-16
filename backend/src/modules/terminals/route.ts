@@ -37,4 +37,10 @@ export const terminalsRouter = publicRouter({
     .mutation(({ input, ctx }) => {
       return ctx.terminalsService.delete(input);
     }),
+
+  cachedTerminals: publicProcedure
+    .input(terminalsFindManyArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.terminalsService.cachedTerminals(input);
+    }),
 });
