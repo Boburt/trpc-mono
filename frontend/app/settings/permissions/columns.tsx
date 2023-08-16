@@ -8,7 +8,7 @@ import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 
 export const permissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"]["data"]["items"][0]
+  RouterOutputs["permissions"]["list"]["items"][0]
 >[] = [
   {
     accessorKey: "active",
