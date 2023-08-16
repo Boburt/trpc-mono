@@ -1,4 +1,3 @@
-import { permissions } from "@backend/lib/zod";
 import { trpc, ReactQueryOptions } from "@frontend/utils/trpc";
 
 export function usePermissionsQuery(filter: any) {
