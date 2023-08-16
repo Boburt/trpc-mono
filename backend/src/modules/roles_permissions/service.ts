@@ -24,7 +24,12 @@ export class RolesPermissionsService {
     input: z.infer<typeof roles_permissionsFindManyArgsSchema>
   ): Promise<roles_permissions[]> {
     const [roles_permissions] = await this.prisma.roles_permissions
-      .paginate({})
+      .paginate({
+        ...input,
+        include: {
+          permissions: true,
+        },
+      })
       .withPages({
         limit: input.take ?? 20,
       });
