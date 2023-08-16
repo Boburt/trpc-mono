@@ -6,13 +6,23 @@ import { Button } from "@components/ui/button";
 import PermissionsForm from "./form";
 import { permissions, permissionsSchema } from "@backend/lib/zod";
 import { RouterInputs, RouterOutputs } from "@frontend/utils/trpc";
+import { Switch } from "@components/ui/switch";
 
 export const permissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"][0]
+  RouterOutputs["permissions"]["list"]["data"]["items"][0]
 >[] = [
   {
     accessorKey: "active",
     header: "Активен",
+    cell: ({ row }) => {
+      const record = row.original;
+
+      return (
+        <div className="flex items-center space-x-2">
+          <Switch checked={record.active} readOnly />
+        </div>
+      );
+    },
   },
   {
     accessorKey: "slug",
