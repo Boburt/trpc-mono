@@ -21,7 +21,6 @@ export const usersRouter = publicRouter({
     }),
   one: publicProcedure
     .input(usersFindUniqueArgsSchema)
-    // .output(usersSchema.omit({ password: true }).nullish())
     .query(({ input, ctx }) => {
       return ctx.usersService.findOne(input);
     }),
