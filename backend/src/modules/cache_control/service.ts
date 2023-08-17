@@ -1,6 +1,6 @@
-import { terminals } from "@backend/lib/zod";
+import { terminals, rolesWithRelations } from "@backend/lib/zod";
 import { DB, RedisClientType } from "@backend/trpc";
-import { organization, permissions, roles } from "@prisma/client";
+import { organization, permissions } from "@prisma/client";
 
 export class CacheControlService {
   constructor(
@@ -9,6 +9,8 @@ export class CacheControlService {
   ) {
     this.cachePermissions();
     this.cacheOrganization();
+    this.cacheRoles();
+    this.cacheTerminals();
   }
 
   async cachePermissions() {
@@ -64,7 +66,11 @@ export class CacheControlService {
   async cacheRoles() {
     const roles = await this.prisma.roles.findMany({
       include: {
-        permissions: true,
+        roles_permissions: {
+          include: {
+            permissions: true,
+          },
+        },
       },
     });
     await this.redis.set(
@@ -73,7 +79,11 @@ export class CacheControlService {
     );
   }
 
-  async getСachedRoles({ take }: { take?: number }): Promise<roles[]> {
+  async getСachedRoles({
+    take,
+  }: {
+    take?: number;
+  }): Promise<rolesWithRelations[]> {
     const roles = await this.redis.get(`${process.env.PROJECT_PREFIX}roles`);
     let res = JSON.parse(roles ?? "[]");
 
@@ -103,5 +113,17 @@ export class CacheControlService {
     }
 
     return res;
+  }
+
+  async getPermissionsByRoleId(roleId: string) {
+    const roles = await this.getСachedRoles({});
+    // console.log("roles", roles);
+    const role = roles.find((role) => role.id === roleId);
+    if (!role) {
+      return [];
+    }
+    return role.roles_permissions.map((rolePermission) => {
+      return rolePermission.permissions.slug;
+    });
   }
 }
