@@ -4,21 +4,12 @@ import { trpc } from "@elysiajs/trpc";
 
 import { publicRouter, createContext } from "./trpc";
 import { router } from "./_routes";
-import { jwt } from "@elysiajs/jwt";
+import jwt from "./jwt";
 
 const app = new Elysia()
   .use(cors())
-  // .use(
-  //   jwt({
-  //     name: "jwt",
-  //     secret: process.env.JWT_SECRET!,
-  //   })
-  // )
+  .use(jwt)
   .get("/", () => ({ hello: "world" }))
-  // .get("/me", ({ jwt }) => {
-  //   const sign = jwt.sign({ hello: "world" });
-  //   return sign;
-  // })
   .use(
     trpc(router, {
       createContext,
@@ -44,9 +35,6 @@ const app = new Elysia()
       },
     })
   )
-  .onStop(() => {
-    console.log("🦊 Elysia is stopping...");
-  })
   .listen(3000);
 
 export type App = typeof app;

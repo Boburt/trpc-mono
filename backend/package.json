@@ -6,13 +6,14 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "@elysiajs/cors": "^0.5.2",
+    "@elysiajs/cors": "^0.6.0",
     "@elysiajs/jwt": "^0.6.3",
-    "@elysiajs/trpc": "^0.5.2",
+    "@elysiajs/trpc": "^0.6.1",
     "@elysiajs/websocket": "^0.2.8",
     "@prisma/client": "^5.1.1",
     "@trpc/server": "^10.37.1",
-    "elysia": "^0.5.25",
+    "elysia": "^0.6.11",
+    "jose": "^4.14.4",
     "prisma-extension-pagination": "^0.4.2",
     "redis": "^4.6.7",
     "zod": "^3.21.1",

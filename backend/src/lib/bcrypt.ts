@@ -1,4 +1,5 @@
 import { randomBytes, pbkdf2, createHash } from "node:crypto";
+import { SignJWT } from "jose";
 async function hashPassword(
   password: string
 ): Promise<{ hash: string; salt: string }> {
@@ -32,4 +33,17 @@ function md5hash(text: string) {
   return createHash("md5").update(text).digest("hex");
 }
 
-export { hashPassword, comparePassword, md5hash };
+async function signJwt(payload: any) {
+  const alg = "HS256";
+  let jwt = new SignJWT({
+    ...payload,
+    nbf: undefined,
+    exp: undefined,
+  }).setProtectedHeader({
+    alg,
+  });
+  const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
+  return jwt.sign(jwtSecret);
+}
+
+export { hashPassword, comparePassword, md5hash, signJwt };

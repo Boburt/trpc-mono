@@ -4,19 +4,27 @@ import {
   usersFindUniqueArgsSchema,
   users,
   users_roles,
+  users as usersSchema,
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
-import { hashPassword, md5hash } from "@backend/lib/bcrypt";
+import {
+  comparePassword,
+  hashPassword,
+  md5hash,
+  signJwt,
+} from "@backend/lib/bcrypt";
 import { z } from "zod";
+import { loginInput } from "./dto/users.dto";
+import { TRPCError } from "@trpc/server";
 
 export class UsersService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: Prisma.usersCreateArgs): Promise<users> {
+  async create(input: Prisma.usersCreateArgs): Promise<usersSchema> {
     if (input.data.password) {
       const { hash, salt } = await hashPassword(input.data.password);
-      input.data.password = md5hash(input.data.password);
+      input.data.password = hash;
       input.data.salt = salt;
     }
     return await this.prisma.users.create(input);
@@ -24,7 +32,7 @@ export class UsersService {
 
   async findMany(
     input: z.infer<typeof usersFindManyArgsSchema>
-  ): Promise<PaginationType<users>> {
+  ): Promise<PaginationType<Omit<usersSchema, "password">>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -37,16 +45,30 @@ export class UsersService {
       page: skip,
       includePageCount: true,
     });
-    return { items: users, meta };
+    return {
+      items: users.map((user) => {
+        return this.exclude(user, ["password"]) as Omit<
+          usersSchema,
+          "password"
+        >;
+      }),
+      meta,
+    };
   }
 
   async findOne(
     input: z.infer<typeof usersFindUniqueArgsSchema>
-  ): Promise<users | null> {
-    return this.prisma.users.findUnique(input);
+  ): Promise<Omit<usersSchema, "password"> | null> {
+    const user = await this.prisma.users.findUnique(input);
+
+    if (!user) {
+      return null;
+    }
+
+    return this.exclude(user, ["password"]) as Omit<usersSchema, "password">;
   }
 
-  async update(input: Prisma.usersUpdateArgs): Promise<users> {
+  async update(input: Prisma.usersUpdateArgs): Promise<usersSchema> {
     if (input.data.password) {
       let password = input.data.password;
       if (typeof password != "string") {
@@ -56,10 +78,23 @@ export class UsersService {
       input.data.password = md5hash(password);
       input.data.salt = salt;
     }
+
     return await this.prisma.users.update(input);
   }
 
-  async delete(input: Prisma.usersDeleteArgs): Promise<users> {
+  private exclude<User extends Record<string, unknown>, Key extends keyof User>(
+    user: User,
+    keys: Key[]
+  ): Omit<User, Key> {
+    const filteredEntries = Object.entries(
+      user as Record<string, unknown>
+    ).filter(([key]) => !keys.includes(key as Key));
+    const filteredObject = Object.fromEntries(
+      filteredEntries
+    ) as unknown as Omit<User, Key>;
+    return filteredObject;
+  }
+  async delete(input: Prisma.usersDeleteArgs): Promise<usersSchema> {
     return await this.prisma.users.delete(input);
   }
 
@@ -73,5 +108,38 @@ export class UsersService {
     });
     console.log("user role input", input);
     return await this.prisma.users_roles.create({ data: input });
+  }
+
+  async login(input: z.infer<typeof loginInput>): Promise<usersSchema> {
+    const user = await this.prisma.users.findUnique({
+      where: {
+        login: input.login,
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const isPasswordSame = await comparePassword(
+      input.password,
+      user.salt!,
+      user.password
+    );
+    if (!isPasswordSame) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+      });
+    }
+
+    // const accessToken = await signJwt({
+    //   id: user.id,
+    //   login: user.login,
+    //   email: user.email,
+    //   first_name: user.first_name,
+    //   last_name: user.last_name,
+    // });
+
+    // console.log("accessToken", accessToken);
+
+    return user;
   }
 }
