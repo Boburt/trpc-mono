@@ -62,7 +62,7 @@ export class RolesService {
     return res;
   }
 
-  async CachedRoles(
+  async cachedRoles(
     input: z.infer<typeof rolesFindManyArgsSchema>
   ): Promise<roles[]> {
     return await this.cacheControl.getСachedRoles(input);
