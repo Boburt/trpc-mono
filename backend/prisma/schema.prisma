@@ -122,6 +122,8 @@ model users {
   timesheet_users                                       timesheet[]
   scheduled_reports_subscription_users                  scheduled_reports_subscription[]
   sessions                                              sessions[]                       @relation("sessions_users")
+
+  @@index([login], map: "fki_users_login")
   }
 
   model sessions {
