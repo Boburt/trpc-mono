@@ -7,8 +7,8 @@ import { RouterOutputs } from "@frontend/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 
-export const permissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"]["items"][0]
+export const rolesColumns: ColumnDef<
+  RouterOutputs["roles"]["list"]["items"][0]
 >[] = [
   {
     accessorKey: "active",
@@ -24,12 +24,12 @@ export const permissionsColumns: ColumnDef<
     },
   },
   {
-    accessorKey: "slug",
-    header: "Код",
+    accessorKey: "name",
+    header: "Заголовок",
   },
   {
-    accessorKey: "description",
-    header: "Описание",
+    accessorKey: "code",
+    header: "Код",
   },
   {
     id: "actions",

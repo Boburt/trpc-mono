@@ -1,6 +1,9 @@
 import { publicRouter } from "@backend/trpc";
 import { publicProcedure } from "@backend/trpc";
-import { users_rolesCreateArgsSchema } from "@backend/lib/zod";
+import {
+  users_permissionsDeleteArgsSchema,
+  users_rolesCreateArgsSchema,
+} from "@backend/lib/zod";
 import { users_rolesFindManyArgsSchema } from "@backend/lib/zod";
 import { users_rolesFindUniqueArgsSchema } from "@backend/lib/zod";
 import { users_rolesUpdateArgsSchema } from "@backend/lib/zod";

@@ -1,6 +1,7 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
   usersCreateArgsSchema,
+  usersDeleteArgsSchema,
   usersFindManyArgsSchema,
   usersFindUniqueArgsSchema,
   usersUpdateArgsSchema,
@@ -26,5 +27,11 @@ export const usersRouter = publicRouter({
     .input(usersUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(usersDeleteArgsSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersService.delete(input);
     }),
 });

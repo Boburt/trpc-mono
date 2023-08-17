@@ -18,7 +18,7 @@ export const RolesScalarFieldEnumSchema = z.enum(['id','name','code','active','c
 
 export const Roles_permissionsScalarFieldEnumSchema = z.enum(['role_id','permission_id','created_by','updated_by']);
 
-export const UsersScalarFieldEnumSchema = z.enum(['id','phone','first_name','last_name','password','is_super_user','status','card_name','card_number','birth_date','car_model','car_number','is_online','latitude','longitude','fcm_token','wallet_balance','max_active_order_count','doc_files','order_start_date','app_version','created_at','updated_at','api_token','tg_id']);
+export const UsersScalarFieldEnumSchema = z.enum(['id','phone','email','login','first_name','last_name','password','is_super_user','status','card_name','card_number','birth_date','car_model','car_number','is_online','latitude','longitude','fcm_token','wallet_balance','max_active_order_count','doc_files','order_start_date','app_version','created_at','updated_at','api_token','tg_id']);
 
 export const Users_permissionsScalarFieldEnumSchema = z.enum(['user_id','permission_id','created_by','updated_by']);
 
@@ -87,6 +87,25 @@ export const permissionsSchema = z.object({
 
 export type permissions = z.infer<typeof permissionsSchema>
 
+// PERMISSIONS RELATION SCHEMA
+//------------------------------------------------------
+
+export type permissionsRelations = {
+  users_permissions_created_byTousers?: usersWithRelations | null;
+  users_permissions_updated_byTousers?: usersWithRelations | null;
+  roles_permissions: roles_permissionsWithRelations[];
+  users_permissions: users_permissionsWithRelations[];
+};
+
+export type permissionsWithRelations = z.infer<typeof permissionsSchema> & permissionsRelations
+
+export const permissionsWithRelationsSchema: z.ZodType<permissionsWithRelations> = permissionsSchema.merge(z.object({
+  users_permissions_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  users_permissions_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  roles_permissions: z.lazy(() => roles_permissionsWithRelationsSchema).array(),
+  users_permissions: z.lazy(() => users_permissionsWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // ROLES SCHEMA
 /////////////////////////////////////////
@@ -104,6 +123,25 @@ export const rolesSchema = z.object({
 
 export type roles = z.infer<typeof rolesSchema>
 
+// ROLES RELATION SCHEMA
+//------------------------------------------------------
+
+export type rolesRelations = {
+  users_roles_created_byTousers?: usersWithRelations | null;
+  users_roles_updated_byTousers?: usersWithRelations | null;
+  roles_permissions: roles_permissionsWithRelations[];
+  users_roles: users_rolesWithRelations[];
+};
+
+export type rolesWithRelations = z.infer<typeof rolesSchema> & rolesRelations
+
+export const rolesWithRelationsSchema: z.ZodType<rolesWithRelations> = rolesSchema.merge(z.object({
+  users_roles_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  users_roles_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  roles_permissions: z.lazy(() => roles_permissionsWithRelationsSchema).array(),
+  users_roles: z.lazy(() => users_rolesWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // ROLES PERMISSIONS SCHEMA
 /////////////////////////////////////////
@@ -117,6 +155,25 @@ export const roles_permissionsSchema = z.object({
 
 export type roles_permissions = z.infer<typeof roles_permissionsSchema>
 
+// ROLES PERMISSIONS RELATION SCHEMA
+//------------------------------------------------------
+
+export type roles_permissionsRelations = {
+  users_roles_permissions_created_byTousers?: usersWithRelations | null;
+  permissions: permissionsWithRelations;
+  roles: rolesWithRelations;
+  users_roles_permissions_updated_byTousers?: usersWithRelations | null;
+};
+
+export type roles_permissionsWithRelations = z.infer<typeof roles_permissionsSchema> & roles_permissionsRelations
+
+export const roles_permissionsWithRelationsSchema: z.ZodType<roles_permissionsWithRelations> = roles_permissionsSchema.merge(z.object({
+  users_roles_permissions_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  permissions: z.lazy(() => permissionsWithRelationsSchema),
+  roles: z.lazy(() => rolesWithRelationsSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+}))
+
 /////////////////////////////////////////
 // USERS SCHEMA
 /////////////////////////////////////////
@@ -124,7 +181,9 @@ export type roles_permissions = z.infer<typeof roles_permissionsSchema>
 export const usersSchema = z.object({
   status: user_statusSchema,
   id: z.string(),
-  phone: z.string(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
+  login: z.string(),
   first_name: z.string().nullish(),
   last_name: z.string().nullish(),
   password: z.string().nullish(),
@@ -151,6 +210,67 @@ export const usersSchema = z.object({
 
 export type users = z.infer<typeof usersSchema>
 
+// USERS RELATION SCHEMA
+//------------------------------------------------------
+
+export type usersRelations = {
+  permissions_permissions_created_byTousers: permissionsWithRelations[];
+  permissions_permissions_updated_byTousers: permissionsWithRelations[];
+  roles_roles_created_byTousers: rolesWithRelations[];
+  roles_roles_updated_byTousers: rolesWithRelations[];
+  roles_permissions_roles_permissions_created_byTousers: roles_permissionsWithRelations[];
+  roles_permissions_roles_permissions_updated_byTousers: roles_permissionsWithRelations[];
+  users_permissions_usersTousers_permissions_created_by: users_permissionsWithRelations[];
+  users_permissions_usersTousers_permissions_updated_by: users_permissionsWithRelations[];
+  users_permissions_usersTousers_permissions_user_id: users_permissionsWithRelations[];
+  users_roles_usersTousers_roles_created_by: users_rolesWithRelations[];
+  users_roles_usersTousers_roles_updated_by: users_rolesWithRelations[];
+  users_roles_usersTousers_roles_user_id: users_rolesWithRelations[];
+  organization_created_byTousers: organizationWithRelations[];
+  organization_updated_byTousers: organizationWithRelations[];
+  work_schedules_created_byTousers: work_schedulesWithRelations[];
+  work_schedules_updated_byTousers: work_schedulesWithRelations[];
+  users_terminals: users_terminalsWithRelations[];
+  users_work_schedules: users_work_schedulesWithRelations[];
+  work_schedule_entries_created_byTousers: work_schedule_entriesWithRelations[];
+  work_schedule_entries_updated_byTousers: work_schedule_entriesWithRelations[];
+  work_schedule_entries_users: work_schedule_entriesWithRelations[];
+  api_tokens_created_byTousers: api_tokensWithRelations[];
+  api_tokens_updated_byTousers: api_tokensWithRelations[];
+  timesheet_users: timesheetWithRelations[];
+  scheduled_reports_subscription_users: scheduled_reports_subscriptionWithRelations[];
+};
+
+export type usersWithRelations = z.infer<typeof usersSchema> & usersRelations
+
+export const usersWithRelationsSchema: z.ZodType<usersWithRelations> = usersSchema.merge(z.object({
+  permissions_permissions_created_byTousers: z.lazy(() => permissionsWithRelationsSchema).array(),
+  permissions_permissions_updated_byTousers: z.lazy(() => permissionsWithRelationsSchema).array(),
+  roles_roles_created_byTousers: z.lazy(() => rolesWithRelationsSchema).array(),
+  roles_roles_updated_byTousers: z.lazy(() => rolesWithRelationsSchema).array(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => roles_permissionsWithRelationsSchema).array(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => roles_permissionsWithRelationsSchema).array(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => users_permissionsWithRelationsSchema).array(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => users_permissionsWithRelationsSchema).array(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => users_permissionsWithRelationsSchema).array(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => users_rolesWithRelationsSchema).array(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => users_rolesWithRelationsSchema).array(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => users_rolesWithRelationsSchema).array(),
+  organization_created_byTousers: z.lazy(() => organizationWithRelationsSchema).array(),
+  organization_updated_byTousers: z.lazy(() => organizationWithRelationsSchema).array(),
+  work_schedules_created_byTousers: z.lazy(() => work_schedulesWithRelationsSchema).array(),
+  work_schedules_updated_byTousers: z.lazy(() => work_schedulesWithRelationsSchema).array(),
+  users_terminals: z.lazy(() => users_terminalsWithRelationsSchema).array(),
+  users_work_schedules: z.lazy(() => users_work_schedulesWithRelationsSchema).array(),
+  work_schedule_entries_created_byTousers: z.lazy(() => work_schedule_entriesWithRelationsSchema).array(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => work_schedule_entriesWithRelationsSchema).array(),
+  work_schedule_entries_users: z.lazy(() => work_schedule_entriesWithRelationsSchema).array(),
+  api_tokens_created_byTousers: z.lazy(() => api_tokensWithRelationsSchema).array(),
+  api_tokens_updated_byTousers: z.lazy(() => api_tokensWithRelationsSchema).array(),
+  timesheet_users: z.lazy(() => timesheetWithRelationsSchema).array(),
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // USERS PERMISSIONS SCHEMA
 /////////////////////////////////////////
@@ -164,6 +284,25 @@ export const users_permissionsSchema = z.object({
 
 export type users_permissions = z.infer<typeof users_permissionsSchema>
 
+// USERS PERMISSIONS RELATION SCHEMA
+//------------------------------------------------------
+
+export type users_permissionsRelations = {
+  users_usersTousers_permissions_created_by?: usersWithRelations | null;
+  permissions: permissionsWithRelations;
+  users_usersTousers_permissions_updated_by?: usersWithRelations | null;
+  users_usersTousers_permissions_user_id: usersWithRelations;
+};
+
+export type users_permissionsWithRelations = z.infer<typeof users_permissionsSchema> & users_permissionsRelations
+
+export const users_permissionsWithRelationsSchema: z.ZodType<users_permissionsWithRelations> = users_permissionsSchema.merge(z.object({
+  users_usersTousers_permissions_created_by: z.lazy(() => usersWithRelationsSchema).nullish(),
+  permissions: z.lazy(() => permissionsWithRelationsSchema),
+  users_usersTousers_permissions_updated_by: z.lazy(() => usersWithRelationsSchema).nullish(),
+  users_usersTousers_permissions_user_id: z.lazy(() => usersWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // USERS ROLES SCHEMA
 /////////////////////////////////////////
@@ -176,6 +315,25 @@ export const users_rolesSchema = z.object({
 })
 
 export type users_roles = z.infer<typeof users_rolesSchema>
+
+// USERS ROLES RELATION SCHEMA
+//------------------------------------------------------
+
+export type users_rolesRelations = {
+  users_usersTousers_roles_created_by?: usersWithRelations | null;
+  roles: rolesWithRelations;
+  users_usersTousers_roles_updated_by?: usersWithRelations | null;
+  users_usersTousers_roles_user_id: usersWithRelations;
+};
+
+export type users_rolesWithRelations = z.infer<typeof users_rolesSchema> & users_rolesRelations
+
+export const users_rolesWithRelationsSchema: z.ZodType<users_rolesWithRelations> = users_rolesSchema.merge(z.object({
+  users_usersTousers_roles_created_by: z.lazy(() => usersWithRelationsSchema).nullish(),
+  roles: z.lazy(() => rolesWithRelationsSchema),
+  users_usersTousers_roles_updated_by: z.lazy(() => usersWithRelationsSchema).nullish(),
+  users_usersTousers_roles_user_id: z.lazy(() => usersWithRelationsSchema),
+}))
 
 /////////////////////////////////////////
 // WORK SCHEDULES SCHEMA
@@ -199,6 +357,27 @@ export const work_schedulesSchema = z.object({
 
 export type work_schedules = z.infer<typeof work_schedulesSchema>
 
+// WORK SCHEDULES RELATION SCHEMA
+//------------------------------------------------------
+
+export type work_schedulesRelations = {
+  organization: organizationWithRelations;
+  work_schedules_created_byTousers?: usersWithRelations | null;
+  work_schedules_updated_byTousers?: usersWithRelations | null;
+  users_work_schedules: users_work_schedulesWithRelations[];
+  work_schedule_entries_work_schedules: work_schedule_entriesWithRelations[];
+};
+
+export type work_schedulesWithRelations = z.infer<typeof work_schedulesSchema> & work_schedulesRelations
+
+export const work_schedulesWithRelationsSchema: z.ZodType<work_schedulesWithRelations> = work_schedulesSchema.merge(z.object({
+  organization: z.lazy(() => organizationWithRelationsSchema),
+  work_schedules_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  work_schedules_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  users_work_schedules: z.lazy(() => users_work_schedulesWithRelationsSchema).array(),
+  work_schedule_entries_work_schedules: z.lazy(() => work_schedule_entriesWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // TERMINALS SCHEMA
 /////////////////////////////////////////
@@ -219,6 +398,21 @@ export const terminalsSchema = z.object({
 })
 
 export type terminals = z.infer<typeof terminalsSchema>
+
+// TERMINALS RELATION SCHEMA
+//------------------------------------------------------
+
+export type terminalsRelations = {
+  organization: organizationWithRelations;
+  users_terminals: users_terminalsWithRelations[];
+};
+
+export type terminalsWithRelations = z.infer<typeof terminalsSchema> & terminalsRelations
+
+export const terminalsWithRelationsSchema: z.ZodType<terminalsWithRelations> = terminalsSchema.merge(z.object({
+  organization: z.lazy(() => organizationWithRelationsSchema),
+  users_terminals: z.lazy(() => users_terminalsWithRelationsSchema).array(),
+}))
 
 /////////////////////////////////////////
 // ORGANIZATION SCHEMA
@@ -254,6 +448,27 @@ export const organizationSchema = z.object({
 
 export type organization = z.infer<typeof organizationSchema>
 
+// ORGANIZATION RELATION SCHEMA
+//------------------------------------------------------
+
+export type organizationRelations = {
+  work_schedules_organization_idTorganization: work_schedulesWithRelations[];
+  organization_created_byTousers?: usersWithRelations | null;
+  organization_updated_byTousers?: usersWithRelations | null;
+  terminals_organization_idTorganization: terminalsWithRelations[];
+  api_tokens_organization: api_tokensWithRelations[];
+};
+
+export type organizationWithRelations = z.infer<typeof organizationSchema> & organizationRelations
+
+export const organizationWithRelationsSchema: z.ZodType<organizationWithRelations> = organizationSchema.merge(z.object({
+  work_schedules_organization_idTorganization: z.lazy(() => work_schedulesWithRelationsSchema).array(),
+  organization_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  organization_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  terminals_organization_idTorganization: z.lazy(() => terminalsWithRelationsSchema).array(),
+  api_tokens_organization: z.lazy(() => api_tokensWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // USERS TERMINALS SCHEMA
 /////////////////////////////////////////
@@ -265,6 +480,21 @@ export const users_terminalsSchema = z.object({
 
 export type users_terminals = z.infer<typeof users_terminalsSchema>
 
+// USERS TERMINALS RELATION SCHEMA
+//------------------------------------------------------
+
+export type users_terminalsRelations = {
+  users: usersWithRelations;
+  terminals: terminalsWithRelations;
+};
+
+export type users_terminalsWithRelations = z.infer<typeof users_terminalsSchema> & users_terminalsRelations
+
+export const users_terminalsWithRelationsSchema: z.ZodType<users_terminalsWithRelations> = users_terminalsSchema.merge(z.object({
+  users: z.lazy(() => usersWithRelationsSchema),
+  terminals: z.lazy(() => terminalsWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // USERS WORK SCHEDULES SCHEMA
 /////////////////////////////////////////
@@ -275,6 +505,21 @@ export const users_work_schedulesSchema = z.object({
 })
 
 export type users_work_schedules = z.infer<typeof users_work_schedulesSchema>
+
+// USERS WORK SCHEDULES RELATION SCHEMA
+//------------------------------------------------------
+
+export type users_work_schedulesRelations = {
+  users: usersWithRelations;
+  work_schedules: work_schedulesWithRelations;
+};
+
+export type users_work_schedulesWithRelations = z.infer<typeof users_work_schedulesSchema> & users_work_schedulesRelations
+
+export const users_work_schedulesWithRelationsSchema: z.ZodType<users_work_schedulesWithRelations> = users_work_schedulesSchema.merge(z.object({
+  users: z.lazy(() => usersWithRelationsSchema),
+  work_schedules: z.lazy(() => work_schedulesWithRelationsSchema),
+}))
 
 /////////////////////////////////////////
 // WORK SCHEDULE ENTRIES SCHEMA
@@ -303,6 +548,25 @@ export const work_schedule_entriesSchema = z.object({
 
 export type work_schedule_entries = z.infer<typeof work_schedule_entriesSchema>
 
+// WORK SCHEDULE ENTRIES RELATION SCHEMA
+//------------------------------------------------------
+
+export type work_schedule_entriesRelations = {
+  work_schedule_entries_created_byTousers?: usersWithRelations | null;
+  work_schedule_entries_updated_byTousers?: usersWithRelations | null;
+  work_schedule_entries_users: usersWithRelations;
+  work_schedule_entries_work_schedules: work_schedulesWithRelations;
+};
+
+export type work_schedule_entriesWithRelations = z.infer<typeof work_schedule_entriesSchema> & work_schedule_entriesRelations
+
+export const work_schedule_entriesWithRelationsSchema: z.ZodType<work_schedule_entriesWithRelations> = work_schedule_entriesSchema.merge(z.object({
+  work_schedule_entries_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  work_schedule_entries_users: z.lazy(() => usersWithRelationsSchema),
+  work_schedule_entries_work_schedules: z.lazy(() => work_schedulesWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // API TOKENS SCHEMA
 /////////////////////////////////////////
@@ -320,6 +584,23 @@ export const api_tokensSchema = z.object({
 
 export type api_tokens = z.infer<typeof api_tokensSchema>
 
+// API TOKENS RELATION SCHEMA
+//------------------------------------------------------
+
+export type api_tokensRelations = {
+  api_tokens_created_byTousers?: usersWithRelations | null;
+  api_tokens_updated_byTousers?: usersWithRelations | null;
+  api_tokens_organization: organizationWithRelations;
+};
+
+export type api_tokensWithRelations = z.infer<typeof api_tokensSchema> & api_tokensRelations
+
+export const api_tokensWithRelationsSchema: z.ZodType<api_tokensWithRelations> = api_tokensSchema.merge(z.object({
+  api_tokens_created_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  api_tokens_updated_byTousers: z.lazy(() => usersWithRelationsSchema).nullish(),
+  api_tokens_organization: z.lazy(() => organizationWithRelationsSchema),
+}))
+
 /////////////////////////////////////////
 // TIMESHEET SCHEMA
 /////////////////////////////////////////
@@ -334,6 +615,19 @@ export const timesheetSchema = z.object({
 })
 
 export type timesheet = z.infer<typeof timesheetSchema>
+
+// TIMESHEET RELATION SCHEMA
+//------------------------------------------------------
+
+export type timesheetRelations = {
+  timesheet_users: usersWithRelations;
+};
+
+export type timesheetWithRelations = z.infer<typeof timesheetSchema> & timesheetRelations
+
+export const timesheetWithRelationsSchema: z.ZodType<timesheetWithRelations> = timesheetSchema.merge(z.object({
+  timesheet_users: z.lazy(() => usersWithRelationsSchema),
+}))
 
 /////////////////////////////////////////
 // SCHEDULED REPORTS SCHEMA
@@ -350,6 +644,19 @@ export const scheduled_reportsSchema = z.object({
 
 export type scheduled_reports = z.infer<typeof scheduled_reportsSchema>
 
+// SCHEDULED REPORTS RELATION SCHEMA
+//------------------------------------------------------
+
+export type scheduled_reportsRelations = {
+  scheduled_reports_scheduled_reports_subscriptions: scheduled_reports_subscriptionWithRelations[];
+};
+
+export type scheduled_reportsWithRelations = z.infer<typeof scheduled_reportsSchema> & scheduled_reportsRelations
+
+export const scheduled_reportsWithRelationsSchema: z.ZodType<scheduled_reportsWithRelations> = scheduled_reportsSchema.merge(z.object({
+  scheduled_reports_scheduled_reports_subscriptions: z.lazy(() => scheduled_reports_subscriptionWithRelationsSchema).array(),
+}))
+
 /////////////////////////////////////////
 // SCHEDULED REPORTS SUBSCRIPTION SCHEMA
 /////////////////////////////////////////
@@ -363,6 +670,21 @@ export const scheduled_reports_subscriptionSchema = z.object({
 })
 
 export type scheduled_reports_subscription = z.infer<typeof scheduled_reports_subscriptionSchema>
+
+// SCHEDULED REPORTS SUBSCRIPTION RELATION SCHEMA
+//------------------------------------------------------
+
+export type scheduled_reports_subscriptionRelations = {
+  scheduled_reports_subscription_reports: scheduled_reportsWithRelations;
+  scheduled_reports_subscription_users: usersWithRelations;
+};
+
+export type scheduled_reports_subscriptionWithRelations = z.infer<typeof scheduled_reports_subscriptionSchema> & scheduled_reports_subscriptionRelations
+
+export const scheduled_reports_subscriptionWithRelationsSchema: z.ZodType<scheduled_reports_subscriptionWithRelations> = scheduled_reports_subscriptionSchema.merge(z.object({
+  scheduled_reports_subscription_reports: z.lazy(() => scheduled_reportsWithRelationsSchema),
+  scheduled_reports_subscription_users: z.lazy(() => usersWithRelationsSchema),
+}))
 
 /////////////////////////////////////////
 // SELECT & INCLUDE
@@ -548,6 +870,8 @@ export const usersCountOutputTypeSelectSchema: z.ZodType<Prisma.usersCountOutput
 export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
   id: z.boolean().optional(),
   phone: z.boolean().optional(),
+  email: z.boolean().optional(),
+  login: z.boolean().optional(),
   first_name: z.boolean().optional(),
   last_name: z.boolean().optional(),
   password: z.boolean().optional(),
@@ -1256,7 +1580,9 @@ export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.object
   OR: z.lazy(() => usersWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => usersWhereInputSchema),z.lazy(() => usersWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  phone: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  phone: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  email: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  login: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   first_name: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   last_name: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   password: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -1309,7 +1635,9 @@ export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.object
 
 export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
-  phone: z.lazy(() => SortOrderSchema).optional(),
+  phone: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  email: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  login: z.lazy(() => SortOrderSchema).optional(),
   first_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   last_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   password: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
@@ -1363,18 +1691,72 @@ export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByW
 export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput> = z.union([
   z.object({
     id: z.string(),
-    phone: z.string()
+    phone: z.string(),
+    email: z.string(),
+    login: z.string()
+  }),
+  z.object({
+    id: z.string(),
+    phone: z.string(),
+    email: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    phone: z.string(),
+    login: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    phone: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    email: z.string(),
+    login: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    email: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    login: z.string(),
   }),
   z.object({
     id: z.string(),
   }),
   z.object({
     phone: z.string(),
+    email: z.string(),
+    login: z.string(),
+  }),
+  z.object({
+    phone: z.string(),
+    email: z.string(),
+  }),
+  z.object({
+    phone: z.string(),
+    login: z.string(),
+  }),
+  z.object({
+    phone: z.string(),
+  }),
+  z.object({
+    email: z.string(),
+    login: z.string(),
+  }),
+  z.object({
+    email: z.string(),
+  }),
+  z.object({
+    login: z.string(),
   }),
 ])
 .and(z.object({
   id: z.string().optional(),
   phone: z.string().optional(),
+  email: z.string().optional(),
+  login: z.string().optional(),
   AND: z.union([ z.lazy(() => usersWhereInputSchema),z.lazy(() => usersWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => usersWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => usersWhereInputSchema),z.lazy(() => usersWhereInputSchema).array() ]).optional(),
@@ -1430,7 +1812,9 @@ export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput
 
 export const usersOrderByWithAggregationInputSchema: z.ZodType<Prisma.usersOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
-  phone: z.lazy(() => SortOrderSchema).optional(),
+  phone: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  email: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  login: z.lazy(() => SortOrderSchema).optional(),
   first_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   last_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   password: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
@@ -1466,7 +1850,9 @@ export const usersScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.usersSc
   OR: z.lazy(() => usersScalarWhereWithAggregatesInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => usersScalarWhereWithAggregatesInputSchema),z.lazy(() => usersScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
-  phone: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  phone: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  email: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  login: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   first_name: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   last_name: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   password: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
@@ -2725,7 +3111,9 @@ export const roles_permissionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.r
 
 export const usersCreateInputSchema: z.ZodType<Prisma.usersCreateInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -2778,7 +3166,9 @@ export const usersCreateInputSchema: z.ZodType<Prisma.usersCreateInput> = z.obje
 
 export const usersUncheckedCreateInputSchema: z.ZodType<Prisma.usersUncheckedCreateInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -2831,7 +3221,9 @@ export const usersUncheckedCreateInputSchema: z.ZodType<Prisma.usersUncheckedCre
 
 export const usersUpdateInputSchema: z.ZodType<Prisma.usersUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2884,7 +3276,9 @@ export const usersUpdateInputSchema: z.ZodType<Prisma.usersUpdateInput> = z.obje
 
 export const usersUncheckedUpdateInputSchema: z.ZodType<Prisma.usersUncheckedUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2937,7 +3331,9 @@ export const usersUncheckedUpdateInputSchema: z.ZodType<Prisma.usersUncheckedUpd
 
 export const usersCreateManyInputSchema: z.ZodType<Prisma.usersCreateManyInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -2965,7 +3361,9 @@ export const usersCreateManyInputSchema: z.ZodType<Prisma.usersCreateManyInput> 
 
 export const usersUpdateManyMutationInputSchema: z.ZodType<Prisma.usersUpdateManyMutationInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2993,7 +3391,9 @@ export const usersUpdateManyMutationInputSchema: z.ZodType<Prisma.usersUpdateMan
 
 export const usersUncheckedUpdateManyInputSchema: z.ZodType<Prisma.usersUncheckedUpdateManyInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -4468,6 +4868,8 @@ export const scheduled_reports_subscriptionOrderByRelationAggregateInputSchema: 
 export const usersCountOrderByAggregateInputSchema: z.ZodType<Prisma.usersCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   phone: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  login: z.lazy(() => SortOrderSchema).optional(),
   first_name: z.lazy(() => SortOrderSchema).optional(),
   last_name: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -4503,6 +4905,8 @@ export const usersAvgOrderByAggregateInputSchema: z.ZodType<Prisma.usersAvgOrder
 export const usersMaxOrderByAggregateInputSchema: z.ZodType<Prisma.usersMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   phone: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  login: z.lazy(() => SortOrderSchema).optional(),
   first_name: z.lazy(() => SortOrderSchema).optional(),
   last_name: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -4530,6 +4934,8 @@ export const usersMaxOrderByAggregateInputSchema: z.ZodType<Prisma.usersMaxOrder
 export const usersMinOrderByAggregateInputSchema: z.ZodType<Prisma.usersMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   phone: z.lazy(() => SortOrderSchema).optional(),
+  email: z.lazy(() => SortOrderSchema).optional(),
+  login: z.lazy(() => SortOrderSchema).optional(),
   first_name: z.lazy(() => SortOrderSchema).optional(),
   last_name: z.lazy(() => SortOrderSchema).optional(),
   password: z.lazy(() => SortOrderSchema).optional(),
@@ -7724,7 +8130,9 @@ export const NestedEnumwork_schedule_entry_statusWithAggregatesFilterSchema: z.Z
 
 export const usersCreateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutPermissions_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -7776,7 +8184,9 @@ export const usersCreateWithoutPermissions_permissions_created_byTousersInputSch
 
 export const usersUncheckedCreateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutPermissions_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -7833,7 +8243,9 @@ export const usersCreateOrConnectWithoutPermissions_permissions_created_byTouser
 
 export const usersCreateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -7885,7 +8297,9 @@ export const usersCreateWithoutPermissions_permissions_updated_byTousersInputSch
 
 export const usersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -7997,7 +8411,9 @@ export const usersUpdateToOneWithWhereWithoutPermissions_permissions_created_byT
 
 export const usersUpdateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutPermissions_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8049,7 +8465,9 @@ export const usersUpdateWithoutPermissions_permissions_created_byTousersInputSch
 
 export const usersUncheckedUpdateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutPermissions_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8112,7 +8530,9 @@ export const usersUpdateToOneWithWhereWithoutPermissions_permissions_updated_byT
 
 export const usersUpdateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8164,7 +8584,9 @@ export const usersUpdateWithoutPermissions_permissions_updated_byTousersInputSch
 
 export const usersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8268,7 +8690,9 @@ export const users_permissionsScalarWhereInputSchema: z.ZodType<Prisma.users_per
 
 export const usersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutRoles_roles_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8320,7 +8744,9 @@ export const usersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
 
 export const usersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_roles_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8377,7 +8803,9 @@ export const usersCreateOrConnectWithoutRoles_roles_created_byTousersInputSchema
 
 export const usersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutRoles_roles_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8429,7 +8857,9 @@ export const usersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
 
 export const usersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_roles_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8541,7 +8971,9 @@ export const usersUpdateToOneWithWhereWithoutRoles_roles_created_byTousersInputS
 
 export const usersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutRoles_roles_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8593,7 +9025,9 @@ export const usersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
 
 export const usersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_roles_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8656,7 +9090,9 @@ export const usersUpdateToOneWithWhereWithoutRoles_roles_updated_byTousersInputS
 
 export const usersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutRoles_roles_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8708,7 +9144,9 @@ export const usersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
 
 export const usersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_roles_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8802,7 +9240,9 @@ export const users_rolesScalarWhereInputSchema: z.ZodType<Prisma.users_rolesScal
 
 export const usersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8854,7 +9294,9 @@ export const usersCreateWithoutRoles_permissions_roles_permissions_created_byTou
 
 export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -8969,7 +9411,9 @@ export const rolesCreateOrConnectWithoutRoles_permissionsInputSchema: z.ZodType<
 
 export const usersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -9021,7 +9465,9 @@ export const usersCreateWithoutRoles_permissions_roles_permissions_updated_byTou
 
 export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -9089,7 +9535,9 @@ export const usersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions
 
 export const usersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9141,7 +9589,9 @@ export const usersUpdateWithoutRoles_permissions_roles_permissions_created_byTou
 
 export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9274,7 +9724,9 @@ export const usersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions
 
 export const usersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9326,7 +9778,9 @@ export const usersUpdateWithoutRoles_permissions_roles_permissions_updated_byTou
 
 export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -10769,7 +11223,9 @@ export const scheduled_reports_subscriptionScalarWhereInputSchema: z.ZodType<Pri
 
 export const usersCreateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -10821,7 +11277,9 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_create
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -10907,7 +11365,9 @@ export const permissionsCreateOrConnectWithoutUsers_permissionsInputSchema: z.Zo
 
 export const usersCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -10959,7 +11419,9 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_update
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11016,7 +11478,9 @@ export const usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissio
 
 export const usersCreateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11068,7 +11532,9 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_user_i
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11136,7 +11602,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_permissions_usersTousers_perm
 
 export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11188,7 +11656,9 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_create
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11286,7 +11756,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_permissions_usersTousers_perm
 
 export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11338,7 +11810,9 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_update
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11401,7 +11875,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_permissions_usersTousers_perm
 
 export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11453,7 +11929,9 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_user_i
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11505,7 +11983,9 @@ export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
 
 export const usersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11557,7 +12037,9 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSch
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11643,7 +12125,9 @@ export const rolesCreateOrConnectWithoutUsers_rolesInputSchema: z.ZodType<Prisma
 
 export const usersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11695,7 +12179,9 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11752,7 +12238,9 @@ export const usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_updated_b
 
 export const usersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11804,7 +12292,9 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -11872,7 +12362,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_roles_usersTousers_roles_crea
 
 export const usersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11924,7 +12416,9 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSch
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12022,7 +12516,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_roles_usersTousers_roles_upda
 
 export const usersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12074,7 +12570,9 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12137,7 +12635,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_roles_usersTousers_roles_user
 
 export const usersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12189,7 +12689,9 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12306,7 +12808,9 @@ export const organizationCreateOrConnectWithoutWork_schedules_organization_idTor
 
 export const usersCreateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutWork_schedules_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -12358,7 +12862,9 @@ export const usersCreateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
 
 export const usersUncheckedCreateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedules_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -12415,7 +12921,9 @@ export const usersCreateOrConnectWithoutWork_schedules_created_byTousersInputSch
 
 export const usersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutWork_schedules_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -12467,7 +12975,9 @@ export const usersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
 
 export const usersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedules_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -12674,7 +13184,9 @@ export const usersUpdateToOneWithWhereWithoutWork_schedules_created_byTousersInp
 
 export const usersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutWork_schedules_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12726,7 +13238,9 @@ export const usersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
 
 export const usersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedules_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12789,7 +13303,9 @@ export const usersUpdateToOneWithWhereWithoutWork_schedules_updated_byTousersInp
 
 export const usersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutWork_schedules_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12841,7 +13357,9 @@ export const usersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
 
 export const usersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedules_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13139,7 +13657,9 @@ export const work_schedulesCreateManyOrganizationInputEnvelopeSchema: z.ZodType<
 
 export const usersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutOrganization_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13191,7 +13711,9 @@ export const usersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodT
 
 export const usersUncheckedCreateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutOrganization_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13248,7 +13770,9 @@ export const usersCreateOrConnectWithoutOrganization_created_byTousersInputSchem
 
 export const usersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutOrganization_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13300,7 +13824,9 @@ export const usersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
 
 export const usersUncheckedCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutOrganization_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13454,7 +13980,9 @@ export const usersUpdateToOneWithWhereWithoutOrganization_created_byTousersInput
 
 export const usersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutOrganization_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13506,7 +14034,9 @@ export const usersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodT
 
 export const usersUncheckedUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutOrganization_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13569,7 +14099,9 @@ export const usersUpdateToOneWithWhereWithoutOrganization_updated_byTousersInput
 
 export const usersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutOrganization_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13621,7 +14153,9 @@ export const usersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
 
 export const usersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutOrganization_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13723,7 +14257,9 @@ export const api_tokensUpdateManyWithWhereWithoutApi_tokens_organizationInputSch
 
 export const usersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_terminalsInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13775,7 +14311,9 @@ export const usersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.user
 
 export const usersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_terminalsInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -13878,7 +14416,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_terminalsInputSchema: z.ZodTy
 
 export const usersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_terminalsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13930,7 +14470,9 @@ export const usersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.user
 
 export const usersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_terminalsInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14023,7 +14565,9 @@ export const terminalsUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodTyp
 
 export const usersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_work_schedulesInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14075,7 +14619,9 @@ export const usersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
 
 export const usersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_work_schedulesInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14182,7 +14728,9 @@ export const usersUpdateToOneWithWhereWithoutUsers_work_schedulesInputSchema: z.
 
 export const usersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersUpdateWithoutUsers_work_schedulesInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14234,7 +14782,9 @@ export const usersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
 
 export const usersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_work_schedulesInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14331,7 +14881,9 @@ export const work_schedulesUncheckedUpdateWithoutUsers_work_schedulesInputSchema
 
 export const usersCreateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14383,7 +14935,9 @@ export const usersCreateWithoutWork_schedule_entries_created_byTousersInputSchem
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14440,7 +14994,9 @@ export const usersCreateOrConnectWithoutWork_schedule_entries_created_byTousersI
 
 export const usersCreateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14492,7 +15048,9 @@ export const usersCreateWithoutWork_schedule_entries_updated_byTousersInputSchem
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14549,7 +15107,9 @@ export const usersCreateOrConnectWithoutWork_schedule_entries_updated_byTousersI
 
 export const usersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersCreateWithoutWork_schedule_entries_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14601,7 +15161,9 @@ export const usersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -14708,7 +15270,9 @@ export const usersUpdateToOneWithWhereWithoutWork_schedule_entries_created_byTou
 
 export const usersUpdateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14760,7 +15324,9 @@ export const usersUpdateWithoutWork_schedule_entries_created_byTousersInputSchem
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14823,7 +15389,9 @@ export const usersUpdateToOneWithWhereWithoutWork_schedule_entries_updated_byTou
 
 export const usersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14875,7 +15443,9 @@ export const usersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchem
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14938,7 +15508,9 @@ export const usersUpdateToOneWithWhereWithoutWork_schedule_entries_usersInputSch
 
 export const usersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUpdateWithoutWork_schedule_entries_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14990,7 +15562,9 @@ export const usersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15087,7 +15661,9 @@ export const work_schedulesUncheckedUpdateWithoutWork_schedule_entries_work_sche
 
 export const usersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutApi_tokens_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15139,7 +15715,9 @@ export const usersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
 
 export const usersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutApi_tokens_created_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15196,7 +15774,9 @@ export const usersCreateOrConnectWithoutApi_tokens_created_byTousersInputSchema:
 
 export const usersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateWithoutApi_tokens_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15248,7 +15828,9 @@ export const usersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
 
 export const usersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutApi_tokens_updated_byTousersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15381,7 +15963,9 @@ export const usersUpdateToOneWithWhereWithoutApi_tokens_created_byTousersInputSc
 
 export const usersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutApi_tokens_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15433,7 +16017,9 @@ export const usersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
 
 export const usersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutApi_tokens_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15496,7 +16082,9 @@ export const usersUpdateToOneWithWhereWithoutApi_tokens_updated_byTousersInputSc
 
 export const usersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpdateWithoutApi_tokens_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15548,7 +16136,9 @@ export const usersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
 
 export const usersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutApi_tokens_updated_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15671,7 +16261,9 @@ export const organizationUncheckedUpdateWithoutApi_tokens_organizationInputSchem
 
 export const usersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersCreateWithoutTimesheet_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15723,7 +16315,9 @@ export const usersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.user
 
 export const usersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutTimesheet_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -15791,7 +16385,9 @@ export const usersUpdateToOneWithWhereWithoutTimesheet_usersInputSchema: z.ZodTy
 
 export const usersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersUpdateWithoutTimesheet_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15843,7 +16439,9 @@ export const usersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.user
 
 export const usersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutTimesheet_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15958,7 +16556,9 @@ export const scheduled_reportsCreateOrConnectWithoutScheduled_reports_scheduled_
 
 export const usersCreateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersCreateWithoutScheduled_reports_subscription_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -16010,7 +16610,9 @@ export const usersCreateWithoutScheduled_reports_subscription_usersInputSchema: 
 
 export const usersUncheckedCreateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutScheduled_reports_subscription_usersInput> = z.object({
   id: z.string().optional(),
-  phone: z.string(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
   first_name: z.string().optional().nullable(),
   last_name: z.string().optional().nullable(),
   password: z.string().optional().nullable(),
@@ -16107,7 +16709,9 @@ export const usersUpdateToOneWithWhereWithoutScheduled_reports_subscription_user
 
 export const usersUpdateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersUpdateWithoutScheduled_reports_subscription_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16159,7 +16763,9 @@ export const usersUpdateWithoutScheduled_reports_subscription_usersInputSchema: 
 
 export const usersUncheckedUpdateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutScheduled_reports_subscription_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17747,8 +18353,9 @@ export const scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
 // ARGS
 /////////////////////////////////////////
 
-export const permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.permissionsFindFirstArgs, "include">> = z.object({
+export const permissionsFindFirstArgsSchema: z.ZodType<Prisma.permissionsFindFirstArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereInputSchema.optional(),
   orderBy: z.union([ permissionsOrderByWithRelationInputSchema.array(),permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: permissionsWhereUniqueInputSchema.optional(),
@@ -17757,8 +18364,9 @@ export const permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.permissionsFi
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.permissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.permissionsFindFirstOrThrowArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereInputSchema.optional(),
   orderBy: z.union([ permissionsOrderByWithRelationInputSchema.array(),permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: permissionsWhereUniqueInputSchema.optional(),
@@ -17767,8 +18375,9 @@ export const permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.permis
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.permissionsFindManyArgs, "include">> = z.object({
+export const permissionsFindManyArgsSchema: z.ZodType<Prisma.permissionsFindManyArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereInputSchema.optional(),
   orderBy: z.union([ permissionsOrderByWithRelationInputSchema.array(),permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: permissionsWhereUniqueInputSchema.optional(),
@@ -17794,18 +18403,21 @@ export const permissionsGroupByArgsSchema: z.ZodType<Prisma.permissionsGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.permissionsFindUniqueArgs, "include">> = z.object({
+export const permissionsFindUniqueArgsSchema: z.ZodType<Prisma.permissionsFindUniqueArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.permissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.permissionsFindUniqueOrThrowArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.rolesFindFirstArgs, "include">> = z.object({
+export const rolesFindFirstArgsSchema: z.ZodType<Prisma.rolesFindFirstArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereInputSchema.optional(),
   orderBy: z.union([ rolesOrderByWithRelationInputSchema.array(),rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: rolesWhereUniqueInputSchema.optional(),
@@ -17814,8 +18426,9 @@ export const rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.rolesFindFirstArgs,
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.rolesFindFirstOrThrowArgs, "include">> = z.object({
+export const rolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.rolesFindFirstOrThrowArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereInputSchema.optional(),
   orderBy: z.union([ rolesOrderByWithRelationInputSchema.array(),rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: rolesWhereUniqueInputSchema.optional(),
@@ -17824,8 +18437,9 @@ export const rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.rolesFindFir
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const rolesFindManyArgsSchema: z.ZodType<Omit<Prisma.rolesFindManyArgs, "include">> = z.object({
+export const rolesFindManyArgsSchema: z.ZodType<Prisma.rolesFindManyArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereInputSchema.optional(),
   orderBy: z.union([ rolesOrderByWithRelationInputSchema.array(),rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: rolesWhereUniqueInputSchema.optional(),
@@ -17851,18 +18465,21 @@ export const rolesGroupByArgsSchema: z.ZodType<Prisma.rolesGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const rolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.rolesFindUniqueArgs, "include">> = z.object({
+export const rolesFindUniqueArgsSchema: z.ZodType<Prisma.rolesFindUniqueArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereUniqueInputSchema,
 }).strict()
 
-export const rolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.rolesFindUniqueOrThrowArgs, "include">> = z.object({
+export const rolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.rolesFindUniqueOrThrowArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereUniqueInputSchema,
 }).strict()
 
-export const roles_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsFindFirstArgs, "include">> = z.object({
+export const roles_permissionsFindFirstArgsSchema: z.ZodType<Prisma.roles_permissionsFindFirstArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ roles_permissionsOrderByWithRelationInputSchema.array(),roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: roles_permissionsWhereUniqueInputSchema.optional(),
@@ -17871,8 +18488,9 @@ export const roles_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.roles_p
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.roles_permissionsFindFirstOrThrowArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ roles_permissionsOrderByWithRelationInputSchema.array(),roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: roles_permissionsWhereUniqueInputSchema.optional(),
@@ -17881,8 +18499,9 @@ export const roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const roles_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsFindManyArgs, "include">> = z.object({
+export const roles_permissionsFindManyArgsSchema: z.ZodType<Prisma.roles_permissionsFindManyArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ roles_permissionsOrderByWithRelationInputSchema.array(),roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: roles_permissionsWhereUniqueInputSchema.optional(),
@@ -17908,18 +18527,21 @@ export const roles_permissionsGroupByArgsSchema: z.ZodType<Prisma.roles_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const roles_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsFindUniqueArgs, "include">> = z.object({
+export const roles_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.roles_permissionsFindUniqueArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.roles_permissionsFindUniqueOrThrowArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const usersFindFirstArgsSchema: z.ZodType<Omit<Prisma.usersFindFirstArgs, "include">> = z.object({
+export const usersFindFirstArgsSchema: z.ZodType<Prisma.usersFindFirstArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereInputSchema.optional(),
   orderBy: z.union([ usersOrderByWithRelationInputSchema.array(),usersOrderByWithRelationInputSchema ]).optional(),
   cursor: usersWhereUniqueInputSchema.optional(),
@@ -17928,8 +18550,9 @@ export const usersFindFirstArgsSchema: z.ZodType<Omit<Prisma.usersFindFirstArgs,
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const usersFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.usersFindFirstOrThrowArgs, "include">> = z.object({
+export const usersFindFirstOrThrowArgsSchema: z.ZodType<Prisma.usersFindFirstOrThrowArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereInputSchema.optional(),
   orderBy: z.union([ usersOrderByWithRelationInputSchema.array(),usersOrderByWithRelationInputSchema ]).optional(),
   cursor: usersWhereUniqueInputSchema.optional(),
@@ -17938,8 +18561,9 @@ export const usersFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.usersFindFir
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const usersFindManyArgsSchema: z.ZodType<Omit<Prisma.usersFindManyArgs, "include">> = z.object({
+export const usersFindManyArgsSchema: z.ZodType<Prisma.usersFindManyArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereInputSchema.optional(),
   orderBy: z.union([ usersOrderByWithRelationInputSchema.array(),usersOrderByWithRelationInputSchema ]).optional(),
   cursor: usersWhereUniqueInputSchema.optional(),
@@ -17965,18 +18589,21 @@ export const usersGroupByArgsSchema: z.ZodType<Prisma.usersGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const usersFindUniqueArgsSchema: z.ZodType<Omit<Prisma.usersFindUniqueArgs, "include">> = z.object({
+export const usersFindUniqueArgsSchema: z.ZodType<Prisma.usersFindUniqueArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereUniqueInputSchema,
 }).strict()
 
-export const usersFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.usersFindUniqueOrThrowArgs, "include">> = z.object({
+export const usersFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.usersFindUniqueOrThrowArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereUniqueInputSchema,
 }).strict()
 
-export const users_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_permissionsFindFirstArgs, "include">> = z.object({
+export const users_permissionsFindFirstArgsSchema: z.ZodType<Prisma.users_permissionsFindFirstArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ users_permissionsOrderByWithRelationInputSchema.array(),users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_permissionsWhereUniqueInputSchema.optional(),
@@ -17985,8 +18612,9 @@ export const users_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_p
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_permissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.users_permissionsFindFirstOrThrowArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ users_permissionsOrderByWithRelationInputSchema.array(),users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_permissionsWhereUniqueInputSchema.optional(),
@@ -17995,8 +18623,9 @@ export const users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.users_permissionsFindManyArgs, "include">> = z.object({
+export const users_permissionsFindManyArgsSchema: z.ZodType<Prisma.users_permissionsFindManyArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ users_permissionsOrderByWithRelationInputSchema.array(),users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_permissionsWhereUniqueInputSchema.optional(),
@@ -18022,18 +18651,21 @@ export const users_permissionsGroupByArgsSchema: z.ZodType<Prisma.users_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const users_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.users_permissionsFindUniqueArgs, "include">> = z.object({
+export const users_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.users_permissionsFindUniqueArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.users_permissionsFindUniqueOrThrowArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const users_rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_rolesFindFirstArgs, "include">> = z.object({
+export const users_rolesFindFirstArgsSchema: z.ZodType<Prisma.users_rolesFindFirstArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ users_rolesOrderByWithRelationInputSchema.array(),users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_rolesWhereUniqueInputSchema.optional(),
@@ -18042,8 +18674,9 @@ export const users_rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_rolesFi
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_rolesFindFirstOrThrowArgs, "include">> = z.object({
+export const users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.users_rolesFindFirstOrThrowArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ users_rolesOrderByWithRelationInputSchema.array(),users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_rolesWhereUniqueInputSchema.optional(),
@@ -18052,8 +18685,9 @@ export const users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_rolesFindManyArgsSchema: z.ZodType<Omit<Prisma.users_rolesFindManyArgs, "include">> = z.object({
+export const users_rolesFindManyArgsSchema: z.ZodType<Prisma.users_rolesFindManyArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ users_rolesOrderByWithRelationInputSchema.array(),users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_rolesWhereUniqueInputSchema.optional(),
@@ -18079,18 +18713,21 @@ export const users_rolesGroupByArgsSchema: z.ZodType<Prisma.users_rolesGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const users_rolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.users_rolesFindUniqueArgs, "include">> = z.object({
+export const users_rolesFindUniqueArgsSchema: z.ZodType<Prisma.users_rolesFindUniqueArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_rolesFindUniqueOrThrowArgs, "include">> = z.object({
+export const users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.users_rolesFindUniqueOrThrowArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.work_schedulesFindFirstArgs, "include">> = z.object({
+export const work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.work_schedulesFindFirstArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedulesOrderByWithRelationInputSchema.array(),work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedulesWhereUniqueInputSchema.optional(),
@@ -18099,8 +18736,9 @@ export const work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.work_sched
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
+export const work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.work_schedulesFindFirstOrThrowArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedulesOrderByWithRelationInputSchema.array(),work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedulesWhereUniqueInputSchema.optional(),
@@ -18109,8 +18747,9 @@ export const work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.wor
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.work_schedulesFindManyArgs, "include">> = z.object({
+export const work_schedulesFindManyArgsSchema: z.ZodType<Prisma.work_schedulesFindManyArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedulesOrderByWithRelationInputSchema.array(),work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedulesWhereUniqueInputSchema.optional(),
@@ -18136,18 +18775,21 @@ export const work_schedulesGroupByArgsSchema: z.ZodType<Prisma.work_schedulesGro
   skip: z.number().optional(),
 }).strict()
 
-export const work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.work_schedulesFindUniqueArgs, "include">> = z.object({
+export const work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.work_schedulesFindUniqueArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
+export const work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.work_schedulesFindUniqueOrThrowArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.terminalsFindFirstArgs, "include">> = z.object({
+export const terminalsFindFirstArgsSchema: z.ZodType<Prisma.terminalsFindFirstArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereInputSchema.optional(),
   orderBy: z.union([ terminalsOrderByWithRelationInputSchema.array(),terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: terminalsWhereUniqueInputSchema.optional(),
@@ -18156,8 +18798,9 @@ export const terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.terminalsFindFi
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.terminalsFindFirstOrThrowArgs, "include">> = z.object({
+export const terminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.terminalsFindFirstOrThrowArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereInputSchema.optional(),
   orderBy: z.union([ terminalsOrderByWithRelationInputSchema.array(),terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: terminalsWhereUniqueInputSchema.optional(),
@@ -18166,8 +18809,9 @@ export const terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.terminal
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const terminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.terminalsFindManyArgs, "include">> = z.object({
+export const terminalsFindManyArgsSchema: z.ZodType<Prisma.terminalsFindManyArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereInputSchema.optional(),
   orderBy: z.union([ terminalsOrderByWithRelationInputSchema.array(),terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: terminalsWhereUniqueInputSchema.optional(),
@@ -18193,18 +18837,21 @@ export const terminalsGroupByArgsSchema: z.ZodType<Prisma.terminalsGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const terminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.terminalsFindUniqueArgs, "include">> = z.object({
+export const terminalsFindUniqueArgsSchema: z.ZodType<Prisma.terminalsFindUniqueArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.terminalsFindUniqueOrThrowArgs, "include">> = z.object({
+export const terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.terminalsFindUniqueOrThrowArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const organizationFindFirstArgsSchema: z.ZodType<Omit<Prisma.organizationFindFirstArgs, "include">> = z.object({
+export const organizationFindFirstArgsSchema: z.ZodType<Prisma.organizationFindFirstArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereInputSchema.optional(),
   orderBy: z.union([ organizationOrderByWithRelationInputSchema.array(),organizationOrderByWithRelationInputSchema ]).optional(),
   cursor: organizationWhereUniqueInputSchema.optional(),
@@ -18213,8 +18860,9 @@ export const organizationFindFirstArgsSchema: z.ZodType<Omit<Prisma.organization
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const organizationFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.organizationFindFirstOrThrowArgs, "include">> = z.object({
+export const organizationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.organizationFindFirstOrThrowArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereInputSchema.optional(),
   orderBy: z.union([ organizationOrderByWithRelationInputSchema.array(),organizationOrderByWithRelationInputSchema ]).optional(),
   cursor: organizationWhereUniqueInputSchema.optional(),
@@ -18223,8 +18871,9 @@ export const organizationFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.organ
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const organizationFindManyArgsSchema: z.ZodType<Omit<Prisma.organizationFindManyArgs, "include">> = z.object({
+export const organizationFindManyArgsSchema: z.ZodType<Prisma.organizationFindManyArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereInputSchema.optional(),
   orderBy: z.union([ organizationOrderByWithRelationInputSchema.array(),organizationOrderByWithRelationInputSchema ]).optional(),
   cursor: organizationWhereUniqueInputSchema.optional(),
@@ -18250,18 +18899,21 @@ export const organizationGroupByArgsSchema: z.ZodType<Prisma.organizationGroupBy
   skip: z.number().optional(),
 }).strict()
 
-export const organizationFindUniqueArgsSchema: z.ZodType<Omit<Prisma.organizationFindUniqueArgs, "include">> = z.object({
+export const organizationFindUniqueArgsSchema: z.ZodType<Prisma.organizationFindUniqueArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereUniqueInputSchema,
 }).strict()
 
-export const organizationFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.organizationFindUniqueOrThrowArgs, "include">> = z.object({
+export const organizationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.organizationFindUniqueOrThrowArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereUniqueInputSchema,
 }).strict()
 
-export const users_terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_terminalsFindFirstArgs, "include">> = z.object({
+export const users_terminalsFindFirstArgsSchema: z.ZodType<Prisma.users_terminalsFindFirstArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ users_terminalsOrderByWithRelationInputSchema.array(),users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_terminalsWhereUniqueInputSchema.optional(),
@@ -18270,8 +18922,9 @@ export const users_terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_ter
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_terminalsFindFirstOrThrowArgs, "include">> = z.object({
+export const users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.users_terminalsFindFirstOrThrowArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ users_terminalsOrderByWithRelationInputSchema.array(),users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_terminalsWhereUniqueInputSchema.optional(),
@@ -18280,8 +18933,9 @@ export const users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.us
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_terminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.users_terminalsFindManyArgs, "include">> = z.object({
+export const users_terminalsFindManyArgsSchema: z.ZodType<Prisma.users_terminalsFindManyArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ users_terminalsOrderByWithRelationInputSchema.array(),users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: users_terminalsWhereUniqueInputSchema.optional(),
@@ -18307,18 +18961,21 @@ export const users_terminalsGroupByArgsSchema: z.ZodType<Prisma.users_terminalsG
   skip: z.number().optional(),
 }).strict()
 
-export const users_terminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.users_terminalsFindUniqueArgs, "include">> = z.object({
+export const users_terminalsFindUniqueArgsSchema: z.ZodType<Prisma.users_terminalsFindUniqueArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_terminalsFindUniqueOrThrowArgs, "include">> = z.object({
+export const users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.users_terminalsFindUniqueOrThrowArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const users_work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesFindFirstArgs, "include">> = z.object({
+export const users_work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.users_work_schedulesFindFirstArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ users_work_schedulesOrderByWithRelationInputSchema.array(),users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -18327,8 +18984,9 @@ export const users_work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.user
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
+export const users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.users_work_schedulesFindFirstOrThrowArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ users_work_schedulesOrderByWithRelationInputSchema.array(),users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -18337,8 +18995,9 @@ export const users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Pris
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const users_work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesFindManyArgs, "include">> = z.object({
+export const users_work_schedulesFindManyArgsSchema: z.ZodType<Prisma.users_work_schedulesFindManyArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ users_work_schedulesOrderByWithRelationInputSchema.array(),users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -18364,18 +19023,21 @@ export const users_work_schedulesGroupByArgsSchema: z.ZodType<Prisma.users_work_
   skip: z.number().optional(),
 }).strict()
 
-export const users_work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesFindUniqueArgs, "include">> = z.object({
+export const users_work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.users_work_schedulesFindUniqueArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
+export const users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.users_work_schedulesFindUniqueOrThrowArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedule_entriesFindFirstArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesFindFirstArgs, "include">> = z.object({
+export const work_schedule_entriesFindFirstArgsSchema: z.ZodType<Prisma.work_schedule_entriesFindFirstArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedule_entriesOrderByWithRelationInputSchema.array(),work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -18384,8 +19046,9 @@ export const work_schedule_entriesFindFirstArgsSchema: z.ZodType<Omit<Prisma.wor
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesFindFirstOrThrowArgs, "include">> = z.object({
+export const work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.work_schedule_entriesFindFirstOrThrowArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedule_entriesOrderByWithRelationInputSchema.array(),work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -18394,8 +19057,9 @@ export const work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Pri
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const work_schedule_entriesFindManyArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesFindManyArgs, "include">> = z.object({
+export const work_schedule_entriesFindManyArgsSchema: z.ZodType<Prisma.work_schedule_entriesFindManyArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ work_schedule_entriesOrderByWithRelationInputSchema.array(),work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -18421,18 +19085,21 @@ export const work_schedule_entriesGroupByArgsSchema: z.ZodType<Prisma.work_sched
   skip: z.number().optional(),
 }).strict()
 
-export const work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesFindUniqueArgs, "include">> = z.object({
+export const work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Prisma.work_schedule_entriesFindUniqueArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesFindUniqueOrThrowArgs, "include">> = z.object({
+export const work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.work_schedule_entriesFindUniqueOrThrowArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const api_tokensFindFirstArgsSchema: z.ZodType<Omit<Prisma.api_tokensFindFirstArgs, "include">> = z.object({
+export const api_tokensFindFirstArgsSchema: z.ZodType<Prisma.api_tokensFindFirstArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ api_tokensOrderByWithRelationInputSchema.array(),api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: api_tokensWhereUniqueInputSchema.optional(),
@@ -18441,8 +19108,9 @@ export const api_tokensFindFirstArgsSchema: z.ZodType<Omit<Prisma.api_tokensFind
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.api_tokensFindFirstOrThrowArgs, "include">> = z.object({
+export const api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Prisma.api_tokensFindFirstOrThrowArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ api_tokensOrderByWithRelationInputSchema.array(),api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: api_tokensWhereUniqueInputSchema.optional(),
@@ -18451,8 +19119,9 @@ export const api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.api_tok
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const api_tokensFindManyArgsSchema: z.ZodType<Omit<Prisma.api_tokensFindManyArgs, "include">> = z.object({
+export const api_tokensFindManyArgsSchema: z.ZodType<Prisma.api_tokensFindManyArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ api_tokensOrderByWithRelationInputSchema.array(),api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: api_tokensWhereUniqueInputSchema.optional(),
@@ -18478,18 +19147,21 @@ export const api_tokensGroupByArgsSchema: z.ZodType<Prisma.api_tokensGroupByArgs
   skip: z.number().optional(),
 }).strict()
 
-export const api_tokensFindUniqueArgsSchema: z.ZodType<Omit<Prisma.api_tokensFindUniqueArgs, "include">> = z.object({
+export const api_tokensFindUniqueArgsSchema: z.ZodType<Prisma.api_tokensFindUniqueArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.api_tokensFindUniqueOrThrowArgs, "include">> = z.object({
+export const api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.api_tokensFindUniqueOrThrowArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const timesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.timesheetFindFirstArgs, "include">> = z.object({
+export const timesheetFindFirstArgsSchema: z.ZodType<Prisma.timesheetFindFirstArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereInputSchema.optional(),
   orderBy: z.union([ timesheetOrderByWithRelationInputSchema.array(),timesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: timesheetWhereUniqueInputSchema.optional(),
@@ -18498,8 +19170,9 @@ export const timesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.timesheetFindFi
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const timesheetFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.timesheetFindFirstOrThrowArgs, "include">> = z.object({
+export const timesheetFindFirstOrThrowArgsSchema: z.ZodType<Prisma.timesheetFindFirstOrThrowArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereInputSchema.optional(),
   orderBy: z.union([ timesheetOrderByWithRelationInputSchema.array(),timesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: timesheetWhereUniqueInputSchema.optional(),
@@ -18508,8 +19181,9 @@ export const timesheetFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.timeshee
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const timesheetFindManyArgsSchema: z.ZodType<Omit<Prisma.timesheetFindManyArgs, "include">> = z.object({
+export const timesheetFindManyArgsSchema: z.ZodType<Prisma.timesheetFindManyArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereInputSchema.optional(),
   orderBy: z.union([ timesheetOrderByWithRelationInputSchema.array(),timesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: timesheetWhereUniqueInputSchema.optional(),
@@ -18535,18 +19209,21 @@ export const timesheetGroupByArgsSchema: z.ZodType<Prisma.timesheetGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const timesheetFindUniqueArgsSchema: z.ZodType<Omit<Prisma.timesheetFindUniqueArgs, "include">> = z.object({
+export const timesheetFindUniqueArgsSchema: z.ZodType<Prisma.timesheetFindUniqueArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereUniqueInputSchema,
 }).strict()
 
-export const timesheetFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.timesheetFindUniqueOrThrowArgs, "include">> = z.object({
+export const timesheetFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.timesheetFindUniqueOrThrowArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reportsFindFirstArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsFindFirstArgs, "include">> = z.object({
+export const scheduled_reportsFindFirstArgsSchema: z.ZodType<Prisma.scheduled_reportsFindFirstArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reportsOrderByWithRelationInputSchema.array(),scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -18555,8 +19232,9 @@ export const scheduled_reportsFindFirstArgsSchema: z.ZodType<Omit<Prisma.schedul
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsFindFirstOrThrowArgs, "include">> = z.object({
+export const scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.scheduled_reportsFindFirstOrThrowArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reportsOrderByWithRelationInputSchema.array(),scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -18565,8 +19243,9 @@ export const scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const scheduled_reportsFindManyArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsFindManyArgs, "include">> = z.object({
+export const scheduled_reportsFindManyArgsSchema: z.ZodType<Prisma.scheduled_reportsFindManyArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reportsOrderByWithRelationInputSchema.array(),scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -18592,18 +19271,21 @@ export const scheduled_reportsGroupByArgsSchema: z.ZodType<Prisma.scheduled_repo
   skip: z.number().optional(),
 }).strict()
 
-export const scheduled_reportsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsFindUniqueArgs, "include">> = z.object({
+export const scheduled_reportsFindUniqueArgsSchema: z.ZodType<Prisma.scheduled_reportsFindUniqueArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsFindUniqueOrThrowArgs, "include">> = z.object({
+export const scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.scheduled_reportsFindUniqueOrThrowArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionFindFirstArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionFindFirstArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -18612,8 +19294,9 @@ export const scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Omit<P
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionFindFirstOrThrowArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionFindFirstOrThrowArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -18622,8 +19305,9 @@ export const scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionFindManyArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionFindManyArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -18649,23 +19333,27 @@ export const scheduled_reports_subscriptionGroupByArgsSchema: z.ZodType<Prisma.s
   skip: z.number().optional(),
 }).strict()
 
-export const scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionFindUniqueArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionFindUniqueArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionFindUniqueOrThrowArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionFindUniqueOrThrowArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.permissionsCreateArgs, "include">> = z.object({
+export const permissionsCreateArgsSchema: z.ZodType<Prisma.permissionsCreateArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   data: z.union([ permissionsCreateInputSchema,permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.permissionsUpsertArgs, "include">> = z.object({
+export const permissionsUpsertArgsSchema: z.ZodType<Prisma.permissionsUpsertArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereUniqueInputSchema,
   create: z.union([ permissionsCreateInputSchema,permissionsUncheckedCreateInputSchema ]),
   update: z.union([ permissionsUpdateInputSchema,permissionsUncheckedUpdateInputSchema ]),
@@ -18676,13 +19364,15 @@ export const permissionsCreateManyArgsSchema: z.ZodType<Prisma.permissionsCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.permissionsDeleteArgs, "include">> = z.object({
+export const permissionsDeleteArgsSchema: z.ZodType<Prisma.permissionsDeleteArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   where: permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.permissionsUpdateArgs, "include">> = z.object({
+export const permissionsUpdateArgsSchema: z.ZodType<Prisma.permissionsUpdateArgs> = z.object({
   select: permissionsSelectSchema.optional(),
+  include: permissionsIncludeSchema.optional(),
   data: z.union([ permissionsUpdateInputSchema,permissionsUncheckedUpdateInputSchema ]),
   where: permissionsWhereUniqueInputSchema,
 }).strict()
@@ -18696,13 +19386,15 @@ export const permissionsDeleteManyArgsSchema: z.ZodType<Prisma.permissionsDelete
   where: permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const rolesCreateArgsSchema: z.ZodType<Omit<Prisma.rolesCreateArgs, "include">> = z.object({
+export const rolesCreateArgsSchema: z.ZodType<Prisma.rolesCreateArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   data: z.union([ rolesCreateInputSchema,rolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const rolesUpsertArgsSchema: z.ZodType<Omit<Prisma.rolesUpsertArgs, "include">> = z.object({
+export const rolesUpsertArgsSchema: z.ZodType<Prisma.rolesUpsertArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereUniqueInputSchema,
   create: z.union([ rolesCreateInputSchema,rolesUncheckedCreateInputSchema ]),
   update: z.union([ rolesUpdateInputSchema,rolesUncheckedUpdateInputSchema ]),
@@ -18713,13 +19405,15 @@ export const rolesCreateManyArgsSchema: z.ZodType<Prisma.rolesCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const rolesDeleteArgsSchema: z.ZodType<Omit<Prisma.rolesDeleteArgs, "include">> = z.object({
+export const rolesDeleteArgsSchema: z.ZodType<Prisma.rolesDeleteArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   where: rolesWhereUniqueInputSchema,
 }).strict()
 
-export const rolesUpdateArgsSchema: z.ZodType<Omit<Prisma.rolesUpdateArgs, "include">> = z.object({
+export const rolesUpdateArgsSchema: z.ZodType<Prisma.rolesUpdateArgs> = z.object({
   select: rolesSelectSchema.optional(),
+  include: rolesIncludeSchema.optional(),
   data: z.union([ rolesUpdateInputSchema,rolesUncheckedUpdateInputSchema ]),
   where: rolesWhereUniqueInputSchema,
 }).strict()
@@ -18733,13 +19427,15 @@ export const rolesDeleteManyArgsSchema: z.ZodType<Prisma.rolesDeleteManyArgs> = 
   where: rolesWhereInputSchema.optional(),
 }).strict()
 
-export const roles_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsCreateArgs, "include">> = z.object({
+export const roles_permissionsCreateArgsSchema: z.ZodType<Prisma.roles_permissionsCreateArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   data: z.union([ roles_permissionsCreateInputSchema,roles_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const roles_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsUpsertArgs, "include">> = z.object({
+export const roles_permissionsUpsertArgsSchema: z.ZodType<Prisma.roles_permissionsUpsertArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereUniqueInputSchema,
   create: z.union([ roles_permissionsCreateInputSchema,roles_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ roles_permissionsUpdateInputSchema,roles_permissionsUncheckedUpdateInputSchema ]),
@@ -18750,13 +19446,15 @@ export const roles_permissionsCreateManyArgsSchema: z.ZodType<Prisma.roles_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const roles_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsDeleteArgs, "include">> = z.object({
+export const roles_permissionsDeleteArgsSchema: z.ZodType<Prisma.roles_permissionsDeleteArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   where: roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const roles_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.roles_permissionsUpdateArgs, "include">> = z.object({
+export const roles_permissionsUpdateArgsSchema: z.ZodType<Prisma.roles_permissionsUpdateArgs> = z.object({
   select: roles_permissionsSelectSchema.optional(),
+  include: roles_permissionsIncludeSchema.optional(),
   data: z.union([ roles_permissionsUpdateInputSchema,roles_permissionsUncheckedUpdateInputSchema ]),
   where: roles_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -18770,13 +19468,15 @@ export const roles_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.roles_permi
   where: roles_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const usersCreateArgsSchema: z.ZodType<Omit<Prisma.usersCreateArgs, "include">> = z.object({
+export const usersCreateArgsSchema: z.ZodType<Prisma.usersCreateArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   data: z.union([ usersCreateInputSchema,usersUncheckedCreateInputSchema ]),
 }).strict()
 
-export const usersUpsertArgsSchema: z.ZodType<Omit<Prisma.usersUpsertArgs, "include">> = z.object({
+export const usersUpsertArgsSchema: z.ZodType<Prisma.usersUpsertArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereUniqueInputSchema,
   create: z.union([ usersCreateInputSchema,usersUncheckedCreateInputSchema ]),
   update: z.union([ usersUpdateInputSchema,usersUncheckedUpdateInputSchema ]),
@@ -18787,13 +19487,15 @@ export const usersCreateManyArgsSchema: z.ZodType<Prisma.usersCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const usersDeleteArgsSchema: z.ZodType<Omit<Prisma.usersDeleteArgs, "include">> = z.object({
+export const usersDeleteArgsSchema: z.ZodType<Prisma.usersDeleteArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   where: usersWhereUniqueInputSchema,
 }).strict()
 
-export const usersUpdateArgsSchema: z.ZodType<Omit<Prisma.usersUpdateArgs, "include">> = z.object({
+export const usersUpdateArgsSchema: z.ZodType<Prisma.usersUpdateArgs> = z.object({
   select: usersSelectSchema.optional(),
+  include: usersIncludeSchema.optional(),
   data: z.union([ usersUpdateInputSchema,usersUncheckedUpdateInputSchema ]),
   where: usersWhereUniqueInputSchema,
 }).strict()
@@ -18807,13 +19509,15 @@ export const usersDeleteManyArgsSchema: z.ZodType<Prisma.usersDeleteManyArgs> = 
   where: usersWhereInputSchema.optional(),
 }).strict()
 
-export const users_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.users_permissionsCreateArgs, "include">> = z.object({
+export const users_permissionsCreateArgsSchema: z.ZodType<Prisma.users_permissionsCreateArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   data: z.union([ users_permissionsCreateInputSchema,users_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const users_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.users_permissionsUpsertArgs, "include">> = z.object({
+export const users_permissionsUpsertArgsSchema: z.ZodType<Prisma.users_permissionsUpsertArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereUniqueInputSchema,
   create: z.union([ users_permissionsCreateInputSchema,users_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ users_permissionsUpdateInputSchema,users_permissionsUncheckedUpdateInputSchema ]),
@@ -18824,13 +19528,15 @@ export const users_permissionsCreateManyArgsSchema: z.ZodType<Prisma.users_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const users_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.users_permissionsDeleteArgs, "include">> = z.object({
+export const users_permissionsDeleteArgsSchema: z.ZodType<Prisma.users_permissionsDeleteArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   where: users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const users_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.users_permissionsUpdateArgs, "include">> = z.object({
+export const users_permissionsUpdateArgsSchema: z.ZodType<Prisma.users_permissionsUpdateArgs> = z.object({
   select: users_permissionsSelectSchema.optional(),
+  include: users_permissionsIncludeSchema.optional(),
   data: z.union([ users_permissionsUpdateInputSchema,users_permissionsUncheckedUpdateInputSchema ]),
   where: users_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -18844,13 +19550,15 @@ export const users_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.users_permi
   where: users_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const users_rolesCreateArgsSchema: z.ZodType<Omit<Prisma.users_rolesCreateArgs, "include">> = z.object({
+export const users_rolesCreateArgsSchema: z.ZodType<Prisma.users_rolesCreateArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   data: z.union([ users_rolesCreateInputSchema,users_rolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const users_rolesUpsertArgsSchema: z.ZodType<Omit<Prisma.users_rolesUpsertArgs, "include">> = z.object({
+export const users_rolesUpsertArgsSchema: z.ZodType<Prisma.users_rolesUpsertArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereUniqueInputSchema,
   create: z.union([ users_rolesCreateInputSchema,users_rolesUncheckedCreateInputSchema ]),
   update: z.union([ users_rolesUpdateInputSchema,users_rolesUncheckedUpdateInputSchema ]),
@@ -18861,13 +19569,15 @@ export const users_rolesCreateManyArgsSchema: z.ZodType<Prisma.users_rolesCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const users_rolesDeleteArgsSchema: z.ZodType<Omit<Prisma.users_rolesDeleteArgs, "include">> = z.object({
+export const users_rolesDeleteArgsSchema: z.ZodType<Prisma.users_rolesDeleteArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   where: users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const users_rolesUpdateArgsSchema: z.ZodType<Omit<Prisma.users_rolesUpdateArgs, "include">> = z.object({
+export const users_rolesUpdateArgsSchema: z.ZodType<Prisma.users_rolesUpdateArgs> = z.object({
   select: users_rolesSelectSchema.optional(),
+  include: users_rolesIncludeSchema.optional(),
   data: z.union([ users_rolesUpdateInputSchema,users_rolesUncheckedUpdateInputSchema ]),
   where: users_rolesWhereUniqueInputSchema,
 }).strict()
@@ -18881,13 +19591,15 @@ export const users_rolesDeleteManyArgsSchema: z.ZodType<Prisma.users_rolesDelete
   where: users_rolesWhereInputSchema.optional(),
 }).strict()
 
-export const work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.work_schedulesCreateArgs, "include">> = z.object({
+export const work_schedulesCreateArgsSchema: z.ZodType<Prisma.work_schedulesCreateArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   data: z.union([ work_schedulesCreateInputSchema,work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.work_schedulesUpsertArgs, "include">> = z.object({
+export const work_schedulesUpsertArgsSchema: z.ZodType<Prisma.work_schedulesUpsertArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereUniqueInputSchema,
   create: z.union([ work_schedulesCreateInputSchema,work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ work_schedulesUpdateInputSchema,work_schedulesUncheckedUpdateInputSchema ]),
@@ -18898,13 +19610,15 @@ export const work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.work_schedules
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.work_schedulesDeleteArgs, "include">> = z.object({
+export const work_schedulesDeleteArgsSchema: z.ZodType<Prisma.work_schedulesDeleteArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   where: work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.work_schedulesUpdateArgs, "include">> = z.object({
+export const work_schedulesUpdateArgsSchema: z.ZodType<Prisma.work_schedulesUpdateArgs> = z.object({
   select: work_schedulesSelectSchema.optional(),
+  include: work_schedulesIncludeSchema.optional(),
   data: z.union([ work_schedulesUpdateInputSchema,work_schedulesUncheckedUpdateInputSchema ]),
   where: work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -18918,13 +19632,15 @@ export const work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.work_schedules
   where: work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const terminalsCreateArgsSchema: z.ZodType<Omit<Prisma.terminalsCreateArgs, "include">> = z.object({
+export const terminalsCreateArgsSchema: z.ZodType<Prisma.terminalsCreateArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   data: z.union([ terminalsCreateInputSchema,terminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const terminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.terminalsUpsertArgs, "include">> = z.object({
+export const terminalsUpsertArgsSchema: z.ZodType<Prisma.terminalsUpsertArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereUniqueInputSchema,
   create: z.union([ terminalsCreateInputSchema,terminalsUncheckedCreateInputSchema ]),
   update: z.union([ terminalsUpdateInputSchema,terminalsUncheckedUpdateInputSchema ]),
@@ -18935,13 +19651,15 @@ export const terminalsCreateManyArgsSchema: z.ZodType<Prisma.terminalsCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const terminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.terminalsDeleteArgs, "include">> = z.object({
+export const terminalsDeleteArgsSchema: z.ZodType<Prisma.terminalsDeleteArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   where: terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const terminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.terminalsUpdateArgs, "include">> = z.object({
+export const terminalsUpdateArgsSchema: z.ZodType<Prisma.terminalsUpdateArgs> = z.object({
   select: terminalsSelectSchema.optional(),
+  include: terminalsIncludeSchema.optional(),
   data: z.union([ terminalsUpdateInputSchema,terminalsUncheckedUpdateInputSchema ]),
   where: terminalsWhereUniqueInputSchema,
 }).strict()
@@ -18955,13 +19673,15 @@ export const terminalsDeleteManyArgsSchema: z.ZodType<Prisma.terminalsDeleteMany
   where: terminalsWhereInputSchema.optional(),
 }).strict()
 
-export const organizationCreateArgsSchema: z.ZodType<Omit<Prisma.organizationCreateArgs, "include">> = z.object({
+export const organizationCreateArgsSchema: z.ZodType<Prisma.organizationCreateArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   data: z.union([ organizationCreateInputSchema,organizationUncheckedCreateInputSchema ]),
 }).strict()
 
-export const organizationUpsertArgsSchema: z.ZodType<Omit<Prisma.organizationUpsertArgs, "include">> = z.object({
+export const organizationUpsertArgsSchema: z.ZodType<Prisma.organizationUpsertArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereUniqueInputSchema,
   create: z.union([ organizationCreateInputSchema,organizationUncheckedCreateInputSchema ]),
   update: z.union([ organizationUpdateInputSchema,organizationUncheckedUpdateInputSchema ]),
@@ -18972,13 +19692,15 @@ export const organizationCreateManyArgsSchema: z.ZodType<Prisma.organizationCrea
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const organizationDeleteArgsSchema: z.ZodType<Omit<Prisma.organizationDeleteArgs, "include">> = z.object({
+export const organizationDeleteArgsSchema: z.ZodType<Prisma.organizationDeleteArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   where: organizationWhereUniqueInputSchema,
 }).strict()
 
-export const organizationUpdateArgsSchema: z.ZodType<Omit<Prisma.organizationUpdateArgs, "include">> = z.object({
+export const organizationUpdateArgsSchema: z.ZodType<Prisma.organizationUpdateArgs> = z.object({
   select: organizationSelectSchema.optional(),
+  include: organizationIncludeSchema.optional(),
   data: z.union([ organizationUpdateInputSchema,organizationUncheckedUpdateInputSchema ]),
   where: organizationWhereUniqueInputSchema,
 }).strict()
@@ -18992,13 +19714,15 @@ export const organizationDeleteManyArgsSchema: z.ZodType<Prisma.organizationDele
   where: organizationWhereInputSchema.optional(),
 }).strict()
 
-export const users_terminalsCreateArgsSchema: z.ZodType<Omit<Prisma.users_terminalsCreateArgs, "include">> = z.object({
+export const users_terminalsCreateArgsSchema: z.ZodType<Prisma.users_terminalsCreateArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   data: z.union([ users_terminalsCreateInputSchema,users_terminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const users_terminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.users_terminalsUpsertArgs, "include">> = z.object({
+export const users_terminalsUpsertArgsSchema: z.ZodType<Prisma.users_terminalsUpsertArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereUniqueInputSchema,
   create: z.union([ users_terminalsCreateInputSchema,users_terminalsUncheckedCreateInputSchema ]),
   update: z.union([ users_terminalsUpdateInputSchema,users_terminalsUncheckedUpdateInputSchema ]),
@@ -19009,13 +19733,15 @@ export const users_terminalsCreateManyArgsSchema: z.ZodType<Prisma.users_termina
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const users_terminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.users_terminalsDeleteArgs, "include">> = z.object({
+export const users_terminalsDeleteArgsSchema: z.ZodType<Prisma.users_terminalsDeleteArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   where: users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const users_terminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.users_terminalsUpdateArgs, "include">> = z.object({
+export const users_terminalsUpdateArgsSchema: z.ZodType<Prisma.users_terminalsUpdateArgs> = z.object({
   select: users_terminalsSelectSchema.optional(),
+  include: users_terminalsIncludeSchema.optional(),
   data: z.union([ users_terminalsUpdateInputSchema,users_terminalsUncheckedUpdateInputSchema ]),
   where: users_terminalsWhereUniqueInputSchema,
 }).strict()
@@ -19029,13 +19755,15 @@ export const users_terminalsDeleteManyArgsSchema: z.ZodType<Prisma.users_termina
   where: users_terminalsWhereInputSchema.optional(),
 }).strict()
 
-export const users_work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesCreateArgs, "include">> = z.object({
+export const users_work_schedulesCreateArgsSchema: z.ZodType<Prisma.users_work_schedulesCreateArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   data: z.union([ users_work_schedulesCreateInputSchema,users_work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const users_work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesUpsertArgs, "include">> = z.object({
+export const users_work_schedulesUpsertArgsSchema: z.ZodType<Prisma.users_work_schedulesUpsertArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereUniqueInputSchema,
   create: z.union([ users_work_schedulesCreateInputSchema,users_work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ users_work_schedulesUpdateInputSchema,users_work_schedulesUncheckedUpdateInputSchema ]),
@@ -19046,13 +19774,15 @@ export const users_work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.users_wo
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const users_work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesDeleteArgs, "include">> = z.object({
+export const users_work_schedulesDeleteArgsSchema: z.ZodType<Prisma.users_work_schedulesDeleteArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   where: users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const users_work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.users_work_schedulesUpdateArgs, "include">> = z.object({
+export const users_work_schedulesUpdateArgsSchema: z.ZodType<Prisma.users_work_schedulesUpdateArgs> = z.object({
   select: users_work_schedulesSelectSchema.optional(),
+  include: users_work_schedulesIncludeSchema.optional(),
   data: z.union([ users_work_schedulesUpdateInputSchema,users_work_schedulesUncheckedUpdateInputSchema ]),
   where: users_work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -19066,13 +19796,15 @@ export const users_work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.users_wo
   where: users_work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const work_schedule_entriesCreateArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesCreateArgs, "include">> = z.object({
+export const work_schedule_entriesCreateArgsSchema: z.ZodType<Prisma.work_schedule_entriesCreateArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ work_schedule_entriesCreateInputSchema,work_schedule_entriesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const work_schedule_entriesUpsertArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesUpsertArgs, "include">> = z.object({
+export const work_schedule_entriesUpsertArgsSchema: z.ZodType<Prisma.work_schedule_entriesUpsertArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereUniqueInputSchema,
   create: z.union([ work_schedule_entriesCreateInputSchema,work_schedule_entriesUncheckedCreateInputSchema ]),
   update: z.union([ work_schedule_entriesUpdateInputSchema,work_schedule_entriesUncheckedUpdateInputSchema ]),
@@ -19083,13 +19815,15 @@ export const work_schedule_entriesCreateManyArgsSchema: z.ZodType<Prisma.work_sc
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const work_schedule_entriesDeleteArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesDeleteArgs, "include">> = z.object({
+export const work_schedule_entriesDeleteArgsSchema: z.ZodType<Prisma.work_schedule_entriesDeleteArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   where: work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const work_schedule_entriesUpdateArgsSchema: z.ZodType<Omit<Prisma.work_schedule_entriesUpdateArgs, "include">> = z.object({
+export const work_schedule_entriesUpdateArgsSchema: z.ZodType<Prisma.work_schedule_entriesUpdateArgs> = z.object({
   select: work_schedule_entriesSelectSchema.optional(),
+  include: work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ work_schedule_entriesUpdateInputSchema,work_schedule_entriesUncheckedUpdateInputSchema ]),
   where: work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
@@ -19103,13 +19837,15 @@ export const work_schedule_entriesDeleteManyArgsSchema: z.ZodType<Prisma.work_sc
   where: work_schedule_entriesWhereInputSchema.optional(),
 }).strict()
 
-export const api_tokensCreateArgsSchema: z.ZodType<Omit<Prisma.api_tokensCreateArgs, "include">> = z.object({
+export const api_tokensCreateArgsSchema: z.ZodType<Prisma.api_tokensCreateArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   data: z.union([ api_tokensCreateInputSchema,api_tokensUncheckedCreateInputSchema ]),
 }).strict()
 
-export const api_tokensUpsertArgsSchema: z.ZodType<Omit<Prisma.api_tokensUpsertArgs, "include">> = z.object({
+export const api_tokensUpsertArgsSchema: z.ZodType<Prisma.api_tokensUpsertArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereUniqueInputSchema,
   create: z.union([ api_tokensCreateInputSchema,api_tokensUncheckedCreateInputSchema ]),
   update: z.union([ api_tokensUpdateInputSchema,api_tokensUncheckedUpdateInputSchema ]),
@@ -19120,13 +19856,15 @@ export const api_tokensCreateManyArgsSchema: z.ZodType<Prisma.api_tokensCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const api_tokensDeleteArgsSchema: z.ZodType<Omit<Prisma.api_tokensDeleteArgs, "include">> = z.object({
+export const api_tokensDeleteArgsSchema: z.ZodType<Prisma.api_tokensDeleteArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   where: api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const api_tokensUpdateArgsSchema: z.ZodType<Omit<Prisma.api_tokensUpdateArgs, "include">> = z.object({
+export const api_tokensUpdateArgsSchema: z.ZodType<Prisma.api_tokensUpdateArgs> = z.object({
   select: api_tokensSelectSchema.optional(),
+  include: api_tokensIncludeSchema.optional(),
   data: z.union([ api_tokensUpdateInputSchema,api_tokensUncheckedUpdateInputSchema ]),
   where: api_tokensWhereUniqueInputSchema,
 }).strict()
@@ -19140,13 +19878,15 @@ export const api_tokensDeleteManyArgsSchema: z.ZodType<Prisma.api_tokensDeleteMa
   where: api_tokensWhereInputSchema.optional(),
 }).strict()
 
-export const timesheetCreateArgsSchema: z.ZodType<Omit<Prisma.timesheetCreateArgs, "include">> = z.object({
+export const timesheetCreateArgsSchema: z.ZodType<Prisma.timesheetCreateArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   data: z.union([ timesheetCreateInputSchema,timesheetUncheckedCreateInputSchema ]),
 }).strict()
 
-export const timesheetUpsertArgsSchema: z.ZodType<Omit<Prisma.timesheetUpsertArgs, "include">> = z.object({
+export const timesheetUpsertArgsSchema: z.ZodType<Prisma.timesheetUpsertArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereUniqueInputSchema,
   create: z.union([ timesheetCreateInputSchema,timesheetUncheckedCreateInputSchema ]),
   update: z.union([ timesheetUpdateInputSchema,timesheetUncheckedUpdateInputSchema ]),
@@ -19157,13 +19897,15 @@ export const timesheetCreateManyArgsSchema: z.ZodType<Prisma.timesheetCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const timesheetDeleteArgsSchema: z.ZodType<Omit<Prisma.timesheetDeleteArgs, "include">> = z.object({
+export const timesheetDeleteArgsSchema: z.ZodType<Prisma.timesheetDeleteArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   where: timesheetWhereUniqueInputSchema,
 }).strict()
 
-export const timesheetUpdateArgsSchema: z.ZodType<Omit<Prisma.timesheetUpdateArgs, "include">> = z.object({
+export const timesheetUpdateArgsSchema: z.ZodType<Prisma.timesheetUpdateArgs> = z.object({
   select: timesheetSelectSchema.optional(),
+  include: timesheetIncludeSchema.optional(),
   data: z.union([ timesheetUpdateInputSchema,timesheetUncheckedUpdateInputSchema ]),
   where: timesheetWhereUniqueInputSchema,
 }).strict()
@@ -19177,13 +19919,15 @@ export const timesheetDeleteManyArgsSchema: z.ZodType<Prisma.timesheetDeleteMany
   where: timesheetWhereInputSchema.optional(),
 }).strict()
 
-export const scheduled_reportsCreateArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsCreateArgs, "include">> = z.object({
+export const scheduled_reportsCreateArgsSchema: z.ZodType<Prisma.scheduled_reportsCreateArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   data: z.union([ scheduled_reportsCreateInputSchema,scheduled_reportsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const scheduled_reportsUpsertArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsUpsertArgs, "include">> = z.object({
+export const scheduled_reportsUpsertArgsSchema: z.ZodType<Prisma.scheduled_reportsUpsertArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereUniqueInputSchema,
   create: z.union([ scheduled_reportsCreateInputSchema,scheduled_reportsUncheckedCreateInputSchema ]),
   update: z.union([ scheduled_reportsUpdateInputSchema,scheduled_reportsUncheckedUpdateInputSchema ]),
@@ -19194,13 +19938,15 @@ export const scheduled_reportsCreateManyArgsSchema: z.ZodType<Prisma.scheduled_r
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const scheduled_reportsDeleteArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsDeleteArgs, "include">> = z.object({
+export const scheduled_reportsDeleteArgsSchema: z.ZodType<Prisma.scheduled_reportsDeleteArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   where: scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reportsUpdateArgsSchema: z.ZodType<Omit<Prisma.scheduled_reportsUpdateArgs, "include">> = z.object({
+export const scheduled_reportsUpdateArgsSchema: z.ZodType<Prisma.scheduled_reportsUpdateArgs> = z.object({
   select: scheduled_reportsSelectSchema.optional(),
+  include: scheduled_reportsIncludeSchema.optional(),
   data: z.union([ scheduled_reportsUpdateInputSchema,scheduled_reportsUncheckedUpdateInputSchema ]),
   where: scheduled_reportsWhereUniqueInputSchema,
 }).strict()
@@ -19214,13 +19960,15 @@ export const scheduled_reportsDeleteManyArgsSchema: z.ZodType<Prisma.scheduled_r
   where: scheduled_reportsWhereInputSchema.optional(),
 }).strict()
 
-export const scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionCreateArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionCreateArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ scheduled_reports_subscriptionCreateInputSchema,scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
 }).strict()
 
-export const scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionUpsertArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionUpsertArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereUniqueInputSchema,
   create: z.union([ scheduled_reports_subscriptionCreateInputSchema,scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
   update: z.union([ scheduled_reports_subscriptionUpdateInputSchema,scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
@@ -19231,13 +19979,15 @@ export const scheduled_reports_subscriptionCreateManyArgsSchema: z.ZodType<Prism
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionDeleteArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionDeleteArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   where: scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Omit<Prisma.scheduled_reports_subscriptionUpdateArgs, "include">> = z.object({
+export const scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Prisma.scheduled_reports_subscriptionUpdateArgs> = z.object({
   select: scheduled_reports_subscriptionSelectSchema.optional(),
+  include: scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ scheduled_reports_subscriptionUpdateInputSchema,scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
   where: scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()

@@ -1,5 +1,4 @@
 import type { Prisma } from "@prisma/client";
-import { paginate } from "prisma-extension-pagination";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 
@@ -61,7 +60,9 @@ export class PermissionsService {
   }
 
   async delete(input: Prisma.permissionsDeleteArgs) {
-    return await this.prisma.permissions.delete(input);
+    const res = await this.prisma.permissions.delete(input);
+    await this.cacheControl.cachePermissions();
+    return res;
   }
 
   async cachedPermissions(

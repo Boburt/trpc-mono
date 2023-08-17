@@ -1,6 +1,7 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
   terminalsCreateArgsSchema,
+  terminalsDeleteArgsSchema,
   terminalsFindManyArgsSchema,
   terminalsFindUniqueArgsSchema,
   terminalsUpdateArgsSchema,
@@ -29,5 +30,17 @@ export const terminalsRouter = publicRouter({
     .input(terminalsUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.terminalsService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(terminalsDeleteArgsSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.terminalsService.delete(input);
+    }),
+
+  cachedTerminals: publicProcedure
+    .input(terminalsFindManyArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.terminalsService.cachedTerminals(input);
     }),
 });
