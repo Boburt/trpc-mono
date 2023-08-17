@@ -74,7 +74,8 @@ model users {
   login                                                 String                          @unique(map: "UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0") @db.VarChar(100)
   first_name                                            String?                          @db.VarChar(100)
   last_name                                             String?                          @db.VarChar(100)
-  password                                              String?                          @db.VarChar
+  password                                              String                          @db.VarChar
+  salt                                                  String                          @db.VarChar
   is_super_user                                         Boolean                          @default(false)
   status                                                user_status
   card_name                                             String?                          @db.VarChar(100)

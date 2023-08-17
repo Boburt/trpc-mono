@@ -36,8 +36,8 @@ export class UsersService {
   async findOne(
     input: z.infer<typeof usersFindUniqueArgsSchema>
   ): Promise<users | null> {
-    const user = await this.prisma.users.findUnique(input);
-    return user;
+    const res = await this.prisma.users.findUnique(input);
+    return res;
   }
 
   async update(input: Prisma.usersUpdateArgs): Promise<users> {

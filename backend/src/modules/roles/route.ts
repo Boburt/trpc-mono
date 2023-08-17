@@ -36,4 +36,10 @@ export const rolesRouter = publicRouter({
     .mutation(async ({ input, ctx }) => {
       return await ctx.rolesService.delete(input);
     }),
+
+  cachedRoles: publicProcedure
+    .input(rolesFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.rolesService.cachedRoles(input);
+    }),
 });
