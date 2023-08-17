@@ -8,6 +8,7 @@ import {
   usersUpdateArgsSchema,
   users_rolesUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
+import { loginInput } from "./dto/users.dto";
 
 export const usersRouter = publicRouter({
   add: publicProcedure
@@ -22,7 +23,6 @@ export const usersRouter = publicRouter({
     }),
   one: publicProcedure
     .input(usersFindUniqueArgsSchema)
-    // .output(usersSchema.omit({ password: true }).nullish())
     .query(({ input, ctx }) => {
       return ctx.usersService.findOne(input);
     }),
@@ -43,4 +43,9 @@ export const usersRouter = publicRouter({
     .mutation(({ input, ctx }) => {
       return ctx.usersService.assignRole(input);
     }),
+
+  login: publicProcedure.input(loginInput).mutation(({ input, ctx }) => {
+    console.log("try login");
+    return ctx.usersService.login(input);
+  }),
 });

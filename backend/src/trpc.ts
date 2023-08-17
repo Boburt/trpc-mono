@@ -41,9 +41,7 @@ const usersTerminalsService = new UsersTerminalsService(db);
 const sessionsService = new SessionsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
-  // opts?.req?.jwt?.verify();
   return {
-    name: "elysia",
     prisma: db,
     permissionsService,
     rolesService,
