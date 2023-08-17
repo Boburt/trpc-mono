@@ -33,15 +33,17 @@ function md5hash(text: string) {
   return createHash("md5").update(text).digest("hex");
 }
 
-async function signJwt(payload: any) {
+async function signJwt(payload: any, expiresIn: string = "1h") {
   const alg = "HS256";
   let jwt = new SignJWT({
     ...payload,
     nbf: undefined,
     exp: undefined,
-  }).setProtectedHeader({
-    alg,
-  });
+  })
+    .setProtectedHeader({
+      alg,
+    })
+    .setExpirationTime(expiresIn);
   const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
   return jwt.sign(jwtSecret);
 }

@@ -30,8 +30,11 @@ await client.connect();
 const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
 const rolesService = new RolesService(db, cacheControlService);
-const rolesPermissionsService = new RolesPermissionsService(db);
-const usersService = new UsersService(db);
+const rolesPermissionsService = new RolesPermissionsService(
+  db,
+  cacheControlService
+);
+const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const workSchedulesService = new WorkSchedulesService(db);
@@ -41,6 +44,8 @@ const usersTerminalsService = new UsersTerminalsService(db);
 const sessionsService = new SessionsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
+  console.log(opts.req.headers);
+
   return {
     prisma: db,
     permissionsService,

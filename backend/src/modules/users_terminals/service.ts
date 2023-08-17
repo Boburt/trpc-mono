@@ -46,7 +46,7 @@ export class UsersTerminalsService {
     return this.prisma.users_terminals.findUnique(input);
   }
 
-  async Update(
+  async update(
     input: Prisma.users_terminalsUpdateArgs
   ): Promise<users_terminals> {
     return this.prisma.users_terminals.update(input);

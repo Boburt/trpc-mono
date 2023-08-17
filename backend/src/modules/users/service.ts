@@ -15,11 +15,15 @@ import {
   signJwt,
 } from "@backend/lib/bcrypt";
 import { z } from "zod";
-import { loginInput } from "./dto/users.dto";
+import { loginInput, typeLoginOutput } from "./dto/users.dto";
 import { TRPCError } from "@trpc/server";
+import { CacheControlService } from "../cache_control/service";
 
 export class UsersService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly cacheController: CacheControlService
+  ) {}
 
   async create(input: Prisma.usersCreateArgs): Promise<usersSchema> {
     if (input.data.password) {
@@ -110,15 +114,23 @@ export class UsersService {
     return await this.prisma.users_roles.create({ data: input });
   }
 
-  async login(input: z.infer<typeof loginInput>): Promise<usersSchema> {
+  async login(
+    input: z.infer<typeof loginInput>
+  ): Promise<z.infer<typeof typeLoginOutput>> {
     const user = await this.prisma.users.findUnique({
       where: {
         login: input.login,
+      },
+      include: {
+        users_roles_usersTousers_roles_user_id: true,
       },
     });
     if (!user) {
       throw new Error("User not found");
     }
+
+    // check password
+
     const isPasswordSame = await comparePassword(
       input.password,
       user.salt!,
@@ -130,16 +142,43 @@ export class UsersService {
       });
     }
 
-    // const accessToken = await signJwt({
-    //   id: user.id,
-    //   login: user.login,
-    //   email: user.email,
-    //   first_name: user.first_name,
-    //   last_name: user.last_name,
-    // });
+    // generate tokens
 
-    // console.log("accessToken", accessToken);
+    const accessToken = await signJwt(
+      {
+        id: user.id,
+        login: user.login,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
+      process.env.JWT_EXPIRES_IN
+    );
 
-    return user;
+    const refreshToken = await signJwt(
+      {
+        id: user.id,
+        login: user.login,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
+      process.env.JWT_REFRESH_EXPIRES_IN
+    );
+
+    console.log("accessToken", accessToken);
+
+    // getting rights
+    let permissions: string[] = [];
+    if (user.users_roles_usersTousers_roles_user_id.length > 0) {
+      const roleId = user.users_roles_usersTousers_roles_user_id[0].role_id;
+      permissions = await this.cacheController.getPermissionsByRoleId(roleId);
+    }
+    return {
+      data: user,
+      refreshToken,
+      accessToken,
+      rights: permissions,
+    };
   }
 }
