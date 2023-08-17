@@ -16,7 +16,7 @@ export default function Manufacturer() {
               height={500}
             />
             <h4>{manufacturer.name}</h4>
-            <p>{manufacturer.derc}</p>
+            <p>{manufacturer.derc}testtst</p>
           </div>
         ))}
       </div>

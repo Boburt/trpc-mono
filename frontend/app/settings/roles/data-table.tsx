@@ -21,7 +21,7 @@ import {
 import { Button } from "@components/ui/button";
 
 import { DataTablePagination } from "@components/ui/data-table-pagination";
-import { usePermissionsQuery } from "@frontend/store/api/permission";
+import { useRolesQuery } from "@frontend/store/api/roles";
 import { useMemo, useState } from "react";
 import {
   Select,
@@ -36,6 +36,8 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
+import { useRolesStore } from "@frontend/store/states/roles";
+import { RouterOutputs } from "@frontend/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,12 +46,15 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const rowSelection = useRolesStore((state) => state.selectedRows);
+  const setRowSelection = useRolesStore((state) => state.toggleSelected);
+
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading } = usePermissionsQuery({
+  const { data, isLoading } = useRolesQuery({
     take: pageSize,
     skip: pageIndex * pageSize,
   });
@@ -70,7 +75,15 @@ export function DataTable<TData, TValue>({
     pageCount: data?.meta?.pageCount ?? -1,
     state: {
       pagination,
+      rowSelection,
     },
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    // onRowSelectionChange: function (stateUpdater) {
+    //   console.log(arguments);
+    //   // setRowSelection(stateUpdater)
+    // },
+
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -137,7 +150,11 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="cursor-pointer"
+                      onClick={() => setRowSelection(row.id)}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

@@ -37,4 +37,10 @@ export const organizationRouter = publicRouter({
     .mutation(({ input, ctx }) => {
       return ctx.organizationService.delete(input);
     }),
+
+  cachedOrganizations: publicProcedure
+    .input(organizationFindManyArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.organizationService.cachedOrginization(input);
+    }),
 });

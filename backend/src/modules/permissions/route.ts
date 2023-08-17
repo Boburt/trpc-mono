@@ -15,10 +15,8 @@ export const permissionsRouter = publicRouter({
 
   list: publicProcedure
     .input(permissionsFindManyArgsSchema)
-    .query(async ({ input, ctx }) => {
-      let res = await ctx.permissionsService.findMany(input);
-      return res;
-      return [];
+    .query(({ input, ctx }) => {
+      return ctx.permissionsService.findMany(input);
     }),
 
   one: publicProcedure

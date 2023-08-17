@@ -26,13 +26,10 @@ import { useState, useMemo, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
-import { permissionsCreateInputSchema } from "@backend/lib/zod";
-import {
-  usePermissionsCreate,
-  usePermissionsUpdate,
-} from "@frontend/store/api/permission";
+import { rolesCreateInputSchema } from "@backend/lib/zod";
+import { useRolesCreate, useRolesUpdate } from "@frontend/store/api/roles";
 
-export default function PermissionsForm({
+export default function RolesForm({
   children,
   recordId,
 }: {
@@ -41,19 +38,19 @@ export default function PermissionsForm({
 }) {
   const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
-  const form = useForm<z.infer<typeof permissionsCreateInputSchema>>({
-    resolver: zodResolver(permissionsCreateInputSchema),
+  const form = useForm<z.infer<typeof rolesCreateInputSchema>>({
+    resolver: zodResolver(rolesCreateInputSchema),
     defaultValues: {
       active: true,
-      slug: "",
-      description: "",
+      name: "",
+      code: "",
     },
   });
 
   const onAddSuccess = (actionText: string) => {
     toast({
       title: "Success",
-      description: `Permission ${actionText}`,
+      description: `Role ${actionText}`,
       duration: 5000,
     });
     form.reset();
@@ -70,34 +67,33 @@ export default function PermissionsForm({
   };
 
   const {
-    mutateAsync: createPermission,
+    mutateAsync: createRole,
     isLoading: isAddLoading,
     data,
     error,
-  } = usePermissionsCreate({
+  } = useRolesCreate({
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
   const {
-    mutateAsync: updatePermission,
+    mutateAsync: updateRole,
     isLoading: isUpdateLoading,
     error: updateError,
-  } = usePermissionsUpdate({
+  } = useRolesUpdate({
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.permissions.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId && open,
-        refetchOnMountOrArgChange: true,
-      }
-    );
+  const { data: record, isLoading: isRecordLoading } = trpc.roles.one.useQuery(
+    {
+      where: { id: recordId },
+    },
+    {
+      enabled: !!recordId && open,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const isLoading = useMemo(() => {
     return isAddLoading || isUpdateLoading;
@@ -106,8 +102,8 @@ export default function PermissionsForm({
   useEffect(() => {
     if (record) {
       form.setValue("active", record.active);
-      form.setValue("slug", record.slug);
-      form.setValue("description", record.description);
+      form.setValue("name", record.name);
+      form.setValue("code", record.code);
     }
 
     return () => {
@@ -119,9 +115,9 @@ export default function PermissionsForm({
     values: z.infer<typeof permissionsCreateInputSchema>
   ) {
     if (recordId) {
-      updatePermission({ data: values, where: { id: recordId } });
+      updateRole({ data: values, where: { id: recordId } });
     } else {
-      createPermission({ data: values });
+      createRole({ data: values });
     }
   }
 
@@ -143,9 +139,9 @@ export default function PermissionsForm({
   return (
     <Sheet onOpenChange={beforeOpen} open={open}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent>
+      <SheetContent side="left">
         <SheetHeader>
-          <SheetTitle>{recordId ? "Edit" : "Add"} Permissions</SheetTitle>
+          <SheetTitle>{recordId ? "Edit" : "Add"} Role</SheetTitle>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -168,10 +164,10 @@ export default function PermissionsForm({
               />
               <FormField
                 control={form.control}
-                name="slug"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Код</FormLabel>
+                    <FormLabel>Название</FormLabel>
                     <FormControl>
                       <div>
                         <Input {...field} />
@@ -183,10 +179,10 @@ export default function PermissionsForm({
               />
               <FormField
                 control={form.control}
-                name="description"
+                name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Описание</FormLabel>
+                    <FormLabel>Код</FormLabel>
                     <FormControl>
                       <div>
                         <Input {...field} />
