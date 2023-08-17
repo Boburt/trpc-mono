@@ -66,7 +66,6 @@ export default function UsersForm({
       description: `User ${actionText}`,
       duration: 5000,
     });
-    console.log("addSuccess", successData);
     assignRole(successData);
   };
 
@@ -157,11 +156,9 @@ export default function UsersForm({
     async (recordData: users) => {
       if (!userRoleId || userRoleId != changedRoleId) {
         let userId = recordData?.id;
-        console.log("userId before", userId);
         if (recordId) {
           userId = recordId;
         }
-        console.log("userId after", userId);
         await asyncAssignRole({
           user_id: userId,
           role_id: changedRoleId,
@@ -191,7 +188,6 @@ export default function UsersForm({
   async function onSubmit(
     values: z.infer<typeof permissionsCreateInputSchema>
   ) {
-    console.log(values);
     if (recordId) {
       updateUser({ data: values, where: { id: recordId } });
     } else {
@@ -213,7 +209,6 @@ export default function UsersForm({
       setOpen(false);
     }
   };
-  console.log("form", form.formState.errors);
   return (
     <Sheet onOpenChange={beforeOpen} open={open}>
       <SheetTrigger asChild>{children}</SheetTrigger>
