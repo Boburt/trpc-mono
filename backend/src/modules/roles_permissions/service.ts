@@ -8,9 +8,13 @@ import {
   roles_permissionsWithRelations,
 } from "@backend/lib/zod";
 import { createManyPermissionsForOneRole } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneRole";
+import { CacheControlService } from "../cache_control/service";
 
 export class RolesPermissionsService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly cacheController: CacheControlService
+  ) {}
 
   async create(
     input: Prisma.roles_permissionsCreateArgs
@@ -60,6 +64,7 @@ export class RolesPermissionsService {
         role_id: input.role_id,
       })),
     });
+    this.cacheController.cacheRoles();
     return res.count;
   }
 }

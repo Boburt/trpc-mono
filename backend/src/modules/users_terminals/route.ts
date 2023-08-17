@@ -29,7 +29,7 @@ export const usersTerminalsRouter = publicRouter({
   renew: publicProcedure
     .input(users_terminalsUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
-      return ctx.usersTerminalsService.Update(input);
+      return ctx.usersTerminalsService.update(input);
     }),
 
   delete: publicProcedure

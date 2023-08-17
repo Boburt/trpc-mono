@@ -59,7 +59,7 @@ export class UsersService {
   ): Omit<User, Key> {
     const filteredEntries = Object.entries(
       user as Record<string, unknown>
-    ).filter(([key]) => keys.includes(key as Key));
+    ).filter(([key]) => !keys.includes(key as Key));
     const filteredObject = Object.fromEntries(
       filteredEntries
     ) as unknown as Omit<User, Key>;
