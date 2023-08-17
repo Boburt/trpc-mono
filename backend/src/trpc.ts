@@ -34,7 +34,7 @@ const rolesPermissionsService = new RolesPermissionsService(
   db,
   cacheControlService
 );
-const usersService = new UsersService(db);
+const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const workSchedulesService = new WorkSchedulesService(db);
@@ -44,8 +44,9 @@ const usersTerminalsService = new UsersTerminalsService(db);
 const sessionsService = new SessionsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
+  console.log(opts.req.headers);
+
   return {
-    name: "elysia",
     prisma: db,
     permissionsService,
     rolesService,
