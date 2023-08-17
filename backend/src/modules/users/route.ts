@@ -5,6 +5,7 @@ import {
   usersFindManyArgsSchema,
   usersFindUniqueArgsSchema,
   usersUpdateArgsSchema,
+  users_rolesUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
 
 export const usersRouter = publicRouter({
@@ -33,5 +34,11 @@ export const usersRouter = publicRouter({
     .input(usersDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersService.delete(input);
+    }),
+
+  assignRole: publicProcedure
+    .input(users_rolesUncheckedCreateInputSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersService.assignRole(input);
     }),
 });

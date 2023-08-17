@@ -62,7 +62,11 @@ export class CacheControlService {
   }
 
   async cacheRoles() {
-    const roles = await this.prisma.roles.findMany();
+    const roles = await this.prisma.roles.findMany({
+      include: {
+        permissions: true,
+      },
+    });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}roles`,
       JSON.stringify(roles)
