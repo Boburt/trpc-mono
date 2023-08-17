@@ -69,7 +69,9 @@ model roles_permissions {
 
 model users {
   id                                                    String                           @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phone                                                 String                           @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar(20)
+  phone                                                 String?                          @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar(20)
+  email                                                 String?                          @unique(map: "UQ_0e2c0e1b4b5b0b0b0b0b0b0b0b0") @db.VarChar(100)
+  login                                                 String                          @unique(map: "UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0") @db.VarChar(100)
   first_name                                            String?                          @db.VarChar(100)
   last_name                                             String?                          @db.VarChar(100)
   password                                              String?                          @db.VarChar
