@@ -7,7 +7,7 @@ import {
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
-import { hashPassword } from "@backend/lib/bcrypt";
+import { hashPassword, md5hash } from "@backend/lib/bcrypt";
 import { z } from "zod";
 
 export class UsersService {
@@ -48,8 +48,12 @@ export class UsersService {
 
   async update(input: Prisma.usersUpdateArgs): Promise<users> {
     if (input.data.password) {
-      const { hash, salt } = await hashPassword(input.data.password);
-      input.data.password = md5hash(input.data.password);
+      let password = input.data.password;
+      if (typeof password != "string") {
+        password = password.set!;
+      }
+      const { hash, salt } = await hashPassword(password);
+      input.data.password = md5hash(password);
       input.data.salt = salt;
     }
     return await this.prisma.users.update(input);
