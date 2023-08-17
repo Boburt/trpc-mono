@@ -30,7 +30,10 @@ await client.connect();
 const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
 const rolesService = new RolesService(db, cacheControlService);
-const rolesPermissionsService = new RolesPermissionsService(db);
+const rolesPermissionsService = new RolesPermissionsService(
+  db,
+  cacheControlService
+);
 const usersService = new UsersService(db);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
