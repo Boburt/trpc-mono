@@ -120,7 +120,18 @@ model users {
   api_tokens_updated_byTousers                          api_tokens[]                     @relation("api_tokens_updated_byTousers")
   timesheet_users                                       timesheet[]
   scheduled_reports_subscription_users                  scheduled_reports_subscription[]
-}
+  sessions                                              sessions[]                       @relation("sessions_users")
+  }
+
+  model sessions {
+    id                                                    String                            @id @default(uuid()) @db.Uuid
+    user_id                                               String                            @db.Uuid
+    user_agent                                            String
+    device_name                                           String
+    created_at                                            DateTime                          @default(now()) @db.Timestamptz(5)
+    updated_at                                            DateTime                          @default(now()) @db.Timestamptz(5)
+    users_sessions                                        users                             @relation("sessions_users", fields: [user_id], references: [id])
+  }
 
 model users_permissions {
   user_id                                   String      @db.Uuid
@@ -331,6 +342,9 @@ model scheduled_reports_subscription {
   scheduled_reports_subscription_users   users             @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_scheduled_reports_subscription_user_id")
 }
 
+
+
+
 enum organization_system_type {
   iiko
   r_keeper
@@ -348,3 +362,5 @@ enum organization_payment_types {
   card
   client
 }
+
+
