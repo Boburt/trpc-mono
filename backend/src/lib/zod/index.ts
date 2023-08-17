@@ -20,6 +20,8 @@ export const Roles_permissionsScalarFieldEnumSchema = z.enum(['role_id','permiss
 
 export const UsersScalarFieldEnumSchema = z.enum(['id','phone','email','login','first_name','last_name','password','is_super_user','status','card_name','card_number','birth_date','car_model','car_number','is_online','latitude','longitude','fcm_token','wallet_balance','max_active_order_count','doc_files','order_start_date','app_version','created_at','updated_at','api_token','tg_id']);
 
+export const SessionsScalarFieldEnumSchema = z.enum(['id','user_id','user_agent','device_name','created_at','updated_at']);
+
 export const Users_permissionsScalarFieldEnumSchema = z.enum(['user_id','permission_id','created_by','updated_by']);
 
 export const Users_rolesScalarFieldEnumSchema = z.enum(['user_id','role_id','created_by','updated_by']);
@@ -239,6 +241,7 @@ export type usersRelations = {
   api_tokens_updated_byTousers: api_tokensWithRelations[];
   timesheet_users: timesheetWithRelations[];
   scheduled_reports_subscription_users: scheduled_reports_subscriptionWithRelations[];
+  sessions: sessionsWithRelations[];
 };
 
 export type usersWithRelations = z.infer<typeof usersSchema> & usersRelations
@@ -269,6 +272,35 @@ export const usersWithRelationsSchema: z.ZodType<usersWithRelations> = usersSche
   api_tokens_updated_byTousers: z.lazy(() => api_tokensWithRelationsSchema).array(),
   timesheet_users: z.lazy(() => timesheetWithRelationsSchema).array(),
   scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionWithRelationsSchema).array(),
+  sessions: z.lazy(() => sessionsWithRelationsSchema).array(),
+}))
+
+/////////////////////////////////////////
+// SESSIONS SCHEMA
+/////////////////////////////////////////
+
+export const sessionsSchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+})
+
+export type sessions = z.infer<typeof sessionsSchema>
+
+// SESSIONS RELATION SCHEMA
+//------------------------------------------------------
+
+export type sessionsRelations = {
+  users_sessions: usersWithRelations;
+};
+
+export type sessionsWithRelations = z.infer<typeof sessionsSchema> & sessionsRelations
+
+export const sessionsWithRelationsSchema: z.ZodType<sessionsWithRelations> = sessionsSchema.merge(z.object({
+  users_sessions: z.lazy(() => usersWithRelationsSchema),
 }))
 
 /////////////////////////////////////////
@@ -827,6 +859,7 @@ export const usersIncludeSchema: z.ZodType<Prisma.usersInclude> = z.object({
   api_tokens_updated_byTousers: z.union([z.boolean(),z.lazy(() => api_tokensFindManyArgsSchema)]).optional(),
   timesheet_users: z.union([z.boolean(),z.lazy(() => timesheetFindManyArgsSchema)]).optional(),
   scheduled_reports_subscription_users: z.union([z.boolean(),z.lazy(() => scheduled_reports_subscriptionFindManyArgsSchema)]).optional(),
+  sessions: z.union([z.boolean(),z.lazy(() => sessionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UsersCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -865,6 +898,7 @@ export const usersCountOutputTypeSelectSchema: z.ZodType<Prisma.usersCountOutput
   api_tokens_updated_byTousers: z.boolean().optional(),
   timesheet_users: z.boolean().optional(),
   scheduled_reports_subscription_users: z.boolean().optional(),
+  sessions: z.boolean().optional(),
 }).strict();
 
 export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
@@ -920,7 +954,30 @@ export const usersSelectSchema: z.ZodType<Prisma.usersSelect> = z.object({
   api_tokens_updated_byTousers: z.union([z.boolean(),z.lazy(() => api_tokensFindManyArgsSchema)]).optional(),
   timesheet_users: z.union([z.boolean(),z.lazy(() => timesheetFindManyArgsSchema)]).optional(),
   scheduled_reports_subscription_users: z.union([z.boolean(),z.lazy(() => scheduled_reports_subscriptionFindManyArgsSchema)]).optional(),
+  sessions: z.union([z.boolean(),z.lazy(() => sessionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UsersCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// SESSIONS
+//------------------------------------------------------
+
+export const sessionsIncludeSchema: z.ZodType<Prisma.sessionsInclude> = z.object({
+  users_sessions: z.union([z.boolean(),z.lazy(() => usersArgsSchema)]).optional(),
+}).strict()
+
+export const sessionsArgsSchema: z.ZodType<Prisma.sessionsDefaultArgs> = z.object({
+  select: z.lazy(() => sessionsSelectSchema).optional(),
+  include: z.lazy(() => sessionsIncludeSchema).optional(),
+}).strict();
+
+export const sessionsSelectSchema: z.ZodType<Prisma.sessionsSelect> = z.object({
+  id: z.boolean().optional(),
+  user_id: z.boolean().optional(),
+  user_agent: z.boolean().optional(),
+  device_name: z.boolean().optional(),
+  created_at: z.boolean().optional(),
+  updated_at: z.boolean().optional(),
+  users_sessions: z.union([z.boolean(),z.lazy(() => usersArgsSchema)]).optional(),
 }).strict()
 
 // USERS PERMISSIONS
@@ -1630,7 +1687,8 @@ export const usersWhereInputSchema: z.ZodType<Prisma.usersWhereInput> = z.object
   api_tokens_created_byTousers: z.lazy(() => Api_tokensListRelationFilterSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => Api_tokensListRelationFilterSchema).optional(),
   timesheet_users: z.lazy(() => TimesheetListRelationFilterSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionListRelationFilterSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionListRelationFilterSchema).optional(),
+  sessions: z.lazy(() => SessionsListRelationFilterSchema).optional()
 }).strict();
 
 export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByWithRelationInput> = z.object({
@@ -1685,7 +1743,8 @@ export const usersOrderByWithRelationInputSchema: z.ZodType<Prisma.usersOrderByW
   api_tokens_created_byTousers: z.lazy(() => api_tokensOrderByRelationAggregateInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensOrderByRelationAggregateInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetOrderByRelationAggregateInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionOrderByRelationAggregateInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionOrderByRelationAggregateInputSchema).optional(),
+  sessions: z.lazy(() => sessionsOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput> = z.union([
@@ -1807,7 +1866,8 @@ export const usersWhereUniqueInputSchema: z.ZodType<Prisma.usersWhereUniqueInput
   api_tokens_created_byTousers: z.lazy(() => Api_tokensListRelationFilterSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => Api_tokensListRelationFilterSchema).optional(),
   timesheet_users: z.lazy(() => TimesheetListRelationFilterSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionListRelationFilterSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionListRelationFilterSchema).optional(),
+  sessions: z.lazy(() => SessionsListRelationFilterSchema).optional()
 }).strict());
 
 export const usersOrderByWithAggregationInputSchema: z.ZodType<Prisma.usersOrderByWithAggregationInput> = z.object({
@@ -1876,6 +1936,69 @@ export const usersScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.usersSc
   updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   api_token: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   tg_id: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+}).strict();
+
+export const sessionsWhereInputSchema: z.ZodType<Prisma.sessionsWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => sessionsWhereInputSchema),z.lazy(() => sessionsWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => sessionsWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => sessionsWhereInputSchema),z.lazy(() => sessionsWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  user_agent: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  device_name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  users_sessions: z.union([ z.lazy(() => UsersRelationFilterSchema),z.lazy(() => usersWhereInputSchema) ]).optional(),
+}).strict();
+
+export const sessionsOrderByWithRelationInputSchema: z.ZodType<Prisma.sessionsOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  user_id: z.lazy(() => SortOrderSchema).optional(),
+  user_agent: z.lazy(() => SortOrderSchema).optional(),
+  device_name: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional(),
+  users_sessions: z.lazy(() => usersOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const sessionsWhereUniqueInputSchema: z.ZodType<Prisma.sessionsWhereUniqueInput> = z.object({
+  id: z.string().uuid()
+})
+.and(z.object({
+  id: z.string().uuid().optional(),
+  AND: z.union([ z.lazy(() => sessionsWhereInputSchema),z.lazy(() => sessionsWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => sessionsWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => sessionsWhereInputSchema),z.lazy(() => sessionsWhereInputSchema).array() ]).optional(),
+  user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  user_agent: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  device_name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  users_sessions: z.union([ z.lazy(() => UsersRelationFilterSchema),z.lazy(() => usersWhereInputSchema) ]).optional(),
+}).strict());
+
+export const sessionsOrderByWithAggregationInputSchema: z.ZodType<Prisma.sessionsOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  user_id: z.lazy(() => SortOrderSchema).optional(),
+  user_agent: z.lazy(() => SortOrderSchema).optional(),
+  device_name: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => sessionsCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => sessionsMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => sessionsMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const sessionsScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.sessionsScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => sessionsScalarWhereWithAggregatesInputSchema),z.lazy(() => sessionsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => sessionsScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => sessionsScalarWhereWithAggregatesInputSchema),z.lazy(() => sessionsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  user_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  user_agent: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  device_name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
 export const users_permissionsWhereInputSchema: z.ZodType<Prisma.users_permissionsWhereInput> = z.object({
@@ -3161,7 +3284,8 @@ export const usersCreateInputSchema: z.ZodType<Prisma.usersCreateInput> = z.obje
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateInputSchema: z.ZodType<Prisma.usersUncheckedCreateInput> = z.object({
@@ -3216,7 +3340,8 @@ export const usersUncheckedCreateInputSchema: z.ZodType<Prisma.usersUncheckedCre
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUpdateInputSchema: z.ZodType<Prisma.usersUpdateInput> = z.object({
@@ -3271,7 +3396,8 @@ export const usersUpdateInputSchema: z.ZodType<Prisma.usersUpdateInput> = z.obje
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateInputSchema: z.ZodType<Prisma.usersUncheckedUpdateInput> = z.object({
@@ -3326,7 +3452,8 @@ export const usersUncheckedUpdateInputSchema: z.ZodType<Prisma.usersUncheckedUpd
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersCreateManyInputSchema: z.ZodType<Prisma.usersCreateManyInput> = z.object({
@@ -3417,6 +3544,68 @@ export const usersUncheckedUpdateManyInputSchema: z.ZodType<Prisma.usersUnchecke
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const sessionsCreateInputSchema: z.ZodType<Prisma.sessionsCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  users_sessions: z.lazy(() => usersCreateNestedOneWithoutSessionsInputSchema)
+}).strict();
+
+export const sessionsUncheckedCreateInputSchema: z.ZodType<Prisma.sessionsUncheckedCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_id: z.string(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const sessionsUpdateInputSchema: z.ZodType<Prisma.sessionsUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  users_sessions: z.lazy(() => usersUpdateOneRequiredWithoutSessionsNestedInputSchema).optional()
+}).strict();
+
+export const sessionsUncheckedUpdateInputSchema: z.ZodType<Prisma.sessionsUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const sessionsCreateManyInputSchema: z.ZodType<Prisma.sessionsCreateManyInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_id: z.string(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const sessionsUpdateManyMutationInputSchema: z.ZodType<Prisma.sessionsUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const sessionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.sessionsUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const users_permissionsCreateInputSchema: z.ZodType<Prisma.users_permissionsCreateInput> = z.object({
@@ -4825,6 +5014,12 @@ export const Scheduled_reports_subscriptionListRelationFilterSchema: z.ZodType<P
   none: z.lazy(() => scheduled_reports_subscriptionWhereInputSchema).optional()
 }).strict();
 
+export const SessionsListRelationFilterSchema: z.ZodType<Prisma.SessionsListRelationFilter> = z.object({
+  every: z.lazy(() => sessionsWhereInputSchema).optional(),
+  some: z.lazy(() => sessionsWhereInputSchema).optional(),
+  none: z.lazy(() => sessionsWhereInputSchema).optional()
+}).strict();
+
 export const permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.permissionsOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -4862,6 +5057,10 @@ export const timesheetOrderByRelationAggregateInputSchema: z.ZodType<Prisma.time
 }).strict();
 
 export const scheduled_reports_subscriptionOrderByRelationAggregateInputSchema: z.ZodType<Prisma.scheduled_reports_subscriptionOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const sessionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.sessionsOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -5042,6 +5241,33 @@ export const IntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.IntNullable
 export const UsersRelationFilterSchema: z.ZodType<Prisma.UsersRelationFilter> = z.object({
   is: z.lazy(() => usersWhereInputSchema).optional(),
   isNot: z.lazy(() => usersWhereInputSchema).optional()
+}).strict();
+
+export const sessionsCountOrderByAggregateInputSchema: z.ZodType<Prisma.sessionsCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  user_id: z.lazy(() => SortOrderSchema).optional(),
+  user_agent: z.lazy(() => SortOrderSchema).optional(),
+  device_name: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const sessionsMaxOrderByAggregateInputSchema: z.ZodType<Prisma.sessionsMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  user_id: z.lazy(() => SortOrderSchema).optional(),
+  user_agent: z.lazy(() => SortOrderSchema).optional(),
+  device_name: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const sessionsMinOrderByAggregateInputSchema: z.ZodType<Prisma.sessionsMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  user_id: z.lazy(() => SortOrderSchema).optional(),
+  user_agent: z.lazy(() => SortOrderSchema).optional(),
+  device_name: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const users_permissionsUser_idPermission_idCompoundUniqueInputSchema: z.ZodType<Prisma.users_permissionsUser_idPermission_idCompoundUniqueInput> = z.object({
@@ -6126,6 +6352,13 @@ export const scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_repo
   connect: z.union([ z.lazy(() => scheduled_reports_subscriptionWhereUniqueInputSchema),z.lazy(() => scheduled_reports_subscriptionWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const sessionsCreateNestedManyWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsCreateNestedManyWithoutUsers_sessionsInput> = z.object({
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema).array(),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => sessionsCreateManyUsers_sessionsInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const permissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema: z.ZodType<Prisma.permissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInput> = z.object({
   create: z.union([ z.lazy(() => permissionsCreateWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsCreateWithoutUsers_permissions_created_byTousersInputSchema).array(),z.lazy(() => permissionsUncheckedCreateWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsUncheckedCreateWithoutUsers_permissions_created_byTousersInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => permissionsCreateOrConnectWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsCreateOrConnectWithoutUsers_permissions_created_byTousersInputSchema).array() ]).optional(),
@@ -6299,6 +6532,13 @@ export const scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutSched
   connectOrCreate: z.union([ z.lazy(() => scheduled_reports_subscriptionCreateOrConnectWithoutScheduled_reports_subscription_usersInputSchema),z.lazy(() => scheduled_reports_subscriptionCreateOrConnectWithoutScheduled_reports_subscription_usersInputSchema).array() ]).optional(),
   createMany: z.lazy(() => scheduled_reports_subscriptionCreateManyScheduled_reports_subscription_usersInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => scheduled_reports_subscriptionWhereUniqueInputSchema),z.lazy(() => scheduled_reports_subscriptionWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInput> = z.object({
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema).array(),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => sessionsCreateManyUsers_sessionsInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const Enumuser_statusFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Enumuser_statusFieldUpdateOperationsInput> = z.object({
@@ -6688,6 +6928,20 @@ export const scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_su
   deleteMany: z.union([ z.lazy(() => scheduled_reports_subscriptionScalarWhereInputSchema),z.lazy(() => scheduled_reports_subscriptionScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema: z.ZodType<Prisma.sessionsUpdateManyWithoutUsers_sessionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema).array(),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => sessionsCreateManyUsers_sessionsInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => sessionsUpdateManyWithWhereWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpdateManyWithWhereWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => sessionsScalarWhereInputSchema),z.lazy(() => sessionsScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const permissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.permissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInput> = z.object({
   create: z.union([ z.lazy(() => permissionsCreateWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsCreateWithoutUsers_permissions_created_byTousersInputSchema).array(),z.lazy(() => permissionsUncheckedCreateWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsUncheckedCreateWithoutUsers_permissions_created_byTousersInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => permissionsCreateOrConnectWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsCreateOrConnectWithoutUsers_permissions_created_byTousersInputSchema).array() ]).optional(),
@@ -7036,6 +7290,34 @@ export const scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
   update: z.union([ z.lazy(() => scheduled_reports_subscriptionUpdateWithWhereUniqueWithoutScheduled_reports_subscription_usersInputSchema),z.lazy(() => scheduled_reports_subscriptionUpdateWithWhereUniqueWithoutScheduled_reports_subscription_usersInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => scheduled_reports_subscriptionUpdateManyWithWhereWithoutScheduled_reports_subscription_usersInputSchema),z.lazy(() => scheduled_reports_subscriptionUpdateManyWithWhereWithoutScheduled_reports_subscription_usersInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => scheduled_reports_subscriptionScalarWhereInputSchema),z.lazy(() => scheduled_reports_subscriptionScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema: z.ZodType<Prisma.sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema).array(),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsCreateOrConnectWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => sessionsCreateManyUsers_sessionsInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => sessionsWhereUniqueInputSchema),z.lazy(() => sessionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => sessionsUpdateManyWithWhereWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUpdateManyWithWhereWithoutUsers_sessionsInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => sessionsScalarWhereInputSchema),z.lazy(() => sessionsScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const usersCreateNestedOneWithoutSessionsInputSchema: z.ZodType<Prisma.usersCreateNestedOneWithoutSessionsInput> = z.object({
+  create: z.union([ z.lazy(() => usersCreateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedCreateWithoutSessionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => usersCreateOrConnectWithoutSessionsInputSchema).optional(),
+  connect: z.lazy(() => usersWhereUniqueInputSchema).optional()
+}).strict();
+
+export const usersUpdateOneRequiredWithoutSessionsNestedInputSchema: z.ZodType<Prisma.usersUpdateOneRequiredWithoutSessionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => usersCreateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedCreateWithoutSessionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => usersCreateOrConnectWithoutSessionsInputSchema).optional(),
+  upsert: z.lazy(() => usersUpsertWithoutSessionsInputSchema).optional(),
+  connect: z.lazy(() => usersWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => usersUpdateToOneWithWhereWithoutSessionsInputSchema),z.lazy(() => usersUpdateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedUpdateWithoutSessionsInputSchema) ]).optional(),
 }).strict();
 
 export const usersCreateNestedOneWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersCreateNestedOneWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
@@ -8179,7 +8461,8 @@ export const usersCreateWithoutPermissions_permissions_created_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutPermissions_permissions_created_byTousersInput> = z.object({
@@ -8233,7 +8516,8 @@ export const usersUncheckedCreateWithoutPermissions_permissions_created_byTouser
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutPermissions_permissions_created_byTousersInput> = z.object({
@@ -8292,7 +8576,8 @@ export const usersCreateWithoutPermissions_permissions_updated_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
@@ -8346,7 +8631,8 @@ export const usersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInput> = z.object({
@@ -8460,7 +8746,8 @@ export const usersUpdateWithoutPermissions_permissions_created_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutPermissions_permissions_created_byTousersInput> = z.object({
@@ -8514,7 +8801,8 @@ export const usersUncheckedUpdateWithoutPermissions_permissions_created_byTouser
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutPermissions_permissions_updated_byTousersInput> = z.object({
@@ -8579,7 +8867,8 @@ export const usersUpdateWithoutPermissions_permissions_updated_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInput> = z.object({
@@ -8633,7 +8922,8 @@ export const usersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInput> = z.object({
@@ -8739,7 +9029,8 @@ export const usersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_roles_created_byTousersInput> = z.object({
@@ -8793,7 +9084,8 @@ export const usersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutRoles_roles_created_byTousersInput> = z.object({
@@ -8852,7 +9144,8 @@ export const usersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_roles_updated_byTousersInput> = z.object({
@@ -8906,7 +9199,8 @@ export const usersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutRoles_roles_updated_byTousersInput> = z.object({
@@ -9020,7 +9314,8 @@ export const usersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_roles_created_byTousersInput> = z.object({
@@ -9074,7 +9369,8 @@ export const usersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutRoles_roles_updated_byTousersInput> = z.object({
@@ -9139,7 +9435,8 @@ export const usersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_roles_updated_byTousersInput> = z.object({
@@ -9193,7 +9490,8 @@ export const usersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const roles_permissionsUpsertWithWhereUniqueWithoutRolesInputSchema: z.ZodType<Prisma.roles_permissionsUpsertWithWhereUniqueWithoutRolesInput> = z.object({
@@ -9289,7 +9587,8 @@ export const usersCreateWithoutRoles_permissions_roles_permissions_created_byTou
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
@@ -9343,7 +9642,8 @@ export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_crea
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
@@ -9460,7 +9760,8 @@ export const usersCreateWithoutRoles_permissions_roles_permissions_updated_byTou
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
@@ -9514,7 +9815,8 @@ export const usersUncheckedCreateWithoutRoles_permissions_roles_permissions_upda
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
@@ -9584,7 +9886,8 @@ export const usersUpdateWithoutRoles_permissions_roles_permissions_created_byTou
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
@@ -9638,7 +9941,8 @@ export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_crea
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const permissionsUpsertWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.permissionsUpsertWithoutRoles_permissionsInput> = z.object({
@@ -9773,7 +10077,8 @@ export const usersUpdateWithoutRoles_permissions_roles_permissions_updated_byTou
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
@@ -9827,7 +10132,8 @@ export const usersUncheckedUpdateWithoutRoles_permissions_roles_permissions_upda
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const permissionsCreateWithoutUsers_permissions_created_byTousersInputSchema: z.ZodType<Prisma.permissionsCreateWithoutUsers_permissions_created_byTousersInput> = z.object({
@@ -10666,6 +10972,32 @@ export const scheduled_reports_subscriptionCreateManyScheduled_reports_subscript
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const sessionsCreateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsCreateWithoutUsers_sessionsInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const sessionsUncheckedCreateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUncheckedCreateWithoutUsers_sessionsInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_agent: z.string(),
+  device_name: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const sessionsCreateOrConnectWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsCreateOrConnectWithoutUsers_sessionsInput> = z.object({
+  where: z.lazy(() => sessionsWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema) ]),
+}).strict();
+
+export const sessionsCreateManyUsers_sessionsInputEnvelopeSchema: z.ZodType<Prisma.sessionsCreateManyUsers_sessionsInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => sessionsCreateManyUsers_sessionsInputSchema),z.lazy(() => sessionsCreateManyUsers_sessionsInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const permissionsUpsertWithWhereUniqueWithoutUsers_permissions_created_byTousersInputSchema: z.ZodType<Prisma.permissionsUpsertWithWhereUniqueWithoutUsers_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => permissionsWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => permissionsUpdateWithoutUsers_permissions_created_byTousersInputSchema),z.lazy(() => permissionsUncheckedUpdateWithoutUsers_permissions_created_byTousersInputSchema) ]),
@@ -11221,6 +11553,270 @@ export const scheduled_reports_subscriptionScalarWhereInputSchema: z.ZodType<Pri
   updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
+export const sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUpsertWithWhereUniqueWithoutUsers_sessionsInput> = z.object({
+  where: z.lazy(() => sessionsWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => sessionsUpdateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedUpdateWithoutUsers_sessionsInputSchema) ]),
+  create: z.union([ z.lazy(() => sessionsCreateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedCreateWithoutUsers_sessionsInputSchema) ]),
+}).strict();
+
+export const sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUpdateWithWhereUniqueWithoutUsers_sessionsInput> = z.object({
+  where: z.lazy(() => sessionsWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => sessionsUpdateWithoutUsers_sessionsInputSchema),z.lazy(() => sessionsUncheckedUpdateWithoutUsers_sessionsInputSchema) ]),
+}).strict();
+
+export const sessionsUpdateManyWithWhereWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUpdateManyWithWhereWithoutUsers_sessionsInput> = z.object({
+  where: z.lazy(() => sessionsScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => sessionsUpdateManyMutationInputSchema),z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsInputSchema) ]),
+}).strict();
+
+export const sessionsScalarWhereInputSchema: z.ZodType<Prisma.sessionsScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => sessionsScalarWhereInputSchema),z.lazy(() => sessionsScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => sessionsScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => sessionsScalarWhereInputSchema),z.lazy(() => sessionsScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  user_agent: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  device_name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const usersCreateWithoutSessionsInputSchema: z.ZodType<Prisma.usersCreateWithoutSessionsInput> = z.object({
+  id: z.string().optional(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
+  first_name: z.string().optional().nullable(),
+  last_name: z.string().optional().nullable(),
+  password: z.string().optional().nullable(),
+  is_super_user: z.boolean().optional(),
+  status: z.lazy(() => user_statusSchema),
+  card_name: z.string().optional().nullable(),
+  card_number: z.string().optional().nullable(),
+  birth_date: z.coerce.date().optional().nullable(),
+  car_model: z.string().optional().nullable(),
+  car_number: z.string().optional().nullable(),
+  is_online: z.boolean().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  fcm_token: z.string().optional().nullable(),
+  wallet_balance: z.number().optional(),
+  max_active_order_count: z.number().int().optional().nullable(),
+  doc_files: z.union([ z.lazy(() => usersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.coerce.date().optional().nullable(),
+  app_version: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  api_token: z.string().optional().nullable(),
+  tg_id: z.string().optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => permissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => permissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => rolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => rolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => organizationCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => organizationCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => work_schedulesCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => work_schedulesCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
+  users_terminals: z.lazy(() => users_terminalsCreateNestedManyWithoutUsersInputSchema).optional(),
+  users_work_schedules: z.lazy(() => users_work_schedulesCreateNestedManyWithoutUsersInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
+  timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+}).strict();
+
+export const usersUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutSessionsInput> = z.object({
+  id: z.string().optional(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
+  first_name: z.string().optional().nullable(),
+  last_name: z.string().optional().nullable(),
+  password: z.string().optional().nullable(),
+  is_super_user: z.boolean().optional(),
+  status: z.lazy(() => user_statusSchema),
+  card_name: z.string().optional().nullable(),
+  card_number: z.string().optional().nullable(),
+  birth_date: z.coerce.date().optional().nullable(),
+  car_model: z.string().optional().nullable(),
+  car_number: z.string().optional().nullable(),
+  is_online: z.boolean().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  fcm_token: z.string().optional().nullable(),
+  wallet_balance: z.number().optional(),
+  max_active_order_count: z.number().int().optional().nullable(),
+  doc_files: z.union([ z.lazy(() => usersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.coerce.date().optional().nullable(),
+  app_version: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  api_token: z.string().optional().nullable(),
+  tg_id: z.string().optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => permissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => permissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => rolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => rolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => organizationUncheckedCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => organizationUncheckedCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
+  users_terminals: z.lazy(() => users_terminalsUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
+  users_work_schedules: z.lazy(() => users_work_schedulesUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
+  timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+}).strict();
+
+export const usersCreateOrConnectWithoutSessionsInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutSessionsInput> = z.object({
+  where: z.lazy(() => usersWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => usersCreateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedCreateWithoutSessionsInputSchema) ]),
+}).strict();
+
+export const usersUpsertWithoutSessionsInputSchema: z.ZodType<Prisma.usersUpsertWithoutSessionsInput> = z.object({
+  update: z.union([ z.lazy(() => usersUpdateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedUpdateWithoutSessionsInputSchema) ]),
+  create: z.union([ z.lazy(() => usersCreateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedCreateWithoutSessionsInputSchema) ]),
+  where: z.lazy(() => usersWhereInputSchema).optional()
+}).strict();
+
+export const usersUpdateToOneWithWhereWithoutSessionsInputSchema: z.ZodType<Prisma.usersUpdateToOneWithWhereWithoutSessionsInput> = z.object({
+  where: z.lazy(() => usersWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => usersUpdateWithoutSessionsInputSchema),z.lazy(() => usersUncheckedUpdateWithoutSessionsInputSchema) ]),
+}).strict();
+
+export const usersUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.usersUpdateWithoutSessionsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
+  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  doc_files: z.union([ z.lazy(() => usersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => permissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => permissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => rolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => rolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => users_rolesUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => users_rolesUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => organizationUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => organizationUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => work_schedulesUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => work_schedulesUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
+  users_terminals: z.lazy(() => users_terminalsUpdateManyWithoutUsersNestedInputSchema).optional(),
+  users_work_schedules: z.lazy(() => users_work_schedulesUpdateManyWithoutUsersNestedInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
+  timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+}).strict();
+
+export const usersUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutSessionsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  password: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
+  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  doc_files: z.union([ z.lazy(() => usersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => permissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => permissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => rolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => rolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => organizationUncheckedUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => organizationUncheckedUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => work_schedulesUncheckedUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => work_schedulesUncheckedUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
+  users_terminals: z.lazy(() => users_terminalsUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
+  users_work_schedules: z.lazy(() => users_work_schedulesUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
+  timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+}).strict();
+
 export const usersCreateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
   id: z.string().optional(),
   phone: z.string().optional().nullable(),
@@ -11272,7 +11868,8 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_create
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
@@ -11326,7 +11923,8 @@ export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
@@ -11414,7 +12012,8 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_update
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
@@ -11468,7 +12067,8 @@ export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
@@ -11527,7 +12127,8 @@ export const usersCreateWithoutUsers_permissions_usersTousers_permissions_user_i
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
@@ -11581,7 +12182,8 @@ export const usersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
@@ -11651,7 +12253,8 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_create
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_created_byInput> = z.object({
@@ -11705,7 +12308,8 @@ export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const permissionsUpsertWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.permissionsUpsertWithoutUsers_permissionsInput> = z.object({
@@ -11805,7 +12409,8 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_update
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
@@ -11859,7 +12464,8 @@ export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUpsertWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
@@ -11924,7 +12530,8 @@ export const usersUpdateWithoutUsers_permissions_usersTousers_permissions_user_i
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissions_user_idInput> = z.object({
@@ -11978,7 +12585,8 @@ export const usersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersCreateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
@@ -12032,7 +12640,8 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
@@ -12086,7 +12695,8 @@ export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_b
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
@@ -12174,7 +12784,8 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
@@ -12228,7 +12839,8 @@ export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_b
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
@@ -12287,7 +12899,8 @@ export const usersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
@@ -12341,7 +12954,8 @@ export const usersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idIn
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
@@ -12411,7 +13025,8 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_byInput> = z.object({
@@ -12465,7 +13080,8 @@ export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_b
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const rolesUpsertWithoutUsers_rolesInputSchema: z.ZodType<Prisma.rolesUpsertWithoutUsers_rolesInput> = z.object({
@@ -12565,7 +13181,8 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_byInput> = z.object({
@@ -12619,7 +13236,8 @@ export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_b
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUpsertWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
@@ -12684,7 +13302,8 @@ export const usersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idInput> = z.object({
@@ -12738,7 +13357,8 @@ export const usersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idIn
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const organizationCreateWithoutWork_schedules_organization_idTorganizationInputSchema: z.ZodType<Prisma.organizationCreateWithoutWork_schedules_organization_idTorganizationInput> = z.object({
@@ -12857,7 +13477,8 @@ export const usersCreateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedules_created_byTousersInput> = z.object({
@@ -12911,7 +13532,8 @@ export const usersUncheckedCreateWithoutWork_schedules_created_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutWork_schedules_created_byTousersInput> = z.object({
@@ -12970,7 +13592,8 @@ export const usersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedules_updated_byTousersInput> = z.object({
@@ -13024,7 +13647,8 @@ export const usersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutWork_schedules_updated_byTousersInput> = z.object({
@@ -13233,7 +13857,8 @@ export const usersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedules_created_byTousersInput> = z.object({
@@ -13287,7 +13912,8 @@ export const usersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutWork_schedules_updated_byTousersInput> = z.object({
@@ -13352,7 +13978,8 @@ export const usersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedules_updated_byTousersInput> = z.object({
@@ -13406,7 +14033,8 @@ export const usersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSch
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const users_work_schedulesUpsertWithWhereUniqueWithoutWork_schedulesInputSchema: z.ZodType<Prisma.users_work_schedulesUpsertWithWhereUniqueWithoutWork_schedulesInput> = z.object({
@@ -13706,7 +14334,8 @@ export const usersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutOrganization_created_byTousersInput> = z.object({
@@ -13760,7 +14389,8 @@ export const usersUncheckedCreateWithoutOrganization_created_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutOrganization_created_byTousersInput> = z.object({
@@ -13819,7 +14449,8 @@ export const usersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutOrganization_updated_byTousersInput> = z.object({
@@ -13873,7 +14504,8 @@ export const usersUncheckedCreateWithoutOrganization_updated_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutOrganization_updated_byTousersInput> = z.object({
@@ -14029,7 +14661,8 @@ export const usersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutOrganization_created_byTousersInput> = z.object({
@@ -14083,7 +14716,8 @@ export const usersUncheckedUpdateWithoutOrganization_created_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutOrganization_updated_byTousersInput> = z.object({
@@ -14148,7 +14782,8 @@ export const usersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutOrganization_updated_byTousersInput> = z.object({
@@ -14202,7 +14837,8 @@ export const usersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const terminalsUpsertWithWhereUniqueWithoutOrganizationInputSchema: z.ZodType<Prisma.terminalsUpsertWithWhereUniqueWithoutOrganizationInput> = z.object({
@@ -14306,7 +14942,8 @@ export const usersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.user
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_terminalsInput> = z.object({
@@ -14360,7 +14997,8 @@ export const usersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_terminalsInput> = z.object({
@@ -14465,7 +15103,8 @@ export const usersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.user
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_terminalsInput> = z.object({
@@ -14519,7 +15158,8 @@ export const usersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const terminalsUpsertWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.terminalsUpsertWithoutUsers_terminalsInput> = z.object({
@@ -14614,7 +15254,8 @@ export const usersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutUsers_work_schedulesInput> = z.object({
@@ -14668,7 +15309,8 @@ export const usersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutUsers_work_schedulesInput> = z.object({
@@ -14777,7 +15419,8 @@ export const usersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutUsers_work_schedulesInput> = z.object({
@@ -14831,7 +15474,8 @@ export const usersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const work_schedulesUpsertWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma.work_schedulesUpsertWithoutUsers_work_schedulesInput> = z.object({
@@ -14930,7 +15574,8 @@ export const usersCreateWithoutWork_schedule_entries_created_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
@@ -14984,7 +15629,8 @@ export const usersUncheckedCreateWithoutWork_schedule_entries_created_byTousersI
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutWork_schedule_entries_created_byTousersInput> = z.object({
@@ -15043,7 +15689,8 @@ export const usersCreateWithoutWork_schedule_entries_updated_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
@@ -15097,7 +15744,8 @@ export const usersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersI
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
@@ -15156,7 +15804,8 @@ export const usersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutWork_schedule_entries_usersInput> = z.object({
@@ -15210,7 +15859,8 @@ export const usersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: 
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutWork_schedule_entries_usersInput> = z.object({
@@ -15319,7 +15969,8 @@ export const usersUpdateWithoutWork_schedule_entries_created_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersInput> = z.object({
@@ -15373,7 +16024,8 @@ export const usersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersI
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
@@ -15438,7 +16090,8 @@ export const usersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchem
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersInput> = z.object({
@@ -15492,7 +16145,8 @@ export const usersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersI
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUpsertWithoutWork_schedule_entries_usersInput> = z.object({
@@ -15557,7 +16211,8 @@ export const usersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutWork_schedule_entries_usersInput> = z.object({
@@ -15611,7 +16266,8 @@ export const usersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: 
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const work_schedulesUpsertWithoutWork_schedule_entries_work_schedulesInputSchema: z.ZodType<Prisma.work_schedulesUpsertWithoutWork_schedule_entries_work_schedulesInput> = z.object({
@@ -15710,7 +16366,8 @@ export const usersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutApi_tokens_created_byTousersInput> = z.object({
@@ -15764,7 +16421,8 @@ export const usersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema:
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutApi_tokens_created_byTousersInput> = z.object({
@@ -15823,7 +16481,8 @@ export const usersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutApi_tokens_updated_byTousersInput> = z.object({
@@ -15877,7 +16536,8 @@ export const usersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema:
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutApi_tokens_updated_byTousersInput> = z.object({
@@ -16012,7 +16672,8 @@ export const usersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutApi_tokens_created_byTousersInput> = z.object({
@@ -16066,7 +16727,8 @@ export const usersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema:
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUpsertWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUpsertWithoutApi_tokens_updated_byTousersInput> = z.object({
@@ -16131,7 +16793,8 @@ export const usersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutApi_tokens_updated_byTousersInput> = z.object({
@@ -16185,7 +16848,8 @@ export const usersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema:
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const organizationUpsertWithoutApi_tokens_organizationInputSchema: z.ZodType<Prisma.organizationUpsertWithoutApi_tokens_organizationInput> = z.object({
@@ -16310,7 +16974,8 @@ export const usersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.user
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutTimesheet_usersInput> = z.object({
@@ -16364,7 +17029,8 @@ export const usersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutTimesheet_usersInput> = z.object({
@@ -16434,7 +17100,8 @@ export const usersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.user
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutTimesheet_usersInput> = z.object({
@@ -16488,7 +17155,8 @@ export const usersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional()
+  scheduled_reports_subscription_users: z.lazy(() => scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const scheduled_reports_subscriptionCreateWithoutScheduled_reports_subscription_reportsInputSchema: z.ZodType<Prisma.scheduled_reports_subscriptionCreateWithoutScheduled_reports_subscription_reportsInput> = z.object({
@@ -16605,7 +17273,8 @@ export const usersCreateWithoutScheduled_reports_subscription_usersInputSchema: 
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional()
+  timesheet_users: z.lazy(() => timesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersUncheckedCreateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersUncheckedCreateWithoutScheduled_reports_subscription_usersInput> = z.object({
@@ -16659,7 +17328,8 @@ export const usersUncheckedCreateWithoutScheduled_reports_subscription_usersInpu
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional()
+  timesheet_users: z.lazy(() => timesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
 export const usersCreateOrConnectWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersCreateOrConnectWithoutScheduled_reports_subscription_usersInput> = z.object({
@@ -16758,7 +17428,8 @@ export const usersUpdateWithoutScheduled_reports_subscription_usersInputSchema: 
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional()
+  timesheet_users: z.lazy(() => timesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const usersUncheckedUpdateWithoutScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.usersUncheckedUpdateWithoutScheduled_reports_subscription_usersInput> = z.object({
@@ -16812,7 +17483,8 @@ export const usersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   work_schedule_entries_users: z.lazy(() => work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
   api_tokens_created_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
   api_tokens_updated_byTousers: z.lazy(() => api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional()
+  timesheet_users: z.lazy(() => timesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => sessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
 export const roles_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.roles_permissionsCreateManyPermissionsInput> = z.object({
@@ -17182,6 +17854,14 @@ export const timesheetCreateManyTimesheet_usersInputSchema: z.ZodType<Prisma.tim
 export const scheduled_reports_subscriptionCreateManyScheduled_reports_subscription_usersInputSchema: z.ZodType<Prisma.scheduled_reports_subscriptionCreateManyScheduled_reports_subscription_usersInput> = z.object({
   id: z.string().optional(),
   report_id: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const sessionsCreateManyUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsCreateManyUsers_sessionsInput> = z.object({
+  id: z.string().uuid().optional(),
+  user_agent: z.string(),
+  device_name: z.string(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional()
 }).strict();
@@ -18047,6 +18727,30 @@ export const scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
+export const sessionsUpdateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUpdateWithoutUsers_sessionsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const sessionsUncheckedUpdateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUncheckedUpdateWithoutUsers_sessionsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const sessionsUncheckedUpdateManyWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.sessionsUncheckedUpdateManyWithoutUsers_sessionsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
 export const users_work_schedulesCreateManyWork_schedulesInputSchema: z.ZodType<Prisma.users_work_schedulesCreateManyWork_schedulesInput> = z.object({
   user_id: z.string()
 }).strict();
@@ -18599,6 +19303,68 @@ export const usersFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.usersFindUniqueO
   select: usersSelectSchema.optional(),
   include: usersIncludeSchema.optional(),
   where: usersWhereUniqueInputSchema,
+}).strict()
+
+export const sessionsFindFirstArgsSchema: z.ZodType<Prisma.sessionsFindFirstArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereInputSchema.optional(),
+  orderBy: z.union([ sessionsOrderByWithRelationInputSchema.array(),sessionsOrderByWithRelationInputSchema ]).optional(),
+  cursor: sessionsWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const sessionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.sessionsFindFirstOrThrowArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereInputSchema.optional(),
+  orderBy: z.union([ sessionsOrderByWithRelationInputSchema.array(),sessionsOrderByWithRelationInputSchema ]).optional(),
+  cursor: sessionsWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const sessionsFindManyArgsSchema: z.ZodType<Prisma.sessionsFindManyArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereInputSchema.optional(),
+  orderBy: z.union([ sessionsOrderByWithRelationInputSchema.array(),sessionsOrderByWithRelationInputSchema ]).optional(),
+  cursor: sessionsWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const sessionsAggregateArgsSchema: z.ZodType<Prisma.sessionsAggregateArgs> = z.object({
+  where: sessionsWhereInputSchema.optional(),
+  orderBy: z.union([ sessionsOrderByWithRelationInputSchema.array(),sessionsOrderByWithRelationInputSchema ]).optional(),
+  cursor: sessionsWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const sessionsGroupByArgsSchema: z.ZodType<Prisma.sessionsGroupByArgs> = z.object({
+  where: sessionsWhereInputSchema.optional(),
+  orderBy: z.union([ sessionsOrderByWithAggregationInputSchema.array(),sessionsOrderByWithAggregationInputSchema ]).optional(),
+  by: SessionsScalarFieldEnumSchema.array(),
+  having: sessionsScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const sessionsFindUniqueArgsSchema: z.ZodType<Prisma.sessionsFindUniqueArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereUniqueInputSchema,
+}).strict()
+
+export const sessionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.sessionsFindUniqueOrThrowArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereUniqueInputSchema,
 }).strict()
 
 export const users_permissionsFindFirstArgsSchema: z.ZodType<Prisma.users_permissionsFindFirstArgs> = z.object({
@@ -19507,6 +20273,47 @@ export const usersUpdateManyArgsSchema: z.ZodType<Prisma.usersUpdateManyArgs> = 
 
 export const usersDeleteManyArgsSchema: z.ZodType<Prisma.usersDeleteManyArgs> = z.object({
   where: usersWhereInputSchema.optional(),
+}).strict()
+
+export const sessionsCreateArgsSchema: z.ZodType<Prisma.sessionsCreateArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  data: z.union([ sessionsCreateInputSchema,sessionsUncheckedCreateInputSchema ]),
+}).strict()
+
+export const sessionsUpsertArgsSchema: z.ZodType<Prisma.sessionsUpsertArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereUniqueInputSchema,
+  create: z.union([ sessionsCreateInputSchema,sessionsUncheckedCreateInputSchema ]),
+  update: z.union([ sessionsUpdateInputSchema,sessionsUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const sessionsCreateManyArgsSchema: z.ZodType<Prisma.sessionsCreateManyArgs> = z.object({
+  data: z.union([ sessionsCreateManyInputSchema,sessionsCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const sessionsDeleteArgsSchema: z.ZodType<Prisma.sessionsDeleteArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  where: sessionsWhereUniqueInputSchema,
+}).strict()
+
+export const sessionsUpdateArgsSchema: z.ZodType<Prisma.sessionsUpdateArgs> = z.object({
+  select: sessionsSelectSchema.optional(),
+  include: sessionsIncludeSchema.optional(),
+  data: z.union([ sessionsUpdateInputSchema,sessionsUncheckedUpdateInputSchema ]),
+  where: sessionsWhereUniqueInputSchema,
+}).strict()
+
+export const sessionsUpdateManyArgsSchema: z.ZodType<Prisma.sessionsUpdateManyArgs> = z.object({
+  data: z.union([ sessionsUpdateManyMutationInputSchema,sessionsUncheckedUpdateManyInputSchema ]),
+  where: sessionsWhereInputSchema.optional(),
+}).strict()
+
+export const sessionsDeleteManyArgsSchema: z.ZodType<Prisma.sessionsDeleteManyArgs> = z.object({
+  where: sessionsWhereInputSchema.optional(),
 }).strict()
 
 export const users_permissionsCreateArgsSchema: z.ZodType<Prisma.users_permissionsCreateArgs> = z.object({
