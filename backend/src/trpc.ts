@@ -16,6 +16,7 @@ import { TerminalsService } from "./modules/terminals/service";
 import { OrganizationService } from "./modules/organization/service";
 import { UsersTerminalsService } from "./modules/users_terminals/service";
 import { CacheControlService } from "./modules/cache_control/service";
+import { SessionsService } from "./modules/sessions/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
@@ -37,6 +38,7 @@ const workSchedulesService = new WorkSchedulesService(db);
 const terminalsService = new TerminalsService(db, cacheControlService);
 const organizationService = new OrganizationService(db, cacheControlService);
 const usersTerminalsService = new UsersTerminalsService(db);
+const sessionsService = new SessionsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
   return {
@@ -53,6 +55,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     organizationService,
     usersTerminalsService,
     cacheControlService,
+    sessionsService,
   };
 };
 

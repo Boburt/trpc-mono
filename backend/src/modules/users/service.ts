@@ -17,6 +17,7 @@ export class UsersService {
     if (input.data.password) {
       const { hash, salt } = await hashPassword(input.data.password);
       input.data.password = md5hash(input.data.password);
+      input.data.salt = salt;
     }
     return await this.prisma.users.create(input);
   }
@@ -46,6 +47,11 @@ export class UsersService {
   }
 
   async update(input: Prisma.usersUpdateArgs): Promise<users> {
+    if (input.data.password) {
+      const { hash, salt } = await hashPassword(input.data.password);
+      input.data.password = md5hash(input.data.password);
+      input.data.salt = salt;
+    }
     return await this.prisma.users.update(input);
   }
 
