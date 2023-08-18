@@ -1,3 +1,6 @@
+import Link from "next/link";
+import React from "react";
+
 export default function Header() {
   return (
     <div className="header-bg-image  bg-center bg-fixed bg-no-repeat bg-cover opacity-80 h-20">
@@ -12,12 +15,12 @@ export default function Header() {
               <li>
                 <a href="/about">About</a>
               </li>
-              <li>
-                <a href="/manufacturer">Manufacturer</a>
-              </li>
             </ul>
           </nav>
         </div>
+        <Link href="/manufacturer" className="flex mx-auto justify-center">
+          <h2>Manufacturer-22</h2>
+        </Link>
         <div className="flex mx-auto justify-center">
           <input
             type="text"
