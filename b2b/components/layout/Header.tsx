@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
@@ -37,15 +38,16 @@ export default function Header() {
             </div>
           </div>
           <button className="btn join-item">Search</button>
-        <Link href="/manufacturer" className="flex mx-auto justify-center">
-          <h2>Manufacturer-22</h2>
-        </Link>
-        <div className="flex mx-auto justify-center">
-          <input
-            type="text"
-            placeholder="Type here"
-            className="input input-ghost w-full max-w-xs input-bordered"
-          />
+          <Link href="/manufacturer" className="flex mx-auto justify-center">
+            <h2>Manufacturer-22</h2>
+          </Link>
+          <div className="flex mx-auto justify-center">
+            <input
+              type="text"
+              placeholder="Type here"
+              className="input input-ghost w-full max-w-xs input-bordered"
+            />
+          </div>
         </div>
       </div>
     </div>
