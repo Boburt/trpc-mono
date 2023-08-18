@@ -39,14 +39,6 @@ export default function Header() {
               />
             </div>
           </div>
-          <select className="select select-bordered join-item">
-            <option disabled selected>
-              Filter
-            </option>
-            <option>Sci-fi</option>
-            <option>Drama</option>
-            <option>Action</option>
-          </select>
           <button className="btn join-item">Search</button>
         </div>
       </div>
