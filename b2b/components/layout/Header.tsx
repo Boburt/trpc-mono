@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <div className="header-bg-image bg-center  bg-no-repeat bg-cover opacity-80 pb-40 pt-5">
+    <div className="header-bg-image bg-center bg-no-repeat bg-cover opacity-80 pb-40 pt-5">
       <div className="bg-white py-2">
         <div className="container mx-auto flex items-center justify-between">
           <div className="cursor-pointer">
@@ -13,9 +13,11 @@ export default function Header() {
           </div>
           <nav>
             <ul className="flex space-x-4">
-              <Link href="/">Home</Link>
               <li>
-                <a href="/about">About</a>
+                <Link href="/">Home</Link>
+              </li>
+              <li>
+                <Link href="/pages/about">About</Link>
               </li>
             </ul>
           </nav>
@@ -35,7 +37,7 @@ export default function Header() {
         </div>
       </div>
       <Link
-        href="/manufacturer"
+        href="/pages/manufacturer"
         className="flex mx-auto justify-center text-white"
       >
         <h2>Manufacturer-22</h2>

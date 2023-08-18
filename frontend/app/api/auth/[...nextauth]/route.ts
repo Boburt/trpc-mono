@@ -1,9 +1,10 @@
-import { authenticate } from "@/services/authService";
+import { trpcClient } from "@frontend/utils/trpc-server";
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: AuthOptions = {
+  debug: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -12,13 +13,18 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
+        console.log("credentials", credentials);
         if (typeof credentials !== "undefined") {
-          const res = await authenticate(
-            credentials.email,
-            credentials.password
-          );
+          const { login, password } = credentials;
+          const res = await trpcClient.users.login.mutate({ login, password });
+          console.log("res", res);
           if (typeof res !== "undefined") {
-            return { ...res.user, apiToken: res.token };
+            return {
+              ...res.data,
+              accessToken: res.accessToken,
+              refreshToken: res.refreshToken,
+              rights: res.rights,
+            };
           } else {
             return null;
           }
