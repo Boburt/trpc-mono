@@ -4,8 +4,11 @@ import {
   usersDeleteArgsSchema,
   usersFindManyArgsSchema,
   usersFindUniqueArgsSchema,
+  usersSchema,
   usersUpdateArgsSchema,
+  users_rolesUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
+import { loginInput } from "./dto/users.dto";
 
 export const usersRouter = publicRouter({
   add: publicProcedure
@@ -34,4 +37,15 @@ export const usersRouter = publicRouter({
     .mutation(({ input, ctx }) => {
       return ctx.usersService.delete(input);
     }),
+
+  assignRole: publicProcedure
+    .input(users_rolesUncheckedCreateInputSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersService.assignRole(input);
+    }),
+
+  login: publicProcedure.input(loginInput).mutation(({ input, ctx }) => {
+    console.log("try login");
+    return ctx.usersService.login(input);
+  }),
 });

@@ -1,5 +1,6 @@
 import {
   users_terminalsCreateArgsSchema,
+  users_terminalsDeleteArgsSchema,
   users_terminalsFindManyArgsSchema,
   users_terminalsFindUniqueArgsSchema,
   users_terminalsUpdateArgsSchema,
@@ -28,6 +29,12 @@ export const usersTerminalsRouter = publicRouter({
   renew: publicProcedure
     .input(users_terminalsUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
-      return ctx.usersTerminalsService.Update(input);
+      return ctx.usersTerminalsService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(users_terminalsDeleteArgsSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersTerminalsService.delete(input);
     }),
 });

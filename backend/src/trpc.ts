@@ -16,6 +16,7 @@ import { TerminalsService } from "./modules/terminals/service";
 import { OrganizationService } from "./modules/organization/service";
 import { UsersTerminalsService } from "./modules/users_terminals/service";
 import { CacheControlService } from "./modules/cache_control/service";
+import { SessionsService } from "./modules/sessions/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
@@ -29,18 +30,23 @@ await client.connect();
 const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
 const rolesService = new RolesService(db, cacheControlService);
-const rolesPermissionsService = new RolesPermissionsService(db);
-const usersService = new UsersService(db);
+const rolesPermissionsService = new RolesPermissionsService(
+  db,
+  cacheControlService
+);
+const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const workSchedulesService = new WorkSchedulesService(db);
 const terminalsService = new TerminalsService(db, cacheControlService);
 const organizationService = new OrganizationService(db, cacheControlService);
 const usersTerminalsService = new UsersTerminalsService(db);
+const sessionsService = new SessionsService(db);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
+  console.log(opts.req.headers);
+
   return {
-    name: "elysia",
     prisma: db,
     permissionsService,
     rolesService,
@@ -53,6 +59,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     organizationService,
     usersTerminalsService,
     cacheControlService,
+    sessionsService,
   };
 };
 
