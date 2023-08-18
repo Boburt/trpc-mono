@@ -17,6 +17,11 @@ import { OrganizationService } from "./modules/organization/service";
 import { UsersTerminalsService } from "./modules/users_terminals/service";
 import { CacheControlService } from "./modules/cache_control/service";
 import { SessionsService } from "./modules/sessions/service";
+import { UsersWorkSchedulesService } from "./modules/users_work_schedules/service";
+import { WorkScheduleEntriesService } from "./modules/work_schedule_entries/service";
+import { ApiTokensService } from "./modules/api_tokens/service";
+import { TimesheetService } from "./modules/timesheet/service";
+import { ScheduledReportsService } from "./modules/scheduled_reports/service";
 
 export const db = new PrismaClient().$extends(pagination);
 
@@ -37,11 +42,19 @@ const rolesPermissionsService = new RolesPermissionsService(
 const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
-const workSchedulesService = new WorkSchedulesService(db);
+const workSchedulesService = new WorkSchedulesService(db, cacheControlService);
 const terminalsService = new TerminalsService(db, cacheControlService);
 const organizationService = new OrganizationService(db, cacheControlService);
 const usersTerminalsService = new UsersTerminalsService(db);
 const sessionsService = new SessionsService(db);
+const usersWorkSchedulesService = new UsersWorkSchedulesService(db);
+const workScheduleEntriesService = new WorkScheduleEntriesService(db);
+const apiTokensService = new ApiTokensService(db, cacheControlService);
+const timesheetService = new TimesheetService(db);
+const scheduledReportsService = new ScheduledReportsService(
+  db,
+  cacheControlService
+);
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
   console.log(opts.req.headers);
@@ -60,6 +73,11 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     usersTerminalsService,
     cacheControlService,
     sessionsService,
+    usersWorkSchedulesService,
+    workScheduleEntriesService,
+    apiTokensService,
+    timesheetService,
+    scheduledReportsService,
   };
 };
 

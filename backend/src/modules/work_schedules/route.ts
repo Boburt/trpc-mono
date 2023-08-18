@@ -1,6 +1,7 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
   work_schedulesCreateArgsSchema,
+  work_schedulesDeleteArgsSchema,
   work_schedulesFindManyArgsSchema,
   work_schedulesFindUniqueArgsSchema,
   work_schedulesUpdateArgsSchema,
@@ -26,5 +27,17 @@ export const workSchedulesRouter = publicRouter({
     .input(work_schedulesUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.workSchedulesService.update(input);
+    }),
+
+  delete: publicProcedure
+    .input(work_schedulesDeleteArgsSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.workSchedulesService.delete(input);
+    }),
+
+  cachedWorkSchedules: publicProcedure
+    .input(work_schedulesFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.workSchedulesService.cachedWorkSchedules(input);
     }),
 });
