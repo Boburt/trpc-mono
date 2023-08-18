@@ -10,7 +10,6 @@ const nextConfig = {
         },
       ],
     ],
-    externalDir: true,
   },
 };
 

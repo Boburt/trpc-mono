@@ -15,14 +15,6 @@ export type RouterOutputs = inferRouterOutputs<Router>;
 
 export const trpc = createTRPCReact<Router>();
 
-// export const trpc = createTRPCProxyClient<Router>({
-//   links: [
-//     httpBatchLink({
-//       url: "http://localhost:3000/trpc", // you should update this to use env variables
-//     }),
-//   ],
-// });
-
 // import { httpBatchLink } from "@trpc/client";
 // import type { Router } from "../../../backend/src/_routes";
 // import { createTRPCNext } from "@trpc/next";
