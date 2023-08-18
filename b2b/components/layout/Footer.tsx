@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <>
-      <footer className="footer p-10 bg-base-200 text-base-content">
+      <footer className="footer text-base-content container mx-auto py-4">
         <div>
           <span className="footer-title">Services</span>
           <a className="link link-hover">Branding</a>
@@ -23,7 +23,7 @@ export default function Footer() {
           <a className="link link-hover">Cookie policy</a>
         </div>
       </footer>
-      <footer className="footer px-10 py-4 border-t bg-base-200 text-base-content border-base-300">
+      <footer className="footer py-4 border-t text-base-content border-base-300 container mx-auto">
         <div className="items-center grid-flow-col">
           <svg
             width="24"
