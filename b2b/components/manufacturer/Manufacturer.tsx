@@ -1,5 +1,5 @@
 import React from "react";
-import manaData from "../../app/manufacturer/data";
+import manaData from "@/app/pages/manufacturer/data";
 import Image from "next/image";
 
 export default function Manufacturer11() {
