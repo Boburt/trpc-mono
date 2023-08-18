@@ -2,6 +2,7 @@ import { organizationRouter } from "./modules/organization/route";
 import { permissionsRouter } from "./modules/permissions/route";
 import { rolesRouter } from "./modules/roles/route";
 import { rolesPermissionsRouter } from "./modules/roles_permissions/route";
+import { sessionsRouter } from "./modules/sessions/route";
 import { terminalsRouter } from "./modules/terminals/route";
 import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
@@ -21,6 +22,7 @@ export const router = publicRouter({
   usersRoles: usersRolesRouter,
   usersTerminals: usersTerminalsRouter,
   workSchedules: workSchedulesRouter,
+  sessions: sessionsRouter,
 });
 
 export type Router = typeof router;
