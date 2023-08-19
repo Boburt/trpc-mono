@@ -3,7 +3,7 @@ import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 export const trpcClient = createTRPCProxyClient<Router>({
   links: [
     httpBatchLink({
-      url: "http://localhost:3000/trpc", // you should update this to use env variables
+      url: `${process.env.TRPC_API_URL}/trpc`, // you should update this to use env variables
     }),
   ],
 });
