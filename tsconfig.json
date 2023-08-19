@@ -14,8 +14,9 @@
     "paths": {
       "@backend/*": ["./backend/src/*"],
       "@frontend/*": ["./frontend/*"],
+      "@admin/*": ["./admin/*"],
       "@lib/*": ["./lib/*"],
-      "@components/*": ["./frontend/components/*"]
+      "@components/*": ["./admin/components/*"]
     }
   }
 }
