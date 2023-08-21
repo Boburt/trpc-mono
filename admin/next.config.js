@@ -14,7 +14,7 @@ const nextConfig = {
   },
   env: {
     TRPC_API_URL: process.env.TRPC_API_URL,
-    },
-}
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
