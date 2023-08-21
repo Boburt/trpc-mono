@@ -1,4 +1,4 @@
-import { usersSchema } from "@backend/lib/zod";
+import { UsersSchema } from "@backend/lib/zod";
 import { z } from "zod";
 
 export const loginInput = z.object({
@@ -7,7 +7,7 @@ export const loginInput = z.object({
 });
 
 export const typeLoginOutput = z.object({
-  data: usersSchema,
+  data: UsersSchema,
   refreshToken: z.string(),
   accessToken: z.string(),
   rights: z.array(z.string()),

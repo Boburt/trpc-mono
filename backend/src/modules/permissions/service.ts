@@ -3,9 +3,9 @@ import { DB } from "@backend/trpc";
 import { z } from "zod";
 
 import {
-  permissionsFindManyArgsSchema,
-  permissionsFindUniqueArgsSchema,
-  permissions,
+  PermissionsFindManyArgsSchema,
+  PermissionsFindUniqueArgsSchema,
+  Permissions,
 } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
@@ -16,15 +16,15 @@ export class PermissionsService {
     private readonly cacheControl: CacheControlService
   ) {}
 
-  async create(input: Prisma.permissionsCreateArgs): Promise<permissions> {
+  async create(input: Prisma.PermissionsCreateArgs): Promise<Permissions> {
     const res = await this.prisma.permissions.create(input);
     await this.cacheControl.cachePermissions();
     return res;
   }
 
   async findMany(
-    input: z.infer<typeof permissionsFindManyArgsSchema>
-  ): Promise<PaginationType<permissions>> {
+    input: z.infer<typeof PermissionsFindManyArgsSchema>
+  ): Promise<PaginationType<Permissions>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -47,27 +47,27 @@ export class PermissionsService {
   }
 
   async findOne(
-    input: z.infer<typeof permissionsFindUniqueArgsSchema>
-  ): Promise<permissions | null> {
+    input: z.infer<typeof PermissionsFindUniqueArgsSchema>
+  ): Promise<Permissions | null> {
     const permission = await this.prisma.permissions.findUnique(input);
     return permission;
   }
 
-  async update(input: Prisma.permissionsUpdateArgs): Promise<permissions> {
+  async update(input: Prisma.PermissionsUpdateArgs): Promise<Permissions> {
     const res = await this.prisma.permissions.update(input);
     await this.cacheControl.cachePermissions();
     return res;
   }
 
-  async delete(input: Prisma.permissionsDeleteArgs) {
+  async delete(input: Prisma.PermissionsDeleteArgs) {
     const res = await this.prisma.permissions.delete(input);
     await this.cacheControl.cachePermissions();
     return res;
   }
 
   async cachedPermissions(
-    input: z.infer<typeof permissionsFindManyArgsSchema>
-  ): Promise<permissions[]> {
+    input: z.infer<typeof PermissionsFindManyArgsSchema>
+  ): Promise<Permissions[]> {
     return await this.cacheControl.getCachedPermissions(input);
   }
 }

@@ -2,9 +2,9 @@ import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import {
-  users_terminals,
-  users_terminalsFindManyArgsSchema,
-  users_terminalsFindUniqueArgsSchema,
+  Users_terminals,
+  Users_terminalsFindManyArgsSchema,
+  Users_terminalsFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
 
@@ -12,14 +12,14 @@ export class UsersTerminalsService {
   constructor(private readonly prisma: DB) {}
 
   async create(
-    input: Prisma.users_terminalsCreateArgs
-  ): Promise<users_terminals> {
+    input: Prisma.Users_terminalsCreateArgs
+  ): Promise<Users_terminals> {
     return this.prisma.users_terminals.create(input);
   }
 
   async findMany(
-    input: z.infer<typeof users_terminalsFindManyArgsSchema>
-  ): Promise<PaginationType<users_terminals>> {
+    input: z.infer<typeof Users_terminalsFindManyArgsSchema>
+  ): Promise<PaginationType<Users_terminals>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -41,18 +41,18 @@ export class UsersTerminalsService {
   }
 
   async findUnique(
-    input: z.infer<typeof users_terminalsFindUniqueArgsSchema>
-  ): Promise<users_terminals | null> {
+    input: z.infer<typeof Users_terminalsFindUniqueArgsSchema>
+  ): Promise<Users_terminals | null> {
     return this.prisma.users_terminals.findUnique(input);
   }
 
   async update(
-    input: Prisma.users_terminalsUpdateArgs
-  ): Promise<users_terminals> {
+    input: Prisma.Users_terminalsUpdateArgs
+  ): Promise<Users_terminals> {
     return this.prisma.users_terminals.update(input);
   }
 
-  async delete(input: Prisma.users_terminalsDeleteArgs) {
+  async delete(input: Prisma.Users_terminalsDeleteArgs) {
     return this.prisma.users_terminals.delete(input);
   }
 }
