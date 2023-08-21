@@ -1,45 +1,45 @@
 import {
-  organizationCreateArgsSchema,
-  organizationUpdateArgsSchema,
-  organizationFindUniqueArgsSchema,
-  organizationFindManyArgsSchema,
-  organizationDeleteArgsSchema,
+  OrganizationCreateArgsSchema,
+  OrganizationUpdateArgsSchema,
+  OrganizationFindUniqueArgsSchema,
+  OrganizationFindManyArgsSchema,
+  OrganizationDeleteArgsSchema,
 } from "@backend/lib/zod";
 import { publicProcedure, publicRouter } from "@backend/trpc";
 
 export const organizationRouter = publicRouter({
   add: publicProcedure
-    .input(organizationCreateArgsSchema)
+    .input(OrganizationCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.organizationService.create(input);
     }),
 
   list: publicProcedure
-    .input(organizationFindManyArgsSchema)
+    .input(OrganizationFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.organizationService.findMany(input);
     }),
 
   one: publicProcedure
-    .input(organizationFindUniqueArgsSchema)
+    .input(OrganizationFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.organizationService.findOne(input);
     }),
 
   renew: publicProcedure
-    .input(organizationUpdateArgsSchema)
+    .input(OrganizationUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.organizationService.update(input);
     }),
 
   delete: publicProcedure
-    .input(organizationDeleteArgsSchema)
+    .input(OrganizationDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.organizationService.delete(input);
     }),
 
   cachedOrganizations: publicProcedure
-    .input(organizationFindManyArgsSchema)
+    .input(OrganizationFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.organizationService.cachedOrginization(input);
     }),

@@ -12,7 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:3000/trpc", // you should update this to use env variables
+          url: `${process.env.TRPC_API_URL}/trpc`, // you should update this to use env variables
         }),
       ],
     })
