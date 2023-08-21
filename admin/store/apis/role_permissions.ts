@@ -1,5 +1,4 @@
-import { ReactQueryOptions, RouterInputs, trpc } from "@frontend/utils/trpc";
-import { UseTRPCQueryOptions } from "@trpc/react-query/dist/shared";
+import { ReactQueryOptions, RouterInputs, trpc } from "@admin/utils/trpc";
 
 export function useRolePermissionsCreate(
   options: ReactQueryOptions["rolesPermissions"]["add"]
@@ -10,9 +9,13 @@ export function useRolePermissionsCreate(
     onSuccess: (post) => {
       utils.rolesPermissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: post
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: post,
+        },
+        {}
+      );
     },
   });
 }
@@ -26,15 +29,19 @@ export function useRolePermissionsUpdate(
     onSuccess: (post) => {
       utils.rolesPermissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: {},
-        where: {
-          role_id_permission_id: {
-            role_id: post!.role_id!,
-            permission_id: post!.permission_id!
-          }
-        }
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: {},
+          where: {
+            role_id_permission_id: {
+              role_id: post!.role_id!,
+              permission_id: post!.permission_id!,
+            },
+          },
+        },
+        {}
+      );
     },
   });
 }
@@ -48,10 +55,14 @@ export function useCreateManyRolePermissions(
     onSuccess: (post) => {
       utils.rolesPermissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-          role_id: '',
-          permissions_ids: ['']
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          role_id: "",
+          permissions_ids: [""],
+        },
+        {}
+      );
     },
   });
 }

@@ -151,8 +151,11 @@ export const RolesWithRelationsSchema: z.ZodType<RolesWithRelations> = RolesSche
 export const Roles_permissionsSchema = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  /**
+   * dasdas
+   */
+  created_by: z.string().nullable().nullable(),
+  updated_by: z.string().nullish().nullable(),
 })
 
 export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>
@@ -1606,8 +1609,8 @@ export const Roles_permissionsWhereUniqueInputSchema: z.ZodType<Prisma.Roles_per
   NOT: z.union([ z.lazy(() => Roles_permissionsWhereInputSchema),z.lazy(() => Roles_permissionsWhereInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string().nullable() ]).optional().nullable(),
+  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string().nullish() ]).optional().nullable(),
   users_roles_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   permissions: z.union([ z.lazy(() => PermissionsRelationFilterSchema),z.lazy(() => PermissionsWhereInputSchema) ]).optional(),
   roles: z.union([ z.lazy(() => RolesRelationFilterSchema),z.lazy(() => RolesWhereInputSchema) ]).optional(),
@@ -3204,8 +3207,8 @@ export const Roles_permissionsCreateInputSchema: z.ZodType<Prisma.Roles_permissi
 export const Roles_permissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateInput> = z.object({
@@ -3218,15 +3221,15 @@ export const Roles_permissionsUpdateInputSchema: z.ZodType<Prisma.Roles_permissi
 export const Roles_permissionsUncheckedUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsCreateManyInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsUpdateManyMutationInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyMutationInput> = z.object({
@@ -3235,8 +3238,8 @@ export const Roles_permissionsUpdateManyMutationInputSchema: z.ZodType<Prisma.Ro
 export const Roles_permissionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const UsersCreateInputSchema: z.ZodType<Prisma.UsersCreateInput> = z.object({
@@ -8669,8 +8672,8 @@ export const Roles_permissionsCreateWithoutPermissionsInputSchema: z.ZodType<Pri
 
 export const Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutPermissionsInput> = z.object({
   role_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutPermissionsInput> = z.object({
@@ -9245,8 +9248,8 @@ export const Roles_permissionsCreateWithoutRolesInputSchema: z.ZodType<Prisma.Ro
 
 export const Roles_permissionsUncheckedCreateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutRolesInput> = z.object({
   permission_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsCreateOrConnectWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutRolesInput> = z.object({
@@ -10322,7 +10325,7 @@ export const Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTou
 export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  updated_by: z.string().optional().nullable()
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
@@ -10344,7 +10347,7 @@ export const Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTou
 export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable()
 }).strict();
 
 export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
@@ -17610,8 +17613,8 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
 
 export const Roles_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInput> = z.object({
   role_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Users_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyPermissionsInput> = z.object({
@@ -17628,14 +17631,14 @@ export const Roles_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Pri
 
 export const Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutPermissionsInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutPermissionsInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutPermissionsInput> = z.object({
@@ -17658,8 +17661,8 @@ export const Users_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema: 
 
 export const Roles_permissionsCreateManyRolesInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyRolesInput> = z.object({
   permission_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable(),
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Users_rolesCreateManyRolesInputSchema: z.ZodType<Prisma.Users_rolesCreateManyRolesInput> = z.object({
@@ -17676,14 +17679,14 @@ export const Roles_permissionsUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Ro
 
 export const Roles_permissionsUncheckedUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutRolesInput> = z.object({
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutRolesInput> = z.object({
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_rolesUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Users_rolesUpdateWithoutRolesInput> = z.object({
@@ -17747,13 +17750,13 @@ export const RolesCreateManyUsers_roles_updated_byTousersInputSchema: z.ZodType<
 export const Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  updated_by: z.string().optional().nullable()
+  updated_by: z.string().nullish().optional().nullable()
 }).strict();
 
 export const Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().optional().nullable()
+  created_by: z.string().nullable().optional().nullable()
 }).strict();
 
 export const Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -18132,13 +18135,13 @@ export const Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTou
 export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string().nullish(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
@@ -18150,13 +18153,13 @@ export const Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTou
 export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string().nullable(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInput> = z.object({
