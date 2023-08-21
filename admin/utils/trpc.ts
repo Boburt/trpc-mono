@@ -2,11 +2,9 @@
 // import { AppRouter } from "@server/trpc/trpc.router";
 import { Router } from "@backend/_routes";
 import {
-  TRPCClientErrorLike,
   createTRPCReact,
   inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
-import { UseTRPCQueryResult } from "@trpc/react-query/dist/shared";
 import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 export type ReactQueryOptions = inferReactQueryProcedureOptions<Router>;
