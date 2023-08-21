@@ -1,44 +1,44 @@
 import {
-  permissionsCreateArgsSchema,
-  permissionsFindManyArgsSchema,
-  permissionsFindUniqueArgsSchema,
-  permissionsUpdateArgsSchema,
+  PermissionsCreateArgsSchema,
+  PermissionsFindManyArgsSchema,
+  PermissionsFindUniqueArgsSchema,
+  PermissionsUpdateArgsSchema,
 } from "@backend/lib/zod";
 import { publicProcedure, publicRouter } from "@backend/trpc";
 
 export const permissionsRouter = publicRouter({
   add: publicProcedure
-    .input(permissionsCreateArgsSchema)
+    .input(PermissionsCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.permissionsService.create(input);
     }),
 
   list: publicProcedure
-    .input(permissionsFindManyArgsSchema)
+    .input(PermissionsFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.permissionsService.findMany(input);
     }),
 
   one: publicProcedure
-    .input(permissionsFindUniqueArgsSchema)
+    .input(PermissionsFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.permissionsService.findOne(input);
     }),
 
   renew: publicProcedure
-    .input(permissionsUpdateArgsSchema)
+    .input(PermissionsUpdateArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.permissionsService.update(input);
     }),
 
   delete: publicProcedure
-    .input(permissionsFindUniqueArgsSchema)
+    .input(PermissionsFindUniqueArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.permissionsService.delete(input);
     }),
 
   cachedPermissions: publicProcedure
-    .input(permissionsFindManyArgsSchema)
+    .input(PermissionsFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
       return await ctx.permissionsService.cachedPermissions(input);
     }),

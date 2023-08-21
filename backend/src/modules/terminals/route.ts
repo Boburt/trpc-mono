@@ -1,45 +1,45 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
-  terminalsCreateArgsSchema,
-  terminalsDeleteArgsSchema,
-  terminalsFindManyArgsSchema,
-  terminalsFindUniqueArgsSchema,
-  terminalsUpdateArgsSchema,
+  TerminalsCreateArgsSchema,
+  TerminalsDeleteArgsSchema,
+  TerminalsFindManyArgsSchema,
+  TerminalsFindUniqueArgsSchema,
+  TerminalsUpdateArgsSchema,
 } from "@backend/lib/zod";
 
 export const terminalsRouter = publicRouter({
   add: publicProcedure
-    .input(terminalsCreateArgsSchema)
+    .input(TerminalsCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.terminalsService.create(input);
     }),
 
   list: publicProcedure
-    .input(terminalsFindManyArgsSchema)
+    .input(TerminalsFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.terminalsService.findMany(input);
     }),
 
   one: publicProcedure
-    .input(terminalsFindUniqueArgsSchema)
+    .input(TerminalsFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.terminalsService.findOne(input);
     }),
 
   update: publicProcedure
-    .input(terminalsUpdateArgsSchema)
+    .input(TerminalsUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.terminalsService.update(input);
     }),
 
   delete: publicProcedure
-    .input(terminalsDeleteArgsSchema)
+    .input(TerminalsDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.terminalsService.delete(input);
     }),
 
   cachedTerminals: publicProcedure
-    .input(terminalsFindManyArgsSchema)
+    .input(TerminalsFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.terminalsService.cachedTerminals(input);
     }),
