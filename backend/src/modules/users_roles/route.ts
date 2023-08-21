@@ -1,32 +1,31 @@
 import { publicRouter } from "@backend/trpc";
 import { publicProcedure } from "@backend/trpc";
 import {
-  users_permissionsDeleteArgsSchema,
-  users_rolesCreateArgsSchema,
+  Users_rolesCreateArgsSchema,
 } from "@backend/lib/zod";
-import { users_rolesFindManyArgsSchema } from "@backend/lib/zod";
-import { users_rolesFindUniqueArgsSchema } from "@backend/lib/zod";
-import { users_rolesUpdateArgsSchema } from "@backend/lib/zod";
+import { Users_rolesFindManyArgsSchema } from "@backend/lib/zod";
+import { Users_rolesFindUniqueArgsSchema } from "@backend/lib/zod";
+import { Users_rolesUpdateArgsSchema } from "@backend/lib/zod";
 import { createManyRolesForUserSchema } from "@backend/lib/custom_zod_objects/createManyRolesForUser";
 
 export const usersRolesRouter = publicRouter({
   add: publicProcedure
-    .input(users_rolesCreateArgsSchema)
+    .input(Users_rolesCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersRolesService.create(input);
     }),
   list: publicProcedure
-    .input(users_rolesFindManyArgsSchema)
+    .input(Users_rolesFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.usersRolesService.findMany(input);
     }),
   one: publicProcedure
-    .input(users_rolesFindUniqueArgsSchema)
+    .input(Users_rolesFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.usersRolesService.findOne(input);
     }),
   renew: publicProcedure
-    .input(users_rolesUpdateArgsSchema)
+    .input(Users_rolesUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersRolesService.update(input);
     }),

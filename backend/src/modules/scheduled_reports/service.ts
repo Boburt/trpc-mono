@@ -2,9 +2,9 @@ import { DB } from "@backend/trpc";
 import { CacheControlService } from "../cache_control/service";
 import { Prisma } from "@prisma/client";
 import {
-  scheduled_reports,
-  scheduled_reportsFindManyArgsSchema,
-  scheduled_reportsFindUniqueArgsSchema,
+  Scheduled_reports,
+  Scheduled_reportsFindManyArgsSchema,
+  Scheduled_reportsFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { z } from "zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
@@ -16,16 +16,16 @@ export class ScheduledReportsService {
   ) {}
 
   async create(
-    input: Prisma.scheduled_reportsCreateArgs
-  ): Promise<scheduled_reports> {
+    input: Prisma.Scheduled_reportsCreateArgs
+  ): Promise<Scheduled_reports> {
     const res = await this.prisma.scheduled_reports.create(input);
     await this.cacheControl.cacheScheduledReports();
     return res;
   }
 
   async findMany(
-    input: z.infer<typeof scheduled_reportsFindManyArgsSchema>
-  ): Promise<PaginationType<scheduled_reports>> {
+    input: z.infer<typeof Scheduled_reportsFindManyArgsSchema>
+  ): Promise<PaginationType<Scheduled_reports>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -47,28 +47,28 @@ export class ScheduledReportsService {
   }
 
   async findOne(
-    input: z.infer<typeof scheduled_reportsFindUniqueArgsSchema>
-  ): Promise<scheduled_reports | null> {
+    input: z.infer<typeof Scheduled_reportsFindUniqueArgsSchema>
+  ): Promise<Scheduled_reports | null> {
     return await this.prisma.scheduled_reports.findUnique(input);
   }
 
   async update(
-    input: Prisma.scheduled_reportsUpdateArgs
-  ): Promise<scheduled_reports> {
+    input: Prisma.Scheduled_reportsUpdateArgs
+  ): Promise<Scheduled_reports> {
     const res = await this.prisma.scheduled_reports.update(input);
     await this.cacheControl.cacheScheduledReports();
     return res;
   }
 
-  async delete(input: Prisma.scheduled_reportsDeleteArgs) {
+  async delete(input: Prisma.Scheduled_reportsDeleteArgs) {
     const res = await this.prisma.scheduled_reports.delete(input);
     await this.cacheControl.cacheScheduledReports();
     return res;
   }
 
   async cachedScheduledReports(
-    input: z.infer<typeof scheduled_reportsFindManyArgsSchema>
-  ): Promise<scheduled_reports[]> {
+    input: z.infer<typeof Scheduled_reportsFindManyArgsSchema>
+  ): Promise<Scheduled_reports[]> {
     return await this.cacheControl.getCachedScheduledReports(input);
   }
 }

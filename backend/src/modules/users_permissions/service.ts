@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { DB } from "@backend/trpc";
-import { users_permissions } from "@prisma/client";
 import {
-  users_permissionsFindManyArgsSchema,
-  users_permissionsFindUniqueArgsSchema,
-  users_permissionsWithRelations,
+  Users_permissionsFindManyArgsSchema,
+  Users_permissionsFindUniqueArgsSchema,
+  Users_permissionsWithRelations,
+  Users_permissions
 } from "@backend/lib/zod";
 import { z } from "zod";
 import { createManyPermissionsForOneUser } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneUser";
@@ -13,26 +13,26 @@ export class UsersPermissionsService {
   constructor(private readonly prisma: DB) {}
 
   async create(
-    input: Prisma.users_permissionsCreateArgs
-  ): Promise<users_permissions> {
+    input: Prisma.Users_permissionsCreateArgs
+  ): Promise<Users_permissions> {
     return await this.prisma.users_permissions.create(input);
   }
 
   async findMany(
-    input: z.infer<typeof users_permissionsFindManyArgsSchema>
-  ): Promise<users_permissionsWithRelations[]> {
+    input: z.infer<typeof Users_permissionsFindManyArgsSchema>
+  ): Promise<Users_permissionsWithRelations[]> {
     const users_permissions = await this.prisma.users_permissions.findMany({
       ...input,
       include: {
         permissions: true,
       },
     });
-    return users_permissions as users_permissionsWithRelations[];
+    return users_permissions as Users_permissionsWithRelations[];
   }
 
   async findOne(
-    input: z.infer<typeof users_permissionsFindUniqueArgsSchema>
-  ): Promise<users_permissions | null> {
+    input: z.infer<typeof Users_permissionsFindUniqueArgsSchema>
+  ): Promise<Users_permissions | null> {
     const users_permissions = await this.prisma.users_permissions.findUnique(
       input
     );
@@ -40,8 +40,8 @@ export class UsersPermissionsService {
   }
 
   async update(
-    input: Prisma.users_permissionsUpdateArgs
-  ): Promise<users_permissions | null> {
+    input: Prisma.Users_permissionsUpdateArgs
+  ): Promise<Users_permissions | null> {
     return await this.prisma.users_permissions.update(input);
   }
 

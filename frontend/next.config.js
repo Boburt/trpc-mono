@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
+    swcTraceProfiling: true,
     externalDir: true,
     swcPlugins: [
       [
@@ -10,7 +11,9 @@ const nextConfig = {
         },
       ],
     ],
-    externalDir: true,
+  },
+  env: {
+    TRPC_API_URL: process.env.TRPC_API_URL,
   },
 };
 
