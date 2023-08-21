@@ -17,7 +17,7 @@ export default function Header() {
                 <Link href="/">Home</Link>
               </li>
               <li>
-                <Link href="/pages/about">About</Link>
+                <Link href="/about">About</Link>
               </li>
             </ul>
           </nav>
@@ -37,7 +37,7 @@ export default function Header() {
         </div>
       </div>
       <Link
-        href="/pages/manufacturer"
+        href="/manufacturer"
         className="flex mx-auto justify-center text-white"
       >
         <h2>Manufacturer-22</h2>
