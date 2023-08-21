@@ -1,6 +1,13 @@
-import { terminals } from "@backend/lib/zod";
+import {
+  Terminals,
+  RolesWithRelations,
+  Organization,
+  Permissions,
+  Work_schedules,
+  Api_tokens,
+  Scheduled_reports,
+} from "@backend/lib/zod";
 import { DB, RedisClientType } from "@backend/trpc";
-import { organization, permissions, roles } from "@prisma/client";
 
 export class CacheControlService {
   constructor(
@@ -9,6 +16,9 @@ export class CacheControlService {
   ) {
     this.cachePermissions();
     this.cacheOrganization();
+    this.cacheRoles();
+    this.cacheTerminals();
+    this.chacheWorkSchedules();
   }
 
   async cachePermissions() {
@@ -23,7 +33,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<permissions[]> {
+  }): Promise<Permissions[]> {
     const permissions = await this.redis.get(
       `${process.env.PROJECT_PREFIX}permissions`
     );
@@ -48,7 +58,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<organization[]> {
+  }): Promise<Organization[]> {
     const organization = await this.redis.get(
       `${process.env.PROJECT_PREFIX}organization`
     );
@@ -62,14 +72,26 @@ export class CacheControlService {
   }
 
   async cacheRoles() {
-    const roles = await this.prisma.roles.findMany();
+    const roles = await this.prisma.roles.findMany({
+      include: {
+        roles_permissions: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
+    });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}roles`,
       JSON.stringify(roles)
     );
   }
 
-  async getСachedRoles({ take }: { take?: number }): Promise<roles[]> {
+  async getCachedRoles({
+    take,
+  }: {
+    take?: number;
+  }): Promise<RolesWithRelations[]> {
     const roles = await this.redis.get(`${process.env.PROJECT_PREFIX}roles`);
     let res = JSON.parse(roles ?? "[]");
 
@@ -88,11 +110,94 @@ export class CacheControlService {
     );
   }
 
-  async getCachedTerminals({ take }: { take?: number }): Promise<terminals[]> {
+  async getCachedTerminals({ take }: { take?: number }): Promise<Terminals[]> {
     const terminals = await this.redis.get(
       `${process.env.PROJECT_PREFIX}terminals`
     );
     let res = JSON.parse(terminals ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async getPermissionsByRoleId(roleId: string) {
+    const roles = await this.getCachedRoles({});
+    // console.log("roles", roles);
+    const role = roles.find((role) => role.id === roleId);
+    if (!role) {
+      return [];
+    }
+    return role.roles_permissions.map((rolePermission) => {
+      return rolePermission.permissions.slug;
+    });
+  }
+
+  async chacheWorkSchedules() {
+    const workSchedules = await this.prisma.work_schedules.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}work_schedules`,
+      JSON.stringify(workSchedules)
+    );
+  }
+
+  async getCachedWorkSchedules({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Work_schedules[]> {
+    const workSchedules = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}work_schedules`
+    );
+    let res = JSON.parse(workSchedules ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheApiTokens() {
+    const apiTokens = await this.prisma.api_tokens.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}api_tokens`,
+      JSON.stringify(apiTokens)
+    );
+  }
+
+  async getCachedApiTokens({ take }: { take?: number }): Promise<Api_tokens[]> {
+    const apiTokens = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}api_tokens`
+    );
+    let res = JSON.parse(apiTokens ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheScheduledReports() {
+    const scheduledReports = await this.prisma.scheduled_reports.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}scheduled_reports`,
+      JSON.stringify(scheduledReports)
+    );
+  }
+
+  async getCachedScheduledReports({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Scheduled_reports[]> {
+    const scheduledReports = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}scheduled_reports`
+    );
+    let res = JSON.parse(scheduledReports ?? "[]");
 
     if (take && res.length > take) {
       res = res.slice(0, take);

@@ -1,9 +1,10 @@
-import { Prisma, organization } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { DB } from "@backend/trpc";
 import { z } from "zod";
 import {
-  organizationFindManyArgsSchema,
-  organizationFindUniqueArgsSchema,
+  Organization,
+  OrganizationFindManyArgsSchema,
+  OrganizationFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { CacheControlService } from "../cache_control/service";
 import { PaginationType } from "@backend/lib/pagination_interface";
@@ -14,15 +15,15 @@ export class OrganizationService {
     private readonly cacheControl: CacheControlService
   ) {}
 
-  async create(input: Prisma.organizationCreateArgs): Promise<organization> {
+  async create(input: Prisma.OrganizationCreateArgs): Promise<Organization> {
     const organization = await this.prisma.organization.create(input);
     await this.cacheControl.cacheOrganization();
     return organization;
   }
 
   async findMany(
-    input: z.infer<typeof organizationFindManyArgsSchema>
-  ): Promise<PaginationType<organization>> {
+    input: z.infer<typeof OrganizationFindManyArgsSchema>
+  ): Promise<PaginationType<Organization>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -45,27 +46,27 @@ export class OrganizationService {
   }
 
   async findOne(
-    input: z.infer<typeof organizationFindUniqueArgsSchema>
-  ): Promise<organization | null> {
+    input: z.infer<typeof OrganizationFindUniqueArgsSchema>
+  ): Promise<Organization | null> {
     const organization = await this.prisma.organization.findUnique(input);
     return organization;
   }
 
-  async update(input: Prisma.organizationUpdateArgs): Promise<organization> {
+  async update(input: Prisma.OrganizationUpdateArgs): Promise<Organization> {
     const organization = await this.prisma.organization.update(input);
     await this.cacheControl.cacheOrganization();
     return organization;
   }
 
-  async delete(input: Prisma.organizationDeleteArgs) {
+  async delete(input: Prisma.OrganizationDeleteArgs) {
     const organization = await this.prisma.organization.delete(input);
     await this.cacheControl.cacheOrganization();
     return organization;
   }
 
   async cachedOrginization(
-    input: z.infer<typeof organizationFindManyArgsSchema>
-  ): Promise<organization[]> {
+    input: z.infer<typeof OrganizationFindManyArgsSchema>
+  ): Promise<Organization[]> {
     return await this.cacheControl.getCachedOrganization(input);
   }
 }

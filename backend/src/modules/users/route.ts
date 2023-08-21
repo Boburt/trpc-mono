@@ -1,37 +1,51 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
-  usersCreateArgsSchema,
-  usersDeleteArgsSchema,
-  usersFindManyArgsSchema,
-  usersFindUniqueArgsSchema,
-  usersUpdateArgsSchema,
+  UsersCreateArgsSchema,
+  UsersDeleteArgsSchema,
+  UsersFindManyArgsSchema,
+  UsersFindUniqueArgsSchema,
+  UsersSchema,
+  UsersUpdateArgsSchema,
+  Users_rolesUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
+import { loginInput } from "./dto/users.dto";
 
 export const usersRouter = publicRouter({
   add: publicProcedure
-    .input(usersCreateArgsSchema)
+    .input(UsersCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersService.create(input);
     }),
   list: publicProcedure
-    .input(usersFindManyArgsSchema)
+    .input(UsersFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.usersService.findMany(input);
     }),
   one: publicProcedure
-    .input(usersFindUniqueArgsSchema)
+    .input(UsersFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.usersService.findOne(input);
     }),
   renew: publicProcedure
-    .input(usersUpdateArgsSchema)
+    .input(UsersUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersService.update(input);
     }),
 
   delete: publicProcedure
-    .input(usersDeleteArgsSchema)
+    .input(UsersDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.usersService.delete(input);
     }),
+
+  assignRole: publicProcedure
+    .input(Users_rolesUncheckedCreateInputSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersService.assignRole(input);
+    }),
+
+  login: publicProcedure.input(loginInput).mutation(({ input, ctx }) => {
+    console.log("try login");
+    return ctx.usersService.login(input);
+  }),
 });

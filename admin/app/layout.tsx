@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { UserNav } from "@components/layout/user-nav";
 import { ModeToggle } from "@components/layout/mode-toggle";
 import { Toaster } from "@components/ui/toaster";
+import { Providers } from "@admin/store/provider";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="flex-col">
               <div className="border-b">
@@ -39,6 +41,7 @@ export default function RootLayout({
             </div>
             <Toaster />
           </ThemeProvider>
+          </Providers>
       </body>
     </html>
   )
