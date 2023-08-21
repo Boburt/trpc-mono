@@ -1,11 +1,11 @@
 import React from "react";
-import manaData from "@/pages/manufacturer/data";
+import manaData from "@/app/manufacturer/data";
 import Image from "next/image";
 
 export default function Manufacturer11() {
   return (
     <div>
-      <div className="container mx-auto mt-8">
+      <div className="mt-8">
         {manaData.map((manufacturerData) => (
           <div
             key={manufacturerData.id}
