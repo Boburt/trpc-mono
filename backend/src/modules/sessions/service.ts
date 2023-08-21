@@ -1,8 +1,8 @@
 import { PaginationType } from "@backend/lib/pagination_interface";
 import {
-  sessions,
-  sessionsFindManyArgsSchema,
-  sessionsFindUniqueArgsSchema,
+  Sessions,
+  SessionsFindManyArgsSchema,
+  SessionsFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
@@ -11,13 +11,13 @@ import { z } from "zod";
 export class SessionsService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: Prisma.sessionsCreateArgs) {
+  async create(input: Prisma.SessionsCreateArgs) {
     return this.prisma.sessions.create(input);
   }
 
   async findMany(
-    input: z.infer<typeof sessionsFindManyArgsSchema>
-  ): Promise<PaginationType<sessions>> {
+    input: z.infer<typeof SessionsFindManyArgsSchema>
+  ): Promise<PaginationType<Sessions>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -40,17 +40,17 @@ export class SessionsService {
   }
 
   async findOne(
-    input: z.infer<typeof sessionsFindUniqueArgsSchema>
-  ): Promise<sessions | null> {
+    input: z.infer<typeof SessionsFindUniqueArgsSchema>
+  ): Promise<Sessions | null> {
     const session = await this.prisma.sessions.findUnique(input);
     return session;
   }
 
-  async update(input: Prisma.sessionsUpdateArgs): Promise<sessions> {
+  async update(input: Prisma.SessionsUpdateArgs): Promise<Sessions> {
     return this.prisma.sessions.update(input);
   }
 
-  async delete(input: Prisma.sessionsDeleteArgs) {
+  async delete(input: Prisma.SessionsDeleteArgs) {
     return this.prisma.sessions.delete(input);
   }
 }

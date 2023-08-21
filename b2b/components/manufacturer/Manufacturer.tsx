@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function Manufacturer11() {
   return (
     <div>
-      <div className="mt-8">
+      <div className="container mx-auto mt-8">
         {manaData.map((manufacturerData) => (
           <div
             key={manufacturerData.id}

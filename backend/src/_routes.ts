@@ -8,8 +8,13 @@ import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
 import { usersRolesRouter } from "./modules/users_roles/route";
 import { usersTerminalsRouter } from "./modules/users_terminals/route";
+import { usersWorkSchedulesRouter } from "./modules/users_work_schedules/route";
 import { workSchedulesRouter } from "./modules/work_schedules/route";
 import { publicRouter } from "./trpc";
+import { workScheduleEntriesRouter } from "./modules/work_schedule_entries/route";
+import { apiTokensRouter } from "./modules/api_tokens/route";
+import { timesheetRouter } from "./modules/timesheet/route";
+import { scheduledReportsRouter } from "./modules/scheduled_reports/route";
 
 export const router = publicRouter({
   permissions: permissionsRouter,
@@ -23,6 +28,11 @@ export const router = publicRouter({
   usersTerminals: usersTerminalsRouter,
   workSchedules: workSchedulesRouter,
   sessions: sessionsRouter,
+  usersWorkSchedules: usersWorkSchedulesRouter,
+  workScheduleEntriesRouter: workScheduleEntriesRouter,
+  apiTokensRouter: apiTokensRouter,
+  timesheetRouter: timesheetRouter,
+  scheduledReportsRouter: scheduledReportsRouter,
 });
 
 export type Router = typeof router;
