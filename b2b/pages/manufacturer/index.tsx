@@ -1,11 +1,8 @@
 import React from "react";
 import ManufacturerComponent from "@/components/manufacturer/Manufacturer";
+import RootLayout from "@/app/layout";
 
 const ManufacturerPage = () => {
-  return (
-    <div>
-      <ManufacturerComponent />
-    </div>
-  );
+  return <ManufacturerComponent />;
 };
 export default ManufacturerPage;
