@@ -1,10 +1,10 @@
 import { PaginationType } from "@backend/lib/pagination_interface";
 import {
-  usersFindManyArgsSchema,
-  usersFindUniqueArgsSchema,
-  users,
-  users_roles,
-  users as usersSchema,
+  UsersFindManyArgsSchema,
+  UsersFindUniqueArgsSchema,
+  Users,
+  Users_roles,
+  Users as usersSchema,
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
@@ -25,7 +25,7 @@ export class UsersService {
     private readonly cacheController: CacheControlService
   ) {}
 
-  async create(input: Prisma.usersCreateArgs): Promise<usersSchema> {
+  async create(input: Prisma.UsersCreateArgs): Promise<usersSchema> {
     if (input.data.password) {
       const { hash, salt } = await hashPassword(input.data.password);
       input.data.password = hash;
@@ -35,7 +35,7 @@ export class UsersService {
   }
 
   async findMany(
-    input: z.infer<typeof usersFindManyArgsSchema>
+    input: z.infer<typeof UsersFindManyArgsSchema>
   ): Promise<PaginationType<Omit<usersSchema, "password">>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
@@ -61,7 +61,7 @@ export class UsersService {
   }
 
   async findOne(
-    input: z.infer<typeof usersFindUniqueArgsSchema>
+    input: z.infer<typeof UsersFindUniqueArgsSchema>
   ): Promise<Omit<usersSchema, "password"> | null> {
     const user = await this.prisma.users.findUnique(input);
 
@@ -72,7 +72,7 @@ export class UsersService {
     return this.exclude(user, ["password"]) as Omit<usersSchema, "password">;
   }
 
-  async update(input: Prisma.usersUpdateArgs): Promise<usersSchema> {
+  async update(input: Prisma.UsersUpdateArgs): Promise<usersSchema> {
     if (input.data.password) {
       let password = input.data.password;
       if (typeof password != "string") {
@@ -98,13 +98,13 @@ export class UsersService {
     ) as unknown as Omit<User, Key>;
     return filteredObject;
   }
-  async delete(input: Prisma.usersDeleteArgs): Promise<usersSchema> {
+  async delete(input: Prisma.UsersDeleteArgs): Promise<usersSchema> {
     return await this.prisma.users.delete(input);
   }
 
   async assignRole(
-    input: Prisma.users_rolesUncheckedCreateInput
-  ): Promise<users_roles> {
+    input: Prisma.Users_rolesUncheckedCreateInput
+  ): Promise<Users_roles> {
     await this.prisma.users_roles.deleteMany({
       where: {
         user_id: input.user_id,

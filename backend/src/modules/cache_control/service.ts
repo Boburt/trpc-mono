@@ -1,11 +1,11 @@
 import {
-  terminals,
-  rolesWithRelations,
-  organization,
-  permissions,
-  work_schedules,
-  api_tokens,
-  scheduled_reports,
+  Terminals,
+  RolesWithRelations,
+  Organization,
+  Permissions,
+  Work_schedules,
+  Api_tokens,
+  Scheduled_reports,
 } from "@backend/lib/zod";
 import { DB, RedisClientType } from "@backend/trpc";
 
@@ -33,7 +33,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<permissions[]> {
+  }): Promise<Permissions[]> {
     const permissions = await this.redis.get(
       `${process.env.PROJECT_PREFIX}permissions`
     );
@@ -58,7 +58,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<organization[]> {
+  }): Promise<Organization[]> {
     const organization = await this.redis.get(
       `${process.env.PROJECT_PREFIX}organization`
     );
@@ -87,11 +87,11 @@ export class CacheControlService {
     );
   }
 
-  async getСachedRoles({
+  async getCachedRoles({
     take,
   }: {
     take?: number;
-  }): Promise<rolesWithRelations[]> {
+  }): Promise<RolesWithRelations[]> {
     const roles = await this.redis.get(`${process.env.PROJECT_PREFIX}roles`);
     let res = JSON.parse(roles ?? "[]");
 
@@ -110,7 +110,7 @@ export class CacheControlService {
     );
   }
 
-  async getCachedTerminals({ take }: { take?: number }): Promise<terminals[]> {
+  async getCachedTerminals({ take }: { take?: number }): Promise<Terminals[]> {
     const terminals = await this.redis.get(
       `${process.env.PROJECT_PREFIX}terminals`
     );
@@ -124,7 +124,7 @@ export class CacheControlService {
   }
 
   async getPermissionsByRoleId(roleId: string) {
-    const roles = await this.getСachedRoles({});
+    const roles = await this.getCachedRoles({});
     // console.log("roles", roles);
     const role = roles.find((role) => role.id === roleId);
     if (!role) {
@@ -147,7 +147,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<work_schedules[]> {
+  }): Promise<Work_schedules[]> {
     const workSchedules = await this.redis.get(
       `${process.env.PROJECT_PREFIX}work_schedules`
     );
@@ -168,7 +168,7 @@ export class CacheControlService {
     );
   }
 
-  async getCachedApiTokens({ take }: { take?: number }): Promise<api_tokens[]> {
+  async getCachedApiTokens({ take }: { take?: number }): Promise<Api_tokens[]> {
     const apiTokens = await this.redis.get(
       `${process.env.PROJECT_PREFIX}api_tokens`
     );
@@ -193,7 +193,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<scheduled_reports[]> {
+  }): Promise<Scheduled_reports[]> {
     const scheduledReports = await this.redis.get(
       `${process.env.PROJECT_PREFIX}scheduled_reports`
     );

@@ -1,7 +1,7 @@
 import {
-  users_work_schedules,
-  users_work_schedulesFindManyArgsSchema,
-  users_work_schedulesFindUniqueArgsSchema,
+  Users_work_schedules,
+  Users_work_schedulesFindManyArgsSchema,
+  Users_work_schedulesFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
@@ -12,14 +12,14 @@ export class UsersWorkSchedulesService {
   constructor(private readonly prisma: DB) {}
 
   async create(
-    input: Prisma.users_work_schedulesCreateArgs
-  ): Promise<users_work_schedules> {
+    input: Prisma.Users_work_schedulesCreateArgs
+  ): Promise<Users_work_schedules> {
     return await this.prisma.users_work_schedules.create(input);
   }
 
   async findMany(
-    input: z.infer<typeof users_work_schedulesFindManyArgsSchema>
-  ): Promise<PaginationType<users_work_schedules>> {
+    input: z.infer<typeof Users_work_schedulesFindManyArgsSchema>
+  ): Promise<PaginationType<Users_work_schedules>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -41,18 +41,18 @@ export class UsersWorkSchedulesService {
   }
 
   async findOne(
-    input: z.infer<typeof users_work_schedulesFindUniqueArgsSchema>
-  ): Promise<users_work_schedules | null> {
+    input: z.infer<typeof Users_work_schedulesFindUniqueArgsSchema>
+  ): Promise<Users_work_schedules | null> {
     return await this.prisma.users_work_schedules.findUnique(input);
   }
 
   async update(
-    input: Prisma.users_work_schedulesUpdateArgs
-  ): Promise<users_work_schedules> {
+    input: Prisma.Users_work_schedulesUpdateArgs
+  ): Promise<Users_work_schedules> {
     return await this.prisma.users_work_schedules.update(input);
   }
 
-  async delete(input: Prisma.users_work_schedulesDeleteArgs) {
+  async delete(input: Prisma.Users_work_schedulesDeleteArgs) {
     return await this.prisma.users_work_schedules.delete(input);
   }
 }
