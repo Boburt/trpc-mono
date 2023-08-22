@@ -83,8 +83,8 @@ export const PermissionsSchema = z.object({
   active: z.boolean(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Permissions = z.infer<typeof PermissionsSchema>
@@ -95,16 +95,14 @@ export type Permissions = z.infer<typeof PermissionsSchema>
 export type PermissionsRelations = {
   users_permissions_created_byTousers?: UsersWithRelations | null;
   users_permissions_updated_byTousers?: UsersWithRelations | null;
-  roles_permissions: Roles_permissionsWithRelations[];
   users_permissions: Users_permissionsWithRelations[];
 };
 
 export type PermissionsWithRelations = z.infer<typeof PermissionsSchema> & PermissionsRelations
 
 export const PermissionsWithRelationsSchema: z.ZodType<PermissionsWithRelations> = PermissionsSchema.merge(z.object({
-  users_permissions_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
+  users_permissions_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  users_permissions_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   users_permissions: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
 }))
 
@@ -115,12 +113,12 @@ export const PermissionsWithRelationsSchema: z.ZodType<PermissionsWithRelations>
 export const RolesSchema = z.object({
   id: z.string(),
   name: z.string(),
-  code: z.string().nullable(),
+  code: z.string().nullish(),
   active: z.boolean(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Roles = z.infer<typeof RolesSchema>
@@ -138,8 +136,8 @@ export type RolesRelations = {
 export type RolesWithRelations = z.infer<typeof RolesSchema> & RolesRelations
 
 export const RolesWithRelationsSchema: z.ZodType<RolesWithRelations> = RolesSchema.merge(z.object({
-  users_roles_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  users_roles_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  users_roles_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  users_roles_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   roles_permissions: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
   users_roles: z.lazy(() => Users_rolesWithRelationsSchema).array(),
 }))
@@ -151,8 +149,8 @@ export const RolesWithRelationsSchema: z.ZodType<RolesWithRelations> = RolesSche
 export const Roles_permissionsSchema = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>
@@ -161,19 +159,15 @@ export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>
 //------------------------------------------------------
 
 export type Roles_permissionsRelations = {
-  users_roles_permissions_created_byTousers?: UsersWithRelations | null;
-  permissions: PermissionsWithRelations;
+  roles_permissions_created_by?: UsersWithRelations | null;
   roles: RolesWithRelations;
-  users_roles_permissions_updated_byTousers?: UsersWithRelations | null;
 };
 
 export type Roles_permissionsWithRelations = z.infer<typeof Roles_permissionsSchema> & Roles_permissionsRelations
 
 export const Roles_permissionsWithRelationsSchema: z.ZodType<Roles_permissionsWithRelations> = Roles_permissionsSchema.merge(z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  permissions: z.lazy(() => PermissionsWithRelationsSchema),
+  roles_permissions_created_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
   roles: z.lazy(() => RolesWithRelationsSchema),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
 }))
 
 /////////////////////////////////////////
@@ -182,33 +176,33 @@ export const Roles_permissionsWithRelationsSchema: z.ZodType<Roles_permissionsWi
 
 export const UsersSchema = z.object({
   status: user_statusSchema,
-  id: z.string(),
-  phone: z.string().nullable(),
-  email: z.string().nullable(),
+  id: z.string().uuid(),
+  phone: z.string().nullish(),
+  email: z.string().nullish(),
   login: z.string(),
-  first_name: z.string().nullable(),
-  last_name: z.string().nullable(),
+  first_name: z.string().nullish(),
+  last_name: z.string().nullish(),
   password: z.string(),
-  salt: z.string().nullable(),
+  salt: z.string().nullish(),
   is_super_user: z.boolean(),
-  card_name: z.string().nullable(),
-  card_number: z.string().nullable(),
-  birth_date: z.coerce.date().nullable(),
-  car_model: z.string().nullable(),
-  car_number: z.string().nullable(),
+  card_name: z.string().nullish(),
+  card_number: z.string().nullish(),
+  birth_date: z.coerce.date().nullish(),
+  car_model: z.string().nullish(),
+  car_number: z.string().nullish(),
   is_online: z.boolean(),
-  latitude: z.number().nullable(),
-  longitude: z.number().nullable(),
-  fcm_token: z.string().nullable(),
+  latitude: z.number().nullish(),
+  longitude: z.number().nullish(),
+  fcm_token: z.string().nullish(),
   wallet_balance: z.number(),
-  max_active_order_count: z.number().int().nullable(),
+  max_active_order_count: z.number().int().nullish(),
   doc_files: z.string().array(),
-  order_start_date: z.coerce.date().nullable(),
-  app_version: z.string().nullable(),
+  order_start_date: z.coerce.date().nullish(),
+  app_version: z.string().nullish(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  api_token: z.string().nullable(),
-  tg_id: z.string().nullable(),
+  api_token: z.string().nullish(),
+  tg_id: z.string().nullish(),
 })
 
 export type Users = z.infer<typeof UsersSchema>
@@ -221,8 +215,7 @@ export type UsersRelations = {
   permissions_permissions_updated_byTousers: PermissionsWithRelations[];
   roles_roles_created_byTousers: RolesWithRelations[];
   roles_roles_updated_byTousers: RolesWithRelations[];
-  roles_permissions_roles_permissions_created_byTousers: Roles_permissionsWithRelations[];
-  roles_permissions_roles_permissions_updated_byTousers: Roles_permissionsWithRelations[];
+  roles_permissions_created_by: Roles_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_created_by: Users_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_updated_by: Users_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_user_id: Users_permissionsWithRelations[];
@@ -252,8 +245,7 @@ export const UsersWithRelationsSchema: z.ZodType<UsersWithRelations> = UsersSche
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsWithRelationsSchema).array(),
   roles_roles_created_byTousers: z.lazy(() => RolesWithRelationsSchema).array(),
   roles_roles_updated_byTousers: z.lazy(() => RolesWithRelationsSchema).array(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
@@ -311,8 +303,8 @@ export const SessionsWithRelationsSchema: z.ZodType<SessionsWithRelations> = Ses
 export const Users_permissionsSchema = z.object({
   user_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Users_permissions = z.infer<typeof Users_permissionsSchema>
@@ -330,9 +322,9 @@ export type Users_permissionsRelations = {
 export type Users_permissionsWithRelations = z.infer<typeof Users_permissionsSchema> & Users_permissionsRelations
 
 export const Users_permissionsWithRelationsSchema: z.ZodType<Users_permissionsWithRelations> = Users_permissionsSchema.merge(z.object({
-  users_usersTousers_permissions_created_by: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  users_usersTousers_permissions_created_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
   permissions: z.lazy(() => PermissionsWithRelationsSchema),
-  users_usersTousers_permissions_updated_by: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  users_usersTousers_permissions_updated_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
   users_usersTousers_permissions_user_id: z.lazy(() => UsersWithRelationsSchema),
 }))
 
@@ -343,8 +335,8 @@ export const Users_permissionsWithRelationsSchema: z.ZodType<Users_permissionsWi
 export const Users_rolesSchema = z.object({
   user_id: z.string(),
   role_id: z.string(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Users_roles = z.infer<typeof Users_rolesSchema>
@@ -362,9 +354,9 @@ export type Users_rolesRelations = {
 export type Users_rolesWithRelations = z.infer<typeof Users_rolesSchema> & Users_rolesRelations
 
 export const Users_rolesWithRelationsSchema: z.ZodType<Users_rolesWithRelations> = Users_rolesSchema.merge(z.object({
-  users_usersTousers_roles_created_by: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  users_usersTousers_roles_created_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
   roles: z.lazy(() => RolesWithRelationsSchema),
-  users_usersTousers_roles_updated_by: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  users_usersTousers_roles_updated_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
   users_usersTousers_roles_user_id: z.lazy(() => UsersWithRelationsSchema),
 }))
 
@@ -384,8 +376,8 @@ export const Work_schedulesSchema = z.object({
   bonus_price: z.number().int(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Work_schedules = z.infer<typeof Work_schedulesSchema>
@@ -405,8 +397,8 @@ export type Work_schedulesWithRelations = z.infer<typeof Work_schedulesSchema> &
 
 export const Work_schedulesWithRelationsSchema: z.ZodType<Work_schedulesWithRelations> = Work_schedulesSchema.merge(z.object({
   organization: z.lazy(() => OrganizationWithRelationsSchema),
-  work_schedules_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  work_schedules_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  work_schedules_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  work_schedules_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   users_work_schedules: z.lazy(() => Users_work_schedulesWithRelationsSchema).array(),
   work_schedule_entries_work_schedules: z.lazy(() => Work_schedule_entriesWithRelationsSchema).array(),
 }))
@@ -419,13 +411,13 @@ export const TerminalsSchema = z.object({
   id: z.string(),
   name: z.string(),
   active: z.boolean(),
-  phone: z.string().nullable(),
-  address: z.string().nullable(),
+  phone: z.string().nullish(),
+  address: z.string().nullish(),
   latitude: z.number(),
   longitude: z.number(),
   external_id: z.string(),
   organization_id: z.string(),
-  manager_name: z.string().nullable(),
+  manager_name: z.string().nullish(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
 })
@@ -456,27 +448,27 @@ export const OrganizationSchema = z.object({
   payment_type: organization_payment_typesSchema,
   id: z.string(),
   name: z.string(),
-  external_id: z.string().nullable(),
+  external_id: z.string().nullish(),
   active: z.boolean(),
   phone: z.string(),
-  iiko_login: z.string().nullable(),
-  webhook: z.string().nullable(),
-  group_id: z.string().nullable(),
-  apelsin_login: z.string().nullable(),
-  apelsin_password: z.string().nullable(),
-  sender_name: z.string().nullable(),
-  sender_number: z.string().nullable(),
-  description: z.string().nullable(),
+  iiko_login: z.string().nullish(),
+  webhook: z.string().nullish(),
+  group_id: z.string().nullish(),
+  apelsin_login: z.string().nullish(),
+  apelsin_password: z.string().nullish(),
+  sender_name: z.string().nullish(),
+  sender_number: z.string().nullish(),
+  description: z.string().nullish(),
   max_distance: z.number().int(),
   max_active_order_count: z.number().int(),
   max_order_close_distance: z.number().int(),
-  support_chat_url: z.string().nullable(),
-  icon_url: z.string().nullable(),
+  support_chat_url: z.string().nullish(),
+  icon_url: z.string().nullish(),
   allow_yandex_delivery: z.boolean(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Organization = z.infer<typeof OrganizationSchema>
@@ -496,8 +488,8 @@ export type OrganizationWithRelations = z.infer<typeof OrganizationSchema> & Org
 
 export const OrganizationWithRelationsSchema: z.ZodType<OrganizationWithRelations> = OrganizationSchema.merge(z.object({
   work_schedules_organization_idTorganization: z.lazy(() => Work_schedulesWithRelationsSchema).array(),
-  organization_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  organization_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  organization_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  organization_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   terminals_organization_idTorganization: z.lazy(() => TerminalsWithRelationsSchema).array(),
   api_tokens_organization: z.lazy(() => Api_tokensWithRelationsSchema).array(),
 }))
@@ -564,19 +556,19 @@ export const Work_schedule_entriesSchema = z.object({
   user_id: z.string(),
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
-  date_finish: z.coerce.date().nullable(),
+  date_finish: z.coerce.date().nullish(),
   duration: z.number().int(),
-  ip_open: z.string().nullable(),
-  ip_close: z.string().nullable(),
+  ip_open: z.string().nullish(),
+  ip_close: z.string().nullish(),
   lat_open: z.number(),
-  lat_close: z.number().nullable(),
+  lat_close: z.number().nullish(),
   lon_open: z.number(),
-  lon_close: z.number().nullable(),
+  lon_close: z.number().nullish(),
   late: z.boolean(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Work_schedule_entries = z.infer<typeof Work_schedule_entriesSchema>
@@ -594,8 +586,8 @@ export type Work_schedule_entriesRelations = {
 export type Work_schedule_entriesWithRelations = z.infer<typeof Work_schedule_entriesSchema> & Work_schedule_entriesRelations
 
 export const Work_schedule_entriesWithRelationsSchema: z.ZodType<Work_schedule_entriesWithRelations> = Work_schedule_entriesSchema.merge(z.object({
-  work_schedule_entries_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  work_schedule_entries_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  work_schedule_entries_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   work_schedule_entries_users: z.lazy(() => UsersWithRelationsSchema),
   work_schedule_entries_work_schedules: z.lazy(() => Work_schedulesWithRelationsSchema),
 }))
@@ -611,8 +603,8 @@ export const Api_tokensSchema = z.object({
   organization_id: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string().nullable(),
-  updated_by: z.string().nullable(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Api_tokens = z.infer<typeof Api_tokensSchema>
@@ -629,8 +621,8 @@ export type Api_tokensRelations = {
 export type Api_tokensWithRelations = z.infer<typeof Api_tokensSchema> & Api_tokensRelations
 
 export const Api_tokensWithRelationsSchema: z.ZodType<Api_tokensWithRelations> = Api_tokensSchema.merge(z.object({
-  api_tokens_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
-  api_tokens_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullable(),
+  api_tokens_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  api_tokens_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   api_tokens_organization: z.lazy(() => OrganizationWithRelationsSchema),
 }))
 
@@ -729,7 +721,6 @@ export const Scheduled_reports_subscriptionWithRelationsSchema: z.ZodType<Schedu
 export const PermissionsIncludeSchema: z.ZodType<Prisma.PermissionsInclude> = z.object({
   users_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   users_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
-  roles_permissions: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PermissionsCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -744,7 +735,6 @@ export const PermissionsCountOutputTypeArgsSchema: z.ZodType<Prisma.PermissionsC
 }).strict();
 
 export const PermissionsCountOutputTypeSelectSchema: z.ZodType<Prisma.PermissionsCountOutputTypeSelect> = z.object({
-  roles_permissions: z.boolean().optional(),
   users_permissions: z.boolean().optional(),
 }).strict();
 
@@ -759,7 +749,6 @@ export const PermissionsSelectSchema: z.ZodType<Prisma.PermissionsSelect> = z.ob
   updated_by: z.boolean().optional(),
   users_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   users_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
-  roles_permissions: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PermissionsCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -809,10 +798,8 @@ export const RolesSelectSchema: z.ZodType<Prisma.RolesSelect> = z.object({
 //------------------------------------------------------
 
 export const Roles_permissionsIncludeSchema: z.ZodType<Prisma.Roles_permissionsInclude> = z.object({
-  users_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
-  permissions: z.union([z.boolean(),z.lazy(() => PermissionsArgsSchema)]).optional(),
+  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   roles: z.union([z.boolean(),z.lazy(() => RolesArgsSchema)]).optional(),
-  users_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
 }).strict()
 
 export const Roles_permissionsArgsSchema: z.ZodType<Prisma.Roles_permissionsDefaultArgs> = z.object({
@@ -825,10 +812,8 @@ export const Roles_permissionsSelectSchema: z.ZodType<Prisma.Roles_permissionsSe
   permission_id: z.boolean().optional(),
   created_by: z.boolean().optional(),
   updated_by: z.boolean().optional(),
-  users_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
-  permissions: z.union([z.boolean(),z.lazy(() => PermissionsArgsSchema)]).optional(),
+  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   roles: z.union([z.boolean(),z.lazy(() => RolesArgsSchema)]).optional(),
-  users_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
 }).strict()
 
 // USERS
@@ -839,8 +824,7 @@ export const UsersIncludeSchema: z.ZodType<Prisma.UsersInclude> = z.object({
   permissions_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => PermissionsFindManyArgsSchema)]).optional(),
   roles_roles_created_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
   roles_roles_updated_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_created_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_user_id: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
@@ -878,8 +862,7 @@ export const UsersCountOutputTypeSelectSchema: z.ZodType<Prisma.UsersCountOutput
   permissions_permissions_updated_byTousers: z.boolean().optional(),
   roles_roles_created_byTousers: z.boolean().optional(),
   roles_roles_updated_byTousers: z.boolean().optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.boolean().optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.boolean().optional(),
+  roles_permissions_created_by: z.boolean().optional(),
   users_permissions_usersTousers_permissions_created_by: z.boolean().optional(),
   users_permissions_usersTousers_permissions_updated_by: z.boolean().optional(),
   users_permissions_usersTousers_permissions_user_id: z.boolean().optional(),
@@ -935,8 +918,7 @@ export const UsersSelectSchema: z.ZodType<Prisma.UsersSelect> = z.object({
   permissions_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => PermissionsFindManyArgsSchema)]).optional(),
   roles_roles_created_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
   roles_roles_updated_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_created_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_user_id: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
@@ -1387,7 +1369,6 @@ export const PermissionsWhereInputSchema: z.ZodType<Prisma.PermissionsWhereInput
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   users_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   users_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsListRelationFilterSchema).optional()
 }).strict();
 
@@ -1402,7 +1383,6 @@ export const PermissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.Permiss
   updated_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
@@ -1432,7 +1412,6 @@ export const PermissionsWhereUniqueInputSchema: z.ZodType<Prisma.PermissionsWher
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   users_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   users_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsListRelationFilterSchema).optional()
 }).strict());
 
@@ -1577,12 +1556,10 @@ export const Roles_permissionsWhereInputSchema: z.ZodType<Prisma.Roles_permissio
   NOT: z.union([ z.lazy(() => Roles_permissionsWhereInputSchema),z.lazy(() => Roles_permissionsWhereInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  users_roles_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
-  permissions: z.union([ z.lazy(() => PermissionsRelationFilterSchema),z.lazy(() => PermissionsWhereInputSchema) ]).optional(),
+  roles_permissions_created_by: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   roles: z.union([ z.lazy(() => RolesRelationFilterSchema),z.lazy(() => RolesWhereInputSchema) ]).optional(),
-  users_roles_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByWithRelationInput> = z.object({
@@ -1590,10 +1567,8 @@ export const Roles_permissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.R
   permission_id: z.lazy(() => SortOrderSchema).optional(),
   created_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   updated_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsOrderByWithRelationInputSchema).optional(),
-  roles: z.lazy(() => RolesOrderByWithRelationInputSchema).optional(),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional()
+  roles_permissions_created_by: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
+  roles: z.lazy(() => RolesOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsWhereUniqueInputSchema: z.ZodType<Prisma.Roles_permissionsWhereUniqueInput> = z.object({
@@ -1606,12 +1581,10 @@ export const Roles_permissionsWhereUniqueInputSchema: z.ZodType<Prisma.Roles_per
   NOT: z.union([ z.lazy(() => Roles_permissionsWhereInputSchema),z.lazy(() => Roles_permissionsWhereInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  users_roles_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
-  permissions: z.union([ z.lazy(() => PermissionsRelationFilterSchema),z.lazy(() => PermissionsWhereInputSchema) ]).optional(),
+  roles_permissions_created_by: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   roles: z.union([ z.lazy(() => RolesRelationFilterSchema),z.lazy(() => RolesWhereInputSchema) ]).optional(),
-  users_roles_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
 }).strict());
 
 export const Roles_permissionsOrderByWithAggregationInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByWithAggregationInput> = z.object({
@@ -1630,7 +1603,7 @@ export const Roles_permissionsScalarWhereWithAggregatesInputSchema: z.ZodType<Pr
   NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereWithAggregatesInputSchema),z.lazy(() => Roles_permissionsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
@@ -1670,8 +1643,7 @@ export const UsersWhereInputSchema: z.ZodType<Prisma.UsersWhereInput> = z.object
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsListRelationFilterSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
@@ -1727,8 +1699,7 @@ export const UsersOrderByWithRelationInputSchema: z.ZodType<Prisma.UsersOrderByW
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsOrderByRelationAggregateInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesOrderByRelationAggregateInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesOrderByRelationAggregateInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
@@ -1839,7 +1810,7 @@ export const UsersWhereUniqueInputSchema: z.ZodType<Prisma.UsersWhereUniqueInput
   longitude: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   fcm_token: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   wallet_balance: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
-  max_active_order_count: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
+  max_active_order_count: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   doc_files: z.lazy(() => StringNullableListFilterSchema).optional(),
   order_start_date: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   app_version: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -1851,8 +1822,7 @@ export const UsersWhereUniqueInputSchema: z.ZodType<Prisma.UsersWhereUniqueInput
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsListRelationFilterSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
@@ -1969,10 +1939,10 @@ export const SessionsOrderByWithRelationInputSchema: z.ZodType<Prisma.SessionsOr
 }).strict();
 
 export const SessionsWhereUniqueInputSchema: z.ZodType<Prisma.SessionsWhereUniqueInput> = z.object({
-  id: z.string().uuid()
+  id: z.string()
 })
 .and(z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   AND: z.union([ z.lazy(() => SessionsWhereInputSchema),z.lazy(() => SessionsWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => SessionsWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => SessionsWhereInputSchema),z.lazy(() => SessionsWhereInputSchema).array() ]).optional(),
@@ -2194,7 +2164,7 @@ export const Work_schedulesWhereUniqueInputSchema: z.ZodType<Prisma.Work_schedul
   start_time: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   end_time: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   max_start_time: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  bonus_price: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  bonus_price: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -2443,9 +2413,9 @@ export const OrganizationWhereUniqueInputSchema: z.ZodType<Prisma.OrganizationWh
   sender_name: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   sender_number: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  max_distance: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
-  max_active_order_count: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
-  max_order_close_distance: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  max_distance: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  max_active_order_count: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  max_order_close_distance: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   payment_type: z.union([ z.lazy(() => Enumorganization_payment_typesFilterSchema),z.lazy(() => organization_payment_typesSchema) ]).optional(),
   support_chat_url: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   icon_url: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -2684,7 +2654,7 @@ export const Work_schedule_entriesWhereUniqueInputSchema: z.ZodType<Prisma.Work_
   work_schedule_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   date_start: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   date_finish: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
-  duration: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  duration: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   ip_open: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   ip_close: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   lat_open: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
@@ -3037,7 +3007,6 @@ export const PermissionsCreateInputSchema: z.ZodType<Prisma.PermissionsCreateInp
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -3050,7 +3019,6 @@ export const PermissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Permissions
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
   updated_by: z.string().optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -3063,7 +3031,6 @@ export const PermissionsUpdateInputSchema: z.ZodType<Prisma.PermissionsUpdateInp
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -3076,7 +3043,6 @@ export const PermissionsUncheckedUpdateInputSchema: z.ZodType<Prisma.Permissions
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -3195,10 +3161,10 @@ export const RolesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.RolesUnchecke
 }).strict();
 
 export const Roles_permissionsCreateInputSchema: z.ZodType<Prisma.Roles_permissionsCreateInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
+  permission_id: z.string(),
+  updated_by: z.string().optional().nullable(),
+  roles_permissions_created_by: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
 }).strict();
 
 export const Roles_permissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateInput> = z.object({
@@ -3209,10 +3175,10 @@ export const Roles_permissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Roles
 }).strict();
 
 export const Roles_permissionsUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
+  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions_created_by: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateInput> = z.object({
@@ -3230,6 +3196,8 @@ export const Roles_permissionsCreateManyInputSchema: z.ZodType<Prisma.Roles_perm
 }).strict();
 
 export const Roles_permissionsUpdateManyMutationInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyMutationInput> = z.object({
+  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyInput> = z.object({
@@ -3260,7 +3228,7 @@ export const UsersCreateInputSchema: z.ZodType<Prisma.UsersCreateInput> = z.obje
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -3272,8 +3240,7 @@ export const UsersCreateInputSchema: z.ZodType<Prisma.UsersCreateInput> = z.obje
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -3317,7 +3284,7 @@ export const UsersUncheckedCreateInputSchema: z.ZodType<Prisma.UsersUncheckedCre
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -3329,8 +3296,7 @@ export const UsersUncheckedCreateInputSchema: z.ZodType<Prisma.UsersUncheckedCre
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -3374,7 +3340,7 @@ export const UsersUpdateInputSchema: z.ZodType<Prisma.UsersUpdateInput> = z.obje
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3386,8 +3352,7 @@ export const UsersUpdateInputSchema: z.ZodType<Prisma.UsersUpdateInput> = z.obje
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -3431,7 +3396,7 @@ export const UsersUncheckedUpdateInputSchema: z.ZodType<Prisma.UsersUncheckedUpd
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3443,8 +3408,7 @@ export const UsersUncheckedUpdateInputSchema: z.ZodType<Prisma.UsersUncheckedUpd
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -3488,7 +3452,7 @@ export const UsersCreateManyInputSchema: z.ZodType<Prisma.UsersCreateManyInput> 
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -3519,7 +3483,7 @@ export const UsersUpdateManyMutationInputSchema: z.ZodType<Prisma.UsersUpdateMan
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3550,7 +3514,7 @@ export const UsersUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UsersUnchecke
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3561,7 +3525,7 @@ export const UsersUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UsersUnchecke
 }).strict();
 
 export const SessionsCreateInputSchema: z.ZodType<Prisma.SessionsCreateInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_agent: z.string(),
   device_name: z.string(),
   created_at: z.coerce.date().optional(),
@@ -3570,7 +3534,7 @@ export const SessionsCreateInputSchema: z.ZodType<Prisma.SessionsCreateInput> = 
 }).strict();
 
 export const SessionsUncheckedCreateInputSchema: z.ZodType<Prisma.SessionsUncheckedCreateInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_id: z.string(),
   user_agent: z.string(),
   device_name: z.string(),
@@ -3579,7 +3543,7 @@ export const SessionsUncheckedCreateInputSchema: z.ZodType<Prisma.SessionsUnchec
 }).strict();
 
 export const SessionsUpdateInputSchema: z.ZodType<Prisma.SessionsUpdateInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3588,7 +3552,7 @@ export const SessionsUpdateInputSchema: z.ZodType<Prisma.SessionsUpdateInput> = 
 }).strict();
 
 export const SessionsUncheckedUpdateInputSchema: z.ZodType<Prisma.SessionsUncheckedUpdateInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3597,7 +3561,7 @@ export const SessionsUncheckedUpdateInputSchema: z.ZodType<Prisma.SessionsUnchec
 }).strict();
 
 export const SessionsCreateManyInputSchema: z.ZodType<Prisma.SessionsCreateManyInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_id: z.string(),
   user_agent: z.string(),
   device_name: z.string(),
@@ -3606,7 +3570,7 @@ export const SessionsCreateManyInputSchema: z.ZodType<Prisma.SessionsCreateManyI
 }).strict();
 
 export const SessionsUpdateManyMutationInputSchema: z.ZodType<Prisma.SessionsUpdateManyMutationInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3614,7 +3578,7 @@ export const SessionsUpdateManyMutationInputSchema: z.ZodType<Prisma.SessionsUpd
 }).strict();
 
 export const SessionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.SessionsUncheckedUpdateManyInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -3720,7 +3684,7 @@ export const Work_schedulesCreateInputSchema: z.ZodType<Prisma.Work_schedulesCre
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutWork_schedules_organization_idTorganizationInputSchema),
@@ -3739,7 +3703,7 @@ export const Work_schedulesUncheckedCreateInputSchema: z.ZodType<Prisma.Work_sch
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -3756,7 +3720,7 @@ export const Work_schedulesUpdateInputSchema: z.ZodType<Prisma.Work_schedulesUpd
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutWork_schedules_organization_idTorganizationNestedInputSchema).optional(),
@@ -3775,7 +3739,7 @@ export const Work_schedulesUncheckedUpdateInputSchema: z.ZodType<Prisma.Work_sch
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3793,7 +3757,7 @@ export const Work_schedulesCreateManyInputSchema: z.ZodType<Prisma.Work_schedule
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -3808,7 +3772,7 @@ export const Work_schedulesUpdateManyMutationInputSchema: z.ZodType<Prisma.Work_
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -3822,7 +3786,7 @@ export const Work_schedulesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Work
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -3952,9 +3916,9 @@ export const OrganizationCreateInputSchema: z.ZodType<Prisma.OrganizationCreateI
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -3983,9 +3947,9 @@ export const OrganizationUncheckedCreateInputSchema: z.ZodType<Prisma.Organizati
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -4014,9 +3978,9 @@ export const OrganizationUpdateInputSchema: z.ZodType<Prisma.OrganizationUpdateI
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -4045,9 +4009,9 @@ export const OrganizationUncheckedUpdateInputSchema: z.ZodType<Prisma.Organizati
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -4076,9 +4040,9 @@ export const OrganizationCreateManyInputSchema: z.ZodType<Prisma.OrganizationCre
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -4104,9 +4068,9 @@ export const OrganizationUpdateManyMutationInputSchema: z.ZodType<Prisma.Organiz
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -4130,9 +4094,9 @@ export const OrganizationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Organi
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -4213,7 +4177,7 @@ export const Work_schedule_entriesCreateInputSchema: z.ZodType<Prisma.Work_sched
   id: z.string().optional(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -4236,7 +4200,7 @@ export const Work_schedule_entriesUncheckedCreateInputSchema: z.ZodType<Prisma.W
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -4255,7 +4219,7 @@ export const Work_schedule_entriesUpdateInputSchema: z.ZodType<Prisma.Work_sched
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4278,7 +4242,7 @@ export const Work_schedule_entriesUncheckedUpdateInputSchema: z.ZodType<Prisma.W
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4299,7 +4263,7 @@ export const Work_schedule_entriesCreateManyInputSchema: z.ZodType<Prisma.Work_s
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -4318,7 +4282,7 @@ export const Work_schedule_entriesUpdateManyMutationInputSchema: z.ZodType<Prism
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4337,7 +4301,7 @@ export const Work_schedule_entriesUncheckedUpdateManyInputSchema: z.ZodType<Pris
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4669,12 +4633,6 @@ export const UsersNullableRelationFilterSchema: z.ZodType<Prisma.UsersNullableRe
   isNot: z.lazy(() => UsersWhereInputSchema).optional().nullable()
 }).strict();
 
-export const Roles_permissionsListRelationFilterSchema: z.ZodType<Prisma.Roles_permissionsListRelationFilter> = z.object({
-  every: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
-  some: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
-  none: z.lazy(() => Roles_permissionsWhereInputSchema).optional()
-}).strict();
-
 export const Users_permissionsListRelationFilterSchema: z.ZodType<Prisma.Users_permissionsListRelationFilter> = z.object({
   every: z.lazy(() => Users_permissionsWhereInputSchema).optional(),
   some: z.lazy(() => Users_permissionsWhereInputSchema).optional(),
@@ -4684,10 +4642,6 @@ export const Users_permissionsListRelationFilterSchema: z.ZodType<Prisma.Users_p
 export const SortOrderInputSchema: z.ZodType<Prisma.SortOrderInput> = z.object({
   sort: z.lazy(() => SortOrderSchema),
   nulls: z.lazy(() => NullsOrderSchema).optional()
-}).strict();
-
-export const Roles_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByRelationAggregateInput> = z.object({
-  _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const Users_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Users_permissionsOrderByRelationAggregateInput> = z.object({
@@ -4812,10 +4766,20 @@ export const StringNullableFilterSchema: z.ZodType<Prisma.StringNullableFilter> 
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
+export const Roles_permissionsListRelationFilterSchema: z.ZodType<Prisma.Roles_permissionsListRelationFilter> = z.object({
+  every: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
+  some: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
+  none: z.lazy(() => Roles_permissionsWhereInputSchema).optional()
+}).strict();
+
 export const Users_rolesListRelationFilterSchema: z.ZodType<Prisma.Users_rolesListRelationFilter> = z.object({
   every: z.lazy(() => Users_rolesWhereInputSchema).optional(),
   some: z.lazy(() => Users_rolesWhereInputSchema).optional(),
   none: z.lazy(() => Users_rolesWhereInputSchema).optional()
+}).strict();
+
+export const Roles_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const Users_rolesOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Users_rolesOrderByRelationAggregateInput> = z.object({
@@ -4871,11 +4835,6 @@ export const StringNullableWithAggregatesFilterSchema: z.ZodType<Prisma.StringNu
   _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedStringNullableFilterSchema).optional(),
   _max: z.lazy(() => NestedStringNullableFilterSchema).optional()
-}).strict();
-
-export const PermissionsRelationFilterSchema: z.ZodType<Prisma.PermissionsRelationFilter> = z.object({
-  is: z.lazy(() => PermissionsWhereInputSchema).optional(),
-  isNot: z.lazy(() => PermissionsWhereInputSchema).optional()
 }).strict();
 
 export const RolesRelationFilterSchema: z.ZodType<Prisma.RolesRelationFilter> = z.object({
@@ -5285,6 +5244,11 @@ export const SessionsMinOrderByAggregateInputSchema: z.ZodType<Prisma.SessionsMi
   device_name: z.lazy(() => SortOrderSchema).optional(),
   created_at: z.lazy(() => SortOrderSchema).optional(),
   updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const PermissionsRelationFilterSchema: z.ZodType<Prisma.PermissionsRelationFilter> = z.object({
+  is: z.lazy(() => PermissionsWhereInputSchema).optional(),
+  isNot: z.lazy(() => PermissionsWhereInputSchema).optional()
 }).strict();
 
 export const Users_permissionsUser_idPermission_idCompoundUniqueInputSchema: z.ZodType<Prisma.Users_permissionsUser_idPermission_idCompoundUniqueInput> = z.object({
@@ -5894,25 +5858,11 @@ export const UsersCreateNestedOneWithoutPermissions_permissions_updated_byTouser
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
 }).strict();
 
-export const Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutPermissionsInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
 export const Users_permissionsCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateNestedManyWithoutPermissionsInput> = z.object({
   create: z.union([ z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
   createMany: z.lazy(() => Users_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Users_permissionsWhereUniqueInputSchema),z.lazy(() => Users_permissionsWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
-export const Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInput> = z.object({
@@ -5954,20 +5904,6 @@ export const UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNeste
   update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInputSchema) ]).optional(),
 }).strict();
 
-export const Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutPermissionsNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
 export const Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Users_permissionsUpdateManyWithoutPermissionsNestedInput> = z.object({
   create: z.union([ z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
@@ -5984,20 +5920,6 @@ export const Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.Z
 
 export const NullableStringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableStringFieldUpdateOperationsInput> = z.object({
   set: z.string().optional().nullable()
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInput> = z.object({
@@ -6130,16 +6052,10 @@ export const Users_rolesUncheckedUpdateManyWithoutRolesNestedInputSchema: z.ZodT
   deleteMany: z.union([ z.lazy(() => Users_rolesScalarWhereInputSchema),z.lazy(() => Users_rolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+export const UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_created_byInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema).optional(),
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
-}).strict();
-
-export const PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateNestedOneWithoutRoles_permissionsInput> = z.object({
-  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema).optional(),
-  connect: z.lazy(() => PermissionsWhereUniqueInputSchema).optional()
 }).strict();
 
 export const RolesCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesCreateNestedOneWithoutRoles_permissionsInput> = z.object({
@@ -6148,28 +6064,14 @@ export const RolesCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<
   connect: z.lazy(() => RolesWhereUniqueInputSchema).optional()
 }).strict();
 
-export const UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
-  connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
-}).strict();
-
-export const UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
-  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+export const UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_created_byNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema).optional(),
+  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_created_byInputSchema).optional(),
   disconnect: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
   delete: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
-}).strict();
-
-export const PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.ZodType<Prisma.PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInput> = z.object({
-  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema).optional(),
-  upsert: z.lazy(() => PermissionsUpsertWithoutRoles_permissionsInputSchema).optional(),
-  connect: z.lazy(() => PermissionsWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
 }).strict();
 
 export const RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.ZodType<Prisma.RolesUpdateOneRequiredWithoutRoles_permissionsNestedInput> = z.object({
@@ -6178,16 +6080,6 @@ export const RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.
   upsert: z.lazy(() => RolesUpsertWithoutRoles_permissionsInputSchema).optional(),
   connect: z.lazy(() => RolesWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => RolesUpdateToOneWithWhereWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUncheckedUpdateWithoutRoles_permissionsInputSchema) ]).optional(),
-}).strict();
-
-export const UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
-  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
-  disconnect: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
-  delete: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
-  connect: z.lazy(() => UsersWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
 }).strict();
 
 export const UsersCreatedoc_filesInputSchema: z.ZodType<Prisma.UsersCreatedoc_filesInput> = z.object({
@@ -6222,17 +6114,10 @@ export const RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchem
   connect: z.union([ z.lazy(() => RolesWhereUniqueInputSchema),z.lazy(() => RolesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
-export const Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
+export const Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -6404,17 +6289,10 @@ export const RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersI
   connect: z.union([ z.lazy(() => RolesWhereUniqueInputSchema),z.lazy(() => RolesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
-export const Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
+export const Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -6651,31 +6529,17 @@ export const RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchem
   deleteMany: z.union([ z.lazy(() => RolesScalarWhereInputSchema),z.lazy(() => RolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
+export const Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
-export const Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -7015,31 +6879,17 @@ export const RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedI
   deleteMany: z.union([ z.lazy(() => RolesScalarWhereInputSchema),z.lazy(() => RolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
+export const Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -8448,7 +8298,7 @@ export const UsersCreateWithoutPermissions_permissions_created_byTousersInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -8459,8 +8309,7 @@ export const UsersCreateWithoutPermissions_permissions_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8504,7 +8353,7 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_created_byTouser
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -8515,8 +8364,7 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_created_byTouser
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8565,7 +8413,7 @@ export const UsersCreateWithoutPermissions_permissions_updated_byTousersInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -8576,8 +8424,7 @@ export const UsersCreateWithoutPermissions_permissions_updated_byTousersInputSch
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8621,7 +8468,7 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -8632,8 +8479,7 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8659,28 +8505,6 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
 export const UsersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   where: z.lazy(() => UsersWhereUniqueInputSchema),
   create: z.union([ z.lazy(() => UsersCreateWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutPermissionsInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
-}).strict();
-
-export const Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutPermissionsInput> = z.object({
-  role_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
-}).strict();
-
-export const Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutPermissionsInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsCreateManyPermissionsInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => Roles_permissionsCreateManyPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateManyPermissionsInputSchema).array() ]),
-  skipDuplicates: z.boolean().optional()
 }).strict();
 
 export const Users_permissionsCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateWithoutPermissionsInput> = z.object({
@@ -8737,7 +8561,7 @@ export const UsersUpdateWithoutPermissions_permissions_created_byTousersInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8748,8 +8572,7 @@ export const UsersUpdateWithoutPermissions_permissions_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8793,7 +8616,7 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_created_byTouser
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8804,8 +8627,7 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_created_byTouser
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8860,7 +8682,7 @@ export const UsersUpdateWithoutPermissions_permissions_updated_byTousersInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8871,8 +8693,7 @@ export const UsersUpdateWithoutPermissions_permissions_updated_byTousersInputSch
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8916,7 +8737,7 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -8927,8 +8748,7 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8949,32 +8769,6 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
   scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
-}).strict();
-
-export const Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema) ]),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutPermissionsInput> = z.object({
-  where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsScalarWhereInputSchema: z.ZodType<Prisma.Roles_permissionsScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => Roles_permissionsScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-  role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUpsertWithWhereUniqueWithoutPermissionsInput> = z.object({
@@ -9024,7 +8818,7 @@ export const UsersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9035,8 +8829,7 @@ export const UsersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9080,7 +8873,7 @@ export const UsersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9091,8 +8884,7 @@ export const UsersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9141,7 +8933,7 @@ export const UsersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9152,8 +8944,7 @@ export const UsersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9197,7 +8988,7 @@ export const UsersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9208,8 +8999,7 @@ export const UsersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9238,9 +9028,9 @@ export const UsersCreateOrConnectWithoutRoles_roles_updated_byTousersInputSchema
 }).strict();
 
 export const Roles_permissionsCreateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutRolesInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
+  permission_id: z.string(),
+  updated_by: z.string().optional().nullable(),
+  roles_permissions_created_by: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedCreateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutRolesInput> = z.object({
@@ -9313,7 +9103,7 @@ export const UsersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9324,8 +9114,7 @@ export const UsersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9369,7 +9158,7 @@ export const UsersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9380,8 +9169,7 @@ export const UsersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9436,7 +9224,7 @@ export const UsersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9447,8 +9235,7 @@ export const UsersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9492,7 +9279,7 @@ export const UsersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9503,8 +9290,7 @@ export const UsersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9543,6 +9329,16 @@ export const Roles_permissionsUpdateManyWithWhereWithoutRolesInputSchema: z.ZodT
   data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRolesInputSchema) ]),
 }).strict();
 
+export const Roles_permissionsScalarWhereInputSchema: z.ZodType<Prisma.Roles_permissionsScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => Roles_permissionsScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+  role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
+}).strict();
+
 export const Users_rolesUpsertWithWhereUniqueWithoutRolesInputSchema: z.ZodType<Prisma.Users_rolesUpsertWithWhereUniqueWithoutRolesInput> = z.object({
   where: z.lazy(() => Users_rolesWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => Users_rolesUpdateWithoutRolesInputSchema),z.lazy(() => Users_rolesUncheckedUpdateWithoutRolesInputSchema) ]),
@@ -9569,7 +9365,7 @@ export const Users_rolesScalarWhereInputSchema: z.ZodType<Prisma.Users_rolesScal
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
-export const UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_created_byInput> = z.object({
   id: z.string().optional(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
@@ -9590,7 +9386,7 @@ export const UsersCreateWithoutRoles_permissions_roles_permissions_created_byTou
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9602,7 +9398,6 @@ export const UsersCreateWithoutRoles_permissions_roles_permissions_created_byTou
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9625,7 +9420,7 @@ export const UsersCreateWithoutRoles_permissions_roles_permissions_created_byTou
   sessions: z.lazy(() => SessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
-export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_created_byInput> = z.object({
   id: z.string().optional(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
@@ -9646,7 +9441,7 @@ export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_crea
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -9658,7 +9453,6 @@ export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_crea
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9681,38 +9475,9 @@ export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_crea
   sessions: z.lazy(() => SessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
-export const UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => UsersWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
-}).strict();
-
-export const PermissionsCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateWithoutRoles_permissionsInput> = z.object({
-  id: z.string().optional(),
-  slug: z.string(),
-  description: z.string(),
-  active: z.boolean().optional(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
-  users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
-  users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
-}).strict();
-
-export const PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedCreateWithoutRoles_permissionsInput> = z.object({
-  id: z.string().optional(),
-  slug: z.string(),
-  description: z.string(),
-  active: z.boolean().optional(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable(),
-  users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
-}).strict();
-
-export const PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateOrConnectWithoutRoles_permissionsInput> = z.object({
-  where: z.lazy(() => PermissionsWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
 export const RolesCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesCreateWithoutRoles_permissionsInput> = z.object({
@@ -9744,135 +9509,18 @@ export const RolesCreateOrConnectWithoutRoles_permissionsInputSchema: z.ZodType<
   create: z.union([ z.lazy(() => RolesCreateWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
 }).strict();
 
-export const UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  id: z.string().optional(),
-  phone: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
-  login: z.string(),
-  first_name: z.string().optional().nullable(),
-  last_name: z.string().optional().nullable(),
-  password: z.string(),
-  salt: z.string().optional().nullable(),
-  is_super_user: z.boolean().optional(),
-  status: z.lazy(() => user_statusSchema),
-  card_name: z.string().optional().nullable(),
-  card_number: z.string().optional().nullable(),
-  birth_date: z.coerce.date().optional().nullable(),
-  car_model: z.string().optional().nullable(),
-  car_number: z.string().optional().nullable(),
-  is_online: z.boolean().optional(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  fcm_token: z.string().optional().nullable(),
-  wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
-  doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
-  order_start_date: z.coerce.date().optional().nullable(),
-  app_version: z.string().optional().nullable(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
-  api_token: z.string().optional().nullable(),
-  tg_id: z.string().optional().nullable(),
-  permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
-  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
-  roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
-  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
-  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
-  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
-  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
-  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
-  organization_created_byTousers: z.lazy(() => OrganizationCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
-  organization_updated_byTousers: z.lazy(() => OrganizationCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
-  work_schedules_created_byTousers: z.lazy(() => Work_schedulesCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
-  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
-  users_terminals: z.lazy(() => Users_terminalsCreateNestedManyWithoutUsersInputSchema).optional(),
-  users_work_schedules: z.lazy(() => Users_work_schedulesCreateNestedManyWithoutUsersInputSchema).optional(),
-  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
-  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
-  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
-  api_tokens_created_byTousers: z.lazy(() => Api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
-  api_tokens_updated_byTousers: z.lazy(() => Api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  timesheet_users: z.lazy(() => TimesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
-  sessions: z.lazy(() => SessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
-}).strict();
-
-export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  id: z.string().optional(),
-  phone: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
-  login: z.string(),
-  first_name: z.string().optional().nullable(),
-  last_name: z.string().optional().nullable(),
-  password: z.string(),
-  salt: z.string().optional().nullable(),
-  is_super_user: z.boolean().optional(),
-  status: z.lazy(() => user_statusSchema),
-  card_name: z.string().optional().nullable(),
-  card_number: z.string().optional().nullable(),
-  birth_date: z.coerce.date().optional().nullable(),
-  car_model: z.string().optional().nullable(),
-  car_number: z.string().optional().nullable(),
-  is_online: z.boolean().optional(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  fcm_token: z.string().optional().nullable(),
-  wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
-  doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
-  order_start_date: z.coerce.date().optional().nullable(),
-  app_version: z.string().optional().nullable(),
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
-  api_token: z.string().optional().nullable(),
-  tg_id: z.string().optional().nullable(),
-  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
-  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
-  roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
-  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
-  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
-  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
-  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
-  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
-  organization_created_byTousers: z.lazy(() => OrganizationUncheckedCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
-  organization_updated_byTousers: z.lazy(() => OrganizationUncheckedCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
-  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
-  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
-  users_terminals: z.lazy(() => Users_terminalsUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
-  users_work_schedules: z.lazy(() => Users_work_schedulesUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
-  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
-  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
-  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
-  api_tokens_created_byTousers: z.lazy(() => Api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
-  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
-  timesheet_users: z.lazy(() => TimesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
-  sessions: z.lazy(() => SessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
-}).strict();
-
-export const UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => UsersWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
-  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
+export const UsersUpsertWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_created_byInput> = z.object({
+  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
   where: z.lazy(() => UsersWhereInputSchema).optional()
 }).strict();
 
-export const UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => UsersWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
+  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
-export const UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9893,7 +9541,7 @@ export const UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTou
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9905,7 +9553,6 @@ export const UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTou
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9928,7 +9575,7 @@ export const UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTou
   sessions: z.lazy(() => SessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
-export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+export const UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_created_byInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9949,7 +9596,7 @@ export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_crea
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9961,7 +9608,6 @@ export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_crea
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9982,41 +9628,6 @@ export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_crea
   timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
   scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
-}).strict();
-
-export const PermissionsUpsertWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpsertWithoutRoles_permissionsInput> = z.object({
-  update: z.union([ z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]),
-  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
-  where: z.lazy(() => PermissionsWhereInputSchema).optional()
-}).strict();
-
-export const PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInput> = z.object({
-  where: z.lazy(() => PermissionsWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]),
-}).strict();
-
-export const PermissionsUpdateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpdateWithoutRoles_permissionsInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
-  users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
-}).strict();
-
-export const PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedUpdateWithoutRoles_permissionsInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
 export const RolesUpsertWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesUpsertWithoutRoles_permissionsInput> = z.object({
@@ -10054,129 +9665,6 @@ export const RolesUncheckedUpdateWithoutRoles_permissionsInputSchema: z.ZodType<
   users_roles: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutRolesNestedInputSchema).optional()
 }).strict();
 
-export const UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
-  where: z.lazy(() => UsersWhereInputSchema).optional()
-}).strict();
-
-export const UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => UsersWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  salt: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
-  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
-  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
-  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
-  roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
-  organization_created_byTousers: z.lazy(() => OrganizationUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
-  organization_updated_byTousers: z.lazy(() => OrganizationUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
-  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
-  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
-  users_terminals: z.lazy(() => Users_terminalsUpdateManyWithoutUsersNestedInputSchema).optional(),
-  users_work_schedules: z.lazy(() => Users_work_schedulesUpdateManyWithoutUsersNestedInputSchema).optional(),
-  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
-  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
-  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
-  api_tokens_created_byTousers: z.lazy(() => Api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
-  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  timesheet_users: z.lazy(() => TimesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
-  sessions: z.lazy(() => SessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
-}).strict();
-
-export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
-  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  salt: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
-  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
-  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
-  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
-  roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
-  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
-  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
-  organization_created_byTousers: z.lazy(() => OrganizationUncheckedUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
-  organization_updated_byTousers: z.lazy(() => OrganizationUncheckedUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
-  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUncheckedUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
-  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUncheckedUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
-  users_terminals: z.lazy(() => Users_terminalsUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
-  users_work_schedules: z.lazy(() => Users_work_schedulesUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
-  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
-  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
-  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
-  api_tokens_created_byTousers: z.lazy(() => Api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
-  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
-  timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
-  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
-  sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
-}).strict();
-
 export const PermissionsCreateWithoutUsers_permissions_created_byTousersInputSchema: z.ZodType<Prisma.PermissionsCreateWithoutUsers_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
   slug: z.string(),
@@ -10185,7 +9673,6 @@ export const PermissionsCreateWithoutUsers_permissions_created_byTousersInputSch
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -10197,7 +9684,6 @@ export const PermissionsUncheckedCreateWithoutUsers_permissions_created_byTouser
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   updated_by: z.string().optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -10219,7 +9705,6 @@ export const PermissionsCreateWithoutUsers_permissions_updated_byTousersInputSch
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -10231,7 +9716,6 @@ export const PermissionsUncheckedCreateWithoutUsers_permissions_updated_byTouser
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -10313,47 +9797,25 @@ export const RolesCreateManyUsers_roles_updated_byTousersInputEnvelopeSchema: z.
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
+export const Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutRoles_permissions_created_byInput> = z.object({
+  permission_id: z.string(),
+  updated_by: z.string().optional().nullable(),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
 }).strict();
 
-export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
   updated_by: z.string().optional().nullable()
 }).strict();
 
-export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema).array() ]),
-  skipDuplicates: z.boolean().optional()
-}).strict();
-
-export const Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
-}).strict();
-
-export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  role_id: z.string(),
-  permission_id: z.string(),
-  created_by: z.string().optional().nullable()
-}).strict();
-
-export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema).array() ]),
+export const Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
@@ -10504,9 +9966,9 @@ export const OrganizationCreateWithoutOrganization_created_byTousersInputSchema:
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -10534,9 +9996,9 @@ export const OrganizationUncheckedCreateWithoutOrganization_created_byTousersInp
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -10574,9 +10036,9 @@ export const OrganizationCreateWithoutOrganization_updated_byTousersInputSchema:
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -10604,9 +10066,9 @@ export const OrganizationUncheckedCreateWithoutOrganization_updated_byTousersInp
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -10637,7 +10099,7 @@ export const Work_schedulesCreateWithoutWork_schedules_created_byTousersInputSch
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutWork_schedules_organization_idTorganizationInputSchema),
@@ -10655,7 +10117,7 @@ export const Work_schedulesUncheckedCreateWithoutWork_schedules_created_byTouser
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   updated_by: z.string().optional().nullable(),
@@ -10681,7 +10143,7 @@ export const Work_schedulesCreateWithoutWork_schedules_updated_byTousersInputSch
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutWork_schedules_organization_idTorganizationInputSchema),
@@ -10699,7 +10161,7 @@ export const Work_schedulesUncheckedCreateWithoutWork_schedules_updated_byTouser
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -10757,7 +10219,7 @@ export const Work_schedule_entriesCreateWithoutWork_schedule_entries_created_byT
   id: z.string().optional(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -10779,7 +10241,7 @@ export const Work_schedule_entriesUncheckedCreateWithoutWork_schedule_entries_cr
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -10807,7 +10269,7 @@ export const Work_schedule_entriesCreateWithoutWork_schedule_entries_updated_byT
   id: z.string().optional(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -10829,7 +10291,7 @@ export const Work_schedule_entriesUncheckedCreateWithoutWork_schedule_entries_up
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -10857,7 +10319,7 @@ export const Work_schedule_entriesCreateWithoutWork_schedule_entries_usersInputS
   id: z.string().optional(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -10878,7 +10340,7 @@ export const Work_schedule_entriesUncheckedCreateWithoutWork_schedule_entries_us
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -11014,7 +10476,7 @@ export const Scheduled_reports_subscriptionCreateManyScheduled_reports_subscript
 }).strict();
 
 export const SessionsCreateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsCreateWithoutUsers_sessionsInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_agent: z.string(),
   device_name: z.string(),
   created_at: z.coerce.date().optional(),
@@ -11022,7 +10484,7 @@ export const SessionsCreateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.Se
 }).strict();
 
 export const SessionsUncheckedCreateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsUncheckedCreateWithoutUsers_sessionsInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_agent: z.string(),
   device_name: z.string(),
   created_at: z.coerce.date().optional(),
@@ -11131,36 +10593,20 @@ export const RolesUpdateManyWithWhereWithoutUsers_roles_updated_byTousersInputSc
   data: z.union([ z.lazy(() => RolesUpdateManyMutationInputSchema),z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInput> = z.object({
   where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
-}).strict();
-
-export const Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInputSchema) ]),
 }).strict();
 
 export const Users_permissionsUpsertWithWhereUniqueWithoutUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsUpsertWithWhereUniqueWithoutUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -11643,7 +11089,7 @@ export const UsersCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersCreate
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -11655,8 +11101,7 @@ export const UsersCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersCreate
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -11699,7 +11144,7 @@ export const UsersUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -11711,8 +11156,7 @@ export const UsersUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -11771,7 +11215,7 @@ export const UsersUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersUpdate
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11783,8 +11227,7 @@ export const UsersUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersUpdate
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -11827,7 +11270,7 @@ export const UsersUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -11839,8 +11282,7 @@ export const UsersUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -11883,7 +11325,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_create
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -11895,8 +11337,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_create
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11939,7 +11380,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -11951,8 +11392,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11987,8 +11427,7 @@ export const PermissionsCreateWithoutUsers_permissionsInputSchema: z.ZodType<Pri
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
+  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional()
 }).strict();
 
 export const PermissionsUncheckedCreateWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedCreateWithoutUsers_permissionsInput> = z.object({
@@ -11999,8 +11438,7 @@ export const PermissionsUncheckedCreateWithoutUsers_permissionsInputSchema: z.Zo
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
+  updated_by: z.string().optional().nullable()
 }).strict();
 
 export const PermissionsCreateOrConnectWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateOrConnectWithoutUsers_permissionsInput> = z.object({
@@ -12029,7 +11467,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_update
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12041,8 +11479,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_update
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -12085,7 +11522,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12097,8 +11534,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -12146,7 +11582,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_user_i
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12158,8 +11594,7 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_user_i
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -12202,7 +11637,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12214,8 +11649,7 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -12274,7 +11708,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_create
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12286,8 +11720,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_create
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12330,7 +11763,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12342,8 +11775,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12384,8 +11816,7 @@ export const PermissionsUpdateWithoutUsers_permissionsInputSchema: z.ZodType<Pri
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
+  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional()
 }).strict();
 
 export const PermissionsUncheckedUpdateWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedUpdateWithoutUsers_permissionsInput> = z.object({
@@ -12397,7 +11828,6 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissionsInputSchema: z.Zo
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
 export const UsersUpsertWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.UsersUpsertWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
@@ -12432,7 +11862,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_update
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12444,8 +11874,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_update
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12488,7 +11917,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12500,8 +11929,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12555,7 +11983,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_user_i
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12567,8 +11995,7 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_user_i
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12611,7 +12038,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -12623,8 +12050,7 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12667,7 +12093,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12679,8 +12105,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12723,7 +12148,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_b
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12735,8 +12160,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12813,7 +12237,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12825,8 +12249,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12869,7 +12292,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_b
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12881,8 +12304,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12930,7 +12352,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12942,8 +12364,7 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12986,7 +12407,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idIn
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -12998,8 +12419,7 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idIn
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13058,7 +12478,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13070,8 +12490,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13114,7 +12533,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_b
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13126,8 +12545,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13216,7 +12634,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13228,8 +12646,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13272,7 +12689,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_b
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13284,8 +12701,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13339,7 +12755,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13351,8 +12767,7 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13395,7 +12810,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idIn
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13407,8 +12822,7 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idIn
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13445,9 +12859,9 @@ export const OrganizationCreateWithoutWork_schedules_organization_idTorganizatio
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -13475,9 +12889,9 @@ export const OrganizationUncheckedCreateWithoutWork_schedules_organization_idTor
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -13516,7 +12930,7 @@ export const UsersCreateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -13528,8 +12942,7 @@ export const UsersCreateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13572,7 +12985,7 @@ export const UsersUncheckedCreateWithoutWork_schedules_created_byTousersInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -13584,8 +12997,7 @@ export const UsersUncheckedCreateWithoutWork_schedules_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13633,7 +13045,7 @@ export const UsersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -13645,8 +13057,7 @@ export const UsersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13689,7 +13100,7 @@ export const UsersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSch
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -13701,8 +13112,7 @@ export const UsersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13751,7 +13161,7 @@ export const Work_schedule_entriesCreateWithoutWork_schedule_entries_work_schedu
   id: z.string().optional(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -13772,7 +13182,7 @@ export const Work_schedule_entriesUncheckedCreateWithoutWork_schedule_entries_wo
   user_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -13823,9 +13233,9 @@ export const OrganizationUpdateWithoutWork_schedules_organization_idTorganizatio
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13853,9 +13263,9 @@ export const OrganizationUncheckedUpdateWithoutWork_schedules_organization_idTor
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13900,7 +13310,7 @@ export const UsersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13912,8 +13322,7 @@ export const UsersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13956,7 +13365,7 @@ export const UsersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -13968,8 +13377,7 @@ export const UsersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14023,7 +13431,7 @@ export const UsersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14035,8 +13443,7 @@ export const UsersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14079,7 +13486,7 @@ export const UsersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSch
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14091,8 +13498,7 @@ export const UsersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14161,9 +13567,9 @@ export const OrganizationCreateWithoutTerminals_organization_idTorganizationInpu
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -14191,9 +13597,9 @@ export const OrganizationUncheckedCreateWithoutTerminals_organization_idTorganiz
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -14255,9 +13661,9 @@ export const OrganizationUpdateWithoutTerminals_organization_idTorganizationInpu
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14285,9 +13691,9 @@ export const OrganizationUncheckedUpdateWithoutTerminals_organization_idTorganiz
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14324,7 +13730,7 @@ export const Work_schedulesCreateWithoutOrganizationInputSchema: z.ZodType<Prism
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   work_schedules_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutWork_schedules_created_byTousersInputSchema).optional(),
@@ -14341,7 +13747,7 @@ export const Work_schedulesUncheckedCreateWithoutOrganizationInputSchema: z.ZodT
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -14381,7 +13787,7 @@ export const UsersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -14393,8 +13799,7 @@ export const UsersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14437,7 +13842,7 @@ export const UsersUncheckedCreateWithoutOrganization_created_byTousersInputSchem
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -14449,8 +13854,7 @@ export const UsersUncheckedCreateWithoutOrganization_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14498,7 +13902,7 @@ export const UsersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -14510,8 +13914,7 @@ export const UsersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14554,7 +13957,7 @@ export const UsersUncheckedCreateWithoutOrganization_updated_byTousersInputSchem
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -14566,8 +13969,7 @@ export const UsersUncheckedCreateWithoutOrganization_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14712,7 +14114,7 @@ export const UsersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14724,8 +14126,7 @@ export const UsersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14768,7 +14169,7 @@ export const UsersUncheckedUpdateWithoutOrganization_created_byTousersInputSchem
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14780,8 +14181,7 @@ export const UsersUncheckedUpdateWithoutOrganization_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14835,7 +14235,7 @@ export const UsersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14847,8 +14247,7 @@ export const UsersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14891,7 +14290,7 @@ export const UsersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchem
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -14903,8 +14302,7 @@ export const UsersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14997,7 +14395,7 @@ export const UsersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15009,8 +14407,7 @@ export const UsersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15053,7 +14450,7 @@ export const UsersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15065,8 +14462,7 @@ export const UsersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15160,7 +14556,7 @@ export const UsersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15172,8 +14568,7 @@ export const UsersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15216,7 +14611,7 @@ export const UsersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15228,8 +14623,7 @@ export const UsersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15313,7 +14707,7 @@ export const UsersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15325,8 +14719,7 @@ export const UsersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15369,7 +14762,7 @@ export const UsersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15381,8 +14774,7 @@ export const UsersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15417,7 +14809,7 @@ export const Work_schedulesCreateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutWork_schedules_organization_idTorganizationInputSchema),
@@ -15435,7 +14827,7 @@ export const Work_schedulesUncheckedCreateWithoutUsers_work_schedulesInputSchema
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -15480,7 +14872,7 @@ export const UsersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15492,8 +14884,7 @@ export const UsersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15536,7 +14927,7 @@ export const UsersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15548,8 +14939,7 @@ export const UsersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15590,7 +14980,7 @@ export const Work_schedulesUpdateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutWork_schedules_organization_idTorganizationNestedInputSchema).optional(),
@@ -15608,7 +14998,7 @@ export const Work_schedulesUncheckedUpdateWithoutUsers_work_schedulesInputSchema
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -15637,7 +15027,7 @@ export const UsersCreateWithoutWork_schedule_entries_created_byTousersInputSchem
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15649,8 +15039,7 @@ export const UsersCreateWithoutWork_schedule_entries_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15693,7 +15082,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_created_byTousersI
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15705,8 +15094,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_created_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15754,7 +15142,7 @@ export const UsersCreateWithoutWork_schedule_entries_updated_byTousersInputSchem
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15766,8 +15154,7 @@ export const UsersCreateWithoutWork_schedule_entries_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15810,7 +15197,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersI
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15822,8 +15209,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15871,7 +15257,7 @@ export const UsersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15883,8 +15269,7 @@ export const UsersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15927,7 +15312,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: 
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -15939,8 +15324,7 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15975,7 +15359,7 @@ export const Work_schedulesCreateWithoutWork_schedule_entries_work_schedulesInpu
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutWork_schedules_organization_idTorganizationInputSchema),
@@ -15993,7 +15377,7 @@ export const Work_schedulesUncheckedCreateWithoutWork_schedule_entries_work_sche
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -16038,7 +15422,7 @@ export const UsersUpdateWithoutWork_schedule_entries_created_byTousersInputSchem
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16050,8 +15434,7 @@ export const UsersUpdateWithoutWork_schedule_entries_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16094,7 +15477,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersI
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16106,8 +15489,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16161,7 +15543,7 @@ export const UsersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchem
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16173,8 +15555,7 @@ export const UsersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16217,7 +15598,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersI
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16229,8 +15610,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16284,7 +15664,7 @@ export const UsersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16296,8 +15676,7 @@ export const UsersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16340,7 +15719,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: 
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16352,8 +15731,7 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16394,7 +15772,7 @@ export const Work_schedulesUpdateWithoutWork_schedule_entries_work_schedulesInpu
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutWork_schedules_organization_idTorganizationNestedInputSchema).optional(),
@@ -16412,7 +15790,7 @@ export const Work_schedulesUncheckedUpdateWithoutWork_schedule_entries_work_sche
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16441,7 +15819,7 @@ export const UsersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -16453,8 +15831,7 @@ export const UsersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16497,7 +15874,7 @@ export const UsersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema:
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -16509,8 +15886,7 @@ export const UsersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16558,7 +15934,7 @@ export const UsersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -16570,8 +15946,7 @@ export const UsersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16614,7 +15989,7 @@ export const UsersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema:
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -16626,8 +16001,7 @@ export const UsersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16669,9 +16043,9 @@ export const OrganizationCreateWithoutApi_tokens_organizationInputSchema: z.ZodT
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -16699,9 +16073,9 @@ export const OrganizationUncheckedCreateWithoutApi_tokens_organizationInputSchem
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -16751,7 +16125,7 @@ export const UsersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16763,8 +16137,7 @@ export const UsersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16807,7 +16180,7 @@ export const UsersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema:
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16819,8 +16192,7 @@ export const UsersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16874,7 +16246,7 @@ export const UsersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16886,8 +16258,7 @@ export const UsersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16930,7 +16301,7 @@ export const UsersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema:
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -16942,8 +16313,7 @@ export const UsersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16991,9 +16361,9 @@ export const OrganizationUpdateWithoutApi_tokens_organizationInputSchema: z.ZodT
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17021,9 +16391,9 @@ export const OrganizationUncheckedUpdateWithoutApi_tokens_organizationInputSchem
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17057,7 +16427,7 @@ export const UsersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -17069,8 +16439,7 @@ export const UsersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -17113,7 +16482,7 @@ export const UsersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -17125,8 +16494,7 @@ export const UsersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -17185,7 +16553,7 @@ export const UsersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17197,8 +16565,7 @@ export const UsersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -17241,7 +16608,7 @@ export const UsersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17253,8 +16620,7 @@ export const UsersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -17360,7 +16726,7 @@ export const UsersCreateWithoutScheduled_reports_subscription_usersInputSchema: 
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -17372,8 +16738,7 @@ export const UsersCreateWithoutScheduled_reports_subscription_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -17416,7 +16781,7 @@ export const UsersUncheckedCreateWithoutScheduled_reports_subscription_usersInpu
   longitude: z.number().optional().nullable(),
   fcm_token: z.string().optional().nullable(),
   wallet_balance: z.number().optional(),
-  max_active_order_count: z.number().int().optional().nullable(),
+  max_active_order_count: z.number().optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.coerce.date().optional().nullable(),
   app_version: z.string().optional().nullable(),
@@ -17428,8 +16793,7 @@ export const UsersUncheckedCreateWithoutScheduled_reports_subscription_usersInpu
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -17517,7 +16881,7 @@ export const UsersUpdateWithoutScheduled_reports_subscription_usersInputSchema: 
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17529,8 +16893,7 @@ export const UsersUpdateWithoutScheduled_reports_subscription_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -17573,7 +16936,7 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
   order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -17585,8 +16948,7 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -17608,34 +16970,10 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
-export const Roles_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInput> = z.object({
-  role_id: z.string(),
-  created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
-}).strict();
-
 export const Users_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyPermissionsInput> = z.object({
   user_id: z.string(),
   created_by: z.string().optional().nullable(),
   updated_by: z.string().optional().nullable()
-}).strict();
-
-export const Roles_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutPermissionsInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutPermissionsInput> = z.object({
-  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutPermissionsInput> = z.object({
-  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutPermissionsInput> = z.object({
@@ -17669,9 +17007,9 @@ export const Users_rolesCreateManyRolesInputSchema: z.ZodType<Prisma.Users_roles
 }).strict();
 
 export const Roles_permissionsUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutRolesInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
+  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions_created_by: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutRolesInput> = z.object({
@@ -17744,16 +17082,10 @@ export const RolesCreateManyUsers_roles_updated_byTousersInputSchema: z.ZodType<
   created_by: z.string().optional().nullable()
 }).strict();
 
-export const Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInput> = z.object({
+export const Roles_permissionsCreateManyRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyRoles_permissions_created_byInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
   updated_by: z.string().optional().nullable()
-}).strict();
-
-export const Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInput> = z.object({
-  role_id: z.string(),
-  permission_id: z.string(),
-  created_by: z.string().optional().nullable()
 }).strict();
 
 export const Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -17807,9 +17139,9 @@ export const OrganizationCreateManyOrganization_created_byTousersInputSchema: z.
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -17834,9 +17166,9 @@ export const OrganizationCreateManyOrganization_updated_byTousersInputSchema: z.
   sender_name: z.string().optional().nullable(),
   sender_number: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  max_distance: z.number().int().optional(),
-  max_active_order_count: z.number().int().optional(),
-  max_order_close_distance: z.number().int().optional(),
+  max_distance: z.number().optional(),
+  max_active_order_count: z.number().optional(),
+  max_order_close_distance: z.number().optional(),
   payment_type: z.lazy(() => organization_payment_typesSchema).optional(),
   support_chat_url: z.string().optional().nullable(),
   icon_url: z.string().optional().nullable(),
@@ -17855,7 +17187,7 @@ export const Work_schedulesCreateManyWork_schedules_created_byTousersInputSchema
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   updated_by: z.string().optional().nullable()
@@ -17870,7 +17202,7 @@ export const Work_schedulesCreateManyWork_schedules_updated_byTousersInputSchema
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable()
@@ -17890,7 +17222,7 @@ export const Work_schedule_entriesCreateManyWork_schedule_entries_created_byTous
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -17910,7 +17242,7 @@ export const Work_schedule_entriesCreateManyWork_schedule_entries_updated_byTous
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -17929,7 +17261,7 @@ export const Work_schedule_entriesCreateManyWork_schedule_entries_usersInputSche
   work_schedule_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -17980,7 +17312,7 @@ export const Scheduled_reports_subscriptionCreateManyScheduled_reports_subscript
 }).strict();
 
 export const SessionsCreateManyUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsCreateManyUsers_sessionsInput> = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   user_agent: z.string(),
   device_name: z.string(),
   created_at: z.coerce.date().optional(),
@@ -17995,7 +17327,6 @@ export const PermissionsUpdateWithoutUsers_permissions_created_byTousersInputSch
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -18007,7 +17338,6 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissions_created_byTouser
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -18029,7 +17359,6 @@ export const PermissionsUpdateWithoutUsers_permissions_updated_byTousersInputSch
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
-  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -18041,7 +17370,6 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissions_updated_byTouser
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -18123,40 +17451,22 @@ export const RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersInputSc
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
-  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+export const Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutRoles_permissions_created_byInput> = z.object({
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
-  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-}).strict();
-
-export const Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
-  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
-  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
   roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional()
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+export const Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+export const Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -18282,9 +17592,9 @@ export const OrganizationUpdateWithoutOrganization_created_byTousersInputSchema:
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18312,9 +17622,9 @@ export const OrganizationUncheckedUpdateWithoutOrganization_created_byTousersInp
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18342,9 +17652,9 @@ export const OrganizationUncheckedUpdateManyWithoutOrganization_created_byTouser
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18369,9 +17679,9 @@ export const OrganizationUpdateWithoutOrganization_updated_byTousersInputSchema:
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18399,9 +17709,9 @@ export const OrganizationUncheckedUpdateWithoutOrganization_updated_byTousersInp
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18429,9 +17739,9 @@ export const OrganizationUncheckedUpdateManyWithoutOrganization_updated_byTouser
   sender_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   sender_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  max_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_active_order_count: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  max_order_close_distance: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  max_order_close_distance: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   payment_type: z.union([ z.lazy(() => organization_payment_typesSchema),z.lazy(() => Enumorganization_payment_typesFieldUpdateOperationsInputSchema) ]).optional(),
   support_chat_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   icon_url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18449,7 +17759,7 @@ export const Work_schedulesUpdateWithoutWork_schedules_created_byTousersInputSch
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutWork_schedules_organization_idTorganizationNestedInputSchema).optional(),
@@ -18467,7 +17777,7 @@ export const Work_schedulesUncheckedUpdateWithoutWork_schedules_created_byTouser
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18484,7 +17794,7 @@ export const Work_schedulesUncheckedUpdateManyWithoutWork_schedules_created_byTo
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18498,7 +17808,7 @@ export const Work_schedulesUpdateWithoutWork_schedules_updated_byTousersInputSch
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutWork_schedules_organization_idTorganizationNestedInputSchema).optional(),
@@ -18516,7 +17826,7 @@ export const Work_schedulesUncheckedUpdateWithoutWork_schedules_updated_byTouser
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18533,7 +17843,7 @@ export const Work_schedulesUncheckedUpdateManyWithoutWork_schedules_updated_byTo
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -18567,7 +17877,7 @@ export const Work_schedule_entriesUpdateWithoutWork_schedule_entries_created_byT
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18589,7 +17899,7 @@ export const Work_schedule_entriesUncheckedUpdateWithoutWork_schedule_entries_cr
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18609,7 +17919,7 @@ export const Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entrie
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18627,7 +17937,7 @@ export const Work_schedule_entriesUpdateWithoutWork_schedule_entries_updated_byT
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18649,7 +17959,7 @@ export const Work_schedule_entriesUncheckedUpdateWithoutWork_schedule_entries_up
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18669,7 +17979,7 @@ export const Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entrie
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18687,7 +17997,7 @@ export const Work_schedule_entriesUpdateWithoutWork_schedule_entries_usersInputS
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18708,7 +18018,7 @@ export const Work_schedule_entriesUncheckedUpdateWithoutWork_schedule_entries_us
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18728,7 +18038,7 @@ export const Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entrie
   work_schedule_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18849,7 +18159,7 @@ export const Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
 }).strict();
 
 export const SessionsUpdateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsUpdateWithoutUsers_sessionsInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18857,7 +18167,7 @@ export const SessionsUpdateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.Se
 }).strict();
 
 export const SessionsUncheckedUpdateWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsUncheckedUpdateWithoutUsers_sessionsInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18865,7 +18175,7 @@ export const SessionsUncheckedUpdateWithoutUsers_sessionsInputSchema: z.ZodType<
 }).strict();
 
 export const SessionsUncheckedUpdateManyWithoutUsers_sessionsInputSchema: z.ZodType<Prisma.SessionsUncheckedUpdateManyWithoutUsers_sessionsInput> = z.object({
-  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_agent: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   device_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18881,7 +18191,7 @@ export const Work_schedule_entriesCreateManyWork_schedule_entries_work_schedules
   user_id: z.string(),
   date_start: z.coerce.date(),
   date_finish: z.coerce.date().optional().nullable(),
-  duration: z.number().int().optional(),
+  duration: z.number().optional(),
   ip_open: z.string().optional().nullable(),
   ip_close: z.string().optional().nullable(),
   lat_open: z.number().optional(),
@@ -18912,7 +18222,7 @@ export const Work_schedule_entriesUpdateWithoutWork_schedule_entries_work_schedu
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18933,7 +18243,7 @@ export const Work_schedule_entriesUncheckedUpdateWithoutWork_schedule_entries_wo
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18953,7 +18263,7 @@ export const Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entrie
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   date_start: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   date_finish: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  duration: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  duration: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ip_open: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   ip_close: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   lat_open: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -18992,7 +18302,7 @@ export const Work_schedulesCreateManyOrganizationInputSchema: z.ZodType<Prisma.W
   start_time: z.coerce.date(),
   end_time: z.coerce.date(),
   max_start_time: z.coerce.date(),
-  bonus_price: z.number().int().optional(),
+  bonus_price: z.number().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
@@ -19031,7 +18341,7 @@ export const Work_schedulesUpdateWithoutOrganizationInputSchema: z.ZodType<Prism
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   work_schedules_created_byTousers: z.lazy(() => UsersUpdateOneWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
@@ -19048,7 +18358,7 @@ export const Work_schedulesUncheckedUpdateWithoutOrganizationInputSchema: z.ZodT
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -19065,7 +18375,7 @@ export const Work_schedulesUncheckedUpdateManyWithoutOrganizationInputSchema: z.
   start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   end_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   max_start_time: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  bonus_price: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  bonus_price: z.union([ z.number(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -19178,9 +18488,8 @@ export const Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
 // ARGS
 /////////////////////////////////////////
 
-export const PermissionsFindFirstArgsSchema: z.ZodType<Prisma.PermissionsFindFirstArgs> = z.object({
+export const PermissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindFirstArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19189,9 +18498,8 @@ export const PermissionsFindFirstArgsSchema: z.ZodType<Prisma.PermissionsFindFir
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.PermissionsFindFirstOrThrowArgs> = z.object({
+export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindFirstOrThrowArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19200,9 +18508,8 @@ export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Permissions
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const PermissionsFindManyArgsSchema: z.ZodType<Prisma.PermissionsFindManyArgs> = z.object({
+export const PermissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindManyArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19228,21 +18535,18 @@ export const PermissionsGroupByArgsSchema: z.ZodType<Prisma.PermissionsGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const PermissionsFindUniqueArgsSchema: z.ZodType<Prisma.PermissionsFindUniqueArgs> = z.object({
+export const PermissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindUniqueArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.PermissionsFindUniqueOrThrowArgs> = z.object({
+export const PermissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindUniqueOrThrowArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const RolesFindFirstArgsSchema: z.ZodType<Prisma.RolesFindFirstArgs> = z.object({
+export const RolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.RolesFindFirstArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19251,9 +18555,8 @@ export const RolesFindFirstArgsSchema: z.ZodType<Prisma.RolesFindFirstArgs> = z.
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.RolesFindFirstOrThrowArgs> = z.object({
+export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.RolesFindFirstOrThrowArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19262,9 +18565,8 @@ export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.RolesFindFirstOrT
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const RolesFindManyArgsSchema: z.ZodType<Prisma.RolesFindManyArgs> = z.object({
+export const RolesFindManyArgsSchema: z.ZodType<Omit<Prisma.RolesFindManyArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19290,21 +18592,18 @@ export const RolesGroupByArgsSchema: z.ZodType<Prisma.RolesGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const RolesFindUniqueArgsSchema: z.ZodType<Prisma.RolesFindUniqueArgs> = z.object({
+export const RolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.RolesFindUniqueArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const RolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.RolesFindUniqueOrThrowArgs> = z.object({
+export const RolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.RolesFindUniqueOrThrowArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Roles_permissionsFindFirstArgs> = z.object({
+export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindFirstArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19313,9 +18612,8 @@ export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Roles_permis
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Roles_permissionsFindFirstOrThrowArgs> = z.object({
+export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindFirstOrThrowArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19324,9 +18622,8 @@ export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Roles
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Roles_permissionsFindManyArgsSchema: z.ZodType<Prisma.Roles_permissionsFindManyArgs> = z.object({
+export const Roles_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindManyArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19352,21 +18649,18 @@ export const Roles_permissionsGroupByArgsSchema: z.ZodType<Prisma.Roles_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const Roles_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.Roles_permissionsFindUniqueArgs> = z.object({
+export const Roles_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindUniqueArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Roles_permissionsFindUniqueOrThrowArgs> = z.object({
+export const Roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const UsersFindFirstArgsSchema: z.ZodType<Prisma.UsersFindFirstArgs> = z.object({
+export const UsersFindFirstArgsSchema: z.ZodType<Omit<Prisma.UsersFindFirstArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19375,9 +18669,8 @@ export const UsersFindFirstArgsSchema: z.ZodType<Prisma.UsersFindFirstArgs> = z.
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Prisma.UsersFindFirstOrThrowArgs> = z.object({
+export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.UsersFindFirstOrThrowArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19386,9 +18679,8 @@ export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Prisma.UsersFindFirstOrT
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const UsersFindManyArgsSchema: z.ZodType<Prisma.UsersFindManyArgs> = z.object({
+export const UsersFindManyArgsSchema: z.ZodType<Omit<Prisma.UsersFindManyArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19414,21 +18706,18 @@ export const UsersGroupByArgsSchema: z.ZodType<Prisma.UsersGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const UsersFindUniqueArgsSchema: z.ZodType<Prisma.UsersFindUniqueArgs> = z.object({
+export const UsersFindUniqueArgsSchema: z.ZodType<Omit<Prisma.UsersFindUniqueArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const UsersFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.UsersFindUniqueOrThrowArgs> = z.object({
+export const UsersFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.UsersFindUniqueOrThrowArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsFindFirstArgsSchema: z.ZodType<Prisma.SessionsFindFirstArgs> = z.object({
+export const SessionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.SessionsFindFirstArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19437,9 +18726,8 @@ export const SessionsFindFirstArgsSchema: z.ZodType<Prisma.SessionsFindFirstArgs
   distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SessionsFindFirstOrThrowArgs> = z.object({
+export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.SessionsFindFirstOrThrowArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19448,9 +18736,8 @@ export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SessionsFindFi
   distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const SessionsFindManyArgsSchema: z.ZodType<Prisma.SessionsFindManyArgs> = z.object({
+export const SessionsFindManyArgsSchema: z.ZodType<Omit<Prisma.SessionsFindManyArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19476,21 +18763,18 @@ export const SessionsGroupByArgsSchema: z.ZodType<Prisma.SessionsGroupByArgs> = 
   skip: z.number().optional(),
 }).strict()
 
-export const SessionsFindUniqueArgsSchema: z.ZodType<Prisma.SessionsFindUniqueArgs> = z.object({
+export const SessionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.SessionsFindUniqueArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.SessionsFindUniqueOrThrowArgs> = z.object({
+export const SessionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.SessionsFindUniqueOrThrowArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Users_permissionsFindFirstArgs> = z.object({
+export const Users_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindFirstArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19499,9 +18783,8 @@ export const Users_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Users_permis
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_permissionsFindFirstOrThrowArgs> = z.object({
+export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindFirstOrThrowArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19510,9 +18793,8 @@ export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_permissionsFindManyArgsSchema: z.ZodType<Prisma.Users_permissionsFindManyArgs> = z.object({
+export const Users_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindManyArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19538,21 +18820,18 @@ export const Users_permissionsGroupByArgsSchema: z.ZodType<Prisma.Users_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const Users_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.Users_permissionsFindUniqueArgs> = z.object({
+export const Users_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindUniqueArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_permissionsFindUniqueOrThrowArgs> = z.object({
+export const Users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesFindFirstArgsSchema: z.ZodType<Prisma.Users_rolesFindFirstArgs> = z.object({
+export const Users_rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindFirstArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19561,9 +18840,8 @@ export const Users_rolesFindFirstArgsSchema: z.ZodType<Prisma.Users_rolesFindFir
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_rolesFindFirstOrThrowArgs> = z.object({
+export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindFirstOrThrowArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19572,9 +18850,8 @@ export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_roles
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_rolesFindManyArgsSchema: z.ZodType<Prisma.Users_rolesFindManyArgs> = z.object({
+export const Users_rolesFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindManyArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19600,21 +18877,18 @@ export const Users_rolesGroupByArgsSchema: z.ZodType<Prisma.Users_rolesGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const Users_rolesFindUniqueArgsSchema: z.ZodType<Prisma.Users_rolesFindUniqueArgs> = z.object({
+export const Users_rolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindUniqueArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_rolesFindUniqueOrThrowArgs> = z.object({
+export const Users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindUniqueOrThrowArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Work_schedulesFindFirstArgs> = z.object({
+export const Work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindFirstArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19623,9 +18897,8 @@ export const Work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Work_schedulesF
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Work_schedulesFindFirstOrThrowArgs> = z.object({
+export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19634,9 +18907,8 @@ export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Work_sch
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedulesFindManyArgsSchema: z.ZodType<Prisma.Work_schedulesFindManyArgs> = z.object({
+export const Work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindManyArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19662,21 +18934,18 @@ export const Work_schedulesGroupByArgsSchema: z.ZodType<Prisma.Work_schedulesGro
   skip: z.number().optional(),
 }).strict()
 
-export const Work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.Work_schedulesFindUniqueArgs> = z.object({
+export const Work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindUniqueArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Work_schedulesFindUniqueOrThrowArgs> = z.object({
+export const Work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsFindFirstArgsSchema: z.ZodType<Prisma.TerminalsFindFirstArgs> = z.object({
+export const TerminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindFirstArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19685,9 +18954,8 @@ export const TerminalsFindFirstArgsSchema: z.ZodType<Prisma.TerminalsFindFirstAr
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TerminalsFindFirstOrThrowArgs> = z.object({
+export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindFirstOrThrowArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19696,9 +18964,8 @@ export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TerminalsFind
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TerminalsFindManyArgsSchema: z.ZodType<Prisma.TerminalsFindManyArgs> = z.object({
+export const TerminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindManyArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19724,21 +18991,18 @@ export const TerminalsGroupByArgsSchema: z.ZodType<Prisma.TerminalsGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const TerminalsFindUniqueArgsSchema: z.ZodType<Prisma.TerminalsFindUniqueArgs> = z.object({
+export const TerminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindUniqueArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.TerminalsFindUniqueOrThrowArgs> = z.object({
+export const TerminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindUniqueOrThrowArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationFindFirstArgsSchema: z.ZodType<Prisma.OrganizationFindFirstArgs> = z.object({
+export const OrganizationFindFirstArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindFirstArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19747,9 +19011,8 @@ export const OrganizationFindFirstArgsSchema: z.ZodType<Prisma.OrganizationFindF
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.OrganizationFindFirstOrThrowArgs> = z.object({
+export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindFirstOrThrowArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19758,9 +19021,8 @@ export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Organizati
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const OrganizationFindManyArgsSchema: z.ZodType<Prisma.OrganizationFindManyArgs> = z.object({
+export const OrganizationFindManyArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindManyArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19786,21 +19048,18 @@ export const OrganizationGroupByArgsSchema: z.ZodType<Prisma.OrganizationGroupBy
   skip: z.number().optional(),
 }).strict()
 
-export const OrganizationFindUniqueArgsSchema: z.ZodType<Prisma.OrganizationFindUniqueArgs> = z.object({
+export const OrganizationFindUniqueArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindUniqueArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.OrganizationFindUniqueOrThrowArgs> = z.object({
+export const OrganizationFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindUniqueOrThrowArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsFindFirstArgsSchema: z.ZodType<Prisma.Users_terminalsFindFirstArgs> = z.object({
+export const Users_terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindFirstArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19809,9 +19068,8 @@ export const Users_terminalsFindFirstArgsSchema: z.ZodType<Prisma.Users_terminal
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_terminalsFindFirstOrThrowArgs> = z.object({
+export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindFirstOrThrowArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19820,9 +19078,8 @@ export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_t
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_terminalsFindManyArgsSchema: z.ZodType<Prisma.Users_terminalsFindManyArgs> = z.object({
+export const Users_terminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindManyArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19848,21 +19105,18 @@ export const Users_terminalsGroupByArgsSchema: z.ZodType<Prisma.Users_terminalsG
   skip: z.number().optional(),
 }).strict()
 
-export const Users_terminalsFindUniqueArgsSchema: z.ZodType<Prisma.Users_terminalsFindUniqueArgs> = z.object({
+export const Users_terminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindUniqueArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_terminalsFindUniqueOrThrowArgs> = z.object({
+export const Users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindUniqueOrThrowArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindFirstArgs> = z.object({
+export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindFirstArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19871,9 +19125,8 @@ export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Users_wor
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindFirstOrThrowArgs> = z.object({
+export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19882,9 +19135,8 @@ export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Us
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_work_schedulesFindManyArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindManyArgs> = z.object({
+export const Users_work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindManyArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19910,21 +19162,18 @@ export const Users_work_schedulesGroupByArgsSchema: z.ZodType<Prisma.Users_work_
   skip: z.number().optional(),
 }).strict()
 
-export const Users_work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindUniqueArgs> = z.object({
+export const Users_work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindUniqueArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindUniqueOrThrowArgs> = z.object({
+export const Users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindFirstArgs> = z.object({
+export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindFirstArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19933,9 +19182,8 @@ export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Prisma.Work_sch
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindFirstOrThrowArgs> = z.object({
+export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindFirstOrThrowArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19944,9 +19192,8 @@ export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.W
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedule_entriesFindManyArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindManyArgs> = z.object({
+export const Work_schedule_entriesFindManyArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindManyArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19972,21 +19219,18 @@ export const Work_schedule_entriesGroupByArgsSchema: z.ZodType<Prisma.Work_sched
   skip: z.number().optional(),
 }).strict()
 
-export const Work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindUniqueArgs> = z.object({
+export const Work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindUniqueArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindUniqueOrThrowArgs> = z.object({
+export const Work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindUniqueOrThrowArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensFindFirstArgsSchema: z.ZodType<Prisma.Api_tokensFindFirstArgs> = z.object({
+export const Api_tokensFindFirstArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindFirstArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -19995,9 +19239,8 @@ export const Api_tokensFindFirstArgsSchema: z.ZodType<Prisma.Api_tokensFindFirst
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Api_tokensFindFirstOrThrowArgs> = z.object({
+export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindFirstOrThrowArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -20006,9 +19249,8 @@ export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Api_tokensFi
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Api_tokensFindManyArgsSchema: z.ZodType<Prisma.Api_tokensFindManyArgs> = z.object({
+export const Api_tokensFindManyArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindManyArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -20034,21 +19276,18 @@ export const Api_tokensGroupByArgsSchema: z.ZodType<Prisma.Api_tokensGroupByArgs
   skip: z.number().optional(),
 }).strict()
 
-export const Api_tokensFindUniqueArgsSchema: z.ZodType<Prisma.Api_tokensFindUniqueArgs> = z.object({
+export const Api_tokensFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindUniqueArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Api_tokensFindUniqueOrThrowArgs> = z.object({
+export const Api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindUniqueOrThrowArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetFindFirstArgsSchema: z.ZodType<Prisma.TimesheetFindFirstArgs> = z.object({
+export const TimesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindFirstArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -20057,9 +19296,8 @@ export const TimesheetFindFirstArgsSchema: z.ZodType<Prisma.TimesheetFindFirstAr
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TimesheetFindFirstOrThrowArgs> = z.object({
+export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindFirstOrThrowArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -20068,9 +19306,8 @@ export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TimesheetFind
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TimesheetFindManyArgsSchema: z.ZodType<Prisma.TimesheetFindManyArgs> = z.object({
+export const TimesheetFindManyArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindManyArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -20096,21 +19333,18 @@ export const TimesheetGroupByArgsSchema: z.ZodType<Prisma.TimesheetGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const TimesheetFindUniqueArgsSchema: z.ZodType<Prisma.TimesheetFindUniqueArgs> = z.object({
+export const TimesheetFindUniqueArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindUniqueArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.TimesheetFindUniqueOrThrowArgs> = z.object({
+export const TimesheetFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindUniqueOrThrowArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindFirstArgs> = z.object({
+export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindFirstArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20119,9 +19353,8 @@ export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Prisma.Scheduled_re
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindFirstOrThrowArgs> = z.object({
+export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindFirstOrThrowArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20130,9 +19363,8 @@ export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Sched
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reportsFindManyArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindManyArgs> = z.object({
+export const Scheduled_reportsFindManyArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindManyArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20158,21 +19390,18 @@ export const Scheduled_reportsGroupByArgsSchema: z.ZodType<Prisma.Scheduled_repo
   skip: z.number().optional(),
 }).strict()
 
-export const Scheduled_reportsFindUniqueArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindUniqueArgs> = z.object({
+export const Scheduled_reportsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindUniqueArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindUniqueOrThrowArgs> = z.object({
+export const Scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindUniqueOrThrowArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindFirstArgs> = z.object({
+export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindFirstArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20181,9 +19410,8 @@ export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Prisma
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindFirstOrThrowArgs> = z.object({
+export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindFirstOrThrowArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20192,9 +19420,8 @@ export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindManyArgs> = z.object({
+export const Scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindManyArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20220,27 +19447,23 @@ export const Scheduled_reports_subscriptionGroupByArgsSchema: z.ZodType<Prisma.S
   skip: z.number().optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindUniqueArgs> = z.object({
+export const Scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindUniqueArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindUniqueOrThrowArgs> = z.object({
+export const Scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindUniqueOrThrowArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsCreateArgsSchema: z.ZodType<Prisma.PermissionsCreateArgs> = z.object({
+export const PermissionsCreateArgsSchema: z.ZodType<Omit<Prisma.PermissionsCreateArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   data: z.union([ PermissionsCreateInputSchema,PermissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const PermissionsUpsertArgsSchema: z.ZodType<Prisma.PermissionsUpsertArgs> = z.object({
+export const PermissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.PermissionsUpsertArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
   create: z.union([ PermissionsCreateInputSchema,PermissionsUncheckedCreateInputSchema ]),
   update: z.union([ PermissionsUpdateInputSchema,PermissionsUncheckedUpdateInputSchema ]),
@@ -20251,15 +19474,13 @@ export const PermissionsCreateManyArgsSchema: z.ZodType<Prisma.PermissionsCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const PermissionsDeleteArgsSchema: z.ZodType<Prisma.PermissionsDeleteArgs> = z.object({
+export const PermissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.PermissionsDeleteArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsUpdateArgsSchema: z.ZodType<Prisma.PermissionsUpdateArgs> = z.object({
+export const PermissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.PermissionsUpdateArgs, "include">> = z.object({
   select: PermissionsSelectSchema.optional(),
-  include: PermissionsIncludeSchema.optional(),
   data: z.union([ PermissionsUpdateInputSchema,PermissionsUncheckedUpdateInputSchema ]),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
@@ -20273,15 +19494,13 @@ export const PermissionsDeleteManyArgsSchema: z.ZodType<Prisma.PermissionsDelete
   where: PermissionsWhereInputSchema.optional(),
 }).strict()
 
-export const RolesCreateArgsSchema: z.ZodType<Prisma.RolesCreateArgs> = z.object({
+export const RolesCreateArgsSchema: z.ZodType<Omit<Prisma.RolesCreateArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   data: z.union([ RolesCreateInputSchema,RolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const RolesUpsertArgsSchema: z.ZodType<Prisma.RolesUpsertArgs> = z.object({
+export const RolesUpsertArgsSchema: z.ZodType<Omit<Prisma.RolesUpsertArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
   create: z.union([ RolesCreateInputSchema,RolesUncheckedCreateInputSchema ]),
   update: z.union([ RolesUpdateInputSchema,RolesUncheckedUpdateInputSchema ]),
@@ -20292,15 +19511,13 @@ export const RolesCreateManyArgsSchema: z.ZodType<Prisma.RolesCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const RolesDeleteArgsSchema: z.ZodType<Prisma.RolesDeleteArgs> = z.object({
+export const RolesDeleteArgsSchema: z.ZodType<Omit<Prisma.RolesDeleteArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const RolesUpdateArgsSchema: z.ZodType<Prisma.RolesUpdateArgs> = z.object({
+export const RolesUpdateArgsSchema: z.ZodType<Omit<Prisma.RolesUpdateArgs, "include">> = z.object({
   select: RolesSelectSchema.optional(),
-  include: RolesIncludeSchema.optional(),
   data: z.union([ RolesUpdateInputSchema,RolesUncheckedUpdateInputSchema ]),
   where: RolesWhereUniqueInputSchema,
 }).strict()
@@ -20314,15 +19531,13 @@ export const RolesDeleteManyArgsSchema: z.ZodType<Prisma.RolesDeleteManyArgs> = 
   where: RolesWhereInputSchema.optional(),
 }).strict()
 
-export const Roles_permissionsCreateArgsSchema: z.ZodType<Prisma.Roles_permissionsCreateArgs> = z.object({
+export const Roles_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsCreateArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   data: z.union([ Roles_permissionsCreateInputSchema,Roles_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Roles_permissionsUpsertArgsSchema: z.ZodType<Prisma.Roles_permissionsUpsertArgs> = z.object({
+export const Roles_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsUpsertArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
   create: z.union([ Roles_permissionsCreateInputSchema,Roles_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ Roles_permissionsUpdateInputSchema,Roles_permissionsUncheckedUpdateInputSchema ]),
@@ -20333,15 +19548,13 @@ export const Roles_permissionsCreateManyArgsSchema: z.ZodType<Prisma.Roles_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Roles_permissionsDeleteArgsSchema: z.ZodType<Prisma.Roles_permissionsDeleteArgs> = z.object({
+export const Roles_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsDeleteArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsUpdateArgsSchema: z.ZodType<Prisma.Roles_permissionsUpdateArgs> = z.object({
+export const Roles_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsUpdateArgs, "include">> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
-  include: Roles_permissionsIncludeSchema.optional(),
   data: z.union([ Roles_permissionsUpdateInputSchema,Roles_permissionsUncheckedUpdateInputSchema ]),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -20355,15 +19568,13 @@ export const Roles_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.Roles_permi
   where: Roles_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const UsersCreateArgsSchema: z.ZodType<Prisma.UsersCreateArgs> = z.object({
+export const UsersCreateArgsSchema: z.ZodType<Omit<Prisma.UsersCreateArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   data: z.union([ UsersCreateInputSchema,UsersUncheckedCreateInputSchema ]),
 }).strict()
 
-export const UsersUpsertArgsSchema: z.ZodType<Prisma.UsersUpsertArgs> = z.object({
+export const UsersUpsertArgsSchema: z.ZodType<Omit<Prisma.UsersUpsertArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
   create: z.union([ UsersCreateInputSchema,UsersUncheckedCreateInputSchema ]),
   update: z.union([ UsersUpdateInputSchema,UsersUncheckedUpdateInputSchema ]),
@@ -20374,15 +19585,13 @@ export const UsersCreateManyArgsSchema: z.ZodType<Prisma.UsersCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const UsersDeleteArgsSchema: z.ZodType<Prisma.UsersDeleteArgs> = z.object({
+export const UsersDeleteArgsSchema: z.ZodType<Omit<Prisma.UsersDeleteArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const UsersUpdateArgsSchema: z.ZodType<Prisma.UsersUpdateArgs> = z.object({
+export const UsersUpdateArgsSchema: z.ZodType<Omit<Prisma.UsersUpdateArgs, "include">> = z.object({
   select: UsersSelectSchema.optional(),
-  include: UsersIncludeSchema.optional(),
   data: z.union([ UsersUpdateInputSchema,UsersUncheckedUpdateInputSchema ]),
   where: UsersWhereUniqueInputSchema,
 }).strict()
@@ -20396,15 +19605,13 @@ export const UsersDeleteManyArgsSchema: z.ZodType<Prisma.UsersDeleteManyArgs> = 
   where: UsersWhereInputSchema.optional(),
 }).strict()
 
-export const SessionsCreateArgsSchema: z.ZodType<Prisma.SessionsCreateArgs> = z.object({
+export const SessionsCreateArgsSchema: z.ZodType<Omit<Prisma.SessionsCreateArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   data: z.union([ SessionsCreateInputSchema,SessionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const SessionsUpsertArgsSchema: z.ZodType<Prisma.SessionsUpsertArgs> = z.object({
+export const SessionsUpsertArgsSchema: z.ZodType<Omit<Prisma.SessionsUpsertArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
   create: z.union([ SessionsCreateInputSchema,SessionsUncheckedCreateInputSchema ]),
   update: z.union([ SessionsUpdateInputSchema,SessionsUncheckedUpdateInputSchema ]),
@@ -20415,15 +19622,13 @@ export const SessionsCreateManyArgsSchema: z.ZodType<Prisma.SessionsCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const SessionsDeleteArgsSchema: z.ZodType<Prisma.SessionsDeleteArgs> = z.object({
+export const SessionsDeleteArgsSchema: z.ZodType<Omit<Prisma.SessionsDeleteArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsUpdateArgsSchema: z.ZodType<Prisma.SessionsUpdateArgs> = z.object({
+export const SessionsUpdateArgsSchema: z.ZodType<Omit<Prisma.SessionsUpdateArgs, "include">> = z.object({
   select: SessionsSelectSchema.optional(),
-  include: SessionsIncludeSchema.optional(),
   data: z.union([ SessionsUpdateInputSchema,SessionsUncheckedUpdateInputSchema ]),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
@@ -20437,15 +19642,13 @@ export const SessionsDeleteManyArgsSchema: z.ZodType<Prisma.SessionsDeleteManyAr
   where: SessionsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_permissionsCreateArgsSchema: z.ZodType<Prisma.Users_permissionsCreateArgs> = z.object({
+export const Users_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsCreateArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   data: z.union([ Users_permissionsCreateInputSchema,Users_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_permissionsUpsertArgsSchema: z.ZodType<Prisma.Users_permissionsUpsertArgs> = z.object({
+export const Users_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsUpsertArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
   create: z.union([ Users_permissionsCreateInputSchema,Users_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ Users_permissionsUpdateInputSchema,Users_permissionsUncheckedUpdateInputSchema ]),
@@ -20456,15 +19659,13 @@ export const Users_permissionsCreateManyArgsSchema: z.ZodType<Prisma.Users_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_permissionsDeleteArgsSchema: z.ZodType<Prisma.Users_permissionsDeleteArgs> = z.object({
+export const Users_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsDeleteArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsUpdateArgsSchema: z.ZodType<Prisma.Users_permissionsUpdateArgs> = z.object({
+export const Users_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsUpdateArgs, "include">> = z.object({
   select: Users_permissionsSelectSchema.optional(),
-  include: Users_permissionsIncludeSchema.optional(),
   data: z.union([ Users_permissionsUpdateInputSchema,Users_permissionsUncheckedUpdateInputSchema ]),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -20478,15 +19679,13 @@ export const Users_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.Users_permi
   where: Users_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_rolesCreateArgsSchema: z.ZodType<Prisma.Users_rolesCreateArgs> = z.object({
+export const Users_rolesCreateArgsSchema: z.ZodType<Omit<Prisma.Users_rolesCreateArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   data: z.union([ Users_rolesCreateInputSchema,Users_rolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_rolesUpsertArgsSchema: z.ZodType<Prisma.Users_rolesUpsertArgs> = z.object({
+export const Users_rolesUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_rolesUpsertArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
   create: z.union([ Users_rolesCreateInputSchema,Users_rolesUncheckedCreateInputSchema ]),
   update: z.union([ Users_rolesUpdateInputSchema,Users_rolesUncheckedUpdateInputSchema ]),
@@ -20497,15 +19696,13 @@ export const Users_rolesCreateManyArgsSchema: z.ZodType<Prisma.Users_rolesCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_rolesDeleteArgsSchema: z.ZodType<Prisma.Users_rolesDeleteArgs> = z.object({
+export const Users_rolesDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_rolesDeleteArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesUpdateArgsSchema: z.ZodType<Prisma.Users_rolesUpdateArgs> = z.object({
+export const Users_rolesUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_rolesUpdateArgs, "include">> = z.object({
   select: Users_rolesSelectSchema.optional(),
-  include: Users_rolesIncludeSchema.optional(),
   data: z.union([ Users_rolesUpdateInputSchema,Users_rolesUncheckedUpdateInputSchema ]),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
@@ -20519,15 +19716,13 @@ export const Users_rolesDeleteManyArgsSchema: z.ZodType<Prisma.Users_rolesDelete
   where: Users_rolesWhereInputSchema.optional(),
 }).strict()
 
-export const Work_schedulesCreateArgsSchema: z.ZodType<Prisma.Work_schedulesCreateArgs> = z.object({
+export const Work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesCreateArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   data: z.union([ Work_schedulesCreateInputSchema,Work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Work_schedulesUpsertArgsSchema: z.ZodType<Prisma.Work_schedulesUpsertArgs> = z.object({
+export const Work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesUpsertArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
   create: z.union([ Work_schedulesCreateInputSchema,Work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ Work_schedulesUpdateInputSchema,Work_schedulesUncheckedUpdateInputSchema ]),
@@ -20538,15 +19733,13 @@ export const Work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.Work_schedules
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Work_schedulesDeleteArgsSchema: z.ZodType<Prisma.Work_schedulesDeleteArgs> = z.object({
+export const Work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesDeleteArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesUpdateArgsSchema: z.ZodType<Prisma.Work_schedulesUpdateArgs> = z.object({
+export const Work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesUpdateArgs, "include">> = z.object({
   select: Work_schedulesSelectSchema.optional(),
-  include: Work_schedulesIncludeSchema.optional(),
   data: z.union([ Work_schedulesUpdateInputSchema,Work_schedulesUncheckedUpdateInputSchema ]),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -20560,15 +19753,13 @@ export const Work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.Work_schedules
   where: Work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const TerminalsCreateArgsSchema: z.ZodType<Prisma.TerminalsCreateArgs> = z.object({
+export const TerminalsCreateArgsSchema: z.ZodType<Omit<Prisma.TerminalsCreateArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   data: z.union([ TerminalsCreateInputSchema,TerminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const TerminalsUpsertArgsSchema: z.ZodType<Prisma.TerminalsUpsertArgs> = z.object({
+export const TerminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.TerminalsUpsertArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
   create: z.union([ TerminalsCreateInputSchema,TerminalsUncheckedCreateInputSchema ]),
   update: z.union([ TerminalsUpdateInputSchema,TerminalsUncheckedUpdateInputSchema ]),
@@ -20579,15 +19770,13 @@ export const TerminalsCreateManyArgsSchema: z.ZodType<Prisma.TerminalsCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const TerminalsDeleteArgsSchema: z.ZodType<Prisma.TerminalsDeleteArgs> = z.object({
+export const TerminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.TerminalsDeleteArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsUpdateArgsSchema: z.ZodType<Prisma.TerminalsUpdateArgs> = z.object({
+export const TerminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.TerminalsUpdateArgs, "include">> = z.object({
   select: TerminalsSelectSchema.optional(),
-  include: TerminalsIncludeSchema.optional(),
   data: z.union([ TerminalsUpdateInputSchema,TerminalsUncheckedUpdateInputSchema ]),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
@@ -20601,15 +19790,13 @@ export const TerminalsDeleteManyArgsSchema: z.ZodType<Prisma.TerminalsDeleteMany
   where: TerminalsWhereInputSchema.optional(),
 }).strict()
 
-export const OrganizationCreateArgsSchema: z.ZodType<Prisma.OrganizationCreateArgs> = z.object({
+export const OrganizationCreateArgsSchema: z.ZodType<Omit<Prisma.OrganizationCreateArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   data: z.union([ OrganizationCreateInputSchema,OrganizationUncheckedCreateInputSchema ]),
 }).strict()
 
-export const OrganizationUpsertArgsSchema: z.ZodType<Prisma.OrganizationUpsertArgs> = z.object({
+export const OrganizationUpsertArgsSchema: z.ZodType<Omit<Prisma.OrganizationUpsertArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
   create: z.union([ OrganizationCreateInputSchema,OrganizationUncheckedCreateInputSchema ]),
   update: z.union([ OrganizationUpdateInputSchema,OrganizationUncheckedUpdateInputSchema ]),
@@ -20620,15 +19807,13 @@ export const OrganizationCreateManyArgsSchema: z.ZodType<Prisma.OrganizationCrea
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const OrganizationDeleteArgsSchema: z.ZodType<Prisma.OrganizationDeleteArgs> = z.object({
+export const OrganizationDeleteArgsSchema: z.ZodType<Omit<Prisma.OrganizationDeleteArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationUpdateArgsSchema: z.ZodType<Prisma.OrganizationUpdateArgs> = z.object({
+export const OrganizationUpdateArgsSchema: z.ZodType<Omit<Prisma.OrganizationUpdateArgs, "include">> = z.object({
   select: OrganizationSelectSchema.optional(),
-  include: OrganizationIncludeSchema.optional(),
   data: z.union([ OrganizationUpdateInputSchema,OrganizationUncheckedUpdateInputSchema ]),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
@@ -20642,15 +19827,13 @@ export const OrganizationDeleteManyArgsSchema: z.ZodType<Prisma.OrganizationDele
   where: OrganizationWhereInputSchema.optional(),
 }).strict()
 
-export const Users_terminalsCreateArgsSchema: z.ZodType<Prisma.Users_terminalsCreateArgs> = z.object({
+export const Users_terminalsCreateArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsCreateArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   data: z.union([ Users_terminalsCreateInputSchema,Users_terminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_terminalsUpsertArgsSchema: z.ZodType<Prisma.Users_terminalsUpsertArgs> = z.object({
+export const Users_terminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsUpsertArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
   create: z.union([ Users_terminalsCreateInputSchema,Users_terminalsUncheckedCreateInputSchema ]),
   update: z.union([ Users_terminalsUpdateInputSchema,Users_terminalsUncheckedUpdateInputSchema ]),
@@ -20661,15 +19844,13 @@ export const Users_terminalsCreateManyArgsSchema: z.ZodType<Prisma.Users_termina
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_terminalsDeleteArgsSchema: z.ZodType<Prisma.Users_terminalsDeleteArgs> = z.object({
+export const Users_terminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsDeleteArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsUpdateArgsSchema: z.ZodType<Prisma.Users_terminalsUpdateArgs> = z.object({
+export const Users_terminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsUpdateArgs, "include">> = z.object({
   select: Users_terminalsSelectSchema.optional(),
-  include: Users_terminalsIncludeSchema.optional(),
   data: z.union([ Users_terminalsUpdateInputSchema,Users_terminalsUncheckedUpdateInputSchema ]),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
@@ -20683,15 +19864,13 @@ export const Users_terminalsDeleteManyArgsSchema: z.ZodType<Prisma.Users_termina
   where: Users_terminalsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_work_schedulesCreateArgsSchema: z.ZodType<Prisma.Users_work_schedulesCreateArgs> = z.object({
+export const Users_work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesCreateArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   data: z.union([ Users_work_schedulesCreateInputSchema,Users_work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_work_schedulesUpsertArgsSchema: z.ZodType<Prisma.Users_work_schedulesUpsertArgs> = z.object({
+export const Users_work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesUpsertArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
   create: z.union([ Users_work_schedulesCreateInputSchema,Users_work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ Users_work_schedulesUpdateInputSchema,Users_work_schedulesUncheckedUpdateInputSchema ]),
@@ -20702,15 +19881,13 @@ export const Users_work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.Users_wo
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_work_schedulesDeleteArgsSchema: z.ZodType<Prisma.Users_work_schedulesDeleteArgs> = z.object({
+export const Users_work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesDeleteArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesUpdateArgsSchema: z.ZodType<Prisma.Users_work_schedulesUpdateArgs> = z.object({
+export const Users_work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesUpdateArgs, "include">> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
-  include: Users_work_schedulesIncludeSchema.optional(),
   data: z.union([ Users_work_schedulesUpdateInputSchema,Users_work_schedulesUncheckedUpdateInputSchema ]),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -20724,15 +19901,13 @@ export const Users_work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.Users_wo
   where: Users_work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const Work_schedule_entriesCreateArgsSchema: z.ZodType<Prisma.Work_schedule_entriesCreateArgs> = z.object({
+export const Work_schedule_entriesCreateArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesCreateArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ Work_schedule_entriesCreateInputSchema,Work_schedule_entriesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Work_schedule_entriesUpsertArgsSchema: z.ZodType<Prisma.Work_schedule_entriesUpsertArgs> = z.object({
+export const Work_schedule_entriesUpsertArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesUpsertArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
   create: z.union([ Work_schedule_entriesCreateInputSchema,Work_schedule_entriesUncheckedCreateInputSchema ]),
   update: z.union([ Work_schedule_entriesUpdateInputSchema,Work_schedule_entriesUncheckedUpdateInputSchema ]),
@@ -20743,15 +19918,13 @@ export const Work_schedule_entriesCreateManyArgsSchema: z.ZodType<Prisma.Work_sc
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Work_schedule_entriesDeleteArgsSchema: z.ZodType<Prisma.Work_schedule_entriesDeleteArgs> = z.object({
+export const Work_schedule_entriesDeleteArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesDeleteArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesUpdateArgsSchema: z.ZodType<Prisma.Work_schedule_entriesUpdateArgs> = z.object({
+export const Work_schedule_entriesUpdateArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesUpdateArgs, "include">> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
-  include: Work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ Work_schedule_entriesUpdateInputSchema,Work_schedule_entriesUncheckedUpdateInputSchema ]),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
@@ -20765,15 +19938,13 @@ export const Work_schedule_entriesDeleteManyArgsSchema: z.ZodType<Prisma.Work_sc
   where: Work_schedule_entriesWhereInputSchema.optional(),
 }).strict()
 
-export const Api_tokensCreateArgsSchema: z.ZodType<Prisma.Api_tokensCreateArgs> = z.object({
+export const Api_tokensCreateArgsSchema: z.ZodType<Omit<Prisma.Api_tokensCreateArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   data: z.union([ Api_tokensCreateInputSchema,Api_tokensUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Api_tokensUpsertArgsSchema: z.ZodType<Prisma.Api_tokensUpsertArgs> = z.object({
+export const Api_tokensUpsertArgsSchema: z.ZodType<Omit<Prisma.Api_tokensUpsertArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
   create: z.union([ Api_tokensCreateInputSchema,Api_tokensUncheckedCreateInputSchema ]),
   update: z.union([ Api_tokensUpdateInputSchema,Api_tokensUncheckedUpdateInputSchema ]),
@@ -20784,15 +19955,13 @@ export const Api_tokensCreateManyArgsSchema: z.ZodType<Prisma.Api_tokensCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Api_tokensDeleteArgsSchema: z.ZodType<Prisma.Api_tokensDeleteArgs> = z.object({
+export const Api_tokensDeleteArgsSchema: z.ZodType<Omit<Prisma.Api_tokensDeleteArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensUpdateArgsSchema: z.ZodType<Prisma.Api_tokensUpdateArgs> = z.object({
+export const Api_tokensUpdateArgsSchema: z.ZodType<Omit<Prisma.Api_tokensUpdateArgs, "include">> = z.object({
   select: Api_tokensSelectSchema.optional(),
-  include: Api_tokensIncludeSchema.optional(),
   data: z.union([ Api_tokensUpdateInputSchema,Api_tokensUncheckedUpdateInputSchema ]),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
@@ -20806,15 +19975,13 @@ export const Api_tokensDeleteManyArgsSchema: z.ZodType<Prisma.Api_tokensDeleteMa
   where: Api_tokensWhereInputSchema.optional(),
 }).strict()
 
-export const TimesheetCreateArgsSchema: z.ZodType<Prisma.TimesheetCreateArgs> = z.object({
+export const TimesheetCreateArgsSchema: z.ZodType<Omit<Prisma.TimesheetCreateArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   data: z.union([ TimesheetCreateInputSchema,TimesheetUncheckedCreateInputSchema ]),
 }).strict()
 
-export const TimesheetUpsertArgsSchema: z.ZodType<Prisma.TimesheetUpsertArgs> = z.object({
+export const TimesheetUpsertArgsSchema: z.ZodType<Omit<Prisma.TimesheetUpsertArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
   create: z.union([ TimesheetCreateInputSchema,TimesheetUncheckedCreateInputSchema ]),
   update: z.union([ TimesheetUpdateInputSchema,TimesheetUncheckedUpdateInputSchema ]),
@@ -20825,15 +19992,13 @@ export const TimesheetCreateManyArgsSchema: z.ZodType<Prisma.TimesheetCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const TimesheetDeleteArgsSchema: z.ZodType<Prisma.TimesheetDeleteArgs> = z.object({
+export const TimesheetDeleteArgsSchema: z.ZodType<Omit<Prisma.TimesheetDeleteArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetUpdateArgsSchema: z.ZodType<Prisma.TimesheetUpdateArgs> = z.object({
+export const TimesheetUpdateArgsSchema: z.ZodType<Omit<Prisma.TimesheetUpdateArgs, "include">> = z.object({
   select: TimesheetSelectSchema.optional(),
-  include: TimesheetIncludeSchema.optional(),
   data: z.union([ TimesheetUpdateInputSchema,TimesheetUncheckedUpdateInputSchema ]),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
@@ -20847,15 +20012,13 @@ export const TimesheetDeleteManyArgsSchema: z.ZodType<Prisma.TimesheetDeleteMany
   where: TimesheetWhereInputSchema.optional(),
 }).strict()
 
-export const Scheduled_reportsCreateArgsSchema: z.ZodType<Prisma.Scheduled_reportsCreateArgs> = z.object({
+export const Scheduled_reportsCreateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsCreateArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   data: z.union([ Scheduled_reportsCreateInputSchema,Scheduled_reportsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Scheduled_reportsUpsertArgsSchema: z.ZodType<Prisma.Scheduled_reportsUpsertArgs> = z.object({
+export const Scheduled_reportsUpsertArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsUpsertArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
   create: z.union([ Scheduled_reportsCreateInputSchema,Scheduled_reportsUncheckedCreateInputSchema ]),
   update: z.union([ Scheduled_reportsUpdateInputSchema,Scheduled_reportsUncheckedUpdateInputSchema ]),
@@ -20866,15 +20029,13 @@ export const Scheduled_reportsCreateManyArgsSchema: z.ZodType<Prisma.Scheduled_r
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Scheduled_reportsDeleteArgsSchema: z.ZodType<Prisma.Scheduled_reportsDeleteArgs> = z.object({
+export const Scheduled_reportsDeleteArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsDeleteArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsUpdateArgsSchema: z.ZodType<Prisma.Scheduled_reportsUpdateArgs> = z.object({
+export const Scheduled_reportsUpdateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsUpdateArgs, "include">> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
-  include: Scheduled_reportsIncludeSchema.optional(),
   data: z.union([ Scheduled_reportsUpdateInputSchema,Scheduled_reportsUncheckedUpdateInputSchema ]),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
@@ -20888,15 +20049,13 @@ export const Scheduled_reportsDeleteManyArgsSchema: z.ZodType<Prisma.Scheduled_r
   where: Scheduled_reportsWhereInputSchema.optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionCreateArgs> = z.object({
+export const Scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionCreateArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ Scheduled_reports_subscriptionCreateInputSchema,Scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionUpsertArgs> = z.object({
+export const Scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionUpsertArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
   create: z.union([ Scheduled_reports_subscriptionCreateInputSchema,Scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
   update: z.union([ Scheduled_reports_subscriptionUpdateInputSchema,Scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
@@ -20907,15 +20066,13 @@ export const Scheduled_reports_subscriptionCreateManyArgsSchema: z.ZodType<Prism
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionDeleteArgs> = z.object({
+export const Scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionDeleteArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionUpdateArgs> = z.object({
+export const Scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionUpdateArgs, "include">> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
-  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ Scheduled_reports_subscriptionUpdateInputSchema,Scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()

@@ -1,4 +1,4 @@
-import { trpc, ReactQueryOptions } from "@frontend/utils/trpc";
+import { trpc, ReactQueryOptions } from @admin/utils/trpc";
 
 export function usePermissionsQuery(filter: any) {
   return trpc.permissions.list.useQuery(filter);
