@@ -4,7 +4,7 @@ import { DataTable } from "./data-table";
 import { permissionsColumns } from "./columns";
 import { Button } from "@components/ui/button";
 import { Plus } from "lucide-react";
-import PermissionsForm from "./form";
+import PermissionsFormSheet from "@admin/components/forms/permissions/sheet";
 
 export default function PermissionListPage() {
   return (
@@ -12,11 +12,11 @@ export default function PermissionListPage() {
       <div className="flex justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Permissions List</h2>
         <div className="flex items-center space-x-2">
-          <PermissionsForm>
+          <PermissionsFormSheet>
             <Button>
               <Plus className="mr-2 h-4 w-4" /> Create Permission
             </Button>
-          </PermissionsForm>
+          </PermissionsFormSheet>
         </div>
       </div>
       <div className="py-10">
