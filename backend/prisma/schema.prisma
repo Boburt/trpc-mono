@@ -35,7 +35,7 @@ model Permissions {
   updated_by                          String?             @db.Uuid
   users_permissions_created_byTousers Users?              @relation("permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_c398f7100db3e0d9b6a6cd6beaf")
   users_permissions_updated_byTousers Users?              @relation("permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_58fae278276b7c2c6dde2bc19a5")
-  // roles_permissions                   Roles_permissions[]
+  roles_permissions                   Roles_permissions[]
   users_permissions                   Users_permissions[]
 
   @@map("permissions")
@@ -59,17 +59,17 @@ model Roles {
 }
 
 model Roles_permissions {
-  role_id                      String  @db.Uuid
-  permission_id                String  @db.Uuid
-  created_by                   String?
-  updated_by                   String? @db.Uuid
-  roles_permissions_created_by Users?  @relation(fields: [created_by], references: [id])
-  // permissions                               Permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_337aa8dba227a1fe6b73998307b") 
-  roles                        Roles   @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_7d2dad9f14eddeb09c256fea719")
-  // users_roles_permissions_updated_byTousers Users?      @relation("roles_permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_d1ba552f47d08621fdd2bbb0124")
+  role_id                                   String      @db.Uuid
+  permission_id                             String      @db.Uuid
+  created_by                                String?     @db.Uuid /// dasdas @zod.custom.use(z.string().nullable())
+  updated_by                                String?     @db.Uuid /// @zod.custom.use(z.string().nullish())
+  users_roles_permissions_created_byTousers Users?      @relation("roles_permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_a3f5b9874c55ee69fdd01531e14")
+  permissions                               Permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_337aa8dba227a1fe6b73998307b")
+  roles                                     Roles       @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_7d2dad9f14eddeb09c256fea719")
+  users_roles_permissions_updated_byTousers Users?      @relation("roles_permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_d1ba552f47d08621fdd2bbb0124")
 
   @@id([role_id, permission_id], map: "PK_0cd11f0b35c4d348c6ebb9b36b7")
-  @@map("roles_permissions")
+	@@map("roles_permissions")
 }
 
 model Users {
@@ -105,8 +105,8 @@ model Users {
   permissions_permissions_updated_byTousers             Permissions[]                    @relation("permissions_updated_byTousers")
   roles_roles_created_byTousers                         Roles[]                          @relation("roles_created_byTousers")
   roles_roles_updated_byTousers                         Roles[]                          @relation("roles_updated_byTousers")
-  roles_permissions_created_by                          Roles_permissions[]
-  // roles_permissions_roles_permissions_updated_byTousers Roles_permissions[]              @relation("roles_permissions_updated_byTousers")
+  roles_permissions_roles_permissions_created_byTousers Roles_permissions[]               @relation("roles_permissions_created_byTousers")
+  roles_permissions_roles_permissions_updated_byTousers Roles_permissions[]              @relation("roles_permissions_updated_byTousers")
   users_permissions_usersTousers_permissions_created_by Users_permissions[]              @relation("usersTousers_permissions_created_by")
   users_permissions_usersTousers_permissions_updated_by Users_permissions[]              @relation("usersTousers_permissions_updated_by")
   users_permissions_usersTousers_permissions_user_id    Users_permissions[]              @relation("usersTousers_permissions_user_id")

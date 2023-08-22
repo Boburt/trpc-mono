@@ -1,5 +1,4 @@
 import { ReactQueryOptions, RouterInputs, trpc } from "@admin/utils/trpc";
-import { UseTRPCQueryOptions } from "@trpc/react-query/dist/shared";
 
 export function useRolePermissionsCreate(
   options: ReactQueryOptions["rolesPermissions"]["add"]
