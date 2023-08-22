@@ -22,7 +22,7 @@ import { trpc } from "@admin/utils/trpc";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@components/ui/use-toast";
@@ -40,6 +40,7 @@ export default function PermissionsForm({
   recordId?: string;
 }) {
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof PermissionsCreateInputSchema>>({
     resolver: zodResolver(PermissionsCreateInputSchema),
@@ -60,7 +61,7 @@ export default function PermissionsForm({
     setOpen(false);
   };
 
-  const onError = (error) => {
+  const onError = (error: any) => {
     toast({
       title: "Error",
       description: error.message,
@@ -95,7 +96,6 @@ export default function PermissionsForm({
       },
       {
         enabled: !!recordId && open,
-        refetchOnMountOrArgChange: true,
       }
     );
 
@@ -116,12 +116,16 @@ export default function PermissionsForm({
   // }, [record, open, form]);
 
   async function onSubmit(
-    values: z.infer<typeof permissionsCreateInputSchema>
+    values: z.infer<typeof PermissionsCreateInputSchema>
   ) {
     if (recordId) {
-      updatePermission({ data: values, where: { id: recordId } });
+      startTransition(() => {
+        updatePermission({ data: values, where: { id: recordId } });
+      });
     } else {
-      createPermission({ data: values });
+      startTransition(() => {
+        createPermission({ data: values });
+      });
     }
   }
 
@@ -166,7 +170,7 @@ export default function PermissionsForm({
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="slug"
                 render={({ field }) => (
@@ -180,8 +184,8 @@ export default function PermissionsForm({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-              <FormField
+              /> */}
+              {/* <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
@@ -195,7 +199,7 @@ export default function PermissionsForm({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Submit
