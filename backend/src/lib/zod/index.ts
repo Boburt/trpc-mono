@@ -95,6 +95,7 @@ export type Permissions = z.infer<typeof PermissionsSchema>
 export type PermissionsRelations = {
   users_permissions_created_byTousers?: UsersWithRelations | null;
   users_permissions_updated_byTousers?: UsersWithRelations | null;
+  roles_permissions: Roles_permissionsWithRelations[];
   users_permissions: Users_permissionsWithRelations[];
 };
 
@@ -103,6 +104,7 @@ export type PermissionsWithRelations = z.infer<typeof PermissionsSchema> & Permi
 export const PermissionsWithRelationsSchema: z.ZodType<PermissionsWithRelations> = PermissionsSchema.merge(z.object({
   users_permissions_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
   users_permissions_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  roles_permissions: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
   users_permissions: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
 }))
 
@@ -149,8 +151,11 @@ export const RolesWithRelationsSchema: z.ZodType<RolesWithRelations> = RolesSche
 export const Roles_permissionsSchema = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  created_by: z.string().nullish(),
-  updated_by: z.string().nullish(),
+  /**
+   * dasdas
+   */
+  created_by: z.string().nullable().nullish(),
+  updated_by: z.string().nullish().nullish(),
 })
 
 export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>
@@ -159,15 +164,19 @@ export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>
 //------------------------------------------------------
 
 export type Roles_permissionsRelations = {
-  roles_permissions_created_by?: UsersWithRelations | null;
+  users_roles_permissions_created_byTousers?: UsersWithRelations | null;
+  permissions: PermissionsWithRelations;
   roles: RolesWithRelations;
+  users_roles_permissions_updated_byTousers?: UsersWithRelations | null;
 };
 
 export type Roles_permissionsWithRelations = z.infer<typeof Roles_permissionsSchema> & Roles_permissionsRelations
 
 export const Roles_permissionsWithRelationsSchema: z.ZodType<Roles_permissionsWithRelations> = Roles_permissionsSchema.merge(z.object({
-  roles_permissions_created_by: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
+  permissions: z.lazy(() => PermissionsWithRelationsSchema),
   roles: z.lazy(() => RolesWithRelationsSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersWithRelationsSchema).nullish(),
 }))
 
 /////////////////////////////////////////
@@ -215,7 +224,8 @@ export type UsersRelations = {
   permissions_permissions_updated_byTousers: PermissionsWithRelations[];
   roles_roles_created_byTousers: RolesWithRelations[];
   roles_roles_updated_byTousers: RolesWithRelations[];
-  roles_permissions_created_by: Roles_permissionsWithRelations[];
+  roles_permissions_roles_permissions_created_byTousers: Roles_permissionsWithRelations[];
+  roles_permissions_roles_permissions_updated_byTousers: Roles_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_created_by: Users_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_updated_by: Users_permissionsWithRelations[];
   users_permissions_usersTousers_permissions_user_id: Users_permissionsWithRelations[];
@@ -245,7 +255,8 @@ export const UsersWithRelationsSchema: z.ZodType<UsersWithRelations> = UsersSche
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsWithRelationsSchema).array(),
   roles_roles_created_byTousers: z.lazy(() => RolesWithRelationsSchema).array(),
   roles_roles_updated_byTousers: z.lazy(() => RolesWithRelationsSchema).array(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsWithRelationsSchema).array(),
@@ -721,6 +732,7 @@ export const Scheduled_reports_subscriptionWithRelationsSchema: z.ZodType<Schedu
 export const PermissionsIncludeSchema: z.ZodType<Prisma.PermissionsInclude> = z.object({
   users_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   users_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  roles_permissions: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PermissionsCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -735,6 +747,7 @@ export const PermissionsCountOutputTypeArgsSchema: z.ZodType<Prisma.PermissionsC
 }).strict();
 
 export const PermissionsCountOutputTypeSelectSchema: z.ZodType<Prisma.PermissionsCountOutputTypeSelect> = z.object({
+  roles_permissions: z.boolean().optional(),
   users_permissions: z.boolean().optional(),
 }).strict();
 
@@ -749,6 +762,7 @@ export const PermissionsSelectSchema: z.ZodType<Prisma.PermissionsSelect> = z.ob
   updated_by: z.boolean().optional(),
   users_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
   users_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  roles_permissions: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => PermissionsCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -798,8 +812,10 @@ export const RolesSelectSchema: z.ZodType<Prisma.RolesSelect> = z.object({
 //------------------------------------------------------
 
 export const Roles_permissionsIncludeSchema: z.ZodType<Prisma.Roles_permissionsInclude> = z.object({
-  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  users_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  permissions: z.union([z.boolean(),z.lazy(() => PermissionsArgsSchema)]).optional(),
   roles: z.union([z.boolean(),z.lazy(() => RolesArgsSchema)]).optional(),
+  users_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
 }).strict()
 
 export const Roles_permissionsArgsSchema: z.ZodType<Prisma.Roles_permissionsDefaultArgs> = z.object({
@@ -812,8 +828,10 @@ export const Roles_permissionsSelectSchema: z.ZodType<Prisma.Roles_permissionsSe
   permission_id: z.boolean().optional(),
   created_by: z.boolean().optional(),
   updated_by: z.boolean().optional(),
-  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  users_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+  permissions: z.union([z.boolean(),z.lazy(() => PermissionsArgsSchema)]).optional(),
   roles: z.union([z.boolean(),z.lazy(() => RolesArgsSchema)]).optional(),
+  users_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
 }).strict()
 
 // USERS
@@ -824,7 +842,8 @@ export const UsersIncludeSchema: z.ZodType<Prisma.UsersInclude> = z.object({
   permissions_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => PermissionsFindManyArgsSchema)]).optional(),
   roles_roles_created_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
   roles_roles_updated_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
-  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_created_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_user_id: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
@@ -862,7 +881,8 @@ export const UsersCountOutputTypeSelectSchema: z.ZodType<Prisma.UsersCountOutput
   permissions_permissions_updated_byTousers: z.boolean().optional(),
   roles_roles_created_byTousers: z.boolean().optional(),
   roles_roles_updated_byTousers: z.boolean().optional(),
-  roles_permissions_created_by: z.boolean().optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.boolean().optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.boolean().optional(),
   users_permissions_usersTousers_permissions_created_by: z.boolean().optional(),
   users_permissions_usersTousers_permissions_updated_by: z.boolean().optional(),
   users_permissions_usersTousers_permissions_user_id: z.boolean().optional(),
@@ -918,7 +938,8 @@ export const UsersSelectSchema: z.ZodType<Prisma.UsersSelect> = z.object({
   permissions_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => PermissionsFindManyArgsSchema)]).optional(),
   roles_roles_created_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
   roles_roles_updated_byTousers: z.union([z.boolean(),z.lazy(() => RolesFindManyArgsSchema)]).optional(),
-  roles_permissions_created_by: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.union([z.boolean(),z.lazy(() => Roles_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_created_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
   users_permissions_usersTousers_permissions_user_id: z.union([z.boolean(),z.lazy(() => Users_permissionsFindManyArgsSchema)]).optional(),
@@ -1369,6 +1390,7 @@ export const PermissionsWhereInputSchema: z.ZodType<Prisma.PermissionsWhereInput
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   users_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   users_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsListRelationFilterSchema).optional()
 }).strict();
 
@@ -1383,6 +1405,7 @@ export const PermissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.Permiss
   updated_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
@@ -1412,6 +1435,7 @@ export const PermissionsWhereUniqueInputSchema: z.ZodType<Prisma.PermissionsWher
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   users_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
   users_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsListRelationFilterSchema).optional()
 }).strict());
 
@@ -1556,10 +1580,12 @@ export const Roles_permissionsWhereInputSchema: z.ZodType<Prisma.Roles_permissio
   NOT: z.union([ z.lazy(() => Roles_permissionsWhereInputSchema),z.lazy(() => Roles_permissionsWhereInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  roles_permissions_created_by: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  users_roles_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  permissions: z.union([ z.lazy(() => PermissionsRelationFilterSchema),z.lazy(() => PermissionsWhereInputSchema) ]).optional(),
   roles: z.union([ z.lazy(() => RolesRelationFilterSchema),z.lazy(() => RolesWhereInputSchema) ]).optional(),
+  users_roles_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByWithRelationInput> = z.object({
@@ -1567,8 +1593,10 @@ export const Roles_permissionsOrderByWithRelationInputSchema: z.ZodType<Prisma.R
   permission_id: z.lazy(() => SortOrderSchema).optional(),
   created_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   updated_by: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  roles_permissions_created_by: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
-  roles: z.lazy(() => RolesOrderByWithRelationInputSchema).optional()
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsOrderByWithRelationInputSchema).optional(),
+  roles: z.lazy(() => RolesOrderByWithRelationInputSchema).optional(),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsWhereUniqueInputSchema: z.ZodType<Prisma.Roles_permissionsWhereUniqueInput> = z.object({
@@ -1581,10 +1609,12 @@ export const Roles_permissionsWhereUniqueInputSchema: z.ZodType<Prisma.Roles_per
   NOT: z.union([ z.lazy(() => Roles_permissionsWhereInputSchema),z.lazy(() => Roles_permissionsWhereInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-  roles_permissions_created_by: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  users_roles_permissions_created_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
+  permissions: z.union([ z.lazy(() => PermissionsRelationFilterSchema),z.lazy(() => PermissionsWhereInputSchema) ]).optional(),
   roles: z.union([ z.lazy(() => RolesRelationFilterSchema),z.lazy(() => RolesWhereInputSchema) ]).optional(),
+  users_roles_permissions_updated_byTousers: z.union([ z.lazy(() => UsersNullableRelationFilterSchema),z.lazy(() => UsersWhereInputSchema) ]).optional().nullable(),
 }).strict());
 
 export const Roles_permissionsOrderByWithAggregationInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByWithAggregationInput> = z.object({
@@ -1603,7 +1633,7 @@ export const Roles_permissionsScalarWhereWithAggregatesInputSchema: z.ZodType<Pr
   NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereWithAggregatesInputSchema),z.lazy(() => Roles_permissionsScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   role_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
   permission_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  created_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   updated_by: z.union([ z.lazy(() => UuidNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
@@ -1643,7 +1673,8 @@ export const UsersWhereInputSchema: z.ZodType<Prisma.UsersWhereInput> = z.object
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsListRelationFilterSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
@@ -1699,7 +1730,8 @@ export const UsersOrderByWithRelationInputSchema: z.ZodType<Prisma.UsersOrderByW
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsOrderByRelationAggregateInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesOrderByRelationAggregateInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesOrderByRelationAggregateInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsOrderByRelationAggregateInputSchema).optional(),
@@ -1822,7 +1854,8 @@ export const UsersWhereUniqueInputSchema: z.ZodType<Prisma.UsersWhereUniqueInput
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsListRelationFilterSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesListRelationFilterSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsListRelationFilterSchema).optional(),
@@ -3007,6 +3040,7 @@ export const PermissionsCreateInputSchema: z.ZodType<Prisma.PermissionsCreateInp
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -3019,6 +3053,7 @@ export const PermissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Permissions
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
   updated_by: z.string().optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -3031,6 +3066,7 @@ export const PermissionsUpdateInputSchema: z.ZodType<Prisma.PermissionsUpdateInp
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -3043,6 +3079,7 @@ export const PermissionsUncheckedUpdateInputSchema: z.ZodType<Prisma.Permissions
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -3161,10 +3198,10 @@ export const RolesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.RolesUnchecke
 }).strict();
 
 export const Roles_permissionsCreateInputSchema: z.ZodType<Prisma.Roles_permissionsCreateInput> = z.object({
-  permission_id: z.string(),
-  updated_by: z.string().optional().nullable(),
-  roles_permissions_created_by: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema).optional(),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateInput> = z.object({
@@ -3175,10 +3212,10 @@ export const Roles_permissionsUncheckedCreateInputSchema: z.ZodType<Prisma.Roles
 }).strict();
 
 export const Roles_permissionsUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateInput> = z.object({
-  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions_created_by: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema).optional(),
-  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional()
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateInput> = z.object({
@@ -3196,8 +3233,6 @@ export const Roles_permissionsCreateManyInputSchema: z.ZodType<Prisma.Roles_perm
 }).strict();
 
 export const Roles_permissionsUpdateManyMutationInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyMutationInput> = z.object({
-  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyInput> = z.object({
@@ -3240,7 +3275,8 @@ export const UsersCreateInputSchema: z.ZodType<Prisma.UsersCreateInput> = z.obje
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -3296,7 +3332,8 @@ export const UsersUncheckedCreateInputSchema: z.ZodType<Prisma.UsersUncheckedCre
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -3352,7 +3389,8 @@ export const UsersUpdateInputSchema: z.ZodType<Prisma.UsersUpdateInput> = z.obje
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -3408,7 +3446,8 @@ export const UsersUncheckedUpdateInputSchema: z.ZodType<Prisma.UsersUncheckedUpd
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -4633,6 +4672,12 @@ export const UsersNullableRelationFilterSchema: z.ZodType<Prisma.UsersNullableRe
   isNot: z.lazy(() => UsersWhereInputSchema).optional().nullable()
 }).strict();
 
+export const Roles_permissionsListRelationFilterSchema: z.ZodType<Prisma.Roles_permissionsListRelationFilter> = z.object({
+  every: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
+  some: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
+  none: z.lazy(() => Roles_permissionsWhereInputSchema).optional()
+}).strict();
+
 export const Users_permissionsListRelationFilterSchema: z.ZodType<Prisma.Users_permissionsListRelationFilter> = z.object({
   every: z.lazy(() => Users_permissionsWhereInputSchema).optional(),
   some: z.lazy(() => Users_permissionsWhereInputSchema).optional(),
@@ -4642,6 +4687,10 @@ export const Users_permissionsListRelationFilterSchema: z.ZodType<Prisma.Users_p
 export const SortOrderInputSchema: z.ZodType<Prisma.SortOrderInput> = z.object({
   sort: z.lazy(() => SortOrderSchema),
   nulls: z.lazy(() => NullsOrderSchema).optional()
+}).strict();
+
+export const Roles_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const Users_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Users_permissionsOrderByRelationAggregateInput> = z.object({
@@ -4766,20 +4815,10 @@ export const StringNullableFilterSchema: z.ZodType<Prisma.StringNullableFilter> 
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
-export const Roles_permissionsListRelationFilterSchema: z.ZodType<Prisma.Roles_permissionsListRelationFilter> = z.object({
-  every: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
-  some: z.lazy(() => Roles_permissionsWhereInputSchema).optional(),
-  none: z.lazy(() => Roles_permissionsWhereInputSchema).optional()
-}).strict();
-
 export const Users_rolesListRelationFilterSchema: z.ZodType<Prisma.Users_rolesListRelationFilter> = z.object({
   every: z.lazy(() => Users_rolesWhereInputSchema).optional(),
   some: z.lazy(() => Users_rolesWhereInputSchema).optional(),
   none: z.lazy(() => Users_rolesWhereInputSchema).optional()
-}).strict();
-
-export const Roles_permissionsOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Roles_permissionsOrderByRelationAggregateInput> = z.object({
-  _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const Users_rolesOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Users_rolesOrderByRelationAggregateInput> = z.object({
@@ -4835,6 +4874,11 @@ export const StringNullableWithAggregatesFilterSchema: z.ZodType<Prisma.StringNu
   _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedStringNullableFilterSchema).optional(),
   _max: z.lazy(() => NestedStringNullableFilterSchema).optional()
+}).strict();
+
+export const PermissionsRelationFilterSchema: z.ZodType<Prisma.PermissionsRelationFilter> = z.object({
+  is: z.lazy(() => PermissionsWhereInputSchema).optional(),
+  isNot: z.lazy(() => PermissionsWhereInputSchema).optional()
 }).strict();
 
 export const RolesRelationFilterSchema: z.ZodType<Prisma.RolesRelationFilter> = z.object({
@@ -5244,11 +5288,6 @@ export const SessionsMinOrderByAggregateInputSchema: z.ZodType<Prisma.SessionsMi
   device_name: z.lazy(() => SortOrderSchema).optional(),
   created_at: z.lazy(() => SortOrderSchema).optional(),
   updated_at: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
-export const PermissionsRelationFilterSchema: z.ZodType<Prisma.PermissionsRelationFilter> = z.object({
-  is: z.lazy(() => PermissionsWhereInputSchema).optional(),
-  isNot: z.lazy(() => PermissionsWhereInputSchema).optional()
 }).strict();
 
 export const Users_permissionsUser_idPermission_idCompoundUniqueInputSchema: z.ZodType<Prisma.Users_permissionsUser_idPermission_idCompoundUniqueInput> = z.object({
@@ -5858,11 +5897,25 @@ export const UsersCreateNestedOneWithoutPermissions_permissions_updated_byTouser
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
 }).strict();
 
+export const Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutPermissionsInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const Users_permissionsCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateNestedManyWithoutPermissionsInput> = z.object({
   create: z.union([ z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
   createMany: z.lazy(() => Users_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Users_permissionsWhereUniqueInputSchema),z.lazy(() => Users_permissionsWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInput> = z.object({
@@ -5904,6 +5957,20 @@ export const UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNeste
   update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTousersInputSchema) ]).optional(),
 }).strict();
 
+export const Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutPermissionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Users_permissionsUpdateManyWithoutPermissionsNestedInput> = z.object({
   create: z.union([ z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Users_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
@@ -5920,6 +5987,20 @@ export const Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema: z.Z
 
 export const NullableStringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableStringFieldUpdateOperationsInput> = z.object({
   set: z.string().optional().nullable()
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyPermissionsInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema: z.ZodType<Prisma.Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInput> = z.object({
@@ -6052,10 +6133,16 @@ export const Users_rolesUncheckedUpdateManyWithoutRolesNestedInputSchema: z.ZodT
   deleteMany: z.union([ z.lazy(() => Users_rolesScalarWhereInputSchema),z.lazy(() => Users_rolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_created_byInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema).optional(),
+export const UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
+}).strict();
+
+export const PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateNestedOneWithoutRoles_permissionsInput> = z.object({
+  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema).optional(),
+  connect: z.lazy(() => PermissionsWhereUniqueInputSchema).optional()
 }).strict();
 
 export const RolesCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesCreateNestedOneWithoutRoles_permissionsInput> = z.object({
@@ -6064,14 +6151,28 @@ export const RolesCreateNestedOneWithoutRoles_permissionsInputSchema: z.ZodType<
   connect: z.lazy(() => RolesWhereUniqueInputSchema).optional()
 }).strict();
 
-export const UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_created_byNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema).optional(),
-  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_created_byInputSchema).optional(),
+export const UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
+  connect: z.lazy(() => UsersWhereUniqueInputSchema).optional()
+}).strict();
+
+export const UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
   disconnect: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
   delete: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
   connect: z.lazy(() => UsersWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]).optional(),
+}).strict();
+
+export const PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.ZodType<Prisma.PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema).optional(),
+  upsert: z.lazy(() => PermissionsUpsertWithoutRoles_permissionsInputSchema).optional(),
+  connect: z.lazy(() => PermissionsWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]).optional(),
 }).strict();
 
 export const RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.ZodType<Prisma.RolesUpdateOneRequiredWithoutRoles_permissionsNestedInput> = z.object({
@@ -6080,6 +6181,16 @@ export const RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema: z.
   upsert: z.lazy(() => RolesUpsertWithoutRoles_permissionsInputSchema).optional(),
   connect: z.lazy(() => RolesWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => RolesUpdateToOneWithWhereWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUncheckedUpdateWithoutRoles_permissionsInputSchema) ]).optional(),
+}).strict();
+
+export const UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
+  upsert: z.lazy(() => UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => UsersWhereInputSchema) ]).optional(),
+  connect: z.lazy(() => UsersWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]).optional(),
 }).strict();
 
 export const UsersCreatedoc_filesInputSchema: z.ZodType<Prisma.UsersCreatedoc_filesInput> = z.object({
@@ -6114,10 +6225,17 @@ export const RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchem
   connect: z.union([ z.lazy(() => RolesWhereUniqueInputSchema),z.lazy(() => RolesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
+export const Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -6289,10 +6407,17 @@ export const RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersI
   connect: z.union([ z.lazy(() => RolesWhereUniqueInputSchema),z.lazy(() => RolesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
+export const Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -6529,17 +6654,31 @@ export const RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchem
   deleteMany: z.union([ z.lazy(() => RolesScalarWhereInputSchema),z.lazy(() => RolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
+export const Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -6879,17 +7018,31 @@ export const RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedI
   deleteMany: z.union([ z.lazy(() => RolesScalarWhereInputSchema),z.lazy(() => RolesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInput> = z.object({
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema).optional(),
+export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array(),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => Roles_permissionsWhereUniqueInputSchema),z.lazy(() => Roles_permissionsWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -8309,7 +8462,8 @@ export const UsersCreateWithoutPermissions_permissions_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8364,7 +8518,8 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_created_byTouser
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8424,7 +8579,8 @@ export const UsersCreateWithoutPermissions_permissions_updated_byTousersInputSch
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8479,7 +8635,8 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8505,6 +8662,28 @@ export const UsersUncheckedCreateWithoutPermissions_permissions_updated_byTouser
 export const UsersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutPermissions_permissions_updated_byTousersInput> = z.object({
   where: z.lazy(() => UsersWhereUniqueInputSchema),
   create: z.union([ z.lazy(() => UsersCreateWithoutPermissions_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutPermissions_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutPermissionsInput> = z.object({
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
+}).strict();
+
+export const Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutPermissionsInput> = z.object({
+  role_id: z.string(),
+  created_by: z.string().optional().nullable(),
+  updated_by: z.string().optional().nullable()
+}).strict();
+
+export const Roles_permissionsCreateOrConnectWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutPermissionsInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsCreateManyPermissionsInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => Roles_permissionsCreateManyPermissionsInputSchema),z.lazy(() => Roles_permissionsCreateManyPermissionsInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
 }).strict();
 
 export const Users_permissionsCreateWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateWithoutPermissionsInput> = z.object({
@@ -8572,7 +8751,8 @@ export const UsersUpdateWithoutPermissions_permissions_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8627,7 +8807,8 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_created_byTouser
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8693,7 +8874,8 @@ export const UsersUpdateWithoutPermissions_permissions_updated_byTousersInputSch
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8748,7 +8930,8 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -8769,6 +8952,32 @@ export const UsersUncheckedUpdateWithoutPermissions_permissions_updated_byTouser
   timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
   scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
+}).strict();
+
+export const Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutPermissionsInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutPermissionsInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutPermissionsInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutPermissionsInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsUpdateManyWithWhereWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutPermissionsInput> = z.object({
+  where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsScalarWhereInputSchema: z.ZodType<Prisma.Roles_permissionsScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => Roles_permissionsScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
+  role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  created_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
+  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpsertWithWhereUniqueWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUpsertWithWhereUniqueWithoutPermissionsInput> = z.object({
@@ -8829,7 +9038,8 @@ export const UsersCreateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8884,7 +9094,8 @@ export const UsersUncheckedCreateWithoutRoles_roles_created_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8944,7 +9155,8 @@ export const UsersCreateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -8999,7 +9211,8 @@ export const UsersUncheckedCreateWithoutRoles_roles_updated_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9028,9 +9241,9 @@ export const UsersCreateOrConnectWithoutRoles_roles_updated_byTousersInputSchema
 }).strict();
 
 export const Roles_permissionsCreateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutRolesInput> = z.object({
-  permission_id: z.string(),
-  updated_by: z.string().optional().nullable(),
-  roles_permissions_created_by: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_created_byInputSchema).optional()
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedCreateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutRolesInput> = z.object({
@@ -9114,7 +9327,8 @@ export const UsersUpdateWithoutRoles_roles_created_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9169,7 +9383,8 @@ export const UsersUncheckedUpdateWithoutRoles_roles_created_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9235,7 +9450,8 @@ export const UsersUpdateWithoutRoles_roles_updated_byTousersInputSchema: z.ZodTy
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9290,7 +9506,8 @@ export const UsersUncheckedUpdateWithoutRoles_roles_updated_byTousersInputSchema
   permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9329,16 +9546,6 @@ export const Roles_permissionsUpdateManyWithWhereWithoutRolesInputSchema: z.ZodT
   data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRolesInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsScalarWhereInputSchema: z.ZodType<Prisma.Roles_permissionsScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => Roles_permissionsScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => Roles_permissionsScalarWhereInputSchema),z.lazy(() => Roles_permissionsScalarWhereInputSchema).array() ]).optional(),
-  role_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  permission_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  created_by: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
-}).strict();
-
 export const Users_rolesUpsertWithWhereUniqueWithoutRolesInputSchema: z.ZodType<Prisma.Users_rolesUpsertWithWhereUniqueWithoutRolesInput> = z.object({
   where: z.lazy(() => Users_rolesWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => Users_rolesUpdateWithoutRolesInputSchema),z.lazy(() => Users_rolesUncheckedUpdateWithoutRolesInputSchema) ]),
@@ -9365,7 +9572,7 @@ export const Users_rolesScalarWhereInputSchema: z.ZodType<Prisma.Users_rolesScal
   updated_by: z.union([ z.lazy(() => UuidNullableFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
-export const UsersCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
@@ -9398,6 +9605,7 @@ export const UsersCreateWithoutRoles_permissions_created_byInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9420,7 +9628,7 @@ export const UsersCreateWithoutRoles_permissions_created_byInputSchema: z.ZodTyp
   sessions: z.lazy(() => SessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
-export const UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
@@ -9453,6 +9661,7 @@ export const UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -9475,9 +9684,38 @@ export const UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema:
   sessions: z.lazy(() => SessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
 }).strict();
 
-export const UsersCreateOrConnectWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => UsersWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
+}).strict();
+
+export const PermissionsCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateWithoutRoles_permissionsInput> = z.object({
+  id: z.string().optional(),
+  slug: z.string(),
+  description: z.string(),
+  active: z.boolean().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
+  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
+  users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
+}).strict();
+
+export const PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedCreateWithoutRoles_permissionsInput> = z.object({
+  id: z.string().optional(),
+  slug: z.string(),
+  description: z.string(),
+  active: z.boolean().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  created_by: z.string().optional().nullable(),
+  updated_by: z.string().optional().nullable(),
+  users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
+}).strict();
+
+export const PermissionsCreateOrConnectWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateOrConnectWithoutRoles_permissionsInput> = z.object({
+  where: z.lazy(() => PermissionsWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
 }).strict();
 
 export const RolesCreateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesCreateWithoutRoles_permissionsInput> = z.object({
@@ -9509,18 +9747,135 @@ export const RolesCreateOrConnectWithoutRoles_permissionsInputSchema: z.ZodType<
   create: z.union([ z.lazy(() => RolesCreateWithoutRoles_permissionsInputSchema),z.lazy(() => RolesUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
 }).strict();
 
-export const UsersUpsertWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_created_byInput> = z.object({
-  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
-  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
+export const UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  id: z.string().optional(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
+  first_name: z.string().optional().nullable(),
+  last_name: z.string().optional().nullable(),
+  password: z.string(),
+  salt: z.string().optional().nullable(),
+  is_super_user: z.boolean().optional(),
+  status: z.lazy(() => user_statusSchema),
+  card_name: z.string().optional().nullable(),
+  card_number: z.string().optional().nullable(),
+  birth_date: z.coerce.date().optional().nullable(),
+  car_model: z.string().optional().nullable(),
+  car_number: z.string().optional().nullable(),
+  is_online: z.boolean().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  fcm_token: z.string().optional().nullable(),
+  wallet_balance: z.number().optional(),
+  max_active_order_count: z.number().optional().nullable(),
+  doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.coerce.date().optional().nullable(),
+  app_version: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  api_token: z.string().optional().nullable(),
+  tg_id: z.string().optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => OrganizationCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => OrganizationCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => Work_schedulesCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
+  users_terminals: z.lazy(() => Users_terminalsCreateNestedManyWithoutUsersInputSchema).optional(),
+  users_work_schedules: z.lazy(() => Users_work_schedulesCreateNestedManyWithoutUsersInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => Api_tokensCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => Api_tokensCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
+  timesheet_users: z.lazy(() => TimesheetCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => SessionsCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
+}).strict();
+
+export const UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  id: z.string().optional(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  login: z.string(),
+  first_name: z.string().optional().nullable(),
+  last_name: z.string().optional().nullable(),
+  password: z.string(),
+  salt: z.string().optional().nullable(),
+  is_super_user: z.boolean().optional(),
+  status: z.lazy(() => user_statusSchema),
+  card_name: z.string().optional().nullable(),
+  card_number: z.string().optional().nullable(),
+  birth_date: z.coerce.date().optional().nullable(),
+  car_model: z.string().optional().nullable(),
+  car_number: z.string().optional().nullable(),
+  is_online: z.boolean().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  fcm_token: z.string().optional().nullable(),
+  wallet_balance: z.number().optional(),
+  max_active_order_count: z.number().optional().nullable(),
+  doc_files: z.union([ z.lazy(() => UsersCreatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.coerce.date().optional().nullable(),
+  app_version: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  api_token: z.string().optional().nullable(),
+  tg_id: z.string().optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_created_byTousersInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_updated_byInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_user_idInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => OrganizationUncheckedCreateNestedManyWithoutOrganization_created_byTousersInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => OrganizationUncheckedCreateNestedManyWithoutOrganization_updated_byTousersInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_created_byTousersInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUncheckedCreateNestedManyWithoutWork_schedules_updated_byTousersInputSchema).optional(),
+  users_terminals: z.lazy(() => Users_terminalsUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
+  users_work_schedules: z.lazy(() => Users_work_schedulesUncheckedCreateNestedManyWithoutUsersInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_created_byTousersInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_updated_byTousersInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUncheckedCreateNestedManyWithoutWork_schedule_entries_usersInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => Api_tokensUncheckedCreateNestedManyWithoutApi_tokens_created_byTousersInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUncheckedCreateNestedManyWithoutApi_tokens_updated_byTousersInputSchema).optional(),
+  timesheet_users: z.lazy(() => TimesheetUncheckedCreateNestedManyWithoutTimesheet_usersInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedCreateNestedManyWithoutScheduled_reports_subscription_usersInputSchema).optional(),
+  sessions: z.lazy(() => SessionsUncheckedCreateNestedManyWithoutUsers_sessionsInputSchema).optional()
+}).strict();
+
+export const UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateOrConnectWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => UsersWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
+  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
   where: z.lazy(() => UsersWhereInputSchema).optional()
 }).strict();
 
-export const UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => UsersWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
+  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema) ]),
 }).strict();
 
-export const UsersUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9553,6 +9908,7 @@ export const UsersUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9575,7 +9931,7 @@ export const UsersUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodTyp
   sessions: z.lazy(() => SessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
-export const UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_created_byInput> = z.object({
+export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_created_byTousersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -9608,6 +9964,7 @@ export const UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -9628,6 +9985,41 @@ export const UsersUncheckedUpdateWithoutRoles_permissions_created_byInputSchema:
   timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
   scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
+}).strict();
+
+export const PermissionsUpsertWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpsertWithoutRoles_permissionsInput> = z.object({
+  update: z.union([ z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]),
+  create: z.union([ z.lazy(() => PermissionsCreateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedCreateWithoutRoles_permissionsInputSchema) ]),
+  where: z.lazy(() => PermissionsWhereInputSchema).optional()
+}).strict();
+
+export const PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpdateToOneWithWhereWithoutRoles_permissionsInput> = z.object({
+  where: z.lazy(() => PermissionsWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => PermissionsUpdateWithoutRoles_permissionsInputSchema),z.lazy(() => PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema) ]),
+}).strict();
+
+export const PermissionsUpdateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUpdateWithoutRoles_permissionsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
+  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
+  users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
+}).strict();
+
+export const PermissionsUncheckedUpdateWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedUpdateWithoutRoles_permissionsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
 export const RolesUpsertWithoutRoles_permissionsInputSchema: z.ZodType<Prisma.RolesUpsertWithoutRoles_permissionsInput> = z.object({
@@ -9665,6 +10057,129 @@ export const RolesUncheckedUpdateWithoutRoles_permissionsInputSchema: z.ZodType<
   users_roles: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutRolesNestedInputSchema).optional()
 }).strict();
 
+export const UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpsertWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  update: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
+  create: z.union([ z.lazy(() => UsersCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedCreateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
+  where: z.lazy(() => UsersWhereInputSchema).optional()
+}).strict();
+
+export const UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateToOneWithWhereWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => UsersWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema),z.lazy(() => UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  salt: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
+  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => OrganizationUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => OrganizationUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
+  users_terminals: z.lazy(() => Users_terminalsUpdateManyWithoutUsersNestedInputSchema).optional(),
+  users_work_schedules: z.lazy(() => Users_work_schedulesUpdateManyWithoutUsersNestedInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => Api_tokensUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
+  timesheet_users: z.lazy(() => TimesheetUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => SessionsUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
+}).strict();
+
+export const UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersUncheckedUpdateWithoutRoles_permissions_roles_permissions_updated_byTousersInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  email: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  login: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  first_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  last_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  password: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  salt: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_super_user: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  status: z.union([ z.lazy(() => user_statusSchema),z.lazy(() => Enumuser_statusFieldUpdateOperationsInputSchema) ]).optional(),
+  card_name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  card_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  birth_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_model: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  car_number: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  is_online: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  fcm_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  wallet_balance: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  max_active_order_count: z.union([ z.number(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  doc_files: z.union([ z.lazy(() => UsersUpdatedoc_filesInputSchema),z.string().array() ]).optional(),
+  order_start_date: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  app_version: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  api_token: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  tg_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  permissions_permissions_created_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
+  roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
+  users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_updated_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_updated_byNestedInputSchema).optional(),
+  users_roles_usersTousers_roles_user_id: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_user_idNestedInputSchema).optional(),
+  organization_created_byTousers: z.lazy(() => OrganizationUncheckedUpdateManyWithoutOrganization_created_byTousersNestedInputSchema).optional(),
+  organization_updated_byTousers: z.lazy(() => OrganizationUncheckedUpdateManyWithoutOrganization_updated_byTousersNestedInputSchema).optional(),
+  work_schedules_created_byTousers: z.lazy(() => Work_schedulesUncheckedUpdateManyWithoutWork_schedules_created_byTousersNestedInputSchema).optional(),
+  work_schedules_updated_byTousers: z.lazy(() => Work_schedulesUncheckedUpdateManyWithoutWork_schedules_updated_byTousersNestedInputSchema).optional(),
+  users_terminals: z.lazy(() => Users_terminalsUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
+  users_work_schedules: z.lazy(() => Users_work_schedulesUncheckedUpdateManyWithoutUsersNestedInputSchema).optional(),
+  work_schedule_entries_created_byTousers: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_created_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_updated_byTousers: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_updated_byTousersNestedInputSchema).optional(),
+  work_schedule_entries_users: z.lazy(() => Work_schedule_entriesUncheckedUpdateManyWithoutWork_schedule_entries_usersNestedInputSchema).optional(),
+  api_tokens_created_byTousers: z.lazy(() => Api_tokensUncheckedUpdateManyWithoutApi_tokens_created_byTousersNestedInputSchema).optional(),
+  api_tokens_updated_byTousers: z.lazy(() => Api_tokensUncheckedUpdateManyWithoutApi_tokens_updated_byTousersNestedInputSchema).optional(),
+  timesheet_users: z.lazy(() => TimesheetUncheckedUpdateManyWithoutTimesheet_usersNestedInputSchema).optional(),
+  scheduled_reports_subscription_users: z.lazy(() => Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_reports_subscription_usersNestedInputSchema).optional(),
+  sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
+}).strict();
+
 export const PermissionsCreateWithoutUsers_permissions_created_byTousersInputSchema: z.ZodType<Prisma.PermissionsCreateWithoutUsers_permissions_created_byTousersInput> = z.object({
   id: z.string().optional(),
   slug: z.string(),
@@ -9673,6 +10188,7 @@ export const PermissionsCreateWithoutUsers_permissions_created_byTousersInputSch
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -9684,6 +10200,7 @@ export const PermissionsUncheckedCreateWithoutUsers_permissions_created_byTouser
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   updated_by: z.string().optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -9705,6 +10222,7 @@ export const PermissionsCreateWithoutUsers_permissions_updated_byTousersInputSch
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -9716,6 +10234,7 @@ export const PermissionsUncheckedCreateWithoutUsers_permissions_updated_byTouser
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
@@ -9797,25 +10316,47 @@ export const RolesCreateManyUsers_roles_updated_byTousersInputEnvelopeSchema: z.
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutRoles_permissions_created_byInput> = z.object({
-  permission_id: z.string(),
-  updated_by: z.string().optional().nullable(),
-  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
+export const Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_updated_byTousersInputSchema).optional()
 }).strict();
 
-export const Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
   updated_by: z.string().optional().nullable()
 }).strict();
 
-export const Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyRoles_permissions_created_byInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsCreateManyRoles_permissions_created_byInputSchema).array() ]),
+export const Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutRoles_permissions_roles_permissions_created_byTousersInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsCreateNestedOneWithoutRoles_permissionsInputSchema),
+  roles: z.lazy(() => RolesCreateNestedOneWithoutRoles_permissionsInputSchema)
+}).strict();
+
+export const Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  role_id: z.string(),
+  permission_id: z.string(),
+  created_by: z.string().optional().nullable()
+}).strict();
+
+export const Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateOrConnectWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelopeSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
@@ -10593,20 +11134,36 @@ export const RolesUpdateManyWithWhereWithoutUsers_roles_updated_byTousersInputSc
   data: z.union([ z.lazy(() => RolesUpdateManyMutationInputSchema),z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
-  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutRoles_permissions_created_byInputSchema) ]),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema) ]),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
 }).strict();
 
-export const Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
   where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInputSchema) ]),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpsertWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
+  create: z.union([ z.lazy(() => Roles_permissionsCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedCreateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithWhereUniqueWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => Roles_permissionsWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
+}).strict();
+
+export const Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateManyWithWhereWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  where: z.lazy(() => Roles_permissionsScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => Roles_permissionsUpdateManyMutationInputSchema),z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInputSchema) ]),
 }).strict();
 
 export const Users_permissionsUpsertWithWhereUniqueWithoutUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsUpsertWithWhereUniqueWithoutUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -11101,7 +11658,8 @@ export const UsersCreateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersCreate
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -11156,7 +11714,8 @@ export const UsersUncheckedCreateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -11227,7 +11786,8 @@ export const UsersUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.UsersUpdate
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -11282,7 +11842,8 @@ export const UsersUncheckedUpdateWithoutSessionsInputSchema: z.ZodType<Prisma.Us
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -11337,7 +11898,8 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_create
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11392,7 +11954,8 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11427,7 +11990,8 @@ export const PermissionsCreateWithoutUsers_permissionsInputSchema: z.ZodType<Pri
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional()
+  users_permissions_updated_byTousers: z.lazy(() => UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
 export const PermissionsUncheckedCreateWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedCreateWithoutUsers_permissionsInput> = z.object({
@@ -11438,7 +12002,8 @@ export const PermissionsUncheckedCreateWithoutUsers_permissionsInputSchema: z.Zo
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   created_by: z.string().optional().nullable(),
-  updated_by: z.string().optional().nullable()
+  updated_by: z.string().optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutPermissionsInputSchema).optional()
 }).strict();
 
 export const PermissionsCreateOrConnectWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsCreateOrConnectWithoutUsers_permissionsInput> = z.object({
@@ -11479,7 +12044,8 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_update
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11534,7 +12100,8 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11594,7 +12161,8 @@ export const UsersCreateWithoutUsers_permissions_usersTousers_permissions_user_i
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11649,7 +12217,8 @@ export const UsersUncheckedCreateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedCreateNestedManyWithoutUsers_usersTousers_roles_created_byInputSchema).optional(),
@@ -11720,7 +12289,8 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_create
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -11775,7 +12345,8 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -11816,7 +12387,8 @@ export const PermissionsUpdateWithoutUsers_permissionsInputSchema: z.ZodType<Pri
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
-  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional()
+  users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
 export const PermissionsUncheckedUpdateWithoutUsers_permissionsInputSchema: z.ZodType<Prisma.PermissionsUncheckedUpdateWithoutUsers_permissionsInput> = z.object({
@@ -11828,6 +12400,7 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissionsInputSchema: z.Zo
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
 export const UsersUpsertWithoutUsers_permissions_usersTousers_permissions_updated_byInputSchema: z.ZodType<Prisma.UsersUpsertWithoutUsers_permissions_usersTousers_permissions_updated_byInput> = z.object({
@@ -11874,7 +12447,8 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_update
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -11929,7 +12503,8 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -11995,7 +12570,8 @@ export const UsersUpdateWithoutUsers_permissions_usersTousers_permissions_user_i
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12050,7 +12626,8 @@ export const UsersUncheckedUpdateWithoutUsers_permissions_usersTousers_permissio
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_roles_usersTousers_roles_created_by: z.lazy(() => Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_created_byNestedInputSchema).optional(),
@@ -12105,7 +12682,8 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12160,7 +12738,8 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_created_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12249,7 +12828,8 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12304,7 +12884,8 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_updated_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12364,7 +12945,8 @@ export const UsersCreateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12419,7 +13001,8 @@ export const UsersUncheckedCreateWithoutUsers_roles_usersTousers_roles_user_idIn
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12490,7 +13073,8 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_created_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12545,7 +13129,8 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_created_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12646,7 +13231,8 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_updated_byInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12701,7 +13287,8 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_updated_b
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12767,7 +13354,8 @@ export const UsersUpdateWithoutUsers_roles_usersTousers_roles_user_idInputSchema
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12822,7 +13410,8 @@ export const UsersUncheckedUpdateWithoutUsers_roles_usersTousers_roles_user_idIn
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -12942,7 +13531,8 @@ export const UsersCreateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -12997,7 +13587,8 @@ export const UsersUncheckedCreateWithoutWork_schedules_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13057,7 +13648,8 @@ export const UsersCreateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13112,7 +13704,8 @@ export const UsersUncheckedCreateWithoutWork_schedules_updated_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13322,7 +13915,8 @@ export const UsersUpdateWithoutWork_schedules_created_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13377,7 +13971,8 @@ export const UsersUncheckedUpdateWithoutWork_schedules_created_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13443,7 +14038,8 @@ export const UsersUpdateWithoutWork_schedules_updated_byTousersInputSchema: z.Zo
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13498,7 +14094,8 @@ export const UsersUncheckedUpdateWithoutWork_schedules_updated_byTousersInputSch
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -13799,7 +14396,8 @@ export const UsersCreateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13854,7 +14452,8 @@ export const UsersUncheckedCreateWithoutOrganization_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13914,7 +14513,8 @@ export const UsersCreateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -13969,7 +14569,8 @@ export const UsersUncheckedCreateWithoutOrganization_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14126,7 +14727,8 @@ export const UsersUpdateWithoutOrganization_created_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14181,7 +14783,8 @@ export const UsersUncheckedUpdateWithoutOrganization_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14247,7 +14850,8 @@ export const UsersUpdateWithoutOrganization_updated_byTousersInputSchema: z.ZodT
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14302,7 +14906,8 @@ export const UsersUncheckedUpdateWithoutOrganization_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14407,7 +15012,8 @@ export const UsersCreateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14462,7 +15068,8 @@ export const UsersUncheckedCreateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14568,7 +15175,8 @@ export const UsersUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14623,7 +15231,8 @@ export const UsersUncheckedUpdateWithoutUsers_terminalsInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14719,7 +15328,8 @@ export const UsersCreateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14774,7 +15384,8 @@ export const UsersUncheckedCreateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -14884,7 +15495,8 @@ export const UsersUpdateWithoutUsers_work_schedulesInputSchema: z.ZodType<Prisma
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -14939,7 +15551,8 @@ export const UsersUncheckedUpdateWithoutUsers_work_schedulesInputSchema: z.ZodTy
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15039,7 +15652,8 @@ export const UsersCreateWithoutWork_schedule_entries_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15094,7 +15708,8 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_created_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15154,7 +15769,8 @@ export const UsersCreateWithoutWork_schedule_entries_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15209,7 +15825,8 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_updated_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15269,7 +15886,8 @@ export const UsersCreateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15324,7 +15942,8 @@ export const UsersUncheckedCreateWithoutWork_schedule_entries_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15434,7 +16053,8 @@ export const UsersUpdateWithoutWork_schedule_entries_created_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15489,7 +16109,8 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_created_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15555,7 +16176,8 @@ export const UsersUpdateWithoutWork_schedule_entries_updated_byTousersInputSchem
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15610,7 +16232,8 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_updated_byTousersI
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15676,7 +16299,8 @@ export const UsersUpdateWithoutWork_schedule_entries_usersInputSchema: z.ZodType
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15731,7 +16355,8 @@ export const UsersUncheckedUpdateWithoutWork_schedule_entries_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -15831,7 +16456,8 @@ export const UsersCreateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15886,7 +16512,8 @@ export const UsersUncheckedCreateWithoutApi_tokens_created_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -15946,7 +16573,8 @@ export const UsersCreateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16001,7 +16629,8 @@ export const UsersUncheckedCreateWithoutApi_tokens_updated_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16137,7 +16766,8 @@ export const UsersUpdateWithoutApi_tokens_created_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16192,7 +16822,8 @@ export const UsersUncheckedUpdateWithoutApi_tokens_created_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16258,7 +16889,8 @@ export const UsersUpdateWithoutApi_tokens_updated_byTousersInputSchema: z.ZodTyp
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16313,7 +16945,8 @@ export const UsersUncheckedUpdateWithoutApi_tokens_updated_byTousersInputSchema:
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16439,7 +17072,8 @@ export const UsersCreateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16494,7 +17128,8 @@ export const UsersUncheckedCreateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16565,7 +17200,8 @@ export const UsersUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Prisma.User
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16620,7 +17256,8 @@ export const UsersUncheckedUpdateWithoutTimesheet_usersInputSchema: z.ZodType<Pr
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16738,7 +17375,8 @@ export const UsersCreateWithoutScheduled_reports_subscription_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16793,7 +17431,8 @@ export const UsersUncheckedCreateWithoutScheduled_reports_subscription_usersInpu
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedCreateNestedManyWithoutUsers_permissions_updated_byTousersInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_created_byTousersInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedCreateNestedManyWithoutUsers_roles_updated_byTousersInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutRoles_permissions_created_byInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_created_byTousersInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedCreateNestedManyWithoutUsers_roles_permissions_updated_byTousersInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_created_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_updated_byInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedCreateNestedManyWithoutUsers_usersTousers_permissions_user_idInputSchema).optional(),
@@ -16893,7 +17532,8 @@ export const UsersUpdateWithoutScheduled_reports_subscription_usersInputSchema: 
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16948,7 +17588,8 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   permissions_permissions_updated_byTousers: z.lazy(() => PermissionsUncheckedUpdateManyWithoutUsers_permissions_updated_byTousersNestedInputSchema).optional(),
   roles_roles_created_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_created_byTousersNestedInputSchema).optional(),
   roles_roles_updated_byTousers: z.lazy(() => RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersNestedInputSchema).optional(),
-  roles_permissions_created_by: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_created_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions_roles_permissions_updated_byTousers: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_created_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_created_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_updated_by: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_updated_byNestedInputSchema).optional(),
   users_permissions_usersTousers_permissions_user_id: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutUsers_usersTousers_permissions_user_idNestedInputSchema).optional(),
@@ -16970,10 +17611,34 @@ export const UsersUncheckedUpdateWithoutScheduled_reports_subscription_usersInpu
   sessions: z.lazy(() => SessionsUncheckedUpdateManyWithoutUsers_sessionsNestedInputSchema).optional()
 }).strict();
 
+export const Roles_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInput> = z.object({
+  role_id: z.string(),
+  created_by: z.string().optional().nullable(),
+  updated_by: z.string().optional().nullable()
+}).strict();
+
 export const Users_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyPermissionsInput> = z.object({
   user_id: z.string(),
   created_by: z.string().optional().nullable(),
   updated_by: z.string().optional().nullable()
+}).strict();
+
+export const Roles_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutPermissionsInput> = z.object({
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutPermissionsInput> = z.object({
+  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateManyWithoutPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutPermissionsInput> = z.object({
+  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutPermissionsInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutPermissionsInput> = z.object({
@@ -17007,9 +17672,9 @@ export const Users_rolesCreateManyRolesInputSchema: z.ZodType<Prisma.Users_roles
 }).strict();
 
 export const Roles_permissionsUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutRolesInput> = z.object({
-  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  roles_permissions_created_by: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_created_byNestedInputSchema).optional()
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsUncheckedUpdateWithoutRolesInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutRolesInput> = z.object({
@@ -17082,10 +17747,16 @@ export const RolesCreateManyUsers_roles_updated_byTousersInputSchema: z.ZodType<
   created_by: z.string().optional().nullable()
 }).strict();
 
-export const Roles_permissionsCreateManyRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_created_byTousersInput> = z.object({
   role_id: z.string(),
   permission_id: z.string(),
   updated_by: z.string().optional().nullable()
+}).strict();
+
+export const Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyUsers_roles_permissions_updated_byTousersInput> = z.object({
+  role_id: z.string(),
+  permission_id: z.string(),
+  created_by: z.string().optional().nullable()
 }).strict();
 
 export const Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsCreateManyUsers_usersTousers_permissions_created_byInput> = z.object({
@@ -17327,6 +17998,7 @@ export const PermissionsUpdateWithoutUsers_permissions_created_byTousersInputSch
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_updated_byTousersNestedInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -17338,6 +18010,7 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissions_created_byTouser
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -17359,6 +18032,7 @@ export const PermissionsUpdateWithoutUsers_permissions_updated_byTousersInputSch
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   users_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutPermissions_permissions_created_byTousersNestedInputSchema).optional(),
+  roles_permissions: z.lazy(() => Roles_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -17370,6 +18044,7 @@ export const PermissionsUncheckedUpdateWithoutUsers_permissions_updated_byTouser
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles_permissions: z.lazy(() => Roles_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional(),
   users_permissions: z.lazy(() => Users_permissionsUncheckedUpdateManyWithoutPermissionsNestedInputSchema).optional()
 }).strict();
 
@@ -17451,22 +18126,40 @@ export const RolesUncheckedUpdateManyWithoutUsers_roles_updated_byTousersInputSc
   created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const Roles_permissionsUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
+  users_roles_permissions_updated_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_updated_byTousersNestedInputSchema).optional()
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_created_byTousersInput> = z.object({
+  role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
+  users_roles_permissions_created_byTousers: z.lazy(() => UsersUpdateOneWithoutRoles_permissions_roles_permissions_created_byTousersNestedInputSchema).optional(),
+  permissions: z.lazy(() => PermissionsUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional(),
   roles: z.lazy(() => RolesUpdateOneRequiredWithoutRoles_permissionsNestedInputSchema).optional()
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutRoles_permissions_created_byInput> = z.object({
+export const Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.Roles_permissionsUncheckedUpdateManyWithoutUsers_roles_permissions_updated_byTousersInput> = z.object({
   role_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   permission_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  updated_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_by: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInputSchema: z.ZodType<Prisma.Users_permissionsUpdateWithoutUsers_usersTousers_permissions_created_byInput> = z.object({

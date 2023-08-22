@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "strict": true,
+    "target": "ES2022",
+    "module": "esnext",
     "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
