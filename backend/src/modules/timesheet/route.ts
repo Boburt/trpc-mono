@@ -1,39 +1,39 @@
 import { publicProcedure, publicRouter } from "@backend/trpc";
 import {
-  timesheetCreateArgsSchema,
-  timesheetDeleteArgsSchema,
-  timesheetFindManyArgsSchema,
-  timesheetFindUniqueArgsSchema,
-  timesheetUpdateArgsSchema,
+  TimesheetCreateArgsSchema,
+  TimesheetDeleteArgsSchema,
+  TimesheetFindManyArgsSchema,
+  TimesheetFindUniqueArgsSchema,
+  TimesheetUpdateArgsSchema,
 } from "@backend/lib/zod";
 
 export const timesheetRouter = publicRouter({
   add: publicProcedure
-    .input(timesheetCreateArgsSchema)
+    .input(TimesheetCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.timesheetService.create(input);
     }),
 
   list: publicProcedure
-    .input(timesheetFindManyArgsSchema)
+    .input(TimesheetFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.timesheetService.findMany(input);
     }),
 
   one: publicProcedure
-    .input(timesheetFindUniqueArgsSchema)
+    .input(TimesheetFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.timesheetService.findOne(input);
     }),
 
   renew: publicProcedure
-    .input(timesheetUpdateArgsSchema)
+    .input(TimesheetUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.timesheetService.update(input);
     }),
 
   delete: publicProcedure
-    .input(timesheetDeleteArgsSchema)
+    .input(TimesheetDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.timesheetService.delete(input);
     }),

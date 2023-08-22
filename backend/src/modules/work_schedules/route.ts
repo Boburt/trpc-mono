@@ -1,42 +1,42 @@
 import { publicRouter, publicProcedure } from "@backend/trpc";
 import {
-  work_schedulesCreateArgsSchema,
-  work_schedulesDeleteArgsSchema,
-  work_schedulesFindManyArgsSchema,
-  work_schedulesFindUniqueArgsSchema,
-  work_schedulesUpdateArgsSchema,
+  Work_schedulesCreateArgsSchema,
+  Work_schedulesDeleteArgsSchema,
+  Work_schedulesFindManyArgsSchema,
+  Work_schedulesFindUniqueArgsSchema,
+  Work_schedulesUpdateArgsSchema,
 } from "@backend/lib/zod";
 
 export const workSchedulesRouter = publicRouter({
   add: publicProcedure
-    .input(work_schedulesCreateArgsSchema)
+    .input(Work_schedulesCreateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.workSchedulesService.create(input);
     }),
   list: publicProcedure
-    .input(work_schedulesFindManyArgsSchema)
+    .input(Work_schedulesFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.workSchedulesService.findMany(input);
     }),
   one: publicProcedure
-    .input(work_schedulesFindUniqueArgsSchema)
+    .input(Work_schedulesFindUniqueArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.workSchedulesService.findOne(input);
     }),
   renew: publicProcedure
-    .input(work_schedulesUpdateArgsSchema)
+    .input(Work_schedulesUpdateArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.workSchedulesService.update(input);
     }),
 
   delete: publicProcedure
-    .input(work_schedulesDeleteArgsSchema)
+    .input(Work_schedulesDeleteArgsSchema)
     .mutation(({ input, ctx }) => {
       return ctx.workSchedulesService.delete(input);
     }),
 
   cachedWorkSchedules: publicProcedure
-    .input(work_schedulesFindManyArgsSchema)
+    .input(Work_schedulesFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
       return await ctx.workSchedulesService.cachedWorkSchedules(input);
     }),

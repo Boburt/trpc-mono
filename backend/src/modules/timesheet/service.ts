@@ -1,8 +1,8 @@
 import { PaginationType } from "@backend/lib/pagination_interface";
 import {
-  timesheet,
-  timesheetFindManyArgsSchema,
-  timesheetFindUniqueArgsSchema,
+  Timesheet,
+  TimesheetFindManyArgsSchema,
+  TimesheetFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
@@ -11,13 +11,13 @@ import { z } from "zod";
 export class TimesheetService {
   constructor(private readonly prisma: DB) {}
 
-  async create(input: Prisma.timesheetCreateArgs): Promise<timesheet> {
+  async create(input: Prisma.TimesheetCreateArgs): Promise<Timesheet> {
     return await this.prisma.timesheet.create(input);
   }
 
   async findMany(
-    input: z.infer<typeof timesheetFindManyArgsSchema>
-  ): Promise<PaginationType<timesheet>> {
+    input: z.infer<typeof TimesheetFindManyArgsSchema>
+  ): Promise<PaginationType<Timesheet>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {
@@ -40,16 +40,16 @@ export class TimesheetService {
   }
 
   async findOne(
-    input: z.infer<typeof timesheetFindUniqueArgsSchema>
-  ): Promise<timesheet | null> {
+    input: z.infer<typeof TimesheetFindUniqueArgsSchema>
+  ): Promise<Timesheet | null> {
     return await this.prisma.timesheet.findUnique(input);
   }
 
-  async update(input: Prisma.timesheetUpdateArgs): Promise<timesheet> {
+  async update(input: Prisma.TimesheetUpdateArgs): Promise<Timesheet> {
     return await this.prisma.timesheet.update(input);
   }
 
-  async delete(input: Prisma.timesheetDeleteArgs) {
+  async delete(input: Prisma.TimesheetDeleteArgs) {
     return await this.prisma.timesheet.delete(input);
   }
 }
