@@ -1,4 +1,4 @@
-import { trpc, ReactQueryOptions } from "@frontend/utils/trpc";
+import { trpc, ReactQueryOptions } from "@admin/utils/trpc";
 
 export function useRolesQuery(filter: any) {
   return trpc.roles.list.useQuery(filter);
@@ -11,9 +11,13 @@ export function useRolesCreate(options: ReactQueryOptions["roles"]["add"]) {
     onSuccess: (post) => {
       utils.roles.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: post
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: post,
+        },
+        {}
+      );
     },
   });
 }
@@ -25,12 +29,16 @@ export function useRolesUpdate(options: ReactQueryOptions["roles"]["renew"]) {
     onSuccess: (post) => {
       utils.roles.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: post!,
-        where: {
-          id: post!.id
-        }
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: post!,
+          where: {
+            id: post!.id,
+          },
+        },
+        {}
+      );
     },
   });
 }
@@ -42,11 +50,15 @@ export function useRolesDestroy(options: ReactQueryOptions["roles"]["delete"]) {
     onSuccess: (post) => {
       utils.roles.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        where: {
-          id: post.id
-        }
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          where: {
+            id: post.id,
+          },
+        },
+        {}
+      );
     },
   });
 }
