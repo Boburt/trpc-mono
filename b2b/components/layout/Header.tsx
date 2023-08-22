@@ -40,7 +40,7 @@ export default function Header() {
         href="/pages/manufacturer"
         className="flex mx-auto justify-center text-white"
       >
-        <h2>Manufacturer-22</h2>
+        <h2 className="text-xl text-indigo-600 hover:">Manufacturer</h2>
       </Link>
     </div>
   );
