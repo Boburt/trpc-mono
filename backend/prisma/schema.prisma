@@ -59,8 +59,8 @@ model Roles {
 model Roles_permissions {
   role_id                                   String      @db.Uuid
   permission_id                             String      @db.Uuid
-  created_by                                String?     @db.Uuid
-  updated_by                                String?     @db.Uuid
+  created_by                                String?     @db.Uuid /// dasdas @zod.custom.use(z.string().nullable())
+  updated_by                                String?     @db.Uuid /// @zod.custom.use(z.string().nullish())
   users_roles_permissions_created_byTousers Users?      @relation("roles_permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_a3f5b9874c55ee69fdd01531e14")
   permissions                               Permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_337aa8dba227a1fe6b73998307b")
   roles                                     Roles       @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_7d2dad9f14eddeb09c256fea719")
