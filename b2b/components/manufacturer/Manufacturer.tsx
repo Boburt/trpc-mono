@@ -1,9 +1,15 @@
 "use client";
 import React from "react";
+import type { Metadata } from "next";
 import manaData from "@/app/pages/manufacturer/data";
 import Image from "next/image";
 import Slider from "../slider/Slider";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Manufacturer",
+  description: "...",
+};
 
 export default function Manufacturer11() {
   return (
@@ -23,7 +29,7 @@ export default function Manufacturer11() {
                 />
                 <div>
                   <h4 className="text-2xl font-bold mb-4 underline">
-                    <Link href={`/manafacture/${manufacturerData.id}`}>
+                    <Link href={`/manafacture/${manufacturerData.name}`}>
                       {manufacturerData.name}
                     </Link>
                   </h4>
