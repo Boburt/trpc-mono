@@ -1,34 +1,49 @@
+"use client";
 import Link from "next/link";
-import React from "react";
 
 export default function Header() {
   return (
-    <div className="header-bg-image  bg-center bg-fixed bg-no-repeat bg-cover opacity-80 h-20">
-      <div className="container mx-auto ">
-        <div className="flex justify-between">
-          <h1 className="text-2xl font-bold">My App</h1>
+    <div className="header-bg-image bg-center bg-no-repeat bg-cover opacity-80 pb-40 pt-5">
+      <div className="bg-white py-2">
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="cursor-pointer">
+            <Link href="/">
+              <h1 className="text-2xl font-bold">My App</h1>
+            </Link>
+          </div>
           <nav>
             <ul className="flex space-x-4">
               <li>
-                <a href="/">Home</a>
+                <Link href="/">Home</Link>
               </li>
               <li>
-                <a href="/about">About</a>
+                <Link href="/about">About</Link>
               </li>
             </ul>
           </nav>
         </div>
-        <Link href="/manufacturer" className="flex mx-auto justify-center">
-          <h2>Manufacturer-22</h2>
-        </Link>
-        <div className="flex mx-auto justify-center">
-          <input
-            type="text"
-            placeholder="Type here"
-            className="input input-ghost w-full max-w-xs input-bordered"
-          />
+      </div>
+      <div className="flex justify-center mt-5">
+        <div className="join">
+          <div>
+            <div>
+              <input
+                className="input input-bordered join-item"
+                placeholder="Search"
+              />
+            </div>
+          </div>
+          <button className="btn join-item">Search</button>
         </div>
       </div>
+      <Link
+        href="/manufacturer"
+        className="flex mx-auto justify-center text-white"
+      >
+        <h1 className="text-xl font-extrabold text-indigo-600 hover:text-black hover:underline active:underline">
+          Manufacturer
+        </h1>
+      </Link>
     </div>
   );
 }
