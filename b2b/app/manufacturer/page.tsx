@@ -6,10 +6,6 @@ export const metadata: Metadata = {
   title: "Manafacturer",
 };
 const ManufacturerPage = () => {
-  return (
-    <div>
-      <ManufacturerComponent />
-    </div>
-  );
+  return <ManufacturerComponent />;
 };
 export default ManufacturerPage;

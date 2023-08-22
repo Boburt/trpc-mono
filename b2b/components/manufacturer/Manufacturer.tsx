@@ -1,20 +1,14 @@
 "use client";
 import React from "react";
-import type { Metadata } from "next";
-import manaData from "@/app/pages/manufacturer/data";
+import manaData from "@/app/manufacturer/data";
 import Image from "next/image";
 import Slider from "../slider/Slider";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Manufacturer",
-  description: "...",
-};
-
 export default function Manufacturer11() {
   return (
     <div>
-      <div className="container mx-auto mt-8">
+      <div className="mt-8">
         {manaData.map((manufacturerData: any) => (
           <div
             key={manufacturerData.id}
