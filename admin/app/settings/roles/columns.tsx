@@ -6,6 +6,7 @@ import { RouterOutputs } from "@admin/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 import RolesFormSheet from "@admin/components/forms/roles/sheet";
+import CanAccess from "@admin/components/can-access";
 
 export const rolesColumns: ColumnDef<
   RouterOutputs["roles"]["list"]["items"][0]
@@ -43,7 +44,9 @@ export const rolesColumns: ColumnDef<
               <Edit2Icon className="h-4 w-4" />
             </Button>
           </RolesFormSheet>
-          <DeleteAction recordId={record.id} />
+          <CanAccess permission="roles.delete">
+            <DeleteAction recordId={record.id} />
+          </CanAccess>
         </div>
       );
     },

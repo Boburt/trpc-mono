@@ -13,9 +13,13 @@ export function usePermissionsCreate(
     onSuccess: (post) => {
       utils.permissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: post
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: post,
+        },
+        {}
+      );
     },
   });
 }
@@ -29,12 +33,16 @@ export function usePermissionsUpdate(
     onSuccess: (post) => {
       utils.permissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        data: post,
-        where: {
-          id: post.id
-        }
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          data: post,
+          where: {
+            id: post.id,
+          },
+        },
+        {}
+      );
     },
   });
 }
@@ -48,11 +56,15 @@ export function usePermissionsDestroy(
     onSuccess: (post) => {
       utils.permissions.list.invalidate();
 
-      options?.onSuccess?.(post, {
-        where: {
-          id: post.id
-        }
-      }, {});
+      options?.onSuccess?.(
+        post,
+        {
+          where: {
+            id: post.id,
+          },
+        },
+        {}
+      );
     },
   });
 }
