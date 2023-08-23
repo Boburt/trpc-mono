@@ -151,11 +151,8 @@ export const RolesWithRelationsSchema: z.ZodType<RolesWithRelations> = RolesSche
 export const Roles_permissionsSchema = z.object({
   role_id: z.string(),
   permission_id: z.string(),
-  /**
-   * dasdas
-   */
-  created_by: z.string().nullable().nullish(),
-  updated_by: z.string().nullish().nullish(),
+  created_by: z.string().nullish(),
+  updated_by: z.string().nullish(),
 })
 
 export type Roles_permissions = z.infer<typeof Roles_permissionsSchema>

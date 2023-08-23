@@ -1,7 +1,12 @@
-/* eslint-disable react/jsx-no-comment-textnodes */
-import Image from "next/image";
-import Link from "next/link";
+import Filter from "@/components/Filter";
+import Manufacturer11 from "@/components/manufacturer/Manufacturer";
 
 export default function Home() {
-  return <main>Body</main>;
+  return (
+    <main>
+      <Filter />
+      Body
+      <Manufacturer11 />
+    </main>
+  );
 }
