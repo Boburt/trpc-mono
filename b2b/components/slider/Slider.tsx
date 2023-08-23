@@ -1,26 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
 import React from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import Image1 from "../app/manufacturer/img/frank-cone.jpg";
-import Image2 from "../app/manufacturer/img/magda-ehlers.jpg";
-import Image3 from "../app/manufacturer/img/scott-webb.jpg";
+import Image1 from "./img/audi.jpg";
+import Image2 from "./img/bmw.jpg";
+import Image3 from "./img/mercedes.jpg";
 import Image from "next/image";
 
 export default function Slider() {
   return (
-    <Carousel>
+    <Carousel className="dislay m-auto p-4">
       <div>
-        <img src="../app/manufacturer/img/frank-cone.jpg" alt="" />
-        <p className="legend">Legend 1</p>
+        <Image src={Image1} alt="Slider 1" width={100} height={100} />
+        <p className="carousel-status"></p>
       </div>
       <div>
-        <img src="../app/manufacturer/img/magda-ehlers.jpg" alt="" />
-        <p className="legend">Legend 2</p>
+        <Image src={Image2} alt="Slider 2" width={100} height={100} />
+        <p className="carousel-status"></p>
       </div>
       <div>
-        <img src="../app/manufacturer/img/scott-webb.jpg" alt="" />
-        <p className="legend">Legend 3</p>
+        <Image src={Image3} alt="Slider 3" width={100} height={100} />
+        <p className="carousel-status"></p>
       </div>
     </Carousel>
   );
