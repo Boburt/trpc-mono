@@ -53,8 +53,6 @@ export const authOptions: AuthOptions = {
           ...session,
           ...token,
         };
-
-        console.log("session", session);
       }
       return session;
     },
