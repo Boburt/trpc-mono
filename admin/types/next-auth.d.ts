@@ -8,5 +8,7 @@ declare module "next-auth" {
   interface Session extends Users {
     user: Users;
     rights: string[];
+    accessToken: string;
+    refreshToken: string;
   }
 }
