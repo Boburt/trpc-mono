@@ -1,4 +1,4 @@
-import { trpcClient } from "@frontend/utils/trpc-server";
+import { trpcClient } from "@admin/utils/trpc-server";
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";

@@ -1,28 +1,32 @@
+import { Users } from "@backend/lib/zod";
 import { withAuth } from "next-auth/middleware";
 import { NextRequest, NextResponse } from "next/server";
 
 export default withAuth(
   // `withAuth` augments your `Request` with the user's token.
   function middleware(req) {
-    // console.log("nextauth", req.nextauth);
+    const token = req.nextauth.token;
+    if (!token) {
+      return NextResponse.redirect("/api/auth/signin");
+    }
+    const path = req.nextUrl.pathname.split("/");
+    // get last values from path
+    const entity = path[path.length - 1];
+
+    if (entity.length > 0 && token.rights) {
+      const rights = token.rights as string[];
+      if (!rights.includes(`${entity}.list`)) {
+        return NextResponse.redirect(new URL("/forbidden", req.url));
+      }
+    }
+
+    return NextResponse.next();
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
         if (!token) return false;
         if (!token.accessToken) return false;
-
-        const path = req.nextUrl.pathname.split("/");
-        // get last values from path
-        const entity = path[path.length - 1];
-
-        if (entity.length > 0 && token.rights) {
-          const rights = token.rights as string[];
-          if (!rights.includes(`${entity}.list`)) {
-            NextResponse.redirect(new URL('/forbidden', req.url));
-            return true;
-          }
-        }
 
         return true;
       },
