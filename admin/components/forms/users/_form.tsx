@@ -238,9 +238,9 @@ export default function UsersForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {user_statusSchema.options.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
+              {rolesData?.items.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name}
                 </SelectItem>
               ))}
             </SelectContent>
