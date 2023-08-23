@@ -23,10 +23,14 @@ export default function Filter() {
 
   return (
     <>
-      <div>
-        <div className="flex gap-2 bg-white mx-auto rounded-md items-center justify-center p-2 mb-2">
+      <div className="sticky top-0 bg-white mx-auto rounded-md items-center p-4 mb-2">
+        <div className="flex gap-4">
           <label
-            className={dataType === "posts" ? "btn btn-xs" : "cursor-pointer"}
+            className={
+              dataType === "posts"
+                ? "border-b-2 border-black"
+                : "cursor-pointer"
+            }
           >
             <input
               type="radio"
@@ -39,7 +43,11 @@ export default function Filter() {
             Posts
           </label>
           <label
-            className={dataType === "users" ? "btn btn-xs" : "cursor-pointer"}
+            className={
+              dataType === "users"
+                ? "border-b-2 border-black"
+                : "cursor-pointer"
+            }
           >
             <input
               type="radio"
@@ -52,7 +60,11 @@ export default function Filter() {
             Users
           </label>
           <label
-            className={dataType === "todos" ? "btn btn-xs" : "cursor-pointer"}
+            className={
+              dataType === "todos"
+                ? "border-b-2 border-black"
+                : "cursor-pointer"
+            }
           >
             <input
               type="radio"
@@ -64,6 +76,13 @@ export default function Filter() {
             />
             Todos
           </label>
+        </div>
+        <div className="divider my-2"></div>
+        <div className="flex items-center gap-2">
+          <div className="rounded-md border px-2">Verified</div>
+          <div className="rounded-md border px-2">Verified</div>
+          <div className="rounded-md border px-2">Verified</div>
+          <div className="rounded-md border px-2">Verified</div>
         </div>
       </div>
       <div>
