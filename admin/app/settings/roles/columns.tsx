@@ -5,10 +5,10 @@ import { Button } from "@components/ui/button";
 import { RouterOutputs } from "@admin/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
-import PermissionsFormSheet from "@admin/components/forms/permissions/sheet";
+import RolesFormSheet from "@admin/components/forms/roles/sheet";
 
-export const permissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"]["items"][0]
+export const rolesColumns: ColumnDef<
+  RouterOutputs["roles"]["list"]["items"][0]
 >[] = [
   {
     accessorKey: "active",
@@ -24,12 +24,12 @@ export const permissionsColumns: ColumnDef<
     },
   },
   {
-    accessorKey: "slug",
-    header: "Код",
+    accessorKey: "name",
+    header: "Заголовок",
   },
   {
-    accessorKey: "description",
-    header: "Описание",
+    accessorKey: "code",
+    header: "Код",
   },
   {
     id: "actions",
@@ -38,11 +38,11 @@ export const permissionsColumns: ColumnDef<
 
       return (
         <div className="flex items-center space-x-2">
-          <PermissionsFormSheet recordId={record.id}>
+          <RolesFormSheet recordId={record.id}>
             <Button variant="outline" size="sm">
               <Edit2Icon className="h-4 w-4" />
             </Button>
-          </PermissionsFormSheet>
+          </RolesFormSheet>
           <DeleteAction recordId={record.id} />
         </div>
       );
