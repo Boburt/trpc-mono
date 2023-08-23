@@ -1,11 +1,9 @@
 // trpc.ts
 
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { createClient } from "redis";
 
-import { PrismaClient } from "@prisma/client";
-import pagination from "prisma-extension-pagination";
 import { PermissionsService } from "./modules/permissions/service";
 import { RolesService } from "./modules/roles/service";
 import { RolesPermissionsService } from "./modules/roles_permissions/service";
@@ -23,11 +21,7 @@ import { WorkScheduleEntriesService } from "./modules/work_schedule_entries/serv
 import { ApiTokensService } from "./modules/api_tokens/service";
 import { TimesheetService } from "./modules/timesheet/service";
 import { ScheduledReportsService } from "./modules/scheduled_reports/service";
-
-export const db = new PrismaClient().$extends(pagination);
-
-// export return type of db
-export type DB = typeof db;
+import { db } from "./db";
 
 const client = createClient();
 export type RedisClientType = typeof client;
@@ -57,8 +51,12 @@ const scheduledReportsService = new ScheduledReportsService(
   cacheControlService
 );
 
+interface Meta {
+  permission?: string;
+}
+
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
-  // console.log(opts.req.headers);
+  console.log(opts.req.headers);
 
   return {
     // prisma: db,
@@ -79,12 +77,33 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     apiTokensService,
     timesheetService,
     scheduledReportsService,
+    token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
   };
 };
 
 const t = initTRPC
   .context<Awaited<ReturnType<typeof createContext>>>()
+  .meta<Meta>()
   .create();
+
+const checkPermission = t.middleware(({ meta, next, ctx }) => {
+  if (!ctx.token) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+  }
+
+  if (meta.permission) {
+    if (ctx.permissionsService.hasPermission(meta.permission)) {
+      return next();
+    } else {
+      throw new Error("No permission");
+    }
+  } else {
+    return next();
+  }
+});
 
 export const publicProcedure = t.procedure;
 export const publicRouter = t.router;
