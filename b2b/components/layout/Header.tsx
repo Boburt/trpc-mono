@@ -40,7 +40,9 @@ export default function Header() {
         href="/manufacturer"
         className="flex mx-auto justify-center text-white"
       >
-        <h2>Manufacturer-22</h2>
+        <h1 className="text-xl font-extrabold text-indigo-600 hover:text-black hover:underline active:underline">
+          Manufacturer
+        </h1>
       </Link>
     </div>
   );
