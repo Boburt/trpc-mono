@@ -61,6 +61,10 @@ const settingsMenu: { title: string; href: string }[] = [
     title: "Роли",
     href: "/settings/roles",
   },
+  {
+    title: "Пользователи",
+    href: "/settings/users"
+  }
 ];
 
 export function NavigationMenuDemo() {

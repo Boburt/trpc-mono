@@ -30,7 +30,7 @@ export default function UsersFormSheet({
   return (
     <Sheet onOpenChange={beforeOpen} open={open}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>{recordId ? "Edit" : "Add"} Users</SheetTitle>
         </SheetHeader>
