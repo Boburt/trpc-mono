@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@hookform/resolvers':
     specifier: ^3.2.0
-    version: 3.2.0(react-hook-form@7.40.0)
+    version: 3.2.0(react-hook-form@7.45.4)
   '@radix-ui/react-avatar':
     specifier: ^1.0.3
     version: 1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
@@ -44,6 +44,9 @@ dependencies:
   '@reduxjs/toolkit':
     specifier: ^1.9.5
     version: 1.9.5(react-redux@8.1.2)(react@18.2.0)
+  '@tanstack/react-form':
+    specifier: ^0.0.11
+    version: 0.0.11(react-dom@18.2.0)(react@18.2.0)
   '@tanstack/react-query':
     specifier: ^4.33.0
     version: 4.33.0(react-dom@18.2.0)(react@18.2.0)
@@ -108,8 +111,8 @@ dependencies:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
   react-hook-form:
-    specifier: ^7.40.0
-    version: 7.40.0(react@18.2.0)
+    specifier: ^7.45.4
+    version: 7.45.4(react@18.2.0)
   react-redux:
     specifier: ^8.1.2
     version: 8.1.2(@types/react-dom@18.2.7)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)(redux@4.2.1)
@@ -222,12 +225,12 @@ packages:
     resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
     dev: false
 
-  /@hookform/resolvers@3.2.0(react-hook-form@7.40.0):
+  /@hookform/resolvers@3.2.0(react-hook-form@7.45.4):
     resolution: {integrity: sha512-skXQHhLxq0Sz2xDwCyv5dygBCtXJe1GmWwxDzfdtl0X6agD6qcyTG8HrZWkjJoy8AkiLARqYvSYJ8z7+Nwmi7w==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.40.0(react@18.2.0)
+      react-hook-form: 7.45.4(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -1189,8 +1192,32 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@tanstack/form-core@0.0.11:
+    resolution: {integrity: sha512-Sv7b9IG0XmBoDbDe0nXrTTl9xl05TA4ir0pwr/xJwNP683CNRIzBpug3/WVzWoQVLCvRvvmo3t12N75Ip8HQNg==}
+    dependencies:
+      '@tanstack/store': 0.0.1-beta.89
+    dev: false
+
   /@tanstack/query-core@4.33.0:
     resolution: {integrity: sha512-qYu73ptvnzRh6se2nyBIDHGBQvPY1XXl3yR769B7B6mIDD7s+EZhdlWHQ67JI6UOTFRaI7wupnTnwJ3gE0Mr/g==}
+    dev: false
+
+  /@tanstack/react-form@0.0.11(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-76tyMuDVtHzWHSUSdYPIfpo06RexmSAg4dKMaBToH0yww8l1Y/PNKdoUGcmUHUUFstObm2ufw1VG2YAnsVWx8Q==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/form-core': 0.0.11
+      '@tanstack/react-store': 0.0.1-beta.85(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@tanstack/react-query@4.33.0(react-dom@18.2.0)(react@18.2.0):
@@ -1211,6 +1238,19 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
+  /@tanstack/react-store@0.0.1-beta.85(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-5APLxQOHgws735Va5ndbS6aa9pIILcximTr5dQeEFRzCNqjLyJ6YHGDuqng9zLMLzCyNILmdEtpNW0tp5l/tNw==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/store': 0.0.1-beta.85
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
   /@tanstack/react-table@8.9.3(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-Ng9rdm3JPoSCi6cVZvANsYnF+UoGVRxflMb270tVj0+LjeT/ZtZ9ckxF6oLPLcKesza6VKBqtdF9mQ+vaz24Aw==}
     engines: {node: '>=12'}
@@ -1221,6 +1261,16 @@ packages:
       '@tanstack/table-core': 8.9.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@tanstack/store@0.0.1-beta.85:
+    resolution: {integrity: sha512-gUn8i4mhS7V5yRTu6NosoKuUBfw4w36JHx0rg2MJ5kAiKukISoTqlzUKKKzmVvVPL6H1xwaDGEf6bmLzLlgZEQ==}
+    engines: {node: '>=12'}
+    dev: false
+
+  /@tanstack/store@0.0.1-beta.89:
+    resolution: {integrity: sha512-YW2aAhsXI4QYLXRnxZzB7MgEah91itQcWAjN3GYg1HKHxPv/11T5bL1CUCSxFLTI0f+45uNRjsmof6eqsN3ECA==}
+    engines: {node: '>=12'}
     dev: false
 
   /@tanstack/table-core@8.9.3:
@@ -3222,8 +3272,8 @@ packages:
       scheduler: 0.23.0
     dev: false
 
-  /react-hook-form@7.40.0(react@18.2.0):
-    resolution: {integrity: sha512-0rokdxMPJs0k9bvFtY6dbcSydyNhnZNXCR49jgDr/aR03FDHFOK6gfh8ccqB3fl696Mk7lqh04xdm+agqWXKSw==}
+  /react-hook-form@7.45.4(react@18.2.0):
+    resolution: {integrity: sha512-HGDV1JOOBPZj10LB3+OZgfDBTn+IeEsNOKiq/cxbQAIbKaiJUe/KV8DBUzsx0Gx/7IG/orWqRRm736JwOfUSWQ==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18

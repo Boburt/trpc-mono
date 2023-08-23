@@ -2,10 +2,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit2Icon } from "lucide-react";
 import { Button } from "@components/ui/button";
-import PermissionsForm from "./form";
 import { RouterOutputs } from "@admin/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
+import PermissionsFormSheet from "@admin/components/forms/permissions/sheet";
 
 export const permissionsColumns: ColumnDef<
   RouterOutputs["permissions"]["list"]["items"][0]
@@ -38,11 +38,11 @@ export const permissionsColumns: ColumnDef<
 
       return (
         <div className="flex items-center space-x-2">
-          <PermissionsForm recordId={record.id}>
+          <PermissionsFormSheet recordId={record.id}>
             <Button variant="outline" size="sm">
               <Edit2Icon className="h-4 w-4" />
             </Button>
-          </PermissionsForm>
+          </PermissionsFormSheet>
           <DeleteAction recordId={record.id} />
         </div>
       );

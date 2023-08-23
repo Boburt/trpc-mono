@@ -10,22 +10,29 @@ const manufacturers = [
     reyting: 5,
     specific: "- test test test",
     image: bio,
+    logo: bio,
+    reviews: "3",
   },
   {
     id: 2,
     name: "Imho Technology",
-    derc: "Lorem Ipsum is simply dummy text.",
+    derc: "Lorem Ipsum is simply dummy text. and typesetting industry",
     reyting: 4,
     specific: "test stes estt",
     image: imho,
+    logo: imho,
+    reviews: "10+",
   },
   {
     id: 3,
     name: "Qinglong Machinery",
-    derc: "Lorem Ipsum is simply dummy text.",
+    derc: "Lorem Ipsum is simply dummy text. and typesetting industry",
     reyting: 5,
     specific: "test stes estt",
     image: mach,
+    logo: mach,
+    reviews: "50+",
+
   },
 ];
 

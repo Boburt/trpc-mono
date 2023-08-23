@@ -1,8 +1,5 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@components/ui/avatar";
+"use client";
+import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import {
   DropdownMenu,
@@ -14,8 +11,10 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export function UserNav() {
+  const { data: session } = useSession();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,10 +28,7 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">shadcn</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              m@example.com
-            </p>
+            <p className="text-sm font-medium leading-none">{session?.login}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -52,10 +48,7 @@ export function UserNav() {
           <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
