@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { DB } from "@backend/trpc";
 import { z } from "zod";
 import {
   Organization,
@@ -8,6 +7,7 @@ import {
 } from "@backend/lib/zod";
 import { CacheControlService } from "../cache_control/service";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { DB } from "@backend/db";
 
 export class OrganizationService {
   constructor(

@@ -1,3 +1,4 @@
+import { DB } from "@backend/db";
 import {
   Terminals,
   RolesWithRelations,
@@ -7,7 +8,7 @@ import {
   Api_tokens,
   Scheduled_reports,
 } from "@backend/lib/zod";
-import { DB, RedisClientType } from "@backend/trpc";
+import { RedisClientType } from "@backend/trpc";
 
 export class CacheControlService {
   constructor(

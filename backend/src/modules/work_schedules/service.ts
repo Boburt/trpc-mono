@@ -1,4 +1,3 @@
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import {
@@ -8,6 +7,7 @@ import {
 } from "@backend/lib/zod";
 import { CacheControlService } from "../cache_control/service";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { DB } from "@backend/db";
 
 export class WorkSchedulesService {
   constructor(
