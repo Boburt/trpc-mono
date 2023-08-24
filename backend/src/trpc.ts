@@ -22,6 +22,7 @@ import { ApiTokensService } from "./modules/api_tokens/service";
 import { TimesheetService } from "./modules/timesheet/service";
 import { ScheduledReportsService } from "./modules/scheduled_reports/service";
 import { db } from "./db";
+import { verifyJwt } from "./lib/bcrypt";
 
 const client = createClient();
 export type RedisClientType = typeof client;
@@ -86,7 +87,7 @@ const t = initTRPC
   .meta<Meta>()
   .create();
 
-const checkPermission = t.middleware(({ meta, next, ctx }) => {
+export const checkPermission = t.middleware(async ({ meta, next, ctx }) => {
   if (!ctx.token) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
@@ -94,12 +95,68 @@ const checkPermission = t.middleware(({ meta, next, ctx }) => {
     });
   }
 
+  if (!meta?.permission) {
+    return new TRPCError({
+      code: "FORBIDDEN",
+      message: "Forbidden",
+    });
+  }
+
   if (meta.permission) {
-    if (ctx.permissionsService.hasPermission(meta.permission)) {
-      return next();
-    } else {
-      throw new Error("No permission");
+    let jwtResult = await verifyJwt(ctx.token);
+    if (!jwtResult) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
     }
+
+    if (!jwtResult.payload) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
+    }
+
+    let user = await ctx.usersService.findOne({
+      where: {
+        id: jwtResult.payload.id as string,
+      },
+      include: {
+        users_roles_usersTousers_roles_user_id: true,
+      },
+    });
+
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
+    }
+
+    const permissions = await ctx.cacheControlService.getPermissionsByRoleId(
+      user.users_roles_usersTousers_roles_user_id[0].role_id
+    );
+    if (permissions.length === 0) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Forbidden",
+      });
+    }
+
+    if (!permissions.includes(meta.permission)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Forbidden",
+      });
+    }
+
+    return next();
+    // if (ctx.permissionsService.hasPermission(meta.permission)) {
+    //   return next();
+    // } else {
+    //   throw new Error("No permission");
+    // }
   } else {
     return next();
   }
