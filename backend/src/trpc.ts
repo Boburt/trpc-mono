@@ -86,10 +86,10 @@ const t = initTRPC
   .context<Awaited<ReturnType<typeof createContext>>>()
   .meta<Meta>()
   .create();
-
+// @ts-ignore
 export const checkPermission = t.middleware(async ({ meta, next, ctx }) => {
   if (!ctx.token) {
-    throw new TRPCError({
+    return new TRPCError({
       code: "UNAUTHORIZED",
       message: "Unauthorized",
     });

@@ -18,7 +18,7 @@ generator zod {
   createInputTypes                = true
   createModelTypes                = true
   writeNullishInModelTypes        = true
-  addIncludeType                  = false
+  addIncludeType                  = true
   createRelationValuesTypes       = true
   createOptionalDefaultValuesType = true
   addInputTypeValidation          = false
