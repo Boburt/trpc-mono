@@ -1,7 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,16 +11,17 @@ datasource db {
 }
 
 generator zod {
-  provider       = "npx zod-prisma-types"
-  output = "../src/lib/zod"
-  useMultipleFiles = false
-  writeBarrelFiles = true
-  createInputTypes = true
-  createModelTypes = true
-  // createOptionalDefaultValuesTypes = true
-  // writeNullishInModelTypes = true
-  addIncludeType = true
-  createRelationValuesTypes = true
+  provider                        = "npx zod-prisma-types"
+  output                          = "../src/lib/zod"
+  useMultipleFiles                = false
+  writeBarrelFiles                = true
+  createInputTypes                = true
+  createModelTypes                = true
+  writeNullishInModelTypes        = true
+  addIncludeType                  = true
+  createRelationValuesTypes       = true
+  createOptionalDefaultValuesType = true
+  addInputTypeValidation          = false
 }
 
 model Permissions {
@@ -37,7 +37,8 @@ model Permissions {
   users_permissions_updated_byTousers Users?              @relation("permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_58fae278276b7c2c6dde2bc19a5")
   roles_permissions                   Roles_permissions[]
   users_permissions                   Users_permissions[]
-	@@map("permissions")
+
+  @@map("permissions")
 }
 
 model Roles {
@@ -53,14 +54,15 @@ model Roles {
   users_roles_updated_byTousers Users?              @relation("roles_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_747b580d73db0ad78963d78b076")
   roles_permissions             Roles_permissions[]
   users_roles                   Users_roles[]
-	@@map("roles")
+
+  @@map("roles")
 }
 
 model Roles_permissions {
   role_id                                   String      @db.Uuid
   permission_id                             String      @db.Uuid
-  created_by                                String?     @db.Uuid /// dasdas @zod.custom.use(z.string().nullable())
-  updated_by                                String?     @db.Uuid /// @zod.custom.use(z.string().nullish())
+  created_by                                String?     @db.Uuid
+  updated_by                                String?     @db.Uuid 
   users_roles_permissions_created_byTousers Users?      @relation("roles_permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_a3f5b9874c55ee69fdd01531e14")
   permissions                               Permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, map: "FK_337aa8dba227a1fe6b73998307b")
   roles                                     Roles       @relation(fields: [role_id], references: [id], onDelete: NoAction, map: "FK_7d2dad9f14eddeb09c256fea719")
@@ -71,13 +73,13 @@ model Roles_permissions {
 }
 
 model Users {
-  id                                                    String                           @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                                                    String                           @id @default(uuid()) @map("PK_a3ffb1c0c8416b9fc6f907b7433") @db.Uuid
   phone                                                 String?                          @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar(20)
   email                                                 String?                          @unique(map: "UQ_0e2c0e1b4b5b0b0b0b0b0b0b0b0") @db.VarChar(100)
-  login                                                 String                          @unique(map: "UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0") @db.VarChar(100)
+  login                                                 String                           @unique(map: "UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0") @db.VarChar(100)
   first_name                                            String?                          @db.VarChar(100)
   last_name                                             String?                          @db.VarChar(100)
-  password                                              String                          @db.VarChar
+  password                                              String                           @db.VarChar
   salt                                                  String?                          @db.VarChar
   is_super_user                                         Boolean                          @default(false)
   status                                                user_status
@@ -103,7 +105,7 @@ model Users {
   permissions_permissions_updated_byTousers             Permissions[]                    @relation("permissions_updated_byTousers")
   roles_roles_created_byTousers                         Roles[]                          @relation("roles_created_byTousers")
   roles_roles_updated_byTousers                         Roles[]                          @relation("roles_updated_byTousers")
-  roles_permissions_roles_permissions_created_byTousers Roles_permissions[]              @relation("roles_permissions_created_byTousers")
+  roles_permissions_roles_permissions_created_byTousers Roles_permissions[]               @relation("roles_permissions_created_byTousers")
   roles_permissions_roles_permissions_updated_byTousers Roles_permissions[]              @relation("roles_permissions_updated_byTousers")
   users_permissions_usersTousers_permissions_created_by Users_permissions[]              @relation("usersTousers_permissions_created_by")
   users_permissions_usersTousers_permissions_updated_by Users_permissions[]              @relation("usersTousers_permissions_updated_by")
@@ -127,18 +129,19 @@ model Users {
   sessions                                              Sessions[]                       @relation("sessions_users")
 
   @@index([login], map: "fki_users_login")
-	@@map("users")
+  @@map("users")
 }
 
-  model Sessions {
-    id                                                    String                            @id @default(uuid()) @db.Uuid
-    user_id                                               String                            @db.Uuid
-    user_agent                                            String
-    device_name                                           String
-    created_at                                            DateTime                          @default(now()) @db.Timestamptz(5)
-    updated_at                                            DateTime                          @default(now()) @db.Timestamptz(5)
-    users_sessions                                        Users                             @relation("sessions_users", fields: [user_id], references: [id])
-	@@map("sessions")
+model Sessions {
+  id             String   @id @default(uuid()) @db.Uuid
+  user_id        String   @db.Uuid
+  user_agent     String
+  device_name    String
+  created_at     DateTime @default(now()) @db.Timestamptz(5)
+  updated_at     DateTime @default(now()) @db.Timestamptz(5)
+  users_sessions Users    @relation("sessions_users", fields: [user_id], references: [id])
+
+  @@map("sessions")
 }
 
 model Users_permissions {
@@ -152,7 +155,7 @@ model Users_permissions {
   users_usersTousers_permissions_user_id    Users       @relation("usersTousers_permissions_user_id", fields: [user_id], references: [id], onDelete: NoAction, map: "FK_4de7d0b175f702be3be55270023")
 
   @@id([user_id, permission_id], map: "PK_7f3736984cd8546a1e418005561")
-	@@map("users_permissions")
+  @@map("users_permissions")
 }
 
 model Users_roles {
@@ -166,9 +169,8 @@ model Users_roles {
   users_usersTousers_roles_user_id    Users   @relation("usersTousers_roles_user_id", fields: [user_id], references: [id], onDelete: NoAction, map: "FK_e4435209df12bc1f001e5360174")
 
   @@id([user_id, role_id], map: "PK_c525e9373d63035b9919e578a9c")
-	@@map("users_roles")
+  @@map("users_roles")
 }
-
 
 enum user_status {
   active
@@ -196,7 +198,8 @@ model Work_schedules {
 
   users_work_schedules                 Users_work_schedules[]
   work_schedule_entries_work_schedules Work_schedule_entries[] @relation("work_schedule_entries_work_schedules")
-	@@map("work_schedules")
+
+  @@map("work_schedules")
 }
 
 model Terminals {
@@ -215,8 +218,9 @@ model Terminals {
   created_at DateTime @default(now()) @db.Timestamptz(5)
   updated_at DateTime @default(now()) @db.Timestamptz(5)
 
-  users_terminals                       Users_terminals[]
-	@@map("terminals")
+  users_terminals Users_terminals[]
+
+  @@map("terminals")
 }
 
 model Organization {
@@ -246,12 +250,13 @@ model Organization {
   created_by               String?                    @db.Uuid
   updated_by               String?                    @db.Uuid
 
-  work_schedules_organization_idTorganization   Work_schedules[]           @relation("work_schedules_organization_idTorganization")
-  organization_created_byTousers                Users?                     @relation("organization_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_organization_created_by")
-  organization_updated_byTousers                Users?                     @relation("organization_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_organization_updated_by")
-  terminals_organization_idTorganization        Terminals[]                @relation("terminals_organization_idTorganization")
-  api_tokens_organization                       Api_tokens[]
-	@@map("organization")
+  work_schedules_organization_idTorganization Work_schedules[] @relation("work_schedules_organization_idTorganization")
+  organization_created_byTousers              Users?           @relation("organization_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_organization_created_by")
+  organization_updated_byTousers              Users?           @relation("organization_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_organization_updated_by")
+  terminals_organization_idTorganization      Terminals[]      @relation("terminals_organization_idTorganization")
+  api_tokens_organization                     Api_tokens[]
+
+  @@map("organization")
 }
 
 model Users_terminals {
@@ -261,7 +266,7 @@ model Users_terminals {
   terminals   Terminals @relation(fields: [terminal_id], references: [id], onDelete: NoAction, map: "FK_users_terminals_terminal_id")
 
   @@id([user_id, terminal_id], map: "PK_users_terminals_id")
-	@@map("users_terminals")
+  @@map("users_terminals")
 }
 
 model Users_work_schedules {
@@ -271,7 +276,7 @@ model Users_work_schedules {
   work_schedules   Work_schedules @relation(fields: [work_schedule_id], references: [id], onDelete: NoAction, map: "FK_users_work_schedules_work_schedule_id")
 
   @@id([user_id, work_schedule_id], map: "PK_users_work_schedules_id")
-	@@map("users_work_schedules")
+  @@map("users_work_schedules")
 }
 
 model Work_schedule_entries {
@@ -304,7 +309,7 @@ model Work_schedule_entries {
 
   @@index([current_status], map: "fki_work_schedule_entries_current_status")
   @@index([user_id], map: "fki_work_schedule_entries_user_id")
-	@@map("work_schedule_entries")
+  @@map("work_schedule_entries")
 }
 
 model Api_tokens {
@@ -321,10 +326,9 @@ model Api_tokens {
   api_tokens_updated_byTousers Users? @relation("api_tokens_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_api_tokens_updated_by")
 
   api_tokens_organization Organization @relation(fields: [organization_id], references: [id], onDelete: NoAction, map: "FK_api_tokens_organization_id")
-	@@map("api_tokens")
+
+  @@map("api_tokens")
 }
-
-
 
 model Timesheet {
   id         String   @id(map: "PK_timesheet_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -335,7 +339,8 @@ model Timesheet {
   updated_at DateTime @default(now()) @db.Timestamptz(5)
 
   timesheet_users Users @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_timesheet_user_id")
-	@@map("timesheet")
+
+  @@map("timesheet")
 }
 
 model Scheduled_reports {
@@ -347,7 +352,8 @@ model Scheduled_reports {
   updated_at DateTime @default(now()) @db.Timestamptz(5)
 
   scheduled_reports_scheduled_reports_subscriptions Scheduled_reports_subscription[]
-	@@map("scheduled_reports")
+
+  @@map("scheduled_reports")
 }
 
 model Scheduled_reports_subscription {
@@ -359,11 +365,9 @@ model Scheduled_reports_subscription {
 
   scheduled_reports_subscription_reports Scheduled_reports @relation(fields: [report_id], references: [id], onDelete: NoAction, map: "FK_scheduled_reports_subscription_report_id")
   scheduled_reports_subscription_users   Users             @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_scheduled_reports_subscription_user_id")
-	@@map("scheduled_reports_subscription")
+
+  @@map("scheduled_reports_subscription")
 }
-
-
-
 
 enum organization_system_type {
   iiko
@@ -376,11 +380,8 @@ enum work_schedule_entry_status {
   closed
 }
 
-
 enum organization_payment_types {
   cash
   card
   client
 }
-
-

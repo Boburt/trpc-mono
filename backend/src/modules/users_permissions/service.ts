@@ -1,13 +1,13 @@
 import { Prisma } from "@prisma/client";
-import { DB } from "@backend/trpc";
 import {
   Users_permissionsFindManyArgsSchema,
   Users_permissionsFindUniqueArgsSchema,
   Users_permissionsWithRelations,
-  Users_permissions
+  Users_permissions,
 } from "@backend/lib/zod";
 import { z } from "zod";
 import { createManyPermissionsForOneUser } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneUser";
+import { DB } from "@backend/db";
 
 export class UsersPermissionsService {
   constructor(private readonly prisma: DB) {}
