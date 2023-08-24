@@ -1,0 +1,7 @@
+{
+  "/page": "app/page.js",
+  "/settings/permissions/page": "app/settings/permissions/page.js",
+  "/settings/roles/page": "app/settings/roles/page.js",
+  "/settings/users/page": "app/settings/users/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js"
+}
