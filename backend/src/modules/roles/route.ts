@@ -1,4 +1,4 @@
-import { publicProcedure, publicRouter } from "@backend/trpc";
+import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
 import {
   RolesCreateArgsSchema,
   RolesFindManyArgsSchema,
@@ -26,6 +26,10 @@ export const rolesRouter = publicRouter({
     }),
 
   renew: publicProcedure
+    .meta({
+      permission: "roles.edit",
+    })
+    .use(checkPermission)
     .input(RolesUpdateArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.rolesService.update(input);

@@ -3,8 +3,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Edit2Icon } from "lucide-react";
 import { Button } from "@components/ui/button";
 import UsersFormSheet from "@components/forms/users/sheet";
-import { RouterOutputs } from "@frontend/utils/trpc";
-import { Badge } from "@frontend/components/ui/badge";
+import { RouterOutputs } from "@admin/utils/trpc";
+import { Badge } from "@components/ui/badge";
 
 export const usersColumns: ColumnDef<
   RouterOutputs["users"]["list"]["items"][0]

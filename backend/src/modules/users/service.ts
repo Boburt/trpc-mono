@@ -5,8 +5,8 @@ import {
   Users,
   Users_roles,
   Users as usersSchema,
+  UsersWithRelations,
 } from "@backend/lib/zod";
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import {
   comparePassword,
@@ -18,6 +18,7 @@ import { z } from "zod";
 import { loginInput, typeLoginOutput } from "./dto/users.dto";
 import { TRPCError } from "@trpc/server";
 import { CacheControlService } from "../cache_control/service";
+import { DB } from "@backend/db";
 
 export class UsersService {
   constructor(
@@ -62,14 +63,17 @@ export class UsersService {
 
   async findOne(
     input: z.infer<typeof UsersFindUniqueArgsSchema>
-  ): Promise<Omit<usersSchema, "password"> | null> {
+  ): Promise<Omit<UsersWithRelations, "password"> | null> {
     const user = await this.prisma.users.findUnique(input);
 
     if (!user) {
       return null;
     }
 
-    return this.exclude(user, ["password"]) as Omit<usersSchema, "password">;
+    return this.exclude(user, ["password"]) as Omit<
+      UsersWithRelations,
+      "password"
+    >;
   }
 
   async update(input: Prisma.UsersUpdateArgs): Promise<usersSchema> {

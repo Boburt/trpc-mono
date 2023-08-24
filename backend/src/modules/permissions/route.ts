@@ -4,7 +4,7 @@ import {
   PermissionsFindUniqueArgsSchema,
   PermissionsUpdateArgsSchema,
 } from "@backend/lib/zod";
-import { publicProcedure, publicRouter } from "@backend/trpc";
+import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
 
 export const permissionsRouter = publicRouter({
   add: publicProcedure
@@ -14,6 +14,10 @@ export const permissionsRouter = publicRouter({
     }),
 
   list: publicProcedure
+    .meta({
+      permission: "permissions.list",
+    })
+    .use(checkPermission)
     .input(PermissionsFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.permissionsService.findMany(input);
