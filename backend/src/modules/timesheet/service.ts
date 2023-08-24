@@ -1,10 +1,10 @@
+import { DB } from "@backend/db";
 import { PaginationType } from "@backend/lib/pagination_interface";
 import {
   Timesheet,
   TimesheetFindManyArgsSchema,
   TimesheetFindUniqueArgsSchema,
 } from "@backend/lib/zod";
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
