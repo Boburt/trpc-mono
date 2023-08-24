@@ -1,5 +1,5 @@
 import { randomBytes, pbkdf2, createHash } from "node:crypto";
-import { SignJWT } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 async function hashPassword(
   password: string
 ): Promise<{ hash: string; salt: string }> {
@@ -48,4 +48,14 @@ async function signJwt(payload: any, expiresIn: string = "1h") {
   return jwt.sign(jwtSecret);
 }
 
-export { hashPassword, comparePassword, md5hash, signJwt };
+async function verifyJwt(token: string) {
+  const alg = "HS256";
+  const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
+  return jwtVerify(token, jwtSecret, {
+    // issuer: process.env.JWT_ISSUER,
+    // audience: process.env.JWT_AUDIENCE,
+    algorithms: [alg],
+  });
+}
+
+export { hashPassword, comparePassword, md5hash, signJwt, verifyJwt };
