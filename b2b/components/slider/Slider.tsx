@@ -3,9 +3,9 @@
 import React from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import Image1 from "./img/audi.jpg";
-import Image2 from "./img/bmw.jpg";
-import Image3 from "./img/mercedes.jpg";
+import Image1 from "../../public/images/audi.jpg";
+import Image2 from "../../public/images/bmw.jpg";
+import Image3 from "../../public/images/mercedes.jpg";
 import Image from "next/image";
 
 export default function Slider() {

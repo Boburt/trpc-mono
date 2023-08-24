@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "logo": "/images/frank-cone.jpg",
+        "name": "Biotexno nature",
+        "derc": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        "reyting": 5,
+        "specific": "- test test test",
+        "reviews": "3",
+        "factory": [
+            "3D Design Provider",
+            "Agile Supply Chain",
+            "OEM for popular brands",
+            "Professional Technique Provider"
+        ],
+        "slider": [
+            "/images/audi.jpg",
+            "/images/bmw.jpg",
+            "/images/mercedes.jpg"
+        ]
+    },
+    {
+        "id": 2,
+        "logo": "/images/magda-ehlers.jpg",
+        "name": "Imho Technology",
+        "derc": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        "reyting": 4,
+        "specific": "test stes estt",
+        "reviews": "10+",
+        "factory": [
+            "Agile Supply Chain",
+            "One-stop Procurement",
+            "Quality assurance",
+            "Competitive OEM factory"
+        ],
+        "slider": [
+            "/images/audi.jpg",
+            "/images/bmw.jpg",
+            "/images/mercedes.jpg"
+        ]
+    },
+    {
+        "id": 3,
+        "logo": "/images/scott-webb.jpg",
+        "name": "Qinglong Machinery",
+        "derc": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        "reyting": 5,
+        "specific": "test stes estt",
+        "reviews": "50+",
+        "factory": [
+            "Quality assurance",
+            "Full customization",
+            "Registered trademarks (1)",
+            "Finished product inspection"
+        ],
+        "slider": [
+            "/images/audi.jpg",
+            "/images/bmw.jpg",
+            "/images/mercedes.jpg"
+        ]
+    }
+]
