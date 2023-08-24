@@ -156,6 +156,7 @@ export default function UsersForm({
       Object.keys(record).forEach((key) => {
         form.setFieldValue(
           key as keyof typeof record,
+          // @ts-ignore
           record[key as keyof typeof record]
         );
       });

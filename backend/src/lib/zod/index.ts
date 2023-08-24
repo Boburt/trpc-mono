@@ -19178,8 +19178,9 @@ export const Scheduled_reports_subscriptionUncheckedUpdateManyWithoutScheduled_r
 // ARGS
 /////////////////////////////////////////
 
-export const PermissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindFirstArgs, "include">> = z.object({
+export const PermissionsFindFirstArgsSchema: z.ZodType<Prisma.PermissionsFindFirstArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19188,8 +19189,9 @@ export const PermissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.PermissionsFi
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.PermissionsFindFirstOrThrowArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19198,8 +19200,9 @@ export const PermissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Permis
   distinct: z.union([ PermissionsScalarFieldEnumSchema,PermissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const PermissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindManyArgs, "include">> = z.object({
+export const PermissionsFindManyArgsSchema: z.ZodType<Prisma.PermissionsFindManyArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereInputSchema.optional(),
   orderBy: z.union([ PermissionsOrderByWithRelationInputSchema.array(),PermissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: PermissionsWhereUniqueInputSchema.optional(),
@@ -19225,18 +19228,21 @@ export const PermissionsGroupByArgsSchema: z.ZodType<Prisma.PermissionsGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const PermissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindUniqueArgs, "include">> = z.object({
+export const PermissionsFindUniqueArgsSchema: z.ZodType<Prisma.PermissionsFindUniqueArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.PermissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const PermissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.PermissionsFindUniqueOrThrowArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const RolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.RolesFindFirstArgs, "include">> = z.object({
+export const RolesFindFirstArgsSchema: z.ZodType<Prisma.RolesFindFirstArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19245,8 +19251,9 @@ export const RolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.RolesFindFirstArgs,
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.RolesFindFirstOrThrowArgs, "include">> = z.object({
+export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.RolesFindFirstOrThrowArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19255,8 +19262,9 @@ export const RolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.RolesFindFir
   distinct: z.union([ RolesScalarFieldEnumSchema,RolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const RolesFindManyArgsSchema: z.ZodType<Omit<Prisma.RolesFindManyArgs, "include">> = z.object({
+export const RolesFindManyArgsSchema: z.ZodType<Prisma.RolesFindManyArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereInputSchema.optional(),
   orderBy: z.union([ RolesOrderByWithRelationInputSchema.array(),RolesOrderByWithRelationInputSchema ]).optional(),
   cursor: RolesWhereUniqueInputSchema.optional(),
@@ -19282,18 +19290,21 @@ export const RolesGroupByArgsSchema: z.ZodType<Prisma.RolesGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const RolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.RolesFindUniqueArgs, "include">> = z.object({
+export const RolesFindUniqueArgsSchema: z.ZodType<Prisma.RolesFindUniqueArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const RolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.RolesFindUniqueOrThrowArgs, "include">> = z.object({
+export const RolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.RolesFindUniqueOrThrowArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindFirstArgs, "include">> = z.object({
+export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Roles_permissionsFindFirstArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19302,8 +19313,9 @@ export const Roles_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Roles_p
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Roles_permissionsFindFirstOrThrowArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19312,8 +19324,9 @@ export const Roles_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Roles_permissionsScalarFieldEnumSchema,Roles_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Roles_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindManyArgs, "include">> = z.object({
+export const Roles_permissionsFindManyArgsSchema: z.ZodType<Prisma.Roles_permissionsFindManyArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Roles_permissionsOrderByWithRelationInputSchema.array(),Roles_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Roles_permissionsWhereUniqueInputSchema.optional(),
@@ -19339,18 +19352,21 @@ export const Roles_permissionsGroupByArgsSchema: z.ZodType<Prisma.Roles_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const Roles_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindUniqueArgs, "include">> = z.object({
+export const Roles_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.Roles_permissionsFindUniqueArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const Roles_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Roles_permissionsFindUniqueOrThrowArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const UsersFindFirstArgsSchema: z.ZodType<Omit<Prisma.UsersFindFirstArgs, "include">> = z.object({
+export const UsersFindFirstArgsSchema: z.ZodType<Prisma.UsersFindFirstArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19359,8 +19375,9 @@ export const UsersFindFirstArgsSchema: z.ZodType<Omit<Prisma.UsersFindFirstArgs,
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.UsersFindFirstOrThrowArgs, "include">> = z.object({
+export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Prisma.UsersFindFirstOrThrowArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19369,8 +19386,9 @@ export const UsersFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.UsersFindFir
   distinct: z.union([ UsersScalarFieldEnumSchema,UsersScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const UsersFindManyArgsSchema: z.ZodType<Omit<Prisma.UsersFindManyArgs, "include">> = z.object({
+export const UsersFindManyArgsSchema: z.ZodType<Prisma.UsersFindManyArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereInputSchema.optional(),
   orderBy: z.union([ UsersOrderByWithRelationInputSchema.array(),UsersOrderByWithRelationInputSchema ]).optional(),
   cursor: UsersWhereUniqueInputSchema.optional(),
@@ -19396,18 +19414,21 @@ export const UsersGroupByArgsSchema: z.ZodType<Prisma.UsersGroupByArgs> = z.obje
   skip: z.number().optional(),
 }).strict()
 
-export const UsersFindUniqueArgsSchema: z.ZodType<Omit<Prisma.UsersFindUniqueArgs, "include">> = z.object({
+export const UsersFindUniqueArgsSchema: z.ZodType<Prisma.UsersFindUniqueArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const UsersFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.UsersFindUniqueOrThrowArgs, "include">> = z.object({
+export const UsersFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.UsersFindUniqueOrThrowArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.SessionsFindFirstArgs, "include">> = z.object({
+export const SessionsFindFirstArgsSchema: z.ZodType<Prisma.SessionsFindFirstArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19416,8 +19437,9 @@ export const SessionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.SessionsFindFirs
   distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.SessionsFindFirstOrThrowArgs, "include">> = z.object({
+export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SessionsFindFirstOrThrowArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19426,8 +19448,9 @@ export const SessionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.SessionsF
   distinct: z.union([ SessionsScalarFieldEnumSchema,SessionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const SessionsFindManyArgsSchema: z.ZodType<Omit<Prisma.SessionsFindManyArgs, "include">> = z.object({
+export const SessionsFindManyArgsSchema: z.ZodType<Prisma.SessionsFindManyArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereInputSchema.optional(),
   orderBy: z.union([ SessionsOrderByWithRelationInputSchema.array(),SessionsOrderByWithRelationInputSchema ]).optional(),
   cursor: SessionsWhereUniqueInputSchema.optional(),
@@ -19453,18 +19476,21 @@ export const SessionsGroupByArgsSchema: z.ZodType<Prisma.SessionsGroupByArgs> = 
   skip: z.number().optional(),
 }).strict()
 
-export const SessionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.SessionsFindUniqueArgs, "include">> = z.object({
+export const SessionsFindUniqueArgsSchema: z.ZodType<Prisma.SessionsFindUniqueArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.SessionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const SessionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.SessionsFindUniqueOrThrowArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindFirstArgs, "include">> = z.object({
+export const Users_permissionsFindFirstArgsSchema: z.ZodType<Prisma.Users_permissionsFindFirstArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19473,8 +19499,9 @@ export const Users_permissionsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_p
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindFirstOrThrowArgs, "include">> = z.object({
+export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_permissionsFindFirstOrThrowArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19483,8 +19510,9 @@ export const Users_permissionsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Users_permissionsScalarFieldEnumSchema,Users_permissionsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_permissionsFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindManyArgs, "include">> = z.object({
+export const Users_permissionsFindManyArgsSchema: z.ZodType<Prisma.Users_permissionsFindManyArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereInputSchema.optional(),
   orderBy: z.union([ Users_permissionsOrderByWithRelationInputSchema.array(),Users_permissionsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_permissionsWhereUniqueInputSchema.optional(),
@@ -19510,18 +19538,21 @@ export const Users_permissionsGroupByArgsSchema: z.ZodType<Prisma.Users_permissi
   skip: z.number().optional(),
 }).strict()
 
-export const Users_permissionsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindUniqueArgs, "include">> = z.object({
+export const Users_permissionsFindUniqueArgsSchema: z.ZodType<Prisma.Users_permissionsFindUniqueArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsFindUniqueOrThrowArgs, "include">> = z.object({
+export const Users_permissionsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_permissionsFindUniqueOrThrowArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindFirstArgs, "include">> = z.object({
+export const Users_rolesFindFirstArgsSchema: z.ZodType<Prisma.Users_rolesFindFirstArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19530,8 +19561,9 @@ export const Users_rolesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFi
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindFirstOrThrowArgs, "include">> = z.object({
+export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_rolesFindFirstOrThrowArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19540,8 +19572,9 @@ export const Users_rolesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_
   distinct: z.union([ Users_rolesScalarFieldEnumSchema,Users_rolesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_rolesFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindManyArgs, "include">> = z.object({
+export const Users_rolesFindManyArgsSchema: z.ZodType<Prisma.Users_rolesFindManyArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereInputSchema.optional(),
   orderBy: z.union([ Users_rolesOrderByWithRelationInputSchema.array(),Users_rolesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_rolesWhereUniqueInputSchema.optional(),
@@ -19567,18 +19600,21 @@ export const Users_rolesGroupByArgsSchema: z.ZodType<Prisma.Users_rolesGroupByAr
   skip: z.number().optional(),
 }).strict()
 
-export const Users_rolesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindUniqueArgs, "include">> = z.object({
+export const Users_rolesFindUniqueArgsSchema: z.ZodType<Prisma.Users_rolesFindUniqueArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_rolesFindUniqueOrThrowArgs, "include">> = z.object({
+export const Users_rolesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_rolesFindUniqueOrThrowArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindFirstArgs, "include">> = z.object({
+export const Work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Work_schedulesFindFirstArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19587,8 +19623,9 @@ export const Work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Work_sched
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
+export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Work_schedulesFindFirstOrThrowArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19597,8 +19634,9 @@ export const Work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Wor
   distinct: z.union([ Work_schedulesScalarFieldEnumSchema,Work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindManyArgs, "include">> = z.object({
+export const Work_schedulesFindManyArgsSchema: z.ZodType<Prisma.Work_schedulesFindManyArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedulesOrderByWithRelationInputSchema.array(),Work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedulesWhereUniqueInputSchema.optional(),
@@ -19624,18 +19662,21 @@ export const Work_schedulesGroupByArgsSchema: z.ZodType<Prisma.Work_schedulesGro
   skip: z.number().optional(),
 }).strict()
 
-export const Work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindUniqueArgs, "include">> = z.object({
+export const Work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.Work_schedulesFindUniqueArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
+export const Work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Work_schedulesFindUniqueOrThrowArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindFirstArgs, "include">> = z.object({
+export const TerminalsFindFirstArgsSchema: z.ZodType<Prisma.TerminalsFindFirstArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19644,8 +19685,9 @@ export const TerminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindFi
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindFirstOrThrowArgs, "include">> = z.object({
+export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TerminalsFindFirstOrThrowArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19654,8 +19696,9 @@ export const TerminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Terminal
   distinct: z.union([ TerminalsScalarFieldEnumSchema,TerminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TerminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindManyArgs, "include">> = z.object({
+export const TerminalsFindManyArgsSchema: z.ZodType<Prisma.TerminalsFindManyArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereInputSchema.optional(),
   orderBy: z.union([ TerminalsOrderByWithRelationInputSchema.array(),TerminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: TerminalsWhereUniqueInputSchema.optional(),
@@ -19681,18 +19724,21 @@ export const TerminalsGroupByArgsSchema: z.ZodType<Prisma.TerminalsGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const TerminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindUniqueArgs, "include">> = z.object({
+export const TerminalsFindUniqueArgsSchema: z.ZodType<Prisma.TerminalsFindUniqueArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.TerminalsFindUniqueOrThrowArgs, "include">> = z.object({
+export const TerminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.TerminalsFindUniqueOrThrowArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationFindFirstArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindFirstArgs, "include">> = z.object({
+export const OrganizationFindFirstArgsSchema: z.ZodType<Prisma.OrganizationFindFirstArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19701,8 +19747,9 @@ export const OrganizationFindFirstArgsSchema: z.ZodType<Omit<Prisma.Organization
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindFirstOrThrowArgs, "include">> = z.object({
+export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.OrganizationFindFirstOrThrowArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19711,8 +19758,9 @@ export const OrganizationFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Organ
   distinct: z.union([ OrganizationScalarFieldEnumSchema,OrganizationScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const OrganizationFindManyArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindManyArgs, "include">> = z.object({
+export const OrganizationFindManyArgsSchema: z.ZodType<Prisma.OrganizationFindManyArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereInputSchema.optional(),
   orderBy: z.union([ OrganizationOrderByWithRelationInputSchema.array(),OrganizationOrderByWithRelationInputSchema ]).optional(),
   cursor: OrganizationWhereUniqueInputSchema.optional(),
@@ -19738,18 +19786,21 @@ export const OrganizationGroupByArgsSchema: z.ZodType<Prisma.OrganizationGroupBy
   skip: z.number().optional(),
 }).strict()
 
-export const OrganizationFindUniqueArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindUniqueArgs, "include">> = z.object({
+export const OrganizationFindUniqueArgsSchema: z.ZodType<Prisma.OrganizationFindUniqueArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.OrganizationFindUniqueOrThrowArgs, "include">> = z.object({
+export const OrganizationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.OrganizationFindUniqueOrThrowArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindFirstArgs, "include">> = z.object({
+export const Users_terminalsFindFirstArgsSchema: z.ZodType<Prisma.Users_terminalsFindFirstArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19758,8 +19809,9 @@ export const Users_terminalsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_ter
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindFirstOrThrowArgs, "include">> = z.object({
+export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_terminalsFindFirstOrThrowArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19768,8 +19820,9 @@ export const Users_terminalsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Us
   distinct: z.union([ Users_terminalsScalarFieldEnumSchema,Users_terminalsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_terminalsFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindManyArgs, "include">> = z.object({
+export const Users_terminalsFindManyArgsSchema: z.ZodType<Prisma.Users_terminalsFindManyArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereInputSchema.optional(),
   orderBy: z.union([ Users_terminalsOrderByWithRelationInputSchema.array(),Users_terminalsOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_terminalsWhereUniqueInputSchema.optional(),
@@ -19795,18 +19848,21 @@ export const Users_terminalsGroupByArgsSchema: z.ZodType<Prisma.Users_terminalsG
   skip: z.number().optional(),
 }).strict()
 
-export const Users_terminalsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindUniqueArgs, "include">> = z.object({
+export const Users_terminalsFindUniqueArgsSchema: z.ZodType<Prisma.Users_terminalsFindUniqueArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsFindUniqueOrThrowArgs, "include">> = z.object({
+export const Users_terminalsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_terminalsFindUniqueOrThrowArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindFirstArgs, "include">> = z.object({
+export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindFirstArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19815,8 +19871,9 @@ export const Users_work_schedulesFindFirstArgsSchema: z.ZodType<Omit<Prisma.User
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindFirstOrThrowArgs, "include">> = z.object({
+export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindFirstOrThrowArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19825,8 +19882,9 @@ export const Users_work_schedulesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Pris
   distinct: z.union([ Users_work_schedulesScalarFieldEnumSchema,Users_work_schedulesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Users_work_schedulesFindManyArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindManyArgs, "include">> = z.object({
+export const Users_work_schedulesFindManyArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindManyArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereInputSchema.optional(),
   orderBy: z.union([ Users_work_schedulesOrderByWithRelationInputSchema.array(),Users_work_schedulesOrderByWithRelationInputSchema ]).optional(),
   cursor: Users_work_schedulesWhereUniqueInputSchema.optional(),
@@ -19852,18 +19910,21 @@ export const Users_work_schedulesGroupByArgsSchema: z.ZodType<Prisma.Users_work_
   skip: z.number().optional(),
 }).strict()
 
-export const Users_work_schedulesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindUniqueArgs, "include">> = z.object({
+export const Users_work_schedulesFindUniqueArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindUniqueArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesFindUniqueOrThrowArgs, "include">> = z.object({
+export const Users_work_schedulesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Users_work_schedulesFindUniqueOrThrowArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindFirstArgs, "include">> = z.object({
+export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindFirstArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19872,8 +19933,9 @@ export const Work_schedule_entriesFindFirstArgsSchema: z.ZodType<Omit<Prisma.Wor
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindFirstOrThrowArgs, "include">> = z.object({
+export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindFirstOrThrowArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19882,8 +19944,9 @@ export const Work_schedule_entriesFindFirstOrThrowArgsSchema: z.ZodType<Omit<Pri
   distinct: z.union([ Work_schedule_entriesScalarFieldEnumSchema,Work_schedule_entriesScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Work_schedule_entriesFindManyArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindManyArgs, "include">> = z.object({
+export const Work_schedule_entriesFindManyArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindManyArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereInputSchema.optional(),
   orderBy: z.union([ Work_schedule_entriesOrderByWithRelationInputSchema.array(),Work_schedule_entriesOrderByWithRelationInputSchema ]).optional(),
   cursor: Work_schedule_entriesWhereUniqueInputSchema.optional(),
@@ -19909,18 +19972,21 @@ export const Work_schedule_entriesGroupByArgsSchema: z.ZodType<Prisma.Work_sched
   skip: z.number().optional(),
 }).strict()
 
-export const Work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindUniqueArgs, "include">> = z.object({
+export const Work_schedule_entriesFindUniqueArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindUniqueArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesFindUniqueOrThrowArgs, "include">> = z.object({
+export const Work_schedule_entriesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Work_schedule_entriesFindUniqueOrThrowArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensFindFirstArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindFirstArgs, "include">> = z.object({
+export const Api_tokensFindFirstArgsSchema: z.ZodType<Prisma.Api_tokensFindFirstArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -19929,8 +19995,9 @@ export const Api_tokensFindFirstArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFind
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindFirstOrThrowArgs, "include">> = z.object({
+export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Api_tokensFindFirstOrThrowArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -19939,8 +20006,9 @@ export const Api_tokensFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Api_tok
   distinct: z.union([ Api_tokensScalarFieldEnumSchema,Api_tokensScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Api_tokensFindManyArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindManyArgs, "include">> = z.object({
+export const Api_tokensFindManyArgsSchema: z.ZodType<Prisma.Api_tokensFindManyArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereInputSchema.optional(),
   orderBy: z.union([ Api_tokensOrderByWithRelationInputSchema.array(),Api_tokensOrderByWithRelationInputSchema ]).optional(),
   cursor: Api_tokensWhereUniqueInputSchema.optional(),
@@ -19966,18 +20034,21 @@ export const Api_tokensGroupByArgsSchema: z.ZodType<Prisma.Api_tokensGroupByArgs
   skip: z.number().optional(),
 }).strict()
 
-export const Api_tokensFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindUniqueArgs, "include">> = z.object({
+export const Api_tokensFindUniqueArgsSchema: z.ZodType<Prisma.Api_tokensFindUniqueArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Api_tokensFindUniqueOrThrowArgs, "include">> = z.object({
+export const Api_tokensFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Api_tokensFindUniqueOrThrowArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindFirstArgs, "include">> = z.object({
+export const TimesheetFindFirstArgsSchema: z.ZodType<Prisma.TimesheetFindFirstArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -19986,8 +20057,9 @@ export const TimesheetFindFirstArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindFi
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindFirstOrThrowArgs, "include">> = z.object({
+export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Prisma.TimesheetFindFirstOrThrowArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -19996,8 +20068,9 @@ export const TimesheetFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Timeshee
   distinct: z.union([ TimesheetScalarFieldEnumSchema,TimesheetScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const TimesheetFindManyArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindManyArgs, "include">> = z.object({
+export const TimesheetFindManyArgsSchema: z.ZodType<Prisma.TimesheetFindManyArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereInputSchema.optional(),
   orderBy: z.union([ TimesheetOrderByWithRelationInputSchema.array(),TimesheetOrderByWithRelationInputSchema ]).optional(),
   cursor: TimesheetWhereUniqueInputSchema.optional(),
@@ -20023,18 +20096,21 @@ export const TimesheetGroupByArgsSchema: z.ZodType<Prisma.TimesheetGroupByArgs> 
   skip: z.number().optional(),
 }).strict()
 
-export const TimesheetFindUniqueArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindUniqueArgs, "include">> = z.object({
+export const TimesheetFindUniqueArgsSchema: z.ZodType<Prisma.TimesheetFindUniqueArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.TimesheetFindUniqueOrThrowArgs, "include">> = z.object({
+export const TimesheetFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.TimesheetFindUniqueOrThrowArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindFirstArgs, "include">> = z.object({
+export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindFirstArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20043,8 +20119,9 @@ export const Scheduled_reportsFindFirstArgsSchema: z.ZodType<Omit<Prisma.Schedul
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindFirstOrThrowArgs, "include">> = z.object({
+export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindFirstOrThrowArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20053,8 +20130,9 @@ export const Scheduled_reportsFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.
   distinct: z.union([ Scheduled_reportsScalarFieldEnumSchema,Scheduled_reportsScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reportsFindManyArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindManyArgs, "include">> = z.object({
+export const Scheduled_reportsFindManyArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindManyArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reportsOrderByWithRelationInputSchema.array(),Scheduled_reportsOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reportsWhereUniqueInputSchema.optional(),
@@ -20080,18 +20158,21 @@ export const Scheduled_reportsGroupByArgsSchema: z.ZodType<Prisma.Scheduled_repo
   skip: z.number().optional(),
 }).strict()
 
-export const Scheduled_reportsFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindUniqueArgs, "include">> = z.object({
+export const Scheduled_reportsFindUniqueArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindUniqueArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsFindUniqueOrThrowArgs, "include">> = z.object({
+export const Scheduled_reportsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reportsFindUniqueOrThrowArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindFirstArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindFirstArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20100,8 +20181,9 @@ export const Scheduled_reports_subscriptionFindFirstArgsSchema: z.ZodType<Omit<P
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindFirstOrThrowArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindFirstOrThrowArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20110,8 +20192,9 @@ export const Scheduled_reports_subscriptionFindFirstOrThrowArgsSchema: z.ZodType
   distinct: z.union([ Scheduled_reports_subscriptionScalarFieldEnumSchema,Scheduled_reports_subscriptionScalarFieldEnumSchema.array() ]).optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindManyArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionFindManyArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindManyArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereInputSchema.optional(),
   orderBy: z.union([ Scheduled_reports_subscriptionOrderByWithRelationInputSchema.array(),Scheduled_reports_subscriptionOrderByWithRelationInputSchema ]).optional(),
   cursor: Scheduled_reports_subscriptionWhereUniqueInputSchema.optional(),
@@ -20137,23 +20220,27 @@ export const Scheduled_reports_subscriptionGroupByArgsSchema: z.ZodType<Prisma.S
   skip: z.number().optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindUniqueArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionFindUniqueArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindUniqueArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionFindUniqueOrThrowArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionFindUniqueOrThrowArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsCreateArgsSchema: z.ZodType<Omit<Prisma.PermissionsCreateArgs, "include">> = z.object({
+export const PermissionsCreateArgsSchema: z.ZodType<Prisma.PermissionsCreateArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   data: z.union([ PermissionsCreateInputSchema,PermissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const PermissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.PermissionsUpsertArgs, "include">> = z.object({
+export const PermissionsUpsertArgsSchema: z.ZodType<Prisma.PermissionsUpsertArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
   create: z.union([ PermissionsCreateInputSchema,PermissionsUncheckedCreateInputSchema ]),
   update: z.union([ PermissionsUpdateInputSchema,PermissionsUncheckedUpdateInputSchema ]),
@@ -20164,13 +20251,15 @@ export const PermissionsCreateManyArgsSchema: z.ZodType<Prisma.PermissionsCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const PermissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.PermissionsDeleteArgs, "include">> = z.object({
+export const PermissionsDeleteArgsSchema: z.ZodType<Prisma.PermissionsDeleteArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
 
-export const PermissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.PermissionsUpdateArgs, "include">> = z.object({
+export const PermissionsUpdateArgsSchema: z.ZodType<Prisma.PermissionsUpdateArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
+  include: PermissionsIncludeSchema.optional(),
   data: z.union([ PermissionsUpdateInputSchema,PermissionsUncheckedUpdateInputSchema ]),
   where: PermissionsWhereUniqueInputSchema,
 }).strict()
@@ -20184,13 +20273,15 @@ export const PermissionsDeleteManyArgsSchema: z.ZodType<Prisma.PermissionsDelete
   where: PermissionsWhereInputSchema.optional(),
 }).strict()
 
-export const RolesCreateArgsSchema: z.ZodType<Omit<Prisma.RolesCreateArgs, "include">> = z.object({
+export const RolesCreateArgsSchema: z.ZodType<Prisma.RolesCreateArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   data: z.union([ RolesCreateInputSchema,RolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const RolesUpsertArgsSchema: z.ZodType<Omit<Prisma.RolesUpsertArgs, "include">> = z.object({
+export const RolesUpsertArgsSchema: z.ZodType<Prisma.RolesUpsertArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
   create: z.union([ RolesCreateInputSchema,RolesUncheckedCreateInputSchema ]),
   update: z.union([ RolesUpdateInputSchema,RolesUncheckedUpdateInputSchema ]),
@@ -20201,13 +20292,15 @@ export const RolesCreateManyArgsSchema: z.ZodType<Prisma.RolesCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const RolesDeleteArgsSchema: z.ZodType<Omit<Prisma.RolesDeleteArgs, "include">> = z.object({
+export const RolesDeleteArgsSchema: z.ZodType<Prisma.RolesDeleteArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   where: RolesWhereUniqueInputSchema,
 }).strict()
 
-export const RolesUpdateArgsSchema: z.ZodType<Omit<Prisma.RolesUpdateArgs, "include">> = z.object({
+export const RolesUpdateArgsSchema: z.ZodType<Prisma.RolesUpdateArgs> = z.object({
   select: RolesSelectSchema.optional(),
+  include: RolesIncludeSchema.optional(),
   data: z.union([ RolesUpdateInputSchema,RolesUncheckedUpdateInputSchema ]),
   where: RolesWhereUniqueInputSchema,
 }).strict()
@@ -20221,13 +20314,15 @@ export const RolesDeleteManyArgsSchema: z.ZodType<Prisma.RolesDeleteManyArgs> = 
   where: RolesWhereInputSchema.optional(),
 }).strict()
 
-export const Roles_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsCreateArgs, "include">> = z.object({
+export const Roles_permissionsCreateArgsSchema: z.ZodType<Prisma.Roles_permissionsCreateArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   data: z.union([ Roles_permissionsCreateInputSchema,Roles_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Roles_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsUpsertArgs, "include">> = z.object({
+export const Roles_permissionsUpsertArgsSchema: z.ZodType<Prisma.Roles_permissionsUpsertArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
   create: z.union([ Roles_permissionsCreateInputSchema,Roles_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ Roles_permissionsUpdateInputSchema,Roles_permissionsUncheckedUpdateInputSchema ]),
@@ -20238,13 +20333,15 @@ export const Roles_permissionsCreateManyArgsSchema: z.ZodType<Prisma.Roles_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Roles_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsDeleteArgs, "include">> = z.object({
+export const Roles_permissionsDeleteArgsSchema: z.ZodType<Prisma.Roles_permissionsDeleteArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Roles_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.Roles_permissionsUpdateArgs, "include">> = z.object({
+export const Roles_permissionsUpdateArgsSchema: z.ZodType<Prisma.Roles_permissionsUpdateArgs> = z.object({
   select: Roles_permissionsSelectSchema.optional(),
+  include: Roles_permissionsIncludeSchema.optional(),
   data: z.union([ Roles_permissionsUpdateInputSchema,Roles_permissionsUncheckedUpdateInputSchema ]),
   where: Roles_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -20258,13 +20355,15 @@ export const Roles_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.Roles_permi
   where: Roles_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const UsersCreateArgsSchema: z.ZodType<Omit<Prisma.UsersCreateArgs, "include">> = z.object({
+export const UsersCreateArgsSchema: z.ZodType<Prisma.UsersCreateArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   data: z.union([ UsersCreateInputSchema,UsersUncheckedCreateInputSchema ]),
 }).strict()
 
-export const UsersUpsertArgsSchema: z.ZodType<Omit<Prisma.UsersUpsertArgs, "include">> = z.object({
+export const UsersUpsertArgsSchema: z.ZodType<Prisma.UsersUpsertArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
   create: z.union([ UsersCreateInputSchema,UsersUncheckedCreateInputSchema ]),
   update: z.union([ UsersUpdateInputSchema,UsersUncheckedUpdateInputSchema ]),
@@ -20275,13 +20374,15 @@ export const UsersCreateManyArgsSchema: z.ZodType<Prisma.UsersCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const UsersDeleteArgsSchema: z.ZodType<Omit<Prisma.UsersDeleteArgs, "include">> = z.object({
+export const UsersDeleteArgsSchema: z.ZodType<Prisma.UsersDeleteArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   where: UsersWhereUniqueInputSchema,
 }).strict()
 
-export const UsersUpdateArgsSchema: z.ZodType<Omit<Prisma.UsersUpdateArgs, "include">> = z.object({
+export const UsersUpdateArgsSchema: z.ZodType<Prisma.UsersUpdateArgs> = z.object({
   select: UsersSelectSchema.optional(),
+  include: UsersIncludeSchema.optional(),
   data: z.union([ UsersUpdateInputSchema,UsersUncheckedUpdateInputSchema ]),
   where: UsersWhereUniqueInputSchema,
 }).strict()
@@ -20295,13 +20396,15 @@ export const UsersDeleteManyArgsSchema: z.ZodType<Prisma.UsersDeleteManyArgs> = 
   where: UsersWhereInputSchema.optional(),
 }).strict()
 
-export const SessionsCreateArgsSchema: z.ZodType<Omit<Prisma.SessionsCreateArgs, "include">> = z.object({
+export const SessionsCreateArgsSchema: z.ZodType<Prisma.SessionsCreateArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   data: z.union([ SessionsCreateInputSchema,SessionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const SessionsUpsertArgsSchema: z.ZodType<Omit<Prisma.SessionsUpsertArgs, "include">> = z.object({
+export const SessionsUpsertArgsSchema: z.ZodType<Prisma.SessionsUpsertArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
   create: z.union([ SessionsCreateInputSchema,SessionsUncheckedCreateInputSchema ]),
   update: z.union([ SessionsUpdateInputSchema,SessionsUncheckedUpdateInputSchema ]),
@@ -20312,13 +20415,15 @@ export const SessionsCreateManyArgsSchema: z.ZodType<Prisma.SessionsCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const SessionsDeleteArgsSchema: z.ZodType<Omit<Prisma.SessionsDeleteArgs, "include">> = z.object({
+export const SessionsDeleteArgsSchema: z.ZodType<Prisma.SessionsDeleteArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
 
-export const SessionsUpdateArgsSchema: z.ZodType<Omit<Prisma.SessionsUpdateArgs, "include">> = z.object({
+export const SessionsUpdateArgsSchema: z.ZodType<Prisma.SessionsUpdateArgs> = z.object({
   select: SessionsSelectSchema.optional(),
+  include: SessionsIncludeSchema.optional(),
   data: z.union([ SessionsUpdateInputSchema,SessionsUncheckedUpdateInputSchema ]),
   where: SessionsWhereUniqueInputSchema,
 }).strict()
@@ -20332,13 +20437,15 @@ export const SessionsDeleteManyArgsSchema: z.ZodType<Prisma.SessionsDeleteManyAr
   where: SessionsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_permissionsCreateArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsCreateArgs, "include">> = z.object({
+export const Users_permissionsCreateArgsSchema: z.ZodType<Prisma.Users_permissionsCreateArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   data: z.union([ Users_permissionsCreateInputSchema,Users_permissionsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_permissionsUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsUpsertArgs, "include">> = z.object({
+export const Users_permissionsUpsertArgsSchema: z.ZodType<Prisma.Users_permissionsUpsertArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
   create: z.union([ Users_permissionsCreateInputSchema,Users_permissionsUncheckedCreateInputSchema ]),
   update: z.union([ Users_permissionsUpdateInputSchema,Users_permissionsUncheckedUpdateInputSchema ]),
@@ -20349,13 +20456,15 @@ export const Users_permissionsCreateManyArgsSchema: z.ZodType<Prisma.Users_permi
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_permissionsDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsDeleteArgs, "include">> = z.object({
+export const Users_permissionsDeleteArgsSchema: z.ZodType<Prisma.Users_permissionsDeleteArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_permissionsUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_permissionsUpdateArgs, "include">> = z.object({
+export const Users_permissionsUpdateArgsSchema: z.ZodType<Prisma.Users_permissionsUpdateArgs> = z.object({
   select: Users_permissionsSelectSchema.optional(),
+  include: Users_permissionsIncludeSchema.optional(),
   data: z.union([ Users_permissionsUpdateInputSchema,Users_permissionsUncheckedUpdateInputSchema ]),
   where: Users_permissionsWhereUniqueInputSchema,
 }).strict()
@@ -20369,13 +20478,15 @@ export const Users_permissionsDeleteManyArgsSchema: z.ZodType<Prisma.Users_permi
   where: Users_permissionsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_rolesCreateArgsSchema: z.ZodType<Omit<Prisma.Users_rolesCreateArgs, "include">> = z.object({
+export const Users_rolesCreateArgsSchema: z.ZodType<Prisma.Users_rolesCreateArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   data: z.union([ Users_rolesCreateInputSchema,Users_rolesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_rolesUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_rolesUpsertArgs, "include">> = z.object({
+export const Users_rolesUpsertArgsSchema: z.ZodType<Prisma.Users_rolesUpsertArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
   create: z.union([ Users_rolesCreateInputSchema,Users_rolesUncheckedCreateInputSchema ]),
   update: z.union([ Users_rolesUpdateInputSchema,Users_rolesUncheckedUpdateInputSchema ]),
@@ -20386,13 +20497,15 @@ export const Users_rolesCreateManyArgsSchema: z.ZodType<Prisma.Users_rolesCreate
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_rolesDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_rolesDeleteArgs, "include">> = z.object({
+export const Users_rolesDeleteArgsSchema: z.ZodType<Prisma.Users_rolesDeleteArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_rolesUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_rolesUpdateArgs, "include">> = z.object({
+export const Users_rolesUpdateArgsSchema: z.ZodType<Prisma.Users_rolesUpdateArgs> = z.object({
   select: Users_rolesSelectSchema.optional(),
+  include: Users_rolesIncludeSchema.optional(),
   data: z.union([ Users_rolesUpdateInputSchema,Users_rolesUncheckedUpdateInputSchema ]),
   where: Users_rolesWhereUniqueInputSchema,
 }).strict()
@@ -20406,13 +20519,15 @@ export const Users_rolesDeleteManyArgsSchema: z.ZodType<Prisma.Users_rolesDelete
   where: Users_rolesWhereInputSchema.optional(),
 }).strict()
 
-export const Work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesCreateArgs, "include">> = z.object({
+export const Work_schedulesCreateArgsSchema: z.ZodType<Prisma.Work_schedulesCreateArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   data: z.union([ Work_schedulesCreateInputSchema,Work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesUpsertArgs, "include">> = z.object({
+export const Work_schedulesUpsertArgsSchema: z.ZodType<Prisma.Work_schedulesUpsertArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
   create: z.union([ Work_schedulesCreateInputSchema,Work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ Work_schedulesUpdateInputSchema,Work_schedulesUncheckedUpdateInputSchema ]),
@@ -20423,13 +20538,15 @@ export const Work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.Work_schedules
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesDeleteArgs, "include">> = z.object({
+export const Work_schedulesDeleteArgsSchema: z.ZodType<Prisma.Work_schedulesDeleteArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.Work_schedulesUpdateArgs, "include">> = z.object({
+export const Work_schedulesUpdateArgsSchema: z.ZodType<Prisma.Work_schedulesUpdateArgs> = z.object({
   select: Work_schedulesSelectSchema.optional(),
+  include: Work_schedulesIncludeSchema.optional(),
   data: z.union([ Work_schedulesUpdateInputSchema,Work_schedulesUncheckedUpdateInputSchema ]),
   where: Work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -20443,13 +20560,15 @@ export const Work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.Work_schedules
   where: Work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const TerminalsCreateArgsSchema: z.ZodType<Omit<Prisma.TerminalsCreateArgs, "include">> = z.object({
+export const TerminalsCreateArgsSchema: z.ZodType<Prisma.TerminalsCreateArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   data: z.union([ TerminalsCreateInputSchema,TerminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const TerminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.TerminalsUpsertArgs, "include">> = z.object({
+export const TerminalsUpsertArgsSchema: z.ZodType<Prisma.TerminalsUpsertArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
   create: z.union([ TerminalsCreateInputSchema,TerminalsUncheckedCreateInputSchema ]),
   update: z.union([ TerminalsUpdateInputSchema,TerminalsUncheckedUpdateInputSchema ]),
@@ -20460,13 +20579,15 @@ export const TerminalsCreateManyArgsSchema: z.ZodType<Prisma.TerminalsCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const TerminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.TerminalsDeleteArgs, "include">> = z.object({
+export const TerminalsDeleteArgsSchema: z.ZodType<Prisma.TerminalsDeleteArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
 
-export const TerminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.TerminalsUpdateArgs, "include">> = z.object({
+export const TerminalsUpdateArgsSchema: z.ZodType<Prisma.TerminalsUpdateArgs> = z.object({
   select: TerminalsSelectSchema.optional(),
+  include: TerminalsIncludeSchema.optional(),
   data: z.union([ TerminalsUpdateInputSchema,TerminalsUncheckedUpdateInputSchema ]),
   where: TerminalsWhereUniqueInputSchema,
 }).strict()
@@ -20480,13 +20601,15 @@ export const TerminalsDeleteManyArgsSchema: z.ZodType<Prisma.TerminalsDeleteMany
   where: TerminalsWhereInputSchema.optional(),
 }).strict()
 
-export const OrganizationCreateArgsSchema: z.ZodType<Omit<Prisma.OrganizationCreateArgs, "include">> = z.object({
+export const OrganizationCreateArgsSchema: z.ZodType<Prisma.OrganizationCreateArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   data: z.union([ OrganizationCreateInputSchema,OrganizationUncheckedCreateInputSchema ]),
 }).strict()
 
-export const OrganizationUpsertArgsSchema: z.ZodType<Omit<Prisma.OrganizationUpsertArgs, "include">> = z.object({
+export const OrganizationUpsertArgsSchema: z.ZodType<Prisma.OrganizationUpsertArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
   create: z.union([ OrganizationCreateInputSchema,OrganizationUncheckedCreateInputSchema ]),
   update: z.union([ OrganizationUpdateInputSchema,OrganizationUncheckedUpdateInputSchema ]),
@@ -20497,13 +20620,15 @@ export const OrganizationCreateManyArgsSchema: z.ZodType<Prisma.OrganizationCrea
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const OrganizationDeleteArgsSchema: z.ZodType<Omit<Prisma.OrganizationDeleteArgs, "include">> = z.object({
+export const OrganizationDeleteArgsSchema: z.ZodType<Prisma.OrganizationDeleteArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
 
-export const OrganizationUpdateArgsSchema: z.ZodType<Omit<Prisma.OrganizationUpdateArgs, "include">> = z.object({
+export const OrganizationUpdateArgsSchema: z.ZodType<Prisma.OrganizationUpdateArgs> = z.object({
   select: OrganizationSelectSchema.optional(),
+  include: OrganizationIncludeSchema.optional(),
   data: z.union([ OrganizationUpdateInputSchema,OrganizationUncheckedUpdateInputSchema ]),
   where: OrganizationWhereUniqueInputSchema,
 }).strict()
@@ -20517,13 +20642,15 @@ export const OrganizationDeleteManyArgsSchema: z.ZodType<Prisma.OrganizationDele
   where: OrganizationWhereInputSchema.optional(),
 }).strict()
 
-export const Users_terminalsCreateArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsCreateArgs, "include">> = z.object({
+export const Users_terminalsCreateArgsSchema: z.ZodType<Prisma.Users_terminalsCreateArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   data: z.union([ Users_terminalsCreateInputSchema,Users_terminalsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_terminalsUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsUpsertArgs, "include">> = z.object({
+export const Users_terminalsUpsertArgsSchema: z.ZodType<Prisma.Users_terminalsUpsertArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
   create: z.union([ Users_terminalsCreateInputSchema,Users_terminalsUncheckedCreateInputSchema ]),
   update: z.union([ Users_terminalsUpdateInputSchema,Users_terminalsUncheckedUpdateInputSchema ]),
@@ -20534,13 +20661,15 @@ export const Users_terminalsCreateManyArgsSchema: z.ZodType<Prisma.Users_termina
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_terminalsDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsDeleteArgs, "include">> = z.object({
+export const Users_terminalsDeleteArgsSchema: z.ZodType<Prisma.Users_terminalsDeleteArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
 
-export const Users_terminalsUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_terminalsUpdateArgs, "include">> = z.object({
+export const Users_terminalsUpdateArgsSchema: z.ZodType<Prisma.Users_terminalsUpdateArgs> = z.object({
   select: Users_terminalsSelectSchema.optional(),
+  include: Users_terminalsIncludeSchema.optional(),
   data: z.union([ Users_terminalsUpdateInputSchema,Users_terminalsUncheckedUpdateInputSchema ]),
   where: Users_terminalsWhereUniqueInputSchema,
 }).strict()
@@ -20554,13 +20683,15 @@ export const Users_terminalsDeleteManyArgsSchema: z.ZodType<Prisma.Users_termina
   where: Users_terminalsWhereInputSchema.optional(),
 }).strict()
 
-export const Users_work_schedulesCreateArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesCreateArgs, "include">> = z.object({
+export const Users_work_schedulesCreateArgsSchema: z.ZodType<Prisma.Users_work_schedulesCreateArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   data: z.union([ Users_work_schedulesCreateInputSchema,Users_work_schedulesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Users_work_schedulesUpsertArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesUpsertArgs, "include">> = z.object({
+export const Users_work_schedulesUpsertArgsSchema: z.ZodType<Prisma.Users_work_schedulesUpsertArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
   create: z.union([ Users_work_schedulesCreateInputSchema,Users_work_schedulesUncheckedCreateInputSchema ]),
   update: z.union([ Users_work_schedulesUpdateInputSchema,Users_work_schedulesUncheckedUpdateInputSchema ]),
@@ -20571,13 +20702,15 @@ export const Users_work_schedulesCreateManyArgsSchema: z.ZodType<Prisma.Users_wo
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Users_work_schedulesDeleteArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesDeleteArgs, "include">> = z.object({
+export const Users_work_schedulesDeleteArgsSchema: z.ZodType<Prisma.Users_work_schedulesDeleteArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
 
-export const Users_work_schedulesUpdateArgsSchema: z.ZodType<Omit<Prisma.Users_work_schedulesUpdateArgs, "include">> = z.object({
+export const Users_work_schedulesUpdateArgsSchema: z.ZodType<Prisma.Users_work_schedulesUpdateArgs> = z.object({
   select: Users_work_schedulesSelectSchema.optional(),
+  include: Users_work_schedulesIncludeSchema.optional(),
   data: z.union([ Users_work_schedulesUpdateInputSchema,Users_work_schedulesUncheckedUpdateInputSchema ]),
   where: Users_work_schedulesWhereUniqueInputSchema,
 }).strict()
@@ -20591,13 +20724,15 @@ export const Users_work_schedulesDeleteManyArgsSchema: z.ZodType<Prisma.Users_wo
   where: Users_work_schedulesWhereInputSchema.optional(),
 }).strict()
 
-export const Work_schedule_entriesCreateArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesCreateArgs, "include">> = z.object({
+export const Work_schedule_entriesCreateArgsSchema: z.ZodType<Prisma.Work_schedule_entriesCreateArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ Work_schedule_entriesCreateInputSchema,Work_schedule_entriesUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Work_schedule_entriesUpsertArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesUpsertArgs, "include">> = z.object({
+export const Work_schedule_entriesUpsertArgsSchema: z.ZodType<Prisma.Work_schedule_entriesUpsertArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
   create: z.union([ Work_schedule_entriesCreateInputSchema,Work_schedule_entriesUncheckedCreateInputSchema ]),
   update: z.union([ Work_schedule_entriesUpdateInputSchema,Work_schedule_entriesUncheckedUpdateInputSchema ]),
@@ -20608,13 +20743,15 @@ export const Work_schedule_entriesCreateManyArgsSchema: z.ZodType<Prisma.Work_sc
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Work_schedule_entriesDeleteArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesDeleteArgs, "include">> = z.object({
+export const Work_schedule_entriesDeleteArgsSchema: z.ZodType<Prisma.Work_schedule_entriesDeleteArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
 
-export const Work_schedule_entriesUpdateArgsSchema: z.ZodType<Omit<Prisma.Work_schedule_entriesUpdateArgs, "include">> = z.object({
+export const Work_schedule_entriesUpdateArgsSchema: z.ZodType<Prisma.Work_schedule_entriesUpdateArgs> = z.object({
   select: Work_schedule_entriesSelectSchema.optional(),
+  include: Work_schedule_entriesIncludeSchema.optional(),
   data: z.union([ Work_schedule_entriesUpdateInputSchema,Work_schedule_entriesUncheckedUpdateInputSchema ]),
   where: Work_schedule_entriesWhereUniqueInputSchema,
 }).strict()
@@ -20628,13 +20765,15 @@ export const Work_schedule_entriesDeleteManyArgsSchema: z.ZodType<Prisma.Work_sc
   where: Work_schedule_entriesWhereInputSchema.optional(),
 }).strict()
 
-export const Api_tokensCreateArgsSchema: z.ZodType<Omit<Prisma.Api_tokensCreateArgs, "include">> = z.object({
+export const Api_tokensCreateArgsSchema: z.ZodType<Prisma.Api_tokensCreateArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   data: z.union([ Api_tokensCreateInputSchema,Api_tokensUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Api_tokensUpsertArgsSchema: z.ZodType<Omit<Prisma.Api_tokensUpsertArgs, "include">> = z.object({
+export const Api_tokensUpsertArgsSchema: z.ZodType<Prisma.Api_tokensUpsertArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
   create: z.union([ Api_tokensCreateInputSchema,Api_tokensUncheckedCreateInputSchema ]),
   update: z.union([ Api_tokensUpdateInputSchema,Api_tokensUncheckedUpdateInputSchema ]),
@@ -20645,13 +20784,15 @@ export const Api_tokensCreateManyArgsSchema: z.ZodType<Prisma.Api_tokensCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Api_tokensDeleteArgsSchema: z.ZodType<Omit<Prisma.Api_tokensDeleteArgs, "include">> = z.object({
+export const Api_tokensDeleteArgsSchema: z.ZodType<Prisma.Api_tokensDeleteArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
 
-export const Api_tokensUpdateArgsSchema: z.ZodType<Omit<Prisma.Api_tokensUpdateArgs, "include">> = z.object({
+export const Api_tokensUpdateArgsSchema: z.ZodType<Prisma.Api_tokensUpdateArgs> = z.object({
   select: Api_tokensSelectSchema.optional(),
+  include: Api_tokensIncludeSchema.optional(),
   data: z.union([ Api_tokensUpdateInputSchema,Api_tokensUncheckedUpdateInputSchema ]),
   where: Api_tokensWhereUniqueInputSchema,
 }).strict()
@@ -20665,13 +20806,15 @@ export const Api_tokensDeleteManyArgsSchema: z.ZodType<Prisma.Api_tokensDeleteMa
   where: Api_tokensWhereInputSchema.optional(),
 }).strict()
 
-export const TimesheetCreateArgsSchema: z.ZodType<Omit<Prisma.TimesheetCreateArgs, "include">> = z.object({
+export const TimesheetCreateArgsSchema: z.ZodType<Prisma.TimesheetCreateArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   data: z.union([ TimesheetCreateInputSchema,TimesheetUncheckedCreateInputSchema ]),
 }).strict()
 
-export const TimesheetUpsertArgsSchema: z.ZodType<Omit<Prisma.TimesheetUpsertArgs, "include">> = z.object({
+export const TimesheetUpsertArgsSchema: z.ZodType<Prisma.TimesheetUpsertArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
   create: z.union([ TimesheetCreateInputSchema,TimesheetUncheckedCreateInputSchema ]),
   update: z.union([ TimesheetUpdateInputSchema,TimesheetUncheckedUpdateInputSchema ]),
@@ -20682,13 +20825,15 @@ export const TimesheetCreateManyArgsSchema: z.ZodType<Prisma.TimesheetCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const TimesheetDeleteArgsSchema: z.ZodType<Omit<Prisma.TimesheetDeleteArgs, "include">> = z.object({
+export const TimesheetDeleteArgsSchema: z.ZodType<Prisma.TimesheetDeleteArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
 
-export const TimesheetUpdateArgsSchema: z.ZodType<Omit<Prisma.TimesheetUpdateArgs, "include">> = z.object({
+export const TimesheetUpdateArgsSchema: z.ZodType<Prisma.TimesheetUpdateArgs> = z.object({
   select: TimesheetSelectSchema.optional(),
+  include: TimesheetIncludeSchema.optional(),
   data: z.union([ TimesheetUpdateInputSchema,TimesheetUncheckedUpdateInputSchema ]),
   where: TimesheetWhereUniqueInputSchema,
 }).strict()
@@ -20702,13 +20847,15 @@ export const TimesheetDeleteManyArgsSchema: z.ZodType<Prisma.TimesheetDeleteMany
   where: TimesheetWhereInputSchema.optional(),
 }).strict()
 
-export const Scheduled_reportsCreateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsCreateArgs, "include">> = z.object({
+export const Scheduled_reportsCreateArgsSchema: z.ZodType<Prisma.Scheduled_reportsCreateArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   data: z.union([ Scheduled_reportsCreateInputSchema,Scheduled_reportsUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Scheduled_reportsUpsertArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsUpsertArgs, "include">> = z.object({
+export const Scheduled_reportsUpsertArgsSchema: z.ZodType<Prisma.Scheduled_reportsUpsertArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
   create: z.union([ Scheduled_reportsCreateInputSchema,Scheduled_reportsUncheckedCreateInputSchema ]),
   update: z.union([ Scheduled_reportsUpdateInputSchema,Scheduled_reportsUncheckedUpdateInputSchema ]),
@@ -20719,13 +20866,15 @@ export const Scheduled_reportsCreateManyArgsSchema: z.ZodType<Prisma.Scheduled_r
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Scheduled_reportsDeleteArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsDeleteArgs, "include">> = z.object({
+export const Scheduled_reportsDeleteArgsSchema: z.ZodType<Prisma.Scheduled_reportsDeleteArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reportsUpdateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reportsUpdateArgs, "include">> = z.object({
+export const Scheduled_reportsUpdateArgsSchema: z.ZodType<Prisma.Scheduled_reportsUpdateArgs> = z.object({
   select: Scheduled_reportsSelectSchema.optional(),
+  include: Scheduled_reportsIncludeSchema.optional(),
   data: z.union([ Scheduled_reportsUpdateInputSchema,Scheduled_reportsUncheckedUpdateInputSchema ]),
   where: Scheduled_reportsWhereUniqueInputSchema,
 }).strict()
@@ -20739,13 +20888,15 @@ export const Scheduled_reportsDeleteManyArgsSchema: z.ZodType<Prisma.Scheduled_r
   where: Scheduled_reportsWhereInputSchema.optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionCreateArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionCreateArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionCreateArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ Scheduled_reports_subscriptionCreateInputSchema,Scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
 }).strict()
 
-export const Scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionUpsertArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionUpsertArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionUpsertArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
   create: z.union([ Scheduled_reports_subscriptionCreateInputSchema,Scheduled_reports_subscriptionUncheckedCreateInputSchema ]),
   update: z.union([ Scheduled_reports_subscriptionUpdateInputSchema,Scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
@@ -20756,13 +20907,15 @@ export const Scheduled_reports_subscriptionCreateManyArgsSchema: z.ZodType<Prism
   skipDuplicates: z.boolean().optional(),
 }).strict()
 
-export const Scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionDeleteArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionDeleteArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionDeleteArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()
 
-export const Scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Omit<Prisma.Scheduled_reports_subscriptionUpdateArgs, "include">> = z.object({
+export const Scheduled_reports_subscriptionUpdateArgsSchema: z.ZodType<Prisma.Scheduled_reports_subscriptionUpdateArgs> = z.object({
   select: Scheduled_reports_subscriptionSelectSchema.optional(),
+  include: Scheduled_reports_subscriptionIncludeSchema.optional(),
   data: z.union([ Scheduled_reports_subscriptionUpdateInputSchema,Scheduled_reports_subscriptionUncheckedUpdateInputSchema ]),
   where: Scheduled_reports_subscriptionWhereUniqueInputSchema,
 }).strict()

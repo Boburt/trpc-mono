@@ -4,10 +4,10 @@ import {
   Users_rolesFindUniqueArgsSchema,
   Users_rolesWithRelations,
 } from "@backend/lib/zod";
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { createManyRolesForUserSchema } from "@backend/lib/custom_zod_objects/createManyRolesForUser";
+import { DB } from "@backend/db";
 
 export class UsersRolesService {
   constructor(private readonly prisma: DB) {}

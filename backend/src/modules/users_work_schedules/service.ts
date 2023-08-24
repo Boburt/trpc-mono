@@ -3,10 +3,10 @@ import {
   Users_work_schedulesFindManyArgsSchema,
   Users_work_schedulesFindUniqueArgsSchema,
 } from "@backend/lib/zod";
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { DB } from "@backend/db";
 
 export class UsersWorkSchedulesService {
   constructor(private readonly prisma: DB) {}
