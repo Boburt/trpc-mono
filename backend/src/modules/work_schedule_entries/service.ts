@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { DB } from "@backend/trpc";
 import { PaginationType } from "@backend/lib/pagination_interface";
 import {
   Work_schedule_entries,
@@ -7,6 +6,7 @@ import {
   Work_schedule_entriesFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { z } from "zod";
+import { DB } from "@backend/db";
 
 export class WorkScheduleEntriesService {
   constructor(private readonly prisma: DB) {}
