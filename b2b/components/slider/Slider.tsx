@@ -8,21 +8,28 @@ import Image2 from "../../public/images/bmw.jpg";
 import Image3 from "../../public/images/mercedes.jpg";
 import Image from "next/image";
 
-export default function Slider() {
+export default function Slider({
+  images,
+  imageWidth,
+  imageHeight,
+}: {
+  images: string[];
+  imageWidth: number;
+  imageHeight: number;
+}) {
   return (
     <Carousel className="dislay m-auto p-4">
-      <div>
-        <Image src={Image1} alt="Slider 1" width={100} height={100} />
-        <p className="carousel-status"></p>
-      </div>
-      <div>
-        <Image src={Image2} alt="Slider 2" width={100} height={100} />
-        <p className="carousel-status"></p>
-      </div>
-      <div>
-        <Image src={Image3} alt="Slider 3" width={100} height={100} />
-        <p className="carousel-status"></p>
-      </div>
+      {images.map((image, index) => (
+        <div key={index}>
+          <Image
+            src={image}
+            width={imageWidth}
+            height={imageHeight}
+            alt="Slider"
+          />
+          <p className="carousel-status"></p>
+        </div>
+      ))}
     </Carousel>
   );
 }
