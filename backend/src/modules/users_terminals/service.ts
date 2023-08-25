@@ -1,4 +1,3 @@
-import { DB } from "@backend/trpc";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import {
@@ -7,6 +6,7 @@ import {
   Users_terminalsFindUniqueArgsSchema,
 } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { DB } from "@backend/db";
 
 export class UsersTerminalsService {
   constructor(private readonly prisma: DB) {}
