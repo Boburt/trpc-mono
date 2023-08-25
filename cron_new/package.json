@@ -1,0 +1,16 @@
+{
+  "name": "cron",
+  "version": "1.0.50",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts -p 8080"
+  },
+  "dependencies": {
+    "@elysiajs/cron": "^0.6.0",
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
+}
