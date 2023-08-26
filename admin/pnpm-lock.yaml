@@ -138,7 +138,7 @@ dependencies:
     specifier: 5.1.6
     version: 5.1.6
   zod:
-    specifier: ^3.21.1
+    specifier: 3.21.1
     version: 3.21.1
   zustand:
     specifier: ^4.4.1
