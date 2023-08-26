@@ -17,6 +17,23 @@
             "/images/audi.jpg",
             "/images/bmw.jpg",
             "/images/mercedes.jpg"
+        ],
+        "products": [
+            {
+                "price": "210",
+                "image": "/images/iphone12.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/hp.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/lambordzhini.jpg",
+                "moq": "20 km"
+            }
         ]
     },
     {
@@ -37,6 +54,23 @@
             "/images/audi.jpg",
             "/images/bmw.jpg",
             "/images/mercedes.jpg"
+        ],
+        "products": [
+            {
+                "price": "210",
+                "image": "/images/iphone12.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/hp.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/lambordzhini.jpg",
+                "moq": "20 km"
+            }
         ]
     },
     {
@@ -57,6 +91,23 @@
             "/images/audi.jpg",
             "/images/bmw.jpg",
             "/images/mercedes.jpg"
+        ],
+        "products": [
+            {
+                "price": "210",
+                "image": "/images/iphone12.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/hp.jpg",
+                "moq": "20 km"
+            },
+            {
+                "price": "210",
+                "image": "/images/lambordzhini.jpg",
+                "moq": "20 km"
+            }
         ]
     }
 ]
