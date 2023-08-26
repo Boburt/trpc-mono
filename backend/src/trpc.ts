@@ -10,19 +10,13 @@ import { RolesPermissionsService } from "./modules/roles_permissions/service";
 import { UsersService } from "./modules/users/service";
 import { UsersPermissionsService } from "./modules/users_permissions/service";
 import { UsersRolesService } from "./modules/users_roles/service";
-import { WorkSchedulesService } from "./modules/work_schedules/service";
-import { TerminalsService } from "./modules/terminals/service";
-import { OrganizationService } from "./modules/organization/service";
-import { UsersTerminalsService } from "./modules/users_terminals/service";
 import { CacheControlService } from "./modules/cache_control/service";
 import { SessionsService } from "./modules/sessions/service";
-import { UsersWorkSchedulesService } from "./modules/users_work_schedules/service";
-import { WorkScheduleEntriesService } from "./modules/work_schedule_entries/service";
 import { ApiTokensService } from "./modules/api_tokens/service";
-import { TimesheetService } from "./modules/timesheet/service";
-import { ScheduledReportsService } from "./modules/scheduled_reports/service";
 import { db } from "./db";
 import { verifyJwt } from "./lib/bcrypt";
+import { LangsService } from "./modules/langs/service";
+import { CategoriesService } from "./modules/categories/service";
 
 const client = createClient();
 export type RedisClientType = typeof client;
@@ -38,27 +32,16 @@ const rolesPermissionsService = new RolesPermissionsService(
 const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
-const workSchedulesService = new WorkSchedulesService(db, cacheControlService);
-const terminalsService = new TerminalsService(db, cacheControlService);
-const organizationService = new OrganizationService(db, cacheControlService);
-const usersTerminalsService = new UsersTerminalsService(db);
 const sessionsService = new SessionsService(db);
-const usersWorkSchedulesService = new UsersWorkSchedulesService(db);
-const workScheduleEntriesService = new WorkScheduleEntriesService(db);
 const apiTokensService = new ApiTokensService(db, cacheControlService);
-const timesheetService = new TimesheetService(db);
-const scheduledReportsService = new ScheduledReportsService(
-  db,
-  cacheControlService
-);
+const langsService = new LangsService(db, cacheControlService);
+const categoriesService = new CategoriesService(db, cacheControlService);
 
 interface Meta {
   permission?: string;
 }
 
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
-  console.log(opts.req.headers);
-
   return {
     // prisma: db,
     permissionsService,
@@ -67,17 +50,11 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     usersService,
     usersPermissionsService,
     usersRolesService,
-    workSchedulesService,
-    terminalsService,
-    organizationService,
-    usersTerminalsService,
     cacheControlService,
     sessionsService,
-    usersWorkSchedulesService,
-    workScheduleEntriesService,
     apiTokensService,
-    timesheetService,
-    scheduledReportsService,
+    langsService,
+    categoriesService,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
   };
 };

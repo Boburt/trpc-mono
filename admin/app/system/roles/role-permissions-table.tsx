@@ -40,6 +40,7 @@ export function RolesPermissionsDataTable<TData, TValue>({
           equals: selectedRoleId,
         },
       },
+      take: 1000,
     },
     {
       enabled: Object.keys(rowSelection).length > 0,
