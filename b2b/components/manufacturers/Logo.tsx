@@ -14,7 +14,7 @@ export default function Logo({
   logoHeight: number;
 }) {
   return (
-    <div>
+    <div className="">
       <Image
         className="rounded-md"
         src={logos}
