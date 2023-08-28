@@ -57,9 +57,9 @@
         ],
         "products": [
             {
-                "price": "210",
+                "price": "110",
                 "image": "/images/iphone12.jpg",
-                "moq": "20 km"
+                "moq": "10 km"
             },
             {
                 "price": "210",
@@ -67,9 +67,9 @@
                 "moq": "20 km"
             },
             {
-                "price": "210",
+                "price": "310",
                 "image": "/images/lambordzhini.jpg",
-                "moq": "20 km"
+                "moq": "30 km"
             }
         ]
     },

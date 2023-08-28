@@ -13,6 +13,7 @@ import Slider from "../slider/Slider";
 import Logo from "./Logo";
 import Like from "./Like";
 import Products from "./Products";
+import jsonData from "../../public/manafacturer.json";
 
 export function ManufactureCard({ item }: { item: any }) {
   return (
@@ -30,14 +31,14 @@ export function ManufactureCard({ item }: { item: any }) {
         </div>
         <div className="card card-side flex justify-between">
           <div>
-            <div className="card-body">
+            <div className="card-body mt-4">
               <h6 className="font-light font-serif tracking-wide">
                 Rating and revews
               </h6>
               <p>
                 <span>{item.reyting}</span>/5({item.reviews} reviews)
               </p>
-              <h4 className="font-light font-serif tracking-wide">
+              <h4 className="font-light font-serif tracking-wide mt-5">
                 Factory capabilities
               </h4>
               {item.factory.map(
@@ -67,10 +68,12 @@ export function ManufactureCard({ item }: { item: any }) {
           </div>
           <div>
             <Products
-              price={item.products}
+              products={item.products}
+              price={item.products.prices}
               image={item.products.image}
               moq={item.products.moq}
-              products={item.products.price}
+              imageWidth={130}
+              imageHeight={1}
             />
           </div>
           <div className="w-1/3">
