@@ -1,27 +1,36 @@
 "use client";
-
 import React from "react";
 import Image from "next/image";
+import { any } from "zod";
 
 export default function Products({
   products,
   price,
-  moq,
   image,
+  moq,
+  imageWidth,
+  imageHeight,
 }: {
-  products: string[];
+  products: { price: string; image: string; moq: string }[];
   price: string[];
-  moq: string[];
   image: string[];
+  moq: string[];
+  imageWidth: number;
+  imageHeight: number;
 }) {
-  if (!products) {
-    return <div>No products to display.</div>;
-  }
   return (
-    <div>
+    <div className="flex flex-row justify-between mt-4">
       {products.map((product, index) => (
-        <div key={index}>
-          <Image src={image[index]} alt={moq[index]} width={100} height={100} />
+        <div key={index} className="mr-4">
+          <Image
+            src={product.image}
+            alt="Product"
+            width={imageWidth}
+            height={imageHeight}
+            className="h-full"
+          />
+          <h4>Price: {product.price}</h4>
+          <p>MOQ: {product.moq}</p>
         </div>
       ))}
     </div>
