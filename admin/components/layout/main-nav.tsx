@@ -55,16 +55,20 @@ const components: { title: string; href: string; description: string }[] = [
 const settingsMenu: { title: string; href: string }[] = [
   {
     title: "Разрешения",
-    href: "/settings/permissions",
+    href: "/system/permissions",
   },
   {
     title: "Роли",
-    href: "/settings/roles",
+    href: "/system/roles",
   },
   {
     title: "Пользователи",
-    href: "/settings/users"
-  }
+    href: "/system/users",
+  },
+  {
+    title: "Языки",
+    href: "/system/langs",
+  },
 ];
 
 export function NavigationMenuDemo() {
