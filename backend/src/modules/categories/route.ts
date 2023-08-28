@@ -57,9 +57,15 @@ export const categoriesRouter = publicRouter({
       return await ctx.categoriesService.delete(input);
     }),
 
-  cachedLangs: publicProcedure
+  cachedCategories: publicProcedure
     .input(CategoriesFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
-      return await ctx.categoriesService.cachedLangs(input);
+      return await ctx.categoriesService.cachedCategories(input);
+    }),
+
+  activeCachedCategories: publicProcedure
+    .input(CategoriesFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.categoriesService.activeCachedCategories(input);
     }),
 });

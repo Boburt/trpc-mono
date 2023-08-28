@@ -7,6 +7,7 @@ import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
 import { usersRolesRouter } from "./modules/users_roles/route";
 import { publicRouter } from "./trpc";
+import {categoriesRouter} from "@backend/modules/categories/route";
 
 export const router = publicRouter({
   permissions: permissionsRouter,
@@ -17,6 +18,7 @@ export const router = publicRouter({
   usersRoles: usersRolesRouter,
   sessions: sessionsRouter,
   langs: langsRouter,
+  categories: categoriesRouter,
 });
 
 export type Router = typeof router;
