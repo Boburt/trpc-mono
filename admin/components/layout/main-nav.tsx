@@ -13,6 +13,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@components/ui/navigation-menu";
+import CanAccess from "../can-access";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -89,6 +90,15 @@ export function NavigationMenuDemo() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <CanAccess permission="categories.list">
+          <NavigationMenuItem>
+            <Link href="/categories" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Категории
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
       </NavigationMenuList>
     </NavigationMenu>
   );

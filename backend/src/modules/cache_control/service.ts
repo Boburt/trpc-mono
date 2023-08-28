@@ -155,4 +155,24 @@ export class CacheControlService {
 
     return res;
   }
+
+  async getActiveCachedCategories({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Categories[]> {
+    const langs = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}categories`
+    );
+
+    let res = JSON.parse(langs ?? "[]");
+
+    res = res.filter((category: Categories) => category.active);
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res.filter((category: Categories) => category.active);
+  }
 }
