@@ -195,6 +195,7 @@ export default function CategoriesForm({
                         <>
                           <Input
                             {...field.getInputProps()}
+                            // @ts-ignore
                             value={field.getValue() ?? ""}
                           />
                         </>
@@ -239,6 +240,7 @@ export default function CategoriesForm({
                         <>
                           <Textarea
                             {...field.getInputProps()}
+                            // @ts-ignore
                             value={field.getValue() ?? ""}
                           />
                         </>
