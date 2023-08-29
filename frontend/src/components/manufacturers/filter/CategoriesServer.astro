@@ -1,15 +1,16 @@
 ---
-import { trpcClient} from "../../../utils/trpc-server";
-import CategoriesFilterClient from "./CategoriesClient";
-import Providers from "../../../store/provider";
-
+import { trpcClient } from "../../../utils/trpc-server";
+import CategoriesServerReact from "./CategoriesServerReact";
 
 const categories = await trpcClient.categories.activeCachedCategories.query({
-    take: 100
+  take: 100,
 });
 
 const pathname = new URL(Astro.request.url).pathname;
 ---
-<Providers client:load>
-<CategoriesFilterClient initialData={categories} pathname={pathname} client:load />
-</Providers>
+
+<CategoriesServerReact
+  categories={categories}
+  pathname={pathname}
+  client:load
+/>

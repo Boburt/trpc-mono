@@ -4,12 +4,11 @@ import { useMemo } from "react";
 
 export default function CategoriesFilterClient({
   initialData,
-    pathname
+  pathname,
 }: {
   initialData: RouterOutputs["categories"]["activeCachedCategories"];
   pathname: string;
 }) {
-
   const { data: categories, isLoading } =
     trpc.categories.activeCachedCategories.useQuery(
       {
