@@ -18,7 +18,7 @@ export default defineConfig({
   },
   server: {
     port: 4000,
-    host: false,
+    host: true,
   },
   integrations: [tailwind(), compress(), react()],
 });
