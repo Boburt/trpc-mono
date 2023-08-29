@@ -3,14 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 7000",
+    "dev": "bun run next_dev",
     "build": "next build",
     "start": "next start -p 7000",
-    "lint": "next lint"
+    "lint": "next lint",
+    "next_dev": "next dev -p 7000"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.33.0",
+    "@trpc/client": "^10.38.0",
+    "@trpc/react-query": "^10.38.0",
+    "@trpc/server": "^10.38.0",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.14",
+    "clsx": "^2.0.0",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.13",
     "ioredis": "^5.3.2",
@@ -21,7 +27,9 @@
     "react-responsive-carousel": "^3.2.23",
     "sharp": "^0.32.5",
     "swr": "^2.2.1",
-    "tailwindcss": "3.3.3"
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss": "3.3.3",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@types/node": "20.5.0",

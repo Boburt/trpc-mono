@@ -64,9 +64,15 @@ export class CategoriesService {
     return res;
   }
 
-  async cachedLangs(
+  async cachedCategories(
     input: z.infer<typeof CategoriesFindManyArgsSchema>
   ): Promise<Categories[]> {
     return await this.cacheControl.getCachedCategories(input);
+  }
+
+  async activeCachedCategories(
+    input: z.infer<typeof CategoriesFindManyArgsSchema>
+  ): Promise<Categories[]> {
+    return await this.cacheControl.getActiveCachedCategories(input);
   }
 }
