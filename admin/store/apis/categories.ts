@@ -1,6 +1,6 @@
-import {trpc, ReactQueryOptions, RouterInputs} from "@admin/utils/trpc";
+import { trpc, ReactQueryOptions, RouterInputs } from "@admin/utils/trpc";
 
-export function useCategoriesQuery(filter: RouterInputs['categories']['list']) {
+export function useCategoriesQuery(filter: RouterInputs["categories"]["list"]) {
   return trpc.categories.list.useQuery(filter);
 }
 
@@ -16,6 +16,7 @@ export function useCategoriesCreate(
       options?.onSuccess?.(
         post,
         {
+          // @ts-ignore
           data: post,
         },
         {}
@@ -36,6 +37,7 @@ export function useCategoriesUpdate(
       options?.onSuccess?.(
         post,
         {
+          // @ts-ignore
           data: post,
           where: {
             id: post.id,
