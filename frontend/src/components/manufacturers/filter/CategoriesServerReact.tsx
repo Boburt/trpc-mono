@@ -1,11 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { trpc } from "../utils/trpc";
-import { useMemo, useState } from "react";
+import { RouterOutputs, trpc } from "../../../utils/trpc";
+import { useState } from "react";
 import { httpBatchLink } from "@trpc/client";
+import CategoriesFilterClient from "./CategoriesClient";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function CategoriesServerReact({
+  categories,
+  pathname,
+}: {
+  categories: RouterOutputs["categories"]["activeCachedCategories"];
+  pathname: string;
+}) {
   const [queryClient] = useState(() => new QueryClient({}));
-  console.log(import.meta.env);
   const [trpcClient] = useState(() => {
     return trpc.createClient({
       links: [
@@ -18,7 +24,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <CategoriesFilterClient initialData={categories} pathname={pathname} />
+      </QueryClientProvider>
     </trpc.Provider>
   );
 }
