@@ -4,6 +4,10 @@ export function useLangsQuery(filter: RouterInputs["langs"]["list"]) {
   return trpc.langs.list.useQuery(filter);
 }
 
+export function useCachedLangsQuery(filter: RouterInputs["langs"]["list"]) {
+  return trpc.langs.cachedLangs.useQuery(filter);
+}
+
 export function useLangsCreate(options: ReactQueryOptions["langs"]["add"]) {
   const utils = trpc.useContext();
   return trpc.langs.add.useMutation({
