@@ -19,7 +19,8 @@
       "@admin/*": ["./admin/*"],
       "@lib/*": ["./lib/*"],
       "@components/*": ["./admin/components/*"],
-      "@/*": ["./b2b/*"]
+      "@/*": ["./b2b/*"],
+      "@uploads/*": ["./uploads/*"]
     }
   }
 }

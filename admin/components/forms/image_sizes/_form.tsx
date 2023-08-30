@@ -1,9 +1,12 @@
 import { useToast } from "@admin/components/ui/use-toast";
-import { useLangsCreate, useLangsUpdate } from "@admin/store/apis/langs";
+import {
+  useImageSizesCreate,
+  useImageSizesUpdate,
+} from "@admin/store/apis/image_sizes";
 import { Button } from "@components/ui/button";
 import { Switch } from "@components/ui/switch";
 import { trpc } from "@admin/utils/trpc";
-import { LangsCreateInputSchema } from "@backend/lib/zod";
+import { ImageSizesCreateInputSchema } from "@backend/lib/zod";
 import { useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
@@ -11,15 +14,17 @@ import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 
-const formFactory = createFormFactory<z.infer<typeof LangsCreateInputSchema>>({
+const formFactory = createFormFactory<
+  z.infer<typeof ImageSizesCreateInputSchema>
+>({
   defaultValues: {
-    name: "",
     code: "",
-    is_default: false,
+    width: 500,
+    height: 500,
   },
 });
 
-export default function LangsForm({
+export default function ImageSizesForm({
   setOpen,
   recordId,
 }: {
@@ -28,19 +33,10 @@ export default function LangsForm({
 }) {
   const { toast } = useToast();
 
-  // const form = useForm<z.infer<typeof PermissionsCreateInputSchema>>({
-  //   resolver: zodResolver(PermissionsCreateInputSchema),
-  //   defaultValues: {
-  //     active: true,
-  //     slug: "",
-  //     description: "",
-  //   },
-  // });
-
   const onAddSuccess = (actionText: string) => {
     toast({
       title: "Success",
-      description: `Langs ${actionText}`,
+      description: `Image Sizes ${actionText}`,
       duration: 5000,
     });
     // form.reset();
@@ -57,42 +53,51 @@ export default function LangsForm({
   };
 
   const {
-    mutateAsync: createLang,
+    mutateAsync: createImageSizes,
     isLoading: isAddLoading,
     data,
     error,
-  } = useLangsCreate({
+  } = useImageSizesCreate({
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
   const {
-    mutateAsync: updateLang,
+    mutateAsync: updateImageSizes,
     isLoading: isUpdateLoading,
     error: updateError,
-  } = useLangsUpdate({
+  } = useImageSizesUpdate({
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
 
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
+      if (values.width) {
+        values.width = +values.width;
+      }
+
+      if (values.height) {
+        values.height = +values.height;
+      }
+
       if (recordId) {
-        updateLang({ data: values, where: { id: recordId } });
+        updateImageSizes({ data: values, where: { id: recordId } });
       } else {
-        createLang({ data: values });
+        createImageSizes({ data: values });
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } = trpc.langs.one.useQuery(
-    {
-      where: { id: recordId },
-    },
-    {
-      enabled: !!recordId,
-    }
-  );
+  const { data: record, isLoading: isRecordLoading } =
+    trpc.imageSizes.one.useQuery(
+      {
+        where: { id: recordId },
+      },
+      {
+        enabled: !!recordId,
+      }
+    );
 
   const isLoading = useMemo(() => {
     return isAddLoading || isUpdateLoading;
@@ -100,32 +105,15 @@ export default function LangsForm({
 
   useEffect(() => {
     if (record) {
-      form.setFieldValue("is_default", record.is_default);
       form.setFieldValue("code", record.code);
-      form.setFieldValue("name", record.name);
+      form.setFieldValue("width", record.width);
+      form.setFieldValue("height", record.height);
     }
   }, [record]);
 
   return (
     <form.Provider>
       <form {...form.getFormProps()} className="space-y-8">
-        <div className="space-y-2">
-          <div>
-            <Label>По-умолчанию</Label>
-          </div>
-          <form.Field name="is_default">
-            {(field) => {
-              return (
-                <>
-                  <Switch
-                    checked={field.getValue()}
-                    onCheckedChange={field.setValue}
-                  />
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
         <div className="space-y-2">
           <div>
             <Label>Код</Label>
@@ -145,15 +133,34 @@ export default function LangsForm({
         </div>
         <div className="space-y-2">
           <div>
-            <Label>Заголовок</Label>
+            <Label>Ширина</Label>
           </div>
-          <form.Field name="name">
+          <form.Field name="width">
             {(field) => {
               return (
                 <>
                   <Input
                     {...field.getInputProps()}
                     value={field.getValue() ?? ""}
+                    type="number"
+                  />
+                </>
+              );
+            }}
+          </form.Field>
+        </div>
+        <div className="space-y-2">
+          <div>
+            <Label>Высота</Label>
+          </div>
+          <form.Field name="height">
+            {(field) => {
+              return (
+                <>
+                  <Input
+                    {...field.getInputProps()}
+                    value={field.getValue() ?? ""}
+                    type="number"
                   />
                 </>
               );

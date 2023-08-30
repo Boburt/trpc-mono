@@ -1,4 +1,6 @@
+import { imageSizesRouter } from "./modules/image_sizes/route";
 import { langsRouter } from "./modules/langs/route";
+import { manufacturersRouter } from "./modules/manufacturers/route";
 import { permissionsRouter } from "./modules/permissions/route";
 import { rolesRouter } from "./modules/roles/route";
 import { rolesPermissionsRouter } from "./modules/roles_permissions/route";
@@ -7,7 +9,7 @@ import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
 import { usersRolesRouter } from "./modules/users_roles/route";
 import { publicRouter } from "./trpc";
-import {categoriesRouter} from "@backend/modules/categories/route";
+import { categoriesRouter } from "@backend/modules/categories/route";
 
 export const router = publicRouter({
   permissions: permissionsRouter,
@@ -19,6 +21,8 @@ export const router = publicRouter({
   sessions: sessionsRouter,
   langs: langsRouter,
   categories: categoriesRouter,
+  imageSizes: imageSizesRouter,
+  manufacturers: manufacturersRouter,
 });
 
 export type Router = typeof router;

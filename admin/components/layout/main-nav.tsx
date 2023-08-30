@@ -70,6 +70,10 @@ const settingsMenu: { title: string; href: string }[] = [
     title: "Языки",
     href: "/system/langs",
   },
+  {
+    title: "Размеры изображений",
+    href: "/system/image_sizes",
+  },
 ];
 
 export function NavigationMenuDemo() {
