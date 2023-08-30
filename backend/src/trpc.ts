@@ -17,25 +17,31 @@ import { db } from "./db";
 import { verifyJwt } from "./lib/bcrypt";
 import { LangsService } from "./modules/langs/service";
 import { CategoriesService } from "./modules/categories/service";
+import { ImageSizesService } from "./modules/image_sizes/service";
+import { AssetsService } from "./modules/assets/service";
+import { ManufacturersService } from "./modules/manufacturers/service";
 
-const client = createClient();
+export const client = createClient();
 export type RedisClientType = typeof client;
 
 await client.connect();
-const cacheControlService = new CacheControlService(db, client);
+export const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
 const rolesService = new RolesService(db, cacheControlService);
 const rolesPermissionsService = new RolesPermissionsService(
   db,
   cacheControlService
 );
-const usersService = new UsersService(db, cacheControlService);
+export const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const sessionsService = new SessionsService(db);
 const apiTokensService = new ApiTokensService(db, cacheControlService);
 const langsService = new LangsService(db, cacheControlService);
 const categoriesService = new CategoriesService(db, cacheControlService);
+const imageSizesService = new ImageSizesService(db, cacheControlService);
+export const assetsService = new AssetsService(db, cacheControlService);
+const manufacturersService = new ManufacturersService(db, cacheControlService);
 
 interface Meta {
   permission?: string;
@@ -55,6 +61,8 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     apiTokensService,
     langsService,
     categoriesService,
+    imageSizesService,
+    manufacturersService,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
   };
 };

@@ -117,6 +117,8 @@ model Users {
   api_tokens_updated_byTousers                          Api_tokens[]                     @relation("api_tokens_updated_byTousers")
   scheduled_reports_subscription_users                  Scheduled_reports_subscription[]
   sessions                                              Sessions[]                       @relation("sessions_users")
+  assets_created_byTousers                              Assets[]                         @relation("assets_created_byTousers")
+  assets_updated_byTousers                              Assets[]                         @relation("assets_updated_byTousers")
 
   @@index([login], map: "fki_users_login")
   @@map("users")
@@ -233,6 +235,47 @@ model Categories {
   updated_at       DateTime @default(now()) @db.Timestamptz(5)
 
   @@map("categories")
+}
+
+model ImageSizes {
+  id     String @id(map: "PK_image_sizes_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code   String @unique
+  width  Int
+  height Int
+
+  @@map("image_sizes")
+}
+
+model Assets {
+  id          String   @id(map: "PK_assets_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  path        String?
+  size        Int
+  mime_type   String
+  parent_id   String?  @db.Uuid
+  resize_code String?
+  model       String?
+  model_id    String?
+  created_at  DateTime @default(now()) @db.Timestamptz(5)
+  updated_at  DateTime @default(now()) @db.Timestamptz(5)
+  created_by  String?  @db.Uuid
+  updated_by  String?  @db.Uuid
+
+  assets_created_byTousers Users? @relation("assets_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, map: "FK_assets_created_by")
+  assets_updated_byTousers Users? @relation("assets_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, map: "FK_assets_updated_by")
+
+  @@map("assets")
+}
+
+model Manufacturers {
+  id          String   @id(map: "PK_manufacturers_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(5)
+  updated_at  DateTime @default(now()) @db.Timestamptz(5)
+
+  @@map("manufacturers")
 }
 
 enum organization_system_type {
