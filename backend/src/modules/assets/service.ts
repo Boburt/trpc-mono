@@ -3,11 +3,13 @@ import path from "path";
 
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
+import { Queue } from "bullmq";
 
 export class AssetsService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService
+    private readonly cacheControl: CacheControlService,
+    private readonly queue: Queue
   ) {}
 
   async addAsset({
@@ -38,6 +40,19 @@ export class AssetsService {
             id: asset.id,
           },
         });
+
+        // delete all childs of asset
+        await this.prisma.assets.deleteMany({
+          where: {
+            parent_id: asset.id,
+          },
+        });
+
+        try {
+          await fs.rmSync(`../uploads/dist/${asset.id}`, {
+            recursive: true,
+          });
+        } catch (error) {}
       }
     }
 
@@ -48,10 +63,23 @@ export class AssetsService {
         mime_type: file.type,
         name,
         size: file.size,
+        path: "sources",
       },
     });
     await fs.mkdirSync(`../uploads/sources/${asset.id}`, { recursive: true });
     Bun.write(`../uploads/sources/${asset.id}/${name}`, file);
+
+    file.type.split("/")[0] === "image" &&
+      this.queue.add(
+        asset.id,
+        {
+          asset_id: asset.id,
+        },
+        {
+          removeOnComplete: true,
+        }
+      );
+
     return asset;
   }
 }
