@@ -9,11 +9,14 @@
   "dependencies": {
     "@elysiajs/cors": "^0.6.0",
     "@elysiajs/jwt": "^0.6.3",
+    "@elysiajs/static": "^0.6.0",
     "@elysiajs/trpc": "^0.6.1",
     "@elysiajs/websocket": "^0.2.8",
     "@prisma/client": "^5.1.1",
     "@trpc/server": "^10.37.1",
+    "bullmq": "^4.8.0",
     "elysia": "^0.6.11",
+    "ioredis": "^5.3.2",
     "jose": "^4.14.4",
     "prisma-extension-pagination": "^0.4.2",
     "redis": "^4.6.7",
@@ -21,6 +24,7 @@
     "zod-prisma-types": "^2.7.9"
   },
   "devDependencies": {
+    "@types/bull": "^4.10.0",
     "bun-types": "^0.7.3",
     "prisma": "^5.1.1"
   },

@@ -10,9 +10,6 @@ export default defineConfig({
     mode: "middleware",
   }),
   output: "hybrid",
-  experimental: {
-    assets: true,
-  },
   image: {
     service: sharpImageService(),
   },
@@ -20,5 +17,5 @@ export default defineConfig({
     port: 4000,
     host: true,
   },
-  integrations: [tailwind(), compress(), react()],
+  integrations: [tailwind(), react()],
 });
