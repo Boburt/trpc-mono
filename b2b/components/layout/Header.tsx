@@ -19,6 +19,9 @@ export default function Header() {
               <li>
                 <Link href="/about">About</Link>
               </li>
+              <li>
+                <Link href="/auth">Sing Up</Link>
+              </li>
             </ul>
           </nav>
         </div>
