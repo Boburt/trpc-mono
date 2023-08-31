@@ -3,6 +3,8 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { createClient } from "redis";
+import Redis from "ioredis";
+import { Queue } from "bullmq";
 
 import { PermissionsService } from "./modules/permissions/service";
 import { RolesService } from "./modules/roles/service";
@@ -21,10 +23,22 @@ import { ImageSizesService } from "./modules/image_sizes/service";
 import { AssetsService } from "./modules/assets/service";
 import { ManufacturersService } from "./modules/manufacturers/service";
 
-export const client = createClient();
+// redis
+export const client = new Redis({
+  maxRetriesPerRequest: null,
+});
 export type RedisClientType = typeof client;
 
-await client.connect();
+// bull queues
+
+export const newAssetsAddedQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}new_assets_added`,
+  {
+    connection: client,
+  }
+);
+
+// services
 export const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
 const rolesService = new RolesService(db, cacheControlService);
@@ -40,13 +54,18 @@ const apiTokensService = new ApiTokensService(db, cacheControlService);
 const langsService = new LangsService(db, cacheControlService);
 const categoriesService = new CategoriesService(db, cacheControlService);
 const imageSizesService = new ImageSizesService(db, cacheControlService);
-export const assetsService = new AssetsService(db, cacheControlService);
+export const assetsService = new AssetsService(
+  db,
+  cacheControlService,
+  newAssetsAddedQueue
+);
 const manufacturersService = new ManufacturersService(db, cacheControlService);
 
 interface Meta {
   permission?: string;
 }
 
+// context trpc
 export const createContext = async (opts: FetchCreateContextFnOptions) => {
   return {
     // prisma: db,

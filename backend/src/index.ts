@@ -1,7 +1,7 @@
 import { Elysia, type HookHandler, t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { trpc } from "@elysiajs/trpc";
-
+import { staticPlugin } from "@elysiajs/static";
 import {
   publicRouter,
   createContext,
@@ -89,6 +89,11 @@ const checkRestPermission = async ({
 };
 
 const app = new Elysia()
+  .use(
+    staticPlugin({
+      assets: "../uploads",
+    })
+  )
   .state("prisma", db)
   .state("redis", redisClient)
   .state("assetsService", assetsService)
