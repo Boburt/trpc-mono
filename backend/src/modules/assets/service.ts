@@ -79,7 +79,6 @@ export class AssetsService {
           removeOnComplete: true,
         }
       );
-
     return asset;
   }
 }
