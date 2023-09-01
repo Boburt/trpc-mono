@@ -4,6 +4,7 @@ import { db } from "@backend/db";
 import { ImageSizes } from "@backend/lib/zod";
 import path from "path";
 import sharp from "sharp";
+import fs from "fs";
 import processNewImages from "./processors/new_assets_added";
 
 export const redisClient = new Redis({
