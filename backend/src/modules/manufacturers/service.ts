@@ -9,6 +9,11 @@ import {
 import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
+import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
+import {
+  ManufacturersWithImagesFindManyArgsSchema,
+  ManufacturersWithImagesSchema,
+} from "./dto/list.dto";
 
 export class ManufacturersService {
   constructor(
@@ -16,14 +21,26 @@ export class ManufacturersService {
     private readonly cacheControl: CacheControlService
   ) {}
 
-  async create(input: Prisma.ManufacturersCreateArgs): Promise<Manufacturers> {
+  async create(
+    input: z.infer<typeof ManufacturersCreateArgsSchemaWithAsset>
+  ): Promise<Manufacturers> {
     const res = await this.prisma.manufacturers.create(input);
+    if (input.asset) {
+      await this.prisma.assets.update({
+        where: {
+          id: input.asset,
+        },
+        data: {
+          model_id: res.id,
+        },
+      });
+    }
     return res;
   }
 
   async findMany(
-    input: z.infer<typeof ManufacturersFindManyArgsSchema>
-  ): Promise<PaginationType<Manufacturers>> {
+    input: z.infer<typeof ManufacturersWithImagesFindManyArgsSchema>
+  ): Promise<PaginationType<z.infer<typeof ManufacturersWithImagesSchema>>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
     if (input.skip && input.skip > 0) {

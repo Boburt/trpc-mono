@@ -4,23 +4,23 @@ import path from "path";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { Queue } from "bullmq";
+import { Assets, AssetsFindManyArgsSchema } from "@backend/lib/zod";
+import { PaginationType } from "@backend/lib/pagination_interface";
 
 export class AssetsService {
-  constructor(
-    private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService,
-    private readonly queue: Queue
-  ) {}
+  constructor(private readonly prisma: DB, private readonly queue: Queue) {}
 
   async addAsset({
     model,
     name,
     model_id,
+    code,
     file,
   }: {
     model: string;
     name: string;
     model_id?: string;
+    code?: string;
     file: Blob;
   }) {
     if (model_id) {
@@ -28,7 +28,7 @@ export class AssetsService {
         where: {
           model,
           model_id,
-          name,
+          code,
         },
       });
       if (asset) {
@@ -64,6 +64,7 @@ export class AssetsService {
         name,
         size: file.size,
         path: "sources",
+        code,
       },
     });
     await fs.mkdirSync(`../uploads/sources/${asset.id}`, { recursive: true });
@@ -80,5 +81,27 @@ export class AssetsService {
         }
       );
     return asset;
+  }
+
+  async listAssets(
+    input: Zod.infer<typeof AssetsFindManyArgsSchema>
+  ): Promise<PaginationType<Assets>> {
+    let take = input.take ?? 20;
+    let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    if (input.skip && input.skip > 0) {
+      skip++;
+    }
+    delete input.take;
+    delete input.skip;
+    const [assets, meta] = await this.prisma.assets.paginate(input).withPages({
+      limit: take,
+      page: skip,
+      includePageCount: true,
+    });
+
+    return {
+      items: assets,
+      meta,
+    };
   }
 }

@@ -1,0 +1,31 @@
+---
+import { trpcClient } from "@frontend/src/utils/trpc-server";
+import { ManufacturersWhereInputSchema } from "@backend/lib/zod/index";
+import { z } from "zod";
+import ManufacturersListClientProvider from "./ManufacturersListClientProvider";
+const { categorySlug } = Astro.props;
+
+const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
+
+if (categorySlug) {
+  where.manufacturers_categories = {
+    some: {
+      manufacturers_categories_categories: {
+        code: {
+          equals: categorySlug,
+        },
+      },
+    },
+  };
+}
+
+const manufacturers = await trpcClient.manufacturers.publicList.query({
+  where,
+  take: 20,
+});
+---
+
+<ManufacturersListClientProvider
+  initialData={manufacturers}
+  categorySlug={categorySlug}
+/>

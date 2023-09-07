@@ -20,7 +20,7 @@ import {
 
 import { Button } from "@components/ui/button";
 
-import { useCategoriesQuery } from "@admin/store/apis/categories";
+import { useManufacturersQuery } from "@admin/store/apis/manufacturers";
 import { useMemo, useState } from "react";
 import {
   Select,
@@ -39,7 +39,7 @@ import { RouterOutputs } from "@admin/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<
-    RouterOutputs["categories"]["list"]["items"][0],
+    RouterOutputs["manufacturers"]["list"]["items"][0],
     TValue
   >[];
 }
@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
     pageSize: 10,
   });
 
-  const { data, isLoading } = useCategoriesQuery({
+  const { data, isLoading } = useManufacturersQuery({
     take: pageSize,
     skip: pageIndex * pageSize,
   });

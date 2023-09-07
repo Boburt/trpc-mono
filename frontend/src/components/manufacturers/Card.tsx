@@ -3,17 +3,27 @@ import Slider from "../slider/Slider";
 import Logo from "./Logo";
 import Like from "./Like";
 import Products from "./Products";
+import { z } from "zod";
+import {
+  ManufacturersSchema,
+  ManufacturersWithRelationsSchema,
+} from "@backend/lib/zod";
+import { RouterOutputs } from "@frontend/src/utils/trpc";
 
-export function ManufactureCard({ item }: { item: any }) {
+export function ManufactureCard({
+  item,
+}: {
+  item: RouterOutputs["manufacturers"]["list"]["items"][number];
+}) {
   return (
     <>
       <div className="bg-base-200 shadow-xl mb-8 gap-96">
         <div className="flex justify-between w-full">
           <div className="flex mt-5 ml-5">
-            <Logo logos={item.logo} logoWidth={100} logoHeight={10} />
+            {/* <Logo logos={item.logo} logoWidth={100} logoHeight={10} /> */}
             <div className="ml-5">
-              <h1 className="text-2xl font-bold underline mb-1">{item.name}</h1>
-              <p>{item.derc}</p>
+              <h3 className="card-title uppercase">{item.short_name}</h3>
+              <span className="">{item.name}</span>
             </div>
           </div>
           <Like />
@@ -24,13 +34,13 @@ export function ManufactureCard({ item }: { item: any }) {
               <h6 className="font-light font-serif tracking-wide">
                 Rating and revews
               </h6>
-              <p>
+              {/* <p>
                 <span>{item.reyting}</span>/5({item.reviews} reviews)
-              </p>
+              </p> */}
               <h4 className="font-light font-serif tracking-wide mt-5">
                 Factory capabilities
               </h4>
-              {item.factory.map(
+              {/* {item.factory.map(
                 (facturyItem: any, facturIndex: Key | null | undefined) => (
                   <ul
                     role="list"
@@ -40,21 +50,21 @@ export function ManufactureCard({ item }: { item: any }) {
                     <li className="text-sm font-bold pl-2">{facturyItem}</li>
                   </ul>
                 )
-              )}
+              )} */}
             </div>
           </div>
           <div>
-            <Products
+            {/* <Products
               products={item.products}
               price={item.products.prices}
               image={item.products.image}
               moq={item.products.moq}
               imageWidth={130}
               imageHeight={1}
-            />
+            /> */}
           </div>
           <div className="w-1/3">
-            <Slider images={item.slider} imageWidth={464} imageHeight={384} />
+            {/* <Slider images={item.slider} imageWidth={464} imageHeight={384} /> */}
           </div>
         </div>
       </div>
