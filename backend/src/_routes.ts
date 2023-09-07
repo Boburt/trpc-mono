@@ -1,6 +1,8 @@
+import { assetsRouter } from "./modules/assets/route";
 import { imageSizesRouter } from "./modules/image_sizes/route";
 import { langsRouter } from "./modules/langs/route";
 import { manufacturersRouter } from "./modules/manufacturers/route";
+import { manufacturersCategoriesRouter } from "./modules/manufacturers_categories/route";
 import { permissionsRouter } from "./modules/permissions/route";
 import { rolesRouter } from "./modules/roles/route";
 import { rolesPermissionsRouter } from "./modules/roles_permissions/route";
@@ -23,6 +25,8 @@ export const router = publicRouter({
   categories: categoriesRouter,
   imageSizes: imageSizesRouter,
   manufacturers: manufacturersRouter,
+  manufacturersCategories: manufacturersCategoriesRouter,
+  assets: assetsRouter,
 });
 
 export type Router = typeof router;

@@ -1,4 +1,5 @@
 import {
+  AssetsFindManyArgsSchema,
   LangsCreateArgsSchema,
   LangsFindManyArgsSchema,
   LangsFindUniqueArgsSchema,
@@ -6,60 +7,14 @@ import {
 } from "@backend/lib/zod";
 import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
 
-export const langsRouter = publicRouter({
-  add: publicProcedure
-    .meta({
-      permission: "langs.add",
-    })
-    .use(checkPermission)
-    .input(LangsCreateArgsSchema)
-    .mutation(({ input, ctx }) => {
-      return ctx.langsService.create(input);
-    }),
-
+export const assetsRouter = publicRouter({
   list: publicProcedure
     .meta({
-      permission: "langs.list",
+      permission: "assets.list",
     })
     .use(checkPermission)
-    .input(LangsFindManyArgsSchema)
+    .input(AssetsFindManyArgsSchema)
     .query(({ input, ctx }) => {
-      return ctx.langsService.findMany(input);
-    }),
-
-  one: publicProcedure
-    .meta({
-      permission: "langs.one",
-    })
-    .use(checkPermission)
-    .input(LangsFindUniqueArgsSchema)
-    .query(({ input, ctx }) => {
-      return ctx.langsService.findOne(input);
-    }),
-
-  renew: publicProcedure
-    .meta({
-      permission: "langs.edit",
-    })
-    .use(checkPermission)
-    .input(LangsUpdateArgsSchema)
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.langsService.update(input);
-    }),
-
-  delete: publicProcedure
-    .meta({
-      permission: "langs.delete",
-    })
-    .use(checkPermission)
-    .input(LangsFindUniqueArgsSchema)
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.langsService.delete(input);
-    }),
-
-  cachedLangs: publicProcedure
-    .input(LangsFindManyArgsSchema)
-    .query(async ({ input, ctx }) => {
-      return await ctx.langsService.cachedLangs(input);
+      return ctx.assetsService.listAssets(input);
     }),
 });

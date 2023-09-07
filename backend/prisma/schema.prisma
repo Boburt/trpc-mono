@@ -234,6 +234,8 @@ model Categories {
   created_at       DateTime @default(now()) @db.Timestamptz(5)
   updated_at       DateTime @default(now()) @db.Timestamptz(5)
 
+  manufacturers_categories ManufacturersCategories[]
+
   @@map("categories")
 }
 
@@ -256,6 +258,7 @@ model Assets {
   resize_code String?
   model       String?
   model_id    String?
+  code        String?
   created_at  DateTime @default(now()) @db.Timestamptz(5)
   updated_at  DateTime @default(now()) @db.Timestamptz(5)
   created_by  String?  @db.Uuid
@@ -269,13 +272,29 @@ model Assets {
 
 model Manufacturers {
   id          String   @id(map: "PK_manufacturers_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  short_name  String
   name        String
   description String?
   active      Boolean  @default(true)
   created_at  DateTime @default(now()) @db.Timestamptz(5)
   updated_at  DateTime @default(now()) @db.Timestamptz(5)
 
+  manufacturers_categories ManufacturersCategories[]
+
   @@map("manufacturers")
+}
+
+model ManufacturersCategories {
+  id              String   @id(map: "PK_manufacturers_categories_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  manufacturer_id String   @db.Uuid
+  category_id     String   @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamptz(5)
+  updated_at      DateTime @default(now()) @db.Timestamptz(5)
+
+  manufacturers_categories_categories    Categories    @relation(fields: [category_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_categories_category_id")
+  manufacturers_categories_manufacturers Manufacturers @relation(fields: [manufacturer_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_categories_manufacturer_id")
+
+  @@map("manufacturers_categories")
 }
 
 enum organization_system_type {

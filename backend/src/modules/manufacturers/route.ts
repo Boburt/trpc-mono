@@ -5,6 +5,8 @@ import {
   ManufacturersUpdateArgsSchema,
 } from "@backend/lib/zod";
 import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
+import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
+import { ManufacturersWithImagesFindManyArgsSchema } from "./dto/list.dto";
 
 export const manufacturersRouter = publicRouter({
   add: publicProcedure
@@ -12,7 +14,7 @@ export const manufacturersRouter = publicRouter({
       permission: "manufacturers.add",
     })
     .use(checkPermission)
-    .input(ManufacturersCreateArgsSchema)
+    .input(ManufacturersCreateArgsSchemaWithAsset)
     .mutation(({ input, ctx }) => {
       return ctx.manufacturersService.create(input);
     }),
@@ -22,7 +24,7 @@ export const manufacturersRouter = publicRouter({
       permission: "manufacturers.list",
     })
     .use(checkPermission)
-    .input(ManufacturersFindManyArgsSchema)
+    .input(ManufacturersWithImagesFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.manufacturersService.findMany(input);
     }),
@@ -55,5 +57,11 @@ export const manufacturersRouter = publicRouter({
     .input(ManufacturersFindUniqueArgsSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.manufacturersService.delete(input);
+    }),
+
+  publicList: publicProcedure
+    .input(ManufacturersWithImagesFindManyArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.manufacturersService.findMany(input);
     }),
 });

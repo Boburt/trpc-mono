@@ -1,8 +1,8 @@
 import { DeleteButton } from "@components/ui/delete-button";
-import { useCategoriesDestroy } from "@admin/store/apis/categories";
+import { useManufacturersDestroy } from "@admin/store/apis/manufacturers";
 
 export default function DeleteAction({ recordId }: { recordId: string }) {
-  const { mutateAsync: deletePermission } = useCategoriesDestroy({});
+  const { mutateAsync: deletePermission } = useManufacturersDestroy({});
 
   return <DeleteButton recordId={recordId} deleteRecord={deletePermission} />;
 }
