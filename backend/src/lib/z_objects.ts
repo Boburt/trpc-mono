@@ -13,6 +13,12 @@ export const paginatedZodObj = z.object({
 });
 
 export const imageAssetsSelectObj = z.object({
-  image_code: z.string().optional(),
-  size_code: z.string().optional(),
+  imageSizes: z
+    .array(
+      z.object({
+        image_code: z.string().optional(),
+        size_code: z.string().optional(),
+      })
+    )
+    .optional(),
 });

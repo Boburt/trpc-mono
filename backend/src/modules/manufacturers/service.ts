@@ -43,18 +43,50 @@ export class ManufacturersService {
   ): Promise<PaginationType<z.infer<typeof ManufacturersWithImagesSchema>>> {
     let take = input.take ?? 20;
     let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    const image_sizes = input.imageSizes;
     if (input.skip && input.skip > 0) {
       skip++;
     }
     delete input.take;
     delete input.skip;
-    const [permissions, meta] = await this.prisma.manufacturers
+    delete input.imageSizes;
+    const [permissions, meta] = (await this.prisma.manufacturers
       .paginate(input)
       .withPages({
         limit: take,
         page: skip,
         includePageCount: true,
+      })) as [z.infer<typeof ManufacturersWithImagesSchema>[], any];
+
+    if (image_sizes && image_sizes.length > 0) {
+      const images = await this.prisma.assets.findMany({
+        where: {
+          OR: image_sizes.map((i) => ({
+            code: {
+              equals: i.image_code,
+            },
+            resize_code: {
+              equals: i.size_code,
+            },
+            model: {
+              equals: "manufacturers",
+            },
+            model_id: {
+              in: permissions.map((p) => p.id),
+            },
+          })),
+        },
       });
+
+      permissions.forEach((p) => {
+        p.images = images
+          .filter((i) => i.model_id === p.id)
+          .map((i) => ({
+            path: `/public/${i.path}/${i.parent_id}/${i.name}`,
+            code: i.code ?? "",
+          }));
+      });
+    }
 
     return {
       items: permissions,

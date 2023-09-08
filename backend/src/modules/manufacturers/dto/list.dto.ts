@@ -17,6 +17,7 @@ export const ManufacturersWithImagesSchema = ManufacturersSchema.extend({
     .array(
       z.object({
         path: z.string(),
+        code: z.string(),
       })
     )
     .optional(),

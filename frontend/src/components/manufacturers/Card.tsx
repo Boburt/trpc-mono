@@ -1,4 +1,4 @@
-import { Key } from "react";
+import { Key, useMemo } from "react";
 import Slider from "../slider/Slider";
 import Logo from "./Logo";
 import Like from "./Like";
@@ -15,14 +15,40 @@ export function ManufactureCard({
 }: {
   item: RouterOutputs["manufacturers"]["list"]["items"][number];
 }) {
+  const logoImage = useMemo(() => {
+    return item.images?.find((image) => image.code === "logo");
+  }, [item.images]);
+
   return (
     <>
-      <div className="bg-base-200 shadow-xl mb-8 gap-96">
+      <div
+        className="bg-base-200 shadow-xl mb-8 gap-96"
+        itemScope
+        itemType="https://schema.org/Organization"
+      >
         <div className="flex justify-between w-full">
           <div className="flex mt-5 ml-5">
             {/* <Logo logos={item.logo} logoWidth={100} logoHeight={10} /> */}
+            <div className="avatar">
+              <div className="w-24 rounded-xl">
+                <img
+                  src={
+                    logoImage
+                      ? `${import.meta.env.PUBLIC_TRPC_API_URL}${
+                          logoImage.path
+                        }`
+                      : "/images/no-photo.webp"
+                  }
+                  alt=""
+                />
+              </div>
+            </div>
             <div className="ml-5">
-              <h3 className="card-title uppercase">{item.short_name}</h3>
+              <a className="link link-hover" href={`/manufacturer/${item.id}`}>
+                <h3 className="card-title uppercase" itemProp="name">
+                  {item.short_name}
+                </h3>
+              </a>
               <span className="">{item.name}</span>
             </div>
           </div>

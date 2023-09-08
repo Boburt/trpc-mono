@@ -22,6 +22,12 @@ if (categorySlug) {
 const manufacturers = await trpcClient.manufacturers.publicList.query({
   where,
   take: 20,
+  imageSizes: [
+    {
+      image_code: "logo",
+      size_code: "300_300",
+    },
+  ],
 });
 ---
 

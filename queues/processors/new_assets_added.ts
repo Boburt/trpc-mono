@@ -62,7 +62,7 @@ export default async function processNewImages({ id }: { id: string }) {
       data: imageSizes.map((imageSize: any) => ({
         model: asset.model,
         model_id: asset.model_id,
-        name: `${asset.name}-${imageSize.code}.webp`,
+        name: `${fileName}-${imageSize.code}.webp`,
         path: "dist",
         parent_id: asset.id,
         mime_type: "image/webp",
