@@ -111,6 +111,7 @@ const app = new Elysia()
         model: t.String(),
         name: t.String(),
         file: t.File(),
+        code: t.Optional(t.String()),
         model_id: t.Optional(t.String()),
       }),
       beforeHandle: checkRestPermission,

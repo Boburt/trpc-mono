@@ -1,8 +1,9 @@
 ---
 import Proez from "../components/Proezvoditel";
+import ManufacturersListServer from "../components/manufacturers/ManufacturersListServer.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Home">
-  <Proez />
+<BaseLayout title="Лёгкая промышленность" showHeaderFilter={true}>
+  <ManufacturersListServer />
 </BaseLayout>

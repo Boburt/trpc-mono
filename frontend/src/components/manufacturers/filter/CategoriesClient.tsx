@@ -36,10 +36,11 @@ export default function CategoriesFilterClient({
             All
           </a>
           {categories.map((category) => {
-            const isActive = pathname === `/categories/${category.code}`;
+            const isActive =
+              pathname === `/manufacturer/categories/${category.code}`;
             return (
               <a
-                href={`/categories/${category.code}`}
+                href={`/manufacturer/categories/${category.code}`}
                 className={clsx("border-b-2", {
                   "border-black": isActive,
                   "cursor-pointer": !isActive,

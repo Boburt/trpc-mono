@@ -5,8 +5,8 @@ import { Button } from "@components/ui/button";
 import { RouterOutputs } from "@admin/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
-import CategoriesFormSheet from "@admin/components/forms/categories/sheet";
 import CanAccess from "@admin/components/can-access";
+import ManufacturersFormSheet from "@admin/components/forms/manufacturers/sheet";
 
 export const manufacturersColumns: ColumnDef<
   RouterOutputs["manufacturers"]["list"]["items"][0]
@@ -25,12 +25,12 @@ export const manufacturersColumns: ColumnDef<
     },
   },
   {
-    accessorKey: "code",
-    header: "Символьный код",
+    accessorKey: "short_name",
+    header: "Короткое название",
   },
   {
     accessorKey: "name",
-    header: "Заголовок",
+    header: "Название",
   },
   {
     id: "actions",
@@ -39,14 +39,14 @@ export const manufacturersColumns: ColumnDef<
 
       return (
         <div className="flex items-center space-x-2">
-          <CanAccess permission="categories.edit">
-            <CategoriesFormSheet recordId={record.id}>
+          <CanAccess permission="manufacturers.edit">
+            <ManufacturersFormSheet recordId={record.id}>
               <Button variant="outline" size="sm">
                 <Edit2Icon className="h-4 w-4" />
               </Button>
-            </CategoriesFormSheet>
+            </ManufacturersFormSheet>
           </CanAccess>
-          <CanAccess permission="categories.delete">
+          <CanAccess permission="manufacturers.delete">
             <DeleteAction recordId={record.id} />
           </CanAccess>
         </div>
