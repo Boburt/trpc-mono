@@ -39,7 +39,7 @@ export const langsColumns: ColumnDef<
 
       return (
         <div className="flex items-center space-x-2">
-          <CanAccess permission="langs.update">
+          <CanAccess permission="langs.edit">
             <LangsFormSheet recordId={record.id}>
               <Button variant="outline" size="sm">
                 <Edit2Icon className="h-4 w-4" />

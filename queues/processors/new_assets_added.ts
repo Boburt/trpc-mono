@@ -29,7 +29,19 @@ export default async function processNewImages({ id }: { id: string }) {
 
     const fileName = path.basename(asset.name, path.extname(asset.name));
 
+    const imageMetadata = await sharp(
+      `../uploads/sources/${asset.id}/${asset.name}`
+    ).metadata();
+
     for (const imageSize of imageSizes) {
+      if (imageSize.width > imageMetadata.width!) {
+        imageSize.width = imageMetadata.width!;
+      }
+
+      if (imageSize.height > imageMetadata.height!) {
+        imageSize.height = imageMetadata.height!;
+      }
+
       await sharp(`../uploads/sources/${asset.id}/${asset.name}`)
         .resize(imageSize.width, imageSize.height, {
           fit: "outside",
@@ -50,12 +62,13 @@ export default async function processNewImages({ id }: { id: string }) {
       data: imageSizes.map((imageSize: any) => ({
         model: asset.model,
         model_id: asset.model_id,
-        name: `${asset.name}-${imageSize.code}.webp`,
+        name: `${fileName}-${imageSize.code}.webp`,
         path: "dist",
         parent_id: asset.id,
         mime_type: "image/webp",
         size: imageSize.size,
         resize_code: imageSize.code,
+        code: asset.code,
       })),
     });
   }

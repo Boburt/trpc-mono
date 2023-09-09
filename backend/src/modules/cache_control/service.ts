@@ -7,7 +7,7 @@ import {
   Langs,
 } from "@backend/lib/zod";
 import { RedisClientType } from "@backend/trpc";
-import { Categories, ImageSizes } from "@prisma/client";
+import { Categories, Cities, ImageSizes } from "@prisma/client";
 
 export class CacheControlService {
   constructor(
@@ -195,6 +195,27 @@ export class CacheControlService {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}image_sizes`
     );
+    let res = JSON.parse(langs ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheCities() {
+    const langs = await this.prisma.cities.findMany({
+      take: 100,
+    });
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}cities`,
+      JSON.stringify(langs)
+    );
+  }
+
+  async getCachedCities({ take }: { take?: number }): Promise<Cities[]> {
+    const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
     let res = JSON.parse(langs ?? "[]");
 
     if (take && res.length > take) {
