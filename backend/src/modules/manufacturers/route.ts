@@ -7,6 +7,7 @@ import {
 import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
 import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
 import { ManufacturersWithImagesFindManyArgsSchema } from "./dto/list.dto";
+import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
 
 export const manufacturersRouter = publicRouter({
   add: publicProcedure
@@ -34,7 +35,7 @@ export const manufacturersRouter = publicRouter({
       permission: "manufacturers.one",
     })
     .use(checkPermission)
-    .input(ManufacturersFindUniqueArgsSchema)
+    .input(ManufacturersFindUniqueWithImageArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.manufacturersService.findOne(input);
     }),
@@ -63,5 +64,10 @@ export const manufacturersRouter = publicRouter({
     .input(ManufacturersWithImagesFindManyArgsSchema)
     .query(({ input, ctx }) => {
       return ctx.manufacturersService.findMany(input);
+    }),
+  publicOne: publicProcedure
+    .input(ManufacturersFindUniqueWithImageArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.manufacturersService.findOne(input);
     }),
 });

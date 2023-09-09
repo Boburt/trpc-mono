@@ -227,7 +227,7 @@ model Categories {
   active           Boolean  @default(true)
   name             String
   description      String?
-  code             String
+  code             String   @unique
   parent_id        String?  @db.Uuid
   i18n_name        Json
   i18n_description Json?
@@ -275,11 +275,15 @@ model Manufacturers {
   short_name  String
   name        String
   description String?
+  city_id     String?  @db.Uuid
+  rating      Float    @default(0)
   active      Boolean  @default(true)
   created_at  DateTime @default(now()) @db.Timestamptz(5)
   updated_at  DateTime @default(now()) @db.Timestamptz(5)
 
   manufacturers_categories ManufacturersCategories[]
+
+  cities Cities? @relation(fields: [city_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_city_id")
 
   @@map("manufacturers")
 }
@@ -295,6 +299,19 @@ model ManufacturersCategories {
   manufacturers_categories_manufacturers Manufacturers @relation(fields: [manufacturer_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_categories_manufacturer_id")
 
   @@map("manufacturers_categories")
+}
+
+model Cities {
+  id          String   @id(map: "PK_city_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String
+  description String?
+  created_at  DateTime @default(now()) @db.Timestamptz(5)
+  updated_at  DateTime @default(now()) @db.Timestamptz(5)
+
+  manufacturers Manufacturers[]
+
+  @@map("cities")
 }
 
 enum organization_system_type {

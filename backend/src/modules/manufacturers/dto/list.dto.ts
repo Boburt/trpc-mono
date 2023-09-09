@@ -1,6 +1,8 @@
 import { imageAssetsSelectObj } from "@backend/lib/z_objects";
 import {
   AssetsSchema,
+  CitiesWithRelationsSchema,
+  ManufacturersCategoriesWithRelationsSchema,
   ManufacturersFindManyArgsSchema,
   ManufacturersIncludeSchema,
   ManufacturersOrderByWithRelationInputSchema,
@@ -12,7 +14,14 @@ import {
 } from "@backend/lib/zod";
 import { z } from "zod";
 
-export const ManufacturersWithImagesSchema = ManufacturersSchema.extend({
+export const ManufacturersWithImagesSchema = ManufacturersSchema.merge(
+  z.object({
+    manufacturers_categories: z
+      .lazy(() => ManufacturersCategoriesWithRelationsSchema)
+      .array(),
+    cities: z.lazy(() => CitiesWithRelationsSchema).nullish(),
+  })
+).extend({
   images: z
     .array(
       z.object({

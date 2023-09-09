@@ -9,6 +9,7 @@ import { trpc } from "@admin/utils/trpc";
 import {
   Manufacturers,
   ManufacturersCreateInputSchema,
+  ManufacturersUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
 import { useMemo, useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
@@ -26,15 +27,23 @@ import { useCachedLangsQuery } from "@admin/store/apis/langs";
 import { Textarea } from "@admin/components/ui/textarea";
 import MultiSelect from "../elements/multiSelect";
 import FileUploadField from "../elements/file-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@admin/components/ui/select";
 
 const formFactory = createFormFactory<
-  z.infer<typeof ManufacturersCreateInputSchema>
+  z.infer<typeof ManufacturersUncheckedCreateInputSchema>
 >({
   defaultValues: {
     active: true,
     short_name: "",
     name: "",
     description: "",
+    city_id: null,
   },
 });
 
@@ -128,6 +137,7 @@ export default function ManufacturersForm({
   const [
     { data: record, isLoading: isRecordLoading },
     { data: categories, isLoading: isCategoriesLoading },
+    { data: cities, isLoading: isCitiesLoading },
     {
       data: manufacturerCategories,
       isLoading: isManufacturerCategoriesLoading,
@@ -142,6 +152,9 @@ export default function ManufacturersForm({
       }
     ),
     t.categories.list({
+      take: 1000,
+    }),
+    t.cities.list({
       take: 1000,
     }),
     t.manufacturersCategories.categoriesByManufacturer(
@@ -180,6 +193,7 @@ export default function ManufacturersForm({
       form.setFieldValue("name", record.name);
       form.setFieldValue("short_name", record.short_name);
       form.setFieldValue("description", record.description);
+      form.setFieldValue("city_id", record.city_id);
     }
 
     if (manufacturerCategories && manufacturerCategories.items) {
@@ -249,6 +263,34 @@ export default function ManufacturersForm({
                     {...field.getInputProps()}
                     value={field.getValue() ?? ""}
                   />
+                </>
+              );
+            }}
+          </form.Field>
+        </div>
+        <div className="space-y-2">
+          <div>
+            <Label>Город</Label>
+          </div>
+          <form.Field name="city_id">
+            {(field) => {
+              return (
+                <>
+                  <Select
+                    {...field.getInputProps()}
+                    onValueChange={(value: string) => field.setValue(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities?.items.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </>
               );
             }}

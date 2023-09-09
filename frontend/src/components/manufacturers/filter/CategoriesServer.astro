@@ -1,5 +1,5 @@
 ---
-import { trpcClient } from "../../../utils/trpc-server";
+import { trpcClient } from "@frontend/src/utils/trpc-server";
 import CategoriesClientProvider from "./CategoriesClientProvider";
 
 const categories = await trpcClient.categories.activeCachedCategories.query({
