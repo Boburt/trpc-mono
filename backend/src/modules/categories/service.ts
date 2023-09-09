@@ -2,6 +2,7 @@ import type { Categories, Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import {
+  CategoriesFindFirstArgsSchema,
   CategoriesFindManyArgsSchema,
   CategoriesFindUniqueArgsSchema,
 } from "@backend/lib/zod";
@@ -46,9 +47,9 @@ export class CategoriesService {
   }
 
   async findOne(
-    input: z.infer<typeof CategoriesFindUniqueArgsSchema>
+    input: z.infer<typeof CategoriesFindFirstArgsSchema>
   ): Promise<Categories | null> {
-    const permission = await this.prisma.categories.findUnique(input);
+    const permission = await this.prisma.categories.findFirst(input);
     return permission;
   }
 

@@ -23,6 +23,7 @@ import { ImageSizesService } from "./modules/image_sizes/service";
 import { AssetsService } from "./modules/assets/service";
 import { ManufacturersService } from "./modules/manufacturers/service";
 import { ManufacturersCategoriesService } from "./modules/manufacturers_categories/service";
+import { CitiesService } from "./modules/cities/service";
 
 // redis
 export const client = new Redis({
@@ -57,6 +58,7 @@ const categoriesService = new CategoriesService(db, cacheControlService);
 const imageSizesService = new ImageSizesService(db, cacheControlService);
 export const assetsService = new AssetsService(db, newAssetsAddedQueue);
 const manufacturersService = new ManufacturersService(db, cacheControlService);
+const citiesService = new CitiesService(db, cacheControlService);
 
 const manufacturersCategories = new ManufacturersCategoriesService(db);
 
@@ -83,6 +85,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     manufacturersService,
     manufacturersCategories,
     assetsService,
+    citiesService,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
   };
 };

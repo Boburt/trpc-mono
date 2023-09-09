@@ -74,6 +74,10 @@ const settingsMenu: { title: string; href: string }[] = [
     title: "Размеры изображений",
     href: "/system/image_sizes",
   },
+  {
+    title: "Города",
+    href: "/system/cities",
+  },
 ];
 
 export function NavigationMenuDemo() {

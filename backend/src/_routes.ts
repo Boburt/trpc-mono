@@ -1,4 +1,5 @@
 import { assetsRouter } from "./modules/assets/route";
+import { citiesRouter } from "./modules/cities/route";
 import { imageSizesRouter } from "./modules/image_sizes/route";
 import { langsRouter } from "./modules/langs/route";
 import { manufacturersRouter } from "./modules/manufacturers/route";
@@ -27,6 +28,7 @@ export const router = publicRouter({
   manufacturers: manufacturersRouter,
   manufacturersCategories: manufacturersCategoriesRouter,
   assets: assetsRouter,
+  cities: citiesRouter,
 });
 
 export type Router = typeof router;

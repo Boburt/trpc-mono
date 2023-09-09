@@ -108,6 +108,7 @@ export default function FileUploadField({
         model,
         model_id,
         code,
+        path: "sources",
       },
     },
     {

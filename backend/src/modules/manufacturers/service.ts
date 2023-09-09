@@ -14,6 +14,7 @@ import {
   ManufacturersWithImagesFindManyArgsSchema,
   ManufacturersWithImagesSchema,
 } from "./dto/list.dto";
+import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
 
 export class ManufacturersService {
   constructor(
@@ -24,6 +25,11 @@ export class ManufacturersService {
   async create(
     input: z.infer<typeof ManufacturersCreateArgsSchemaWithAsset>
   ): Promise<Manufacturers> {
+    if (input.data.rating) {
+      // not to be able to change rating
+      delete input.data.rating;
+    }
+
     const res = await this.prisma.manufacturers.create(input);
     if (input.asset) {
       await this.prisma.assets.update({
@@ -95,13 +101,48 @@ export class ManufacturersService {
   }
 
   async findOne(
-    input: z.infer<typeof ManufacturersFindUniqueArgsSchema>
-  ): Promise<Manufacturers | null> {
-    const permission = await this.prisma.manufacturers.findUnique(input);
+    input: z.infer<typeof ManufacturersFindUniqueWithImageArgsSchema>
+  ): Promise<z.infer<typeof ManufacturersWithImagesSchema> | null> {
+    const image_sizes = input.imageSizes;
+    delete input.imageSizes;
+    const permission = (await this.prisma.manufacturers.findFirst(
+      input
+    )) as z.infer<typeof ManufacturersWithImagesSchema>;
+    if (permission) {
+      if (image_sizes && image_sizes.length > 0) {
+        const images = await this.prisma.assets.findMany({
+          where: {
+            OR: image_sizes.map((i) => ({
+              code: {
+                equals: i.image_code,
+              },
+              resize_code: {
+                equals: i.size_code,
+              },
+              model: {
+                equals: "manufacturers",
+              },
+              model_id: {
+                equals: permission.id,
+              },
+            })),
+          },
+        });
+
+        permission.images = images.map((i) => ({
+          path: `/public/${i.path}/${i.parent_id}/${i.name}`,
+          code: i.code ?? "",
+        }));
+      }
+    }
     return permission;
   }
 
   async update(input: Prisma.ManufacturersUpdateArgs): Promise<Manufacturers> {
+    if (input.data.rating) {
+      // not to be able to change rating
+      delete input.data.rating;
+    }
     const res = await this.prisma.manufacturers.update(input);
     return res;
   }

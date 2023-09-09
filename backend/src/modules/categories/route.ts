@@ -1,5 +1,6 @@
 import {
   CategoriesCreateArgsSchema,
+  CategoriesFindFirstArgsSchema,
   CategoriesFindManyArgsSchema,
   CategoriesFindUniqueArgsSchema,
   CategoriesUpdateArgsSchema,
@@ -67,5 +68,11 @@ export const categoriesRouter = publicRouter({
     .input(CategoriesFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
       return await ctx.categoriesService.activeCachedCategories(input);
+    }),
+
+  publicOne: publicProcedure
+    .input(CategoriesFindFirstArgsSchema)
+    .query(({ input, ctx }) => {
+      return ctx.categoriesService.findOne(input);
     }),
 });

@@ -1,6 +1,20 @@
-export default function Header() {
+import clsx from "clsx";
+
+export default function Header({
+  showHeaderFilter,
+}: {
+  showHeaderFilter: boolean;
+}) {
   return (
-    <div className="header-bg-image bg-center bg-no-repeat bg-cover opacity-80 pb-40 pt-5">
+    <div
+      className={clsx([
+        "header-bg-image bg-center bg-no-repeat bg-cover opacity-80 pt-5",
+        {
+          "pb-40": showHeaderFilter,
+          "pb-10": !showHeaderFilter,
+        },
+      ])}
+    >
       <div className="bg-white py-2">
         <div className="container mx-auto flex items-center justify-between">
           <div className="cursor-pointer">
@@ -20,27 +34,23 @@ export default function Header() {
           </nav>
         </div>
       </div>
-      <div className="flex justify-center mt-5">
-        <div className="join">
-          <div>
-            <div>
-              <input
-                className="input input-bordered join-item"
-                placeholder="Search"
-              />
+      {showHeaderFilter && (
+        <>
+          <div className="flex justify-center mt-5">
+            <div className="join">
+              <div>
+                <div>
+                  <input
+                    className="input input-bordered join-item"
+                    placeholder="Search"
+                  />
+                </div>
+              </div>
+              <button className="btn join-item">Search</button>
             </div>
           </div>
-          <button className="btn join-item">Search</button>
-        </div>
-      </div>
-      <a
-        href="/manufacturer"
-        className="flex mx-auto justify-center text-white"
-      >
-        <h1 className="text-xl font-extrabold text-indigo-600 hover:text-black hover:underline active:underline">
-          Manufacturer
-        </h1>
-      </a>
+        </>
+      )}
     </div>
   );
 }
