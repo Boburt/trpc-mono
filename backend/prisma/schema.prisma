@@ -283,6 +283,8 @@ model Manufacturers {
 
   manufacturers_categories ManufacturersCategories[]
 
+  manyfacturers_properties_values_manufacturers_properties ManufacturersPropertiesValues[]
+
   cities Cities? @relation(fields: [city_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_city_id")
 
   @@map("manufacturers")
@@ -314,6 +316,45 @@ model Cities {
   @@map("cities")
 }
 
+model ManufacturersPropertiesCategories {
+  id                      String                    @id(map: "PK_manufacturers_properties_categories_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String
+  code                    String
+  i18n_name               Json?
+  ManufacturersProperties ManufacturersProperties[]
+
+  @@map("manufacturers_properties_categories")
+}
+
+model ManufacturersProperties {
+  id              String                         @id(map: "PK_manufacturers_properties_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  code            String
+  i18n_name       Json?
+  category_id     String                         @db.Uuid
+  type            manufacturers_properties_types
+  additional_data Json?
+  created_at      DateTime                       @default(now()) @db.Timestamptz(5)
+  updated_at      DateTime                       @default(now()) @db.Timestamptz(5)
+
+  manufacturers_properties_categories                      ManufacturersPropertiesCategories? @relation(fields: [category_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_properties_category_id")
+  manufacturers_properties_values_manufacturers_properties ManufacturersPropertiesValues[]
+
+  @@map("manufacturers_properties")
+}
+
+model ManufacturersPropertiesValues {
+  id              String @id(map: "PK_manufacturers_properties_values_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id     String @db.Uuid
+  manufacturer_id String @db.Uuid
+  value           String
+
+  manufacturers_properties_values_manufacturers_properties ManufacturersProperties @relation(fields: [property_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_properties_values_property_id")
+  manyfacturers_properties_values_manufacturers            Manufacturers           @relation(fields: [manufacturer_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_properties_values_manufacturer_id")
+
+  @@map("manufacturers_properties_values")
+}
+
 enum organization_system_type {
   iiko
   r_keeper
@@ -329,4 +370,12 @@ enum organization_payment_types {
   cash
   card
   client
+}
+
+enum manufacturers_properties_types {
+  string
+  number
+  boolean
+  date
+  list
 }

@@ -84,6 +84,12 @@ export const ManufacturersCategoriesScalarFieldEnumSchema = z.enum(['id','manufa
 
 export const CitiesScalarFieldEnumSchema = z.enum(['id','name','slug','description','created_at','updated_at']);
 
+export const ManufacturersPropertiesCategoriesScalarFieldEnumSchema = z.enum(['id','name','code','i18n_name']);
+
+export const ManufacturersPropertiesScalarFieldEnumSchema = z.enum(['id','name','code','i18n_name','category_id','type','additional_data','created_at','updated_at']);
+
+export const ManufacturersPropertiesValuesScalarFieldEnumSchema = z.enum(['id','property_id','manufacturer_id','value']);
+
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const JsonNullValueInputSchema = z.enum(['JsonNull',]);
@@ -111,6 +117,10 @@ export type work_schedule_entry_statusType = `${z.infer<typeof work_schedule_ent
 export const organization_payment_typesSchema = z.enum(['cash','card','client']);
 
 export type organization_payment_typesType = `${z.infer<typeof organization_payment_typesSchema>}`
+
+export const manufacturers_properties_typesSchema = z.enum(['string','number','boolean','date','list']);
+
+export type manufacturers_properties_typesType = `${z.infer<typeof manufacturers_properties_typesSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -607,6 +617,7 @@ export type Manufacturers = z.infer<typeof ManufacturersSchema>
 
 export type ManufacturersRelations = {
   manufacturers_categories: ManufacturersCategoriesWithRelations[];
+  manyfacturers_properties_values_manufacturers_properties: ManufacturersPropertiesValuesWithRelations[];
   cities?: CitiesWithRelations | null;
 };
 
@@ -614,6 +625,7 @@ export type ManufacturersWithRelations = z.infer<typeof ManufacturersSchema> & M
 
 export const ManufacturersWithRelationsSchema: z.ZodType<ManufacturersWithRelations> = ManufacturersSchema.merge(z.object({
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesWithRelationsSchema).array(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesWithRelationsSchema).array(),
   cities: z.lazy(() => CitiesWithRelationsSchema).nullish(),
 }))
 
@@ -672,6 +684,98 @@ export type CitiesWithRelations = z.infer<typeof CitiesSchema> & CitiesRelations
 
 export const CitiesWithRelationsSchema: z.ZodType<CitiesWithRelations> = CitiesSchema.merge(z.object({
   manufacturers: z.lazy(() => ManufacturersWithRelationsSchema).array(),
+}))
+
+/////////////////////////////////////////
+// MANUFACTURERS PROPERTIES CATEGORIES SCHEMA
+/////////////////////////////////////////
+
+export const ManufacturersPropertiesCategoriesSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: NullableJsonValue.optional(),
+})
+
+export type ManufacturersPropertiesCategories = z.infer<typeof ManufacturersPropertiesCategoriesSchema>
+
+// MANUFACTURERS PROPERTIES CATEGORIES RELATION SCHEMA
+//------------------------------------------------------
+
+export type ManufacturersPropertiesCategoriesRelations = {
+  ManufacturersProperties: ManufacturersPropertiesWithRelations[];
+};
+
+export type ManufacturersPropertiesCategoriesWithRelations = Omit<z.infer<typeof ManufacturersPropertiesCategoriesSchema>, "i18n_name"> & {
+  i18n_name?: NullableJsonInput;
+} & ManufacturersPropertiesCategoriesRelations
+
+export const ManufacturersPropertiesCategoriesWithRelationsSchema: z.ZodType<ManufacturersPropertiesCategoriesWithRelations> = ManufacturersPropertiesCategoriesSchema.merge(z.object({
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesWithRelationsSchema).array(),
+}))
+
+/////////////////////////////////////////
+// MANUFACTURERS PROPERTIES SCHEMA
+/////////////////////////////////////////
+
+export const ManufacturersPropertiesSchema = z.object({
+  type: manufacturers_properties_typesSchema,
+  id: z.string(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: NullableJsonValue.optional(),
+  category_id: z.string(),
+  additional_data: NullableJsonValue.optional(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+})
+
+export type ManufacturersProperties = z.infer<typeof ManufacturersPropertiesSchema>
+
+// MANUFACTURERS PROPERTIES RELATION SCHEMA
+//------------------------------------------------------
+
+export type ManufacturersPropertiesRelations = {
+  manufacturers_properties_categories?: ManufacturersPropertiesCategoriesWithRelations | null;
+  manufacturers_properties_values_manufacturers_properties: ManufacturersPropertiesValuesWithRelations[];
+};
+
+export type ManufacturersPropertiesWithRelations = Omit<z.infer<typeof ManufacturersPropertiesSchema>, "i18n_name" | "additional_data"> & {
+  i18n_name?: NullableJsonInput;
+  additional_data?: NullableJsonInput;
+} & ManufacturersPropertiesRelations
+
+export const ManufacturersPropertiesWithRelationsSchema: z.ZodType<ManufacturersPropertiesWithRelations> = ManufacturersPropertiesSchema.merge(z.object({
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesWithRelationsSchema).nullish(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesWithRelationsSchema).array(),
+}))
+
+/////////////////////////////////////////
+// MANUFACTURERS PROPERTIES VALUES SCHEMA
+/////////////////////////////////////////
+
+export const ManufacturersPropertiesValuesSchema = z.object({
+  id: z.string(),
+  property_id: z.string(),
+  manufacturer_id: z.string(),
+  value: z.string(),
+})
+
+export type ManufacturersPropertiesValues = z.infer<typeof ManufacturersPropertiesValuesSchema>
+
+// MANUFACTURERS PROPERTIES VALUES RELATION SCHEMA
+//------------------------------------------------------
+
+export type ManufacturersPropertiesValuesRelations = {
+  manufacturers_properties_values_manufacturers_properties: ManufacturersPropertiesWithRelations;
+  manyfacturers_properties_values_manufacturers: ManufacturersWithRelations;
+};
+
+export type ManufacturersPropertiesValuesWithRelations = z.infer<typeof ManufacturersPropertiesValuesSchema> & ManufacturersPropertiesValuesRelations
+
+export const ManufacturersPropertiesValuesWithRelationsSchema: z.ZodType<ManufacturersPropertiesValuesWithRelations> = ManufacturersPropertiesValuesSchema.merge(z.object({
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesWithRelationsSchema),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersWithRelationsSchema),
 }))
 
 /////////////////////////////////////////
@@ -1140,6 +1244,7 @@ export const AssetsSelectSchema: z.ZodType<Prisma.AssetsSelect> = z.object({
 
 export const ManufacturersIncludeSchema: z.ZodType<Prisma.ManufacturersInclude> = z.object({
   manufacturers_categories: z.union([z.boolean(),z.lazy(() => ManufacturersCategoriesFindManyArgsSchema)]).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesValuesFindManyArgsSchema)]).optional(),
   cities: z.union([z.boolean(),z.lazy(() => CitiesArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ManufacturersCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -1155,6 +1260,7 @@ export const ManufacturersCountOutputTypeArgsSchema: z.ZodType<Prisma.Manufactur
 
 export const ManufacturersCountOutputTypeSelectSchema: z.ZodType<Prisma.ManufacturersCountOutputTypeSelect> = z.object({
   manufacturers_categories: z.boolean().optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.boolean().optional(),
 }).strict();
 
 export const ManufacturersSelectSchema: z.ZodType<Prisma.ManufacturersSelect> = z.object({
@@ -1168,6 +1274,7 @@ export const ManufacturersSelectSchema: z.ZodType<Prisma.ManufacturersSelect> = 
   created_at: z.boolean().optional(),
   updated_at: z.boolean().optional(),
   manufacturers_categories: z.union([z.boolean(),z.lazy(() => ManufacturersCategoriesFindManyArgsSchema)]).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesValuesFindManyArgsSchema)]).optional(),
   cities: z.union([z.boolean(),z.lazy(() => CitiesArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ManufacturersCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -1225,6 +1332,95 @@ export const CitiesSelectSchema: z.ZodType<Prisma.CitiesSelect> = z.object({
   updated_at: z.boolean().optional(),
   manufacturers: z.union([z.boolean(),z.lazy(() => ManufacturersFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CitiesCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// MANUFACTURERS PROPERTIES CATEGORIES
+//------------------------------------------------------
+
+export const ManufacturersPropertiesCategoriesIncludeSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesInclude> = z.object({
+  ManufacturersProperties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesDefaultArgs> = z.object({
+  select: z.lazy(() => ManufacturersPropertiesCategoriesSelectSchema).optional(),
+  include: z.lazy(() => ManufacturersPropertiesCategoriesIncludeSchema).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCountOutputTypeArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCountOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => ManufacturersPropertiesCategoriesCountOutputTypeSelectSchema).nullish(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCountOutputTypeSelectSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCountOutputTypeSelect> = z.object({
+  ManufacturersProperties: z.boolean().optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesSelectSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesSelect> = z.object({
+  id: z.boolean().optional(),
+  name: z.boolean().optional(),
+  code: z.boolean().optional(),
+  i18n_name: z.boolean().optional(),
+  ManufacturersProperties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// MANUFACTURERS PROPERTIES
+//------------------------------------------------------
+
+export const ManufacturersPropertiesIncludeSchema: z.ZodType<Prisma.ManufacturersPropertiesInclude> = z.object({
+  manufacturers_properties_categories: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesArgsSchema)]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesValuesFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesDefaultArgs> = z.object({
+  select: z.lazy(() => ManufacturersPropertiesSelectSchema).optional(),
+  include: z.lazy(() => ManufacturersPropertiesIncludeSchema).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCountOutputTypeArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCountOutputTypeDefaultArgs> = z.object({
+  select: z.lazy(() => ManufacturersPropertiesCountOutputTypeSelectSchema).nullish(),
+}).strict();
+
+export const ManufacturersPropertiesCountOutputTypeSelectSchema: z.ZodType<Prisma.ManufacturersPropertiesCountOutputTypeSelect> = z.object({
+  manufacturers_properties_values_manufacturers_properties: z.boolean().optional(),
+}).strict();
+
+export const ManufacturersPropertiesSelectSchema: z.ZodType<Prisma.ManufacturersPropertiesSelect> = z.object({
+  id: z.boolean().optional(),
+  name: z.boolean().optional(),
+  code: z.boolean().optional(),
+  i18n_name: z.boolean().optional(),
+  category_id: z.boolean().optional(),
+  type: z.boolean().optional(),
+  additional_data: z.boolean().optional(),
+  created_at: z.boolean().optional(),
+  updated_at: z.boolean().optional(),
+  manufacturers_properties_categories: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesArgsSchema)]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesValuesFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// MANUFACTURERS PROPERTIES VALUES
+//------------------------------------------------------
+
+export const ManufacturersPropertiesValuesIncludeSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesInclude> = z.object({
+  manufacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesArgsSchema)]).optional(),
+  manyfacturers_properties_values_manufacturers: z.union([z.boolean(),z.lazy(() => ManufacturersArgsSchema)]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesDefaultArgs> = z.object({
+  select: z.lazy(() => ManufacturersPropertiesValuesSelectSchema).optional(),
+  include: z.lazy(() => ManufacturersPropertiesValuesIncludeSchema).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesSelectSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesSelect> = z.object({
+  id: z.boolean().optional(),
+  property_id: z.boolean().optional(),
+  manufacturer_id: z.boolean().optional(),
+  value: z.boolean().optional(),
+  manufacturers_properties_values_manufacturers_properties: z.union([z.boolean(),z.lazy(() => ManufacturersPropertiesArgsSchema)]).optional(),
+  manyfacturers_properties_values_manufacturers: z.union([z.boolean(),z.lazy(() => ManufacturersArgsSchema)]).optional(),
 }).strict()
 
 
@@ -2517,6 +2713,7 @@ export const ManufacturersWhereInputSchema: z.ZodType<Prisma.ManufacturersWhereI
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesListRelationFilterSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesListRelationFilterSchema).optional(),
   cities: z.union([ z.lazy(() => CitiesNullableRelationFilterSchema),z.lazy(() => CitiesWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
@@ -2531,6 +2728,7 @@ export const ManufacturersOrderByWithRelationInputSchema: z.ZodType<Prisma.Manuf
   created_at: z.lazy(() => SortOrderSchema).optional(),
   updated_at: z.lazy(() => SortOrderSchema).optional(),
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesOrderByRelationAggregateInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesOrderByRelationAggregateInputSchema).optional(),
   cities: z.lazy(() => CitiesOrderByWithRelationInputSchema).optional()
 }).strict();
 
@@ -2551,6 +2749,7 @@ export const ManufacturersWhereUniqueInputSchema: z.ZodType<Prisma.Manufacturers
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesListRelationFilterSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesListRelationFilterSchema).optional(),
   cities: z.union([ z.lazy(() => CitiesNullableRelationFilterSchema),z.lazy(() => CitiesWhereInputSchema) ]).optional().nullable(),
 }).strict());
 
@@ -2708,6 +2907,196 @@ export const CitiesScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Cities
   description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesWhereInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableFilterSchema).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesListRelationFilterSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesOrderByRelationAggregateInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesWhereUniqueInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesWhereUniqueInput> = z.object({
+  id: z.string()
+})
+.and(z.object({
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).array() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableFilterSchema).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesListRelationFilterSchema).optional()
+}).strict());
+
+export const ManufacturersPropertiesCategoriesOrderByWithAggregationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  _count: z.lazy(() => ManufacturersPropertiesCategoriesCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => ManufacturersPropertiesCategoriesMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => ManufacturersPropertiesCategoriesMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesWhereInputSchema: z.ZodType<Prisma.ManufacturersPropertiesWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesWhereInputSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesWhereInputSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableFilterSchema).optional(),
+  category_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => Enummanufacturers_properties_typesFilterSchema),z.lazy(() => manufacturers_properties_typesSchema) ]).optional(),
+  additional_data: z.lazy(() => JsonNullableFilterSchema).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  manufacturers_properties_categories: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesNullableRelationFilterSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema) ]).optional().nullable(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesListRelationFilterSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesOrderByWithRelationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  category_id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  additional_data: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional(),
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesOrderByRelationAggregateInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesWhereUniqueInputSchema: z.ZodType<Prisma.ManufacturersPropertiesWhereUniqueInput> = z.object({
+  id: z.string()
+})
+.and(z.object({
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesWhereInputSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesWhereInputSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema).array() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableFilterSchema).optional(),
+  category_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => Enummanufacturers_properties_typesFilterSchema),z.lazy(() => manufacturers_properties_typesSchema) ]).optional(),
+  additional_data: z.lazy(() => JsonNullableFilterSchema).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  manufacturers_properties_categories: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesNullableRelationFilterSchema),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema) ]).optional().nullable(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesListRelationFilterSchema).optional()
+}).strict());
+
+export const ManufacturersPropertiesOrderByWithAggregationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  category_id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  additional_data: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => ManufacturersPropertiesCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => ManufacturersPropertiesMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => ManufacturersPropertiesMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
+  category_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => Enummanufacturers_properties_typesWithAggregatesFilterSchema),z.lazy(() => manufacturers_properties_typesSchema) ]).optional(),
+  additional_data: z.lazy(() => JsonNullableWithAggregatesFilterSchema).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesWhereInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  property_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  value: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.union([ z.lazy(() => ManufacturersPropertiesRelationFilterSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema) ]).optional(),
+  manyfacturers_properties_values_manufacturers: z.union([ z.lazy(() => ManufacturersRelationFilterSchema),z.lazy(() => ManufacturersWhereInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesOrderByWithRelationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  property_id: z.lazy(() => SortOrderSchema).optional(),
+  manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesOrderByWithRelationInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesWhereUniqueInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesWhereUniqueInput> = z.object({
+  id: z.string()
+})
+.and(z.object({
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).array() ]).optional(),
+  property_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  value: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.union([ z.lazy(() => ManufacturersPropertiesRelationFilterSchema),z.lazy(() => ManufacturersPropertiesWhereInputSchema) ]).optional(),
+  manyfacturers_properties_values_manufacturers: z.union([ z.lazy(() => ManufacturersRelationFilterSchema),z.lazy(() => ManufacturersWhereInputSchema) ]).optional(),
+}).strict());
+
+export const ManufacturersPropertiesValuesOrderByWithAggregationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  property_id: z.lazy(() => SortOrderSchema).optional(),
+  manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => ManufacturersPropertiesValuesCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => ManufacturersPropertiesValuesMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => ManufacturersPropertiesValuesMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  property_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  manufacturer_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  value: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
 }).strict();
 
 export const PermissionsCreateInputSchema: z.ZodType<Prisma.PermissionsCreateInput> = z.object({
@@ -3885,6 +4274,7 @@ export const ManufacturersCreateInputSchema: z.ZodType<Prisma.ManufacturersCreat
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional(),
   cities: z.lazy(() => CitiesCreateNestedOneWithoutManufacturersInputSchema).optional()
 }).strict();
 
@@ -3898,7 +4288,8 @@ export const ManufacturersUncheckedCreateInputSchema: z.ZodType<Prisma.Manufactu
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional()
 }).strict();
 
 export const ManufacturersUpdateInputSchema: z.ZodType<Prisma.ManufacturersUpdateInput> = z.object({
@@ -3911,6 +4302,7 @@ export const ManufacturersUpdateInputSchema: z.ZodType<Prisma.ManufacturersUpdat
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   manufacturers_categories: z.lazy(() => ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional(),
   cities: z.lazy(() => CitiesUpdateOneWithoutManufacturersNestedInputSchema).optional()
 }).strict();
 
@@ -3924,7 +4316,8 @@ export const ManufacturersUncheckedUpdateInputSchema: z.ZodType<Prisma.Manufactu
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional()
 }).strict();
 
 export const ManufacturersCreateManyInputSchema: z.ZodType<Prisma.ManufacturersCreateManyInput> = z.object({
@@ -4081,6 +4474,193 @@ export const CitiesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.CitiesUnchec
   description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesCreateNestedManyWithoutManufacturers_properties_categoriesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUncheckedCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUncheckedCreateInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesUncheckedCreateNestedManyWithoutManufacturers_properties_categoriesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesUpdateManyWithoutManufacturers_properties_categoriesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUncheckedUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  ManufacturersProperties: z.lazy(() => ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCreateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateManyInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpdateManyMutationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesCreateNestedOneWithoutManufacturersPropertiesInputSchema).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedCreateInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.string(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesUpdateOneWithoutManufacturersPropertiesNestedInputSchema).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCreateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateManyInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.string(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const ManufacturersPropertiesUpdateManyMutationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateInput> = z.object({
+  id: z.string().optional(),
+  value: z.string(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesCreateNestedOneWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersCreateNestedOneWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema)
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedCreateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedCreateInput> = z.object({
+  id: z.string().optional(),
+  property_id: z.string(),
+  manufacturer_id: z.string(),
+  value: z.string()
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesUpdateOneRequiredWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersUpdateOneRequiredWithoutManyfacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  property_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyInput> = z.object({
+  id: z.string().optional(),
+  property_id: z.string(),
+  manufacturer_id: z.string(),
+  value: z.string()
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateManyMutationInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  property_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const UuidFilterSchema: z.ZodType<Prisma.UuidFilter> = z.object({
@@ -5108,9 +5688,19 @@ export const AssetsSumOrderByAggregateInputSchema: z.ZodType<Prisma.AssetsSumOrd
   size: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const ManufacturersPropertiesValuesListRelationFilterSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesListRelationFilter> = z.object({
+  every: z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).optional(),
+  some: z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).optional(),
+  none: z.lazy(() => ManufacturersPropertiesValuesWhereInputSchema).optional()
+}).strict();
+
 export const CitiesNullableRelationFilterSchema: z.ZodType<Prisma.CitiesNullableRelationFilter> = z.object({
   is: z.lazy(() => CitiesWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => CitiesWhereInputSchema).optional().nullable()
+}).strict();
+
+export const ManufacturersPropertiesValuesOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ManufacturersCountOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersCountOrderByAggregateInput> = z.object({
@@ -5226,6 +5816,115 @@ export const CitiesMinOrderByAggregateInputSchema: z.ZodType<Prisma.CitiesMinOrd
   description: z.lazy(() => SortOrderSchema).optional(),
   created_at: z.lazy(() => SortOrderSchema).optional(),
   updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesListRelationFilterSchema: z.ZodType<Prisma.ManufacturersPropertiesListRelationFilter> = z.object({
+  every: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional(),
+  some: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional(),
+  none: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCountOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesMinOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const Enummanufacturers_properties_typesFilterSchema: z.ZodType<Prisma.Enummanufacturers_properties_typesFilter> = z.object({
+  equals: z.lazy(() => manufacturers_properties_typesSchema).optional(),
+  in: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  notIn: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  not: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesNullableRelationFilterSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesNullableRelationFilter> = z.object({
+  is: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).optional().nullable(),
+  isNot: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).optional().nullable()
+}).strict();
+
+export const ManufacturersPropertiesCountOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  i18n_name: z.lazy(() => SortOrderSchema).optional(),
+  category_id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  additional_data: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  category_id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesMinOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  name: z.lazy(() => SortOrderSchema).optional(),
+  code: z.lazy(() => SortOrderSchema).optional(),
+  category_id: z.lazy(() => SortOrderSchema).optional(),
+  type: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const Enummanufacturers_properties_typesWithAggregatesFilterSchema: z.ZodType<Prisma.Enummanufacturers_properties_typesWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => manufacturers_properties_typesSchema).optional(),
+  in: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  notIn: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  not: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => NestedEnummanufacturers_properties_typesWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesRelationFilterSchema: z.ZodType<Prisma.ManufacturersPropertiesRelationFilter> = z.object({
+  is: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional(),
+  isNot: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesCountOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  property_id: z.lazy(() => SortOrderSchema).optional(),
+  manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  property_id: z.lazy(() => SortOrderSchema).optional(),
+  manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesMinOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  property_id: z.lazy(() => SortOrderSchema).optional(),
+  manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
+  value: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutPermissions_permissions_created_byTousersInput> = z.object({
@@ -6658,6 +7357,13 @@ export const ManufacturersCategoriesCreateNestedManyWithoutManufacturers_categor
   connect: z.union([ z.lazy(() => ManufacturersCategoriesWhereUniqueInputSchema),z.lazy(() => ManufacturersCategoriesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const ManufacturersPropertiesValuesCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const CitiesCreateNestedOneWithoutManufacturersInputSchema: z.ZodType<Prisma.CitiesCreateNestedOneWithoutManufacturersInput> = z.object({
   create: z.union([ z.lazy(() => CitiesCreateWithoutManufacturersInputSchema),z.lazy(() => CitiesUncheckedCreateWithoutManufacturersInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => CitiesCreateOrConnectWithoutManufacturersInputSchema).optional(),
@@ -6669,6 +7375,13 @@ export const ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturer
   connectOrCreate: z.union([ z.lazy(() => ManufacturersCategoriesCreateOrConnectWithoutManufacturers_categories_manufacturersInputSchema),z.lazy(() => ManufacturersCategoriesCreateOrConnectWithoutManufacturers_categories_manufacturersInputSchema).array() ]).optional(),
   createMany: z.lazy(() => ManufacturersCategoriesCreateManyManufacturers_categories_manufacturersInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => ManufacturersCategoriesWhereUniqueInputSchema),z.lazy(() => ManufacturersCategoriesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema: z.ZodType<Prisma.ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInput> = z.object({
@@ -6683,6 +7396,20 @@ export const ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_ma
   update: z.union([ z.lazy(() => ManufacturersCategoriesUpdateWithWhereUniqueWithoutManufacturers_categories_manufacturersInputSchema),z.lazy(() => ManufacturersCategoriesUpdateWithWhereUniqueWithoutManufacturers_categories_manufacturersInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInputSchema),z.lazy(() => ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ManufacturersCategoriesScalarWhereInputSchema),z.lazy(() => ManufacturersCategoriesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const CitiesUpdateOneWithoutManufacturersNestedInputSchema: z.ZodType<Prisma.CitiesUpdateOneWithoutManufacturersNestedInput> = z.object({
@@ -6707,6 +7434,20 @@ export const ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_cate
   update: z.union([ z.lazy(() => ManufacturersCategoriesUpdateWithWhereUniqueWithoutManufacturers_categories_manufacturersInputSchema),z.lazy(() => ManufacturersCategoriesUpdateWithWhereUniqueWithoutManufacturers_categories_manufacturersInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInputSchema),z.lazy(() => ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ManufacturersCategoriesScalarWhereInputSchema),z.lazy(() => ManufacturersCategoriesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const CategoriesCreateNestedOneWithoutManufacturers_categoriesInputSchema: z.ZodType<Prisma.CategoriesCreateNestedOneWithoutManufacturers_categoriesInput> = z.object({
@@ -6777,6 +7518,138 @@ export const ManufacturersUncheckedUpdateManyWithoutCitiesNestedInputSchema: z.Z
   update: z.union([ z.lazy(() => ManufacturersUpdateWithWhereUniqueWithoutCitiesInputSchema),z.lazy(() => ManufacturersUpdateWithWhereUniqueWithoutCitiesInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => ManufacturersUpdateManyWithWhereWithoutCitiesInputSchema),z.lazy(() => ManufacturersUpdateManyWithWhereWithoutCitiesInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ManufacturersScalarWhereInputSchema),z.lazy(() => ManufacturersScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCreateNestedManyWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateNestedManyWithoutManufacturers_properties_categoriesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema).array(),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesUncheckedCreateNestedManyWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedCreateNestedManyWithoutManufacturers_properties_categoriesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema).array(),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesUpdateManyWithoutManufacturers_properties_categoriesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateManyWithoutManufacturers_properties_categoriesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema).array(),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema).array(),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCreateNestedOneWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateNestedOneWithoutManufacturersPropertiesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersPropertiesCategoriesCreateOrConnectWithoutManufacturersPropertiesInputSchema).optional(),
+  connect: z.lazy(() => ManufacturersPropertiesCategoriesWhereUniqueInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Enummanufacturers_properties_typesFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => manufacturers_properties_typesSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpdateOneWithoutManufacturersPropertiesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateOneWithoutManufacturersPropertiesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersPropertiesCategoriesCreateOrConnectWithoutManufacturersPropertiesInputSchema).optional(),
+  upsert: z.lazy(() => ManufacturersPropertiesCategoriesUpsertWithoutManufacturersPropertiesInputSchema).optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema) ]).optional(),
+  connect: z.lazy(() => ManufacturersPropertiesCategoriesWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesUpdateToOneWithWhereWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUpdateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedUpdateWithoutManufacturersPropertiesInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array(),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCreateNestedOneWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateNestedOneWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  connect: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).optional()
+}).strict();
+
+export const ManufacturersCreateNestedOneWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersCreateNestedOneWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersCreateOrConnectWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  connect: z.lazy(() => ManufacturersWhereUniqueInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUpdateOneRequiredWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateOneRequiredWithoutManufacturers_properties_values_manufacturers_propertiesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  upsert: z.lazy(() => ManufacturersPropertiesUpsertWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  connect: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesUpdateToOneWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersUpdateOneRequiredWithoutManyfacturers_properties_values_manufacturers_propertiesNestedInputSchema: z.ZodType<Prisma.ManufacturersUpdateOneRequiredWithoutManyfacturers_properties_values_manufacturers_propertiesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ManufacturersCreateOrConnectWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  upsert: z.lazy(() => ManufacturersUpsertWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema).optional(),
+  connect: z.lazy(() => ManufacturersWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => ManufacturersUpdateToOneWithWhereWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]).optional(),
 }).strict();
 
 export const NestedUuidFilterSchema: z.ZodType<Prisma.NestedUuidFilter> = z.object({
@@ -7109,6 +7982,23 @@ export const NestedIntWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntWith
   _sum: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedIntFilterSchema).optional(),
   _max: z.lazy(() => NestedIntFilterSchema).optional()
+}).strict();
+
+export const NestedEnummanufacturers_properties_typesFilterSchema: z.ZodType<Prisma.NestedEnummanufacturers_properties_typesFilter> = z.object({
+  equals: z.lazy(() => manufacturers_properties_typesSchema).optional(),
+  in: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  notIn: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  not: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema) ]).optional(),
+}).strict();
+
+export const NestedEnummanufacturers_properties_typesWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnummanufacturers_properties_typesWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => manufacturers_properties_typesSchema).optional(),
+  in: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  notIn: z.lazy(() => manufacturers_properties_typesSchema).array().optional(),
+  not: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => NestedEnummanufacturers_properties_typesWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnummanufacturers_properties_typesFilterSchema).optional()
 }).strict();
 
 export const UsersCreateWithoutPermissions_permissions_created_byTousersInputSchema: z.ZodType<Prisma.UsersCreateWithoutPermissions_permissions_created_byTousersInput> = z.object({
@@ -12334,6 +13224,28 @@ export const ManufacturersCategoriesCreateManyManufacturers_categories_manufactu
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.string().optional(),
+  value: z.string(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesCreateNestedOneWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema)
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.string().optional(),
+  property_id: z.string(),
+  value: z.string()
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateOrConnectWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelopeSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const CitiesCreateWithoutManufacturersInputSchema: z.ZodType<Prisma.CitiesCreateWithoutManufacturersInput> = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -12371,6 +13283,32 @@ export const ManufacturersCategoriesUpdateWithWhereUniqueWithoutManufacturers_ca
 export const ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersCategoriesUpdateManyWithWhereWithoutManufacturers_categories_manufacturersInput> = z.object({
   where: z.lazy(() => ManufacturersCategoriesScalarWhereInputSchema),
   data: z.union([ z.lazy(() => ManufacturersCategoriesUpdateManyMutationInputSchema),z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManyfacturers_properties_values_manufacturersInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyMutationInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesScalarWhereInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  property_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  value: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
 }).strict();
 
 export const CitiesUpsertWithoutManufacturersInputSchema: z.ZodType<Prisma.CitiesUpsertWithoutManufacturersInput> = z.object({
@@ -12442,6 +13380,7 @@ export const ManufacturersCreateWithoutManufacturers_categoriesInputSchema: z.Zo
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional(),
   cities: z.lazy(() => CitiesCreateNestedOneWithoutManufacturersInputSchema).optional()
 }).strict();
 
@@ -12454,7 +13393,8 @@ export const ManufacturersUncheckedCreateWithoutManufacturers_categoriesInputSch
   rating: z.number().optional(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional()
+  updated_at: z.coerce.date().optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional()
 }).strict();
 
 export const ManufacturersCreateOrConnectWithoutManufacturers_categoriesInputSchema: z.ZodType<Prisma.ManufacturersCreateOrConnectWithoutManufacturers_categoriesInput> = z.object({
@@ -12519,6 +13459,7 @@ export const ManufacturersUpdateWithoutManufacturers_categoriesInputSchema: z.Zo
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional(),
   cities: z.lazy(() => CitiesUpdateOneWithoutManufacturersNestedInputSchema).optional()
 }).strict();
 
@@ -12532,6 +13473,7 @@ export const ManufacturersUncheckedUpdateWithoutManufacturers_categoriesInputSch
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional()
 }).strict();
 
 export const ManufacturersCreateWithoutCitiesInputSchema: z.ZodType<Prisma.ManufacturersCreateWithoutCitiesInput> = z.object({
@@ -12543,7 +13485,8 @@ export const ManufacturersCreateWithoutCitiesInputSchema: z.ZodType<Prisma.Manuf
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional()
 }).strict();
 
 export const ManufacturersUncheckedCreateWithoutCitiesInputSchema: z.ZodType<Prisma.ManufacturersUncheckedCreateWithoutCitiesInput> = z.object({
@@ -12555,7 +13498,8 @@ export const ManufacturersUncheckedCreateWithoutCitiesInputSchema: z.ZodType<Pri
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManyfacturers_properties_values_manufacturersInputSchema).optional()
 }).strict();
 
 export const ManufacturersCreateOrConnectWithoutCitiesInputSchema: z.ZodType<Prisma.ManufacturersCreateOrConnectWithoutCitiesInput> = z.object({
@@ -12597,6 +13541,285 @@ export const ManufacturersScalarWhereInputSchema: z.ZodType<Prisma.Manufacturers
   active: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateNestedManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_categoriesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelopeSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpsertWithWhereUniqueWithoutManufacturers_properties_categoriesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_categoriesInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_categoriesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateWithWhereUniqueWithoutManufacturers_properties_categoriesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithoutManufacturers_properties_categoriesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_categoriesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateManyWithWhereWithoutManufacturers_properties_categoriesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesUpdateManyMutationInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesScalarWhereInputSchema: z.ZodType<Prisma.ManufacturersPropertiesScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema),z.lazy(() => ManufacturersPropertiesScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  name: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  code: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  i18n_name: z.lazy(() => JsonNullableFilterSchema).optional(),
+  category_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  type: z.union([ z.lazy(() => Enummanufacturers_properties_typesFilterSchema),z.lazy(() => manufacturers_properties_typesSchema) ]).optional(),
+  additional_data: z.lazy(() => JsonNullableFilterSchema).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesCreateOrConnectWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateOrConnectWithoutManufacturersPropertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesCategoriesWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  value: z.string(),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersCreateNestedOneWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema)
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  manufacturer_id: z.string(),
+  value: z.string()
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelopeSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpsertWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpsertWithoutManufacturersPropertiesInput> = z.object({
+  update: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesUpdateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedUpdateWithoutManufacturersPropertiesInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesCreateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedCreateWithoutManufacturersPropertiesInputSchema) ]),
+  where: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpdateToOneWithWhereWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateToOneWithWhereWithoutManufacturersPropertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesCategoriesWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesCategoriesUpdateWithoutManufacturersPropertiesInputSchema),z.lazy(() => ManufacturersPropertiesCategoriesUncheckedUpdateWithoutManufacturersPropertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUpdateWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateWithoutManufacturersPropertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCategoriesUncheckedUpdateWithoutManufacturersPropertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUncheckedUpdateWithoutManufacturersPropertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpsertWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesValuesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateWithWhereUniqueWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesValuesScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesValuesUpdateManyMutationInputSchema),z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesCreateNestedOneWithoutManufacturersPropertiesInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.string(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateOrConnectWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  short_name: z.string(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  rating: z.number().optional(),
+  active: z.boolean().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional(),
+  cities: z.lazy(() => CitiesCreateNestedOneWithoutManufacturersInputSchema).optional()
+}).strict();
+
+export const ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  short_name: z.string(),
+  name: z.string(),
+  description: z.string().optional().nullable(),
+  city_id: z.string().optional().nullable(),
+  rating: z.number().optional(),
+  active: z.boolean().optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedCreateNestedManyWithoutManufacturers_categories_manufacturersInputSchema).optional()
+}).strict();
+
+export const ManufacturersCreateOrConnectWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersCreateOrConnectWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesUpsertWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpsertWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  update: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersPropertiesCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedCreateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+  where: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUpdateToOneWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateToOneWithWhereWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersPropertiesWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ManufacturersPropertiesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersPropertiesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_categories: z.lazy(() => ManufacturersPropertiesCategoriesUpdateOneWithoutManufacturersPropertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  category_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersUpsertWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersUpsertWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  update: z.union([ z.lazy(() => ManufacturersUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+  create: z.union([ z.lazy(() => ManufacturersCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedCreateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+  where: z.lazy(() => ManufacturersWhereInputSchema).optional()
+}).strict();
+
+export const ManufacturersUpdateToOneWithWhereWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersUpdateToOneWithWhereWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  where: z.lazy(() => ManufacturersWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ManufacturersUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema),z.lazy(() => ManufacturersUncheckedUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema) ]),
+}).strict();
+
+export const ManufacturersUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  short_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional(),
+  cities: z.lazy(() => CitiesUpdateOneWithoutManufacturersNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersUncheckedUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersUncheckedUpdateWithoutManyfacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  short_name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  city_id: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional()
 }).strict();
 
 export const Roles_permissionsCreateManyPermissionsInputSchema: z.ZodType<Prisma.Roles_permissionsCreateManyPermissionsInput> = z.object({
@@ -13386,6 +14609,12 @@ export const ManufacturersCategoriesCreateManyManufacturers_categories_manufactu
   updated_at: z.coerce.date().optional()
 }).strict();
 
+export const ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.string().optional(),
+  property_id: z.string(),
+  value: z.string()
+}).strict();
+
 export const ManufacturersCategoriesUpdateWithoutManufacturers_categories_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersCategoriesUpdateWithoutManufacturers_categories_manufacturersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -13405,6 +14634,24 @@ export const ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_cate
   category_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesUpdateOneRequiredWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  property_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  property_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const ManufacturersCreateManyCitiesInputSchema: z.ZodType<Prisma.ManufacturersCreateManyCitiesInput> = z.object({
@@ -13427,7 +14674,8 @@ export const ManufacturersUpdateWithoutCitiesInputSchema: z.ZodType<Prisma.Manuf
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional()
 }).strict();
 
 export const ManufacturersUncheckedUpdateWithoutCitiesInputSchema: z.ZodType<Prisma.ManufacturersUncheckedUpdateWithoutCitiesInput> = z.object({
@@ -13439,7 +14687,8 @@ export const ManufacturersUncheckedUpdateWithoutCitiesInputSchema: z.ZodType<Pri
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional()
+  manufacturers_categories: z.lazy(() => ManufacturersCategoriesUncheckedUpdateManyWithoutManufacturers_categories_manufacturersNestedInputSchema).optional(),
+  manyfacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturers_properties_values_manufacturersNestedInputSchema).optional()
 }).strict();
 
 export const ManufacturersUncheckedUpdateManyWithoutCitiesInputSchema: z.ZodType<Prisma.ManufacturersUncheckedUpdateManyWithoutCitiesInput> = z.object({
@@ -13451,6 +14700,76 @@ export const ManufacturersUncheckedUpdateManyWithoutCitiesInputSchema: z.ZodType
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateManyManufacturers_properties_categoriesInput> = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  code: z.string(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.lazy(() => manufacturers_properties_typesSchema),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const ManufacturersPropertiesUpdateWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateWithoutManufacturers_properties_categoriesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateWithoutManufacturers_properties_categoriesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturers_properties_values_manufacturers_properties: z.lazy(() => ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesUncheckedUpdateManyWithoutManufacturers_properties_categoriesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  code: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  i18n_name: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  type: z.union([ z.lazy(() => manufacturers_properties_typesSchema),z.lazy(() => Enummanufacturers_properties_typesFieldUpdateOperationsInputSchema) ]).optional(),
+  additional_data: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.string().optional(),
+  manufacturer_id: z.string(),
+  value: z.string()
+}).strict();
+
+export const ManufacturersPropertiesValuesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manyfacturers_properties_values_manufacturers: z.lazy(() => ManufacturersUpdateOneRequiredWithoutManyfacturers_properties_values_manufacturers_propertiesNestedInputSchema).optional()
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesInputSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManufacturers_properties_values_manufacturers_propertiesInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  value: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 /////////////////////////////////////////
@@ -14501,6 +15820,192 @@ export const CitiesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.CitiesFindUniqu
   where: CitiesWhereUniqueInputSchema,
 }).strict()
 
+export const ManufacturersPropertiesCategoriesFindFirstArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesFindFirstArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesCategoriesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesCategoriesScalarFieldEnumSchema,ManufacturersPropertiesCategoriesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesFindFirstOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesCategoriesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesCategoriesScalarFieldEnumSchema,ManufacturersPropertiesCategoriesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesFindManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesFindManyArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesCategoriesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesCategoriesScalarFieldEnumSchema,ManufacturersPropertiesCategoriesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesAggregateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesAggregateArgs> = z.object({
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesCategoriesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesCategoriesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesGroupByArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesGroupByArgs> = z.object({
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesCategoriesOrderByWithAggregationInputSchema.array(),ManufacturersPropertiesCategoriesOrderByWithAggregationInputSchema ]).optional(),
+  by: ManufacturersPropertiesCategoriesScalarFieldEnumSchema.array(),
+  having: ManufacturersPropertiesCategoriesScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesFindUniqueArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesFindUniqueArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesCategoriesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesFindUniqueOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesFindFirstArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesFindFirstArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesScalarFieldEnumSchema,ManufacturersPropertiesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesFindFirstOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesScalarFieldEnumSchema,ManufacturersPropertiesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesFindManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesFindManyArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesScalarFieldEnumSchema,ManufacturersPropertiesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesAggregateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesAggregateArgs> = z.object({
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesGroupByArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesGroupByArgs> = z.object({
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesOrderByWithAggregationInputSchema.array(),ManufacturersPropertiesOrderByWithAggregationInputSchema ]).optional(),
+  by: ManufacturersPropertiesScalarFieldEnumSchema.array(),
+  having: ManufacturersPropertiesScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesFindUniqueArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesFindUniqueArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesFindUniqueOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesValuesFindFirstArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesFindFirstArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesValuesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesValuesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesValuesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesValuesScalarFieldEnumSchema,ManufacturersPropertiesValuesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesFindFirstOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesValuesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesValuesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesValuesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesValuesScalarFieldEnumSchema,ManufacturersPropertiesValuesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesFindManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesFindManyArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesValuesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesValuesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesValuesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ManufacturersPropertiesValuesScalarFieldEnumSchema,ManufacturersPropertiesValuesScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesAggregateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesAggregateArgs> = z.object({
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesValuesOrderByWithRelationInputSchema.array(),ManufacturersPropertiesValuesOrderByWithRelationInputSchema ]).optional(),
+  cursor: ManufacturersPropertiesValuesWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesGroupByArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesGroupByArgs> = z.object({
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+  orderBy: z.union([ ManufacturersPropertiesValuesOrderByWithAggregationInputSchema.array(),ManufacturersPropertiesValuesOrderByWithAggregationInputSchema ]).optional(),
+  by: ManufacturersPropertiesValuesScalarFieldEnumSchema.array(),
+  having: ManufacturersPropertiesValuesScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesFindUniqueArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesFindUniqueArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesValuesFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesFindUniqueOrThrowArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereUniqueInputSchema,
+}).strict()
+
 export const PermissionsCreateArgsSchema: z.ZodType<Prisma.PermissionsCreateArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
   include: PermissionsIncludeSchema.optional(),
@@ -15188,4 +16693,127 @@ export const CitiesUpdateManyArgsSchema: z.ZodType<Prisma.CitiesUpdateManyArgs> 
 
 export const CitiesDeleteManyArgsSchema: z.ZodType<Prisma.CitiesDeleteManyArgs> = z.object({
   where: CitiesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesCreateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesCategoriesCreateInputSchema,ManufacturersPropertiesCategoriesUncheckedCreateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesUpsertArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpsertArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereUniqueInputSchema,
+  create: z.union([ ManufacturersPropertiesCategoriesCreateInputSchema,ManufacturersPropertiesCategoriesUncheckedCreateInputSchema ]),
+  update: z.union([ ManufacturersPropertiesCategoriesUpdateInputSchema,ManufacturersPropertiesCategoriesUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesCreateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesCreateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesCategoriesCreateManyInputSchema,ManufacturersPropertiesCategoriesCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesDeleteArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesDeleteArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  where: ManufacturersPropertiesCategoriesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesCategoriesUpdateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateArgs> = z.object({
+  select: ManufacturersPropertiesCategoriesSelectSchema.optional(),
+  include: ManufacturersPropertiesCategoriesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesCategoriesUpdateInputSchema,ManufacturersPropertiesCategoriesUncheckedUpdateInputSchema ]),
+  where: ManufacturersPropertiesCategoriesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesCategoriesUpdateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesUpdateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesCategoriesUpdateManyMutationInputSchema,ManufacturersPropertiesCategoriesUncheckedUpdateManyInputSchema ]),
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesCategoriesDeleteManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCategoriesDeleteManyArgs> = z.object({
+  where: ManufacturersPropertiesCategoriesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesCreateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesCreateInputSchema,ManufacturersPropertiesUncheckedCreateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesUpsertArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesUpsertArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereUniqueInputSchema,
+  create: z.union([ ManufacturersPropertiesCreateInputSchema,ManufacturersPropertiesUncheckedCreateInputSchema ]),
+  update: z.union([ ManufacturersPropertiesUpdateInputSchema,ManufacturersPropertiesUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesCreateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesCreateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesCreateManyInputSchema,ManufacturersPropertiesCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const ManufacturersPropertiesDeleteArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesDeleteArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  where: ManufacturersPropertiesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesUpdateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateArgs> = z.object({
+  select: ManufacturersPropertiesSelectSchema.optional(),
+  include: ManufacturersPropertiesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesUpdateInputSchema,ManufacturersPropertiesUncheckedUpdateInputSchema ]),
+  where: ManufacturersPropertiesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesUpdateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesUpdateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesUpdateManyMutationInputSchema,ManufacturersPropertiesUncheckedUpdateManyInputSchema ]),
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesDeleteManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesDeleteManyArgs> = z.object({
+  where: ManufacturersPropertiesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesCreateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesValuesCreateInputSchema,ManufacturersPropertiesValuesUncheckedCreateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesValuesUpsertArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpsertArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereUniqueInputSchema,
+  create: z.union([ ManufacturersPropertiesValuesCreateInputSchema,ManufacturersPropertiesValuesUncheckedCreateInputSchema ]),
+  update: z.union([ ManufacturersPropertiesValuesUpdateInputSchema,ManufacturersPropertiesValuesUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const ManufacturersPropertiesValuesCreateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesCreateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesValuesCreateManyInputSchema,ManufacturersPropertiesValuesCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesDeleteArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesDeleteArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  where: ManufacturersPropertiesValuesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesValuesUpdateArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateArgs> = z.object({
+  select: ManufacturersPropertiesValuesSelectSchema.optional(),
+  include: ManufacturersPropertiesValuesIncludeSchema.optional(),
+  data: z.union([ ManufacturersPropertiesValuesUpdateInputSchema,ManufacturersPropertiesValuesUncheckedUpdateInputSchema ]),
+  where: ManufacturersPropertiesValuesWhereUniqueInputSchema,
+}).strict()
+
+export const ManufacturersPropertiesValuesUpdateManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesUpdateManyArgs> = z.object({
+  data: z.union([ ManufacturersPropertiesValuesUpdateManyMutationInputSchema,ManufacturersPropertiesValuesUncheckedUpdateManyInputSchema ]),
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
+}).strict()
+
+export const ManufacturersPropertiesValuesDeleteManyArgsSchema: z.ZodType<Prisma.ManufacturersPropertiesValuesDeleteManyArgs> = z.object({
+  where: ManufacturersPropertiesValuesWhereInputSchema.optional(),
 }).strict()
