@@ -7,7 +7,13 @@ import {
   Langs,
 } from "@backend/lib/zod";
 import { RedisClientType } from "@backend/trpc";
-import { Categories, Cities, ImageSizes } from "@prisma/client";
+import {
+  Categories,
+  Cities,
+  ImageSizes,
+  ManufacturersProperties,
+  ManufacturersPropertiesCategories,
+} from "@prisma/client";
 
 export class CacheControlService {
   constructor(
@@ -19,6 +25,9 @@ export class CacheControlService {
     this.cacheLangs();
     this.cacheCategories();
     this.cacheImageSizes();
+    this.cacheCities();
+    this.cacheManufacturersPropertiesCategories();
+    this.cacheManufacturersProperties();
   }
 
   async cachePermissions() {
@@ -216,6 +225,60 @@ export class CacheControlService {
 
   async getCachedCities({ take }: { take?: number }): Promise<Cities[]> {
     const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
+    let res = JSON.parse(langs ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheManufacturersPropertiesCategories() {
+    const langs = await this.prisma.manufacturersPropertiesCategories.findMany({
+      take: 300,
+    });
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}manufacturersPropertiesCategories`,
+      JSON.stringify(langs)
+    );
+  }
+
+  async getCachedManufacturersPropertiesCategories({
+    take,
+  }: {
+    take?: number;
+  }): Promise<ManufacturersPropertiesCategories[]> {
+    const langs = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}manufacturersPropertiesCategories`
+    );
+    let res = JSON.parse(langs ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheManufacturersProperties() {
+    const langs = await this.prisma.manufacturersProperties.findMany({
+      take: 300,
+    });
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}manufacturersProperties`,
+      JSON.stringify(langs)
+    );
+  }
+
+  async getCachedManufacturersProperties({
+    take,
+  }: {
+    take?: number;
+  }): Promise<ManufacturersProperties[]> {
+    const langs = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}manufacturersProperties`
+    );
     let res = JSON.parse(langs ?? "[]");
 
     if (take && res.length > take) {
