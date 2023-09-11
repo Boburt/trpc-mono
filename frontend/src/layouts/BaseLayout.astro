@@ -3,6 +3,7 @@ import "../styles/global.css";
 
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import { Breadcrumbs } from "astro-breadcrumbs";
 import CategoriesFilterServer from "../components/manufacturers/filter/CategoriesServer.astro";
 import { ViewTransitions } from "astro:transitions";
 
@@ -21,6 +22,11 @@ const pathname = new URL(Astro.request.url).pathname;
   <body>
     <Header showHeaderFilter={showHeaderFilter} />
     <div class="container min-h-screen mx-auto py-4">
+      {
+        pathname !== "/" && (
+          <Breadcrumbs indexText="Home" mainBemClass="breadcrumbs" />
+        )
+      }
       {showHeaderFilter && <CategoriesFilterServer />}
       <slot />
     </div>
