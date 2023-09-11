@@ -6,9 +6,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@components/ui/sheet";
-import RolesForm from "./_form";
+import ManufacturersPropertiesCategoriesForm from "./_form";
 
-export default function RolesFormSheet({
+export default function ManufacturersPropertiesCategoriesFormSheet({
   children,
   recordId,
 }: {
@@ -37,9 +37,16 @@ export default function RolesFormSheet({
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="left">
         <SheetHeader>
-          <SheetTitle>{recordId ? "Edit" : "Add"} Roles</SheetTitle>
+          <SheetTitle>
+            {recordId ? "Edit" : "Add"} Manufacturers Properties Category
+          </SheetTitle>
         </SheetHeader>
-        {open && <RolesForm setOpen={setOpen} recordId={recordId} />}
+        {open && (
+          <ManufacturersPropertiesCategoriesForm
+            setOpen={setOpen}
+            recordId={recordId}
+          />
+        )}
       </SheetContent>
     </Sheet>
   );
