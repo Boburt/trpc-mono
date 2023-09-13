@@ -6,6 +6,7 @@ import Location from "@/components/Map/icon/Location";
 import Phone from "@/components/Map/icon/Phone";
 import Mail from "@/components/Map/icon/Mail";
 import FormElement from "@/components/Map/FormElement";
+import MapYandex from "@/components/Map/Map";
 
 export default function Contact() {
   const {
@@ -31,7 +32,7 @@ export default function Contact() {
             <div className="space-y-4 mt-2">
               <p className="flex items-center">
                 <a href="">
-                  <Iconinfo icon={<Location />} text="Location 24 po" />
+                  <Iconinfo icon={<Location />} text="Amir Temur Xiyoboni" />
                 </a>
               </p>
               <p className="flex items-center">
@@ -101,6 +102,7 @@ export default function Contact() {
           </form>
         </div>
       </section>
+      <MapYandex />
     </>
   );
 }
