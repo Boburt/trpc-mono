@@ -3,7 +3,7 @@ import { DataTable } from "./data-table";
 import { rolesColumns } from "./columns";
 import { Button } from "@components/ui/button";
 import { Plus } from "lucide-react";
-import RolePermissions from "./role-permissions";
+import ManufacturersProperties from "./manufacturers-properties";
 import CanAccess from "@admin/components/can-access";
 import ManufacturersPropertiesCategoriesFormSheet from "@admin/components/forms/manufacturers_properties_categories/sheet";
 
@@ -30,7 +30,7 @@ export default function RolesListPage() {
         </div>
       </div>
       <div className="w-6/12">
-        <RolePermissions />
+        <ManufacturersProperties />
       </div>
     </div>
   );

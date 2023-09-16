@@ -17,26 +17,31 @@ import {
 } from "@components/ui/table";
 
 import { useMemo } from "react";
-import { useRolesStore } from "@admin/store/states/roles";
+import { useManufacturersPropertiesCategoriesStore } from "@admin/store/states/manufacturersPropertiesCategories";
 import { RouterOutputs, trpc } from "@admin/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["rolesPermissions"]["list"][0], TValue>[];
+  columns: ColumnDef<
+    RouterOutputs["manufacturersProperties"]["list"]["items"][0],
+    TValue
+  >[];
 }
 
-export function RolesPermissionsDataTable<TData, TValue>({
+export function ManufacturersPropertiesDataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
-  const rowSelection = useRolesStore((state) => state.selectedRows);
+  const rowSelection = useManufacturersPropertiesCategoriesStore(
+    (state) => state.selectedRows
+  );
 
   const selectedRoleId = useMemo(() => {
     return Object.keys(rowSelection)[0];
   }, [rowSelection]);
 
-  const { data, isLoading } = trpc.rolesPermissions.list.useQuery(
+  const { data, isLoading } = trpc.manufacturersProperties.list.useQuery(
     {
       where: {
-        role_id: {
+        category_id: {
           equals: selectedRoleId,
         },
       },
@@ -49,7 +54,7 @@ export function RolesPermissionsDataTable<TData, TValue>({
 
   const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: data ?? defaultData,
+    data: data?.items ?? defaultData,
     columns,
     // onRowSelectionChange: function (stateUpdater) {
     //   console.log(arguments);

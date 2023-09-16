@@ -35,7 +35,7 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
-import { useRolesStore } from "@admin/store/states/roles";
+import { useManufacturersPropertiesCategoriesStore } from "@admin/store/states/manufacturersPropertiesCategories";
 import { RouterOutputs } from "@admin/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
@@ -48,8 +48,12 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
-  const rowSelection = useRolesStore((state) => state.selectedRows);
-  const setRowSelection = useRolesStore((state) => state.toggleSelected);
+  const rowSelection = useManufacturersPropertiesCategoriesStore(
+    (state) => state.selectedRows
+  );
+  const setRowSelection = useManufacturersPropertiesCategoriesStore(
+    (state) => state.toggleSelected
+  );
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,

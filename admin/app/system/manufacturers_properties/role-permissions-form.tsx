@@ -11,14 +11,14 @@ import { trpc } from "@admin/utils/trpc";
 
 import { useState, useMemo, useEffect } from "react";
 import { useToast } from "@components/ui/use-toast";
-import { useRolesStore } from "@admin/store/states/roles";
+import { useManufacturersPropertiesCategoriesStore } from "@admin/store/states/manufacturersPropertiesCategories";
 import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { linkedRolesPermissionsColumns } from "./role-permissions-columns";
+import { linkedRolesPermissionsColumns } from "./manufacturers-properties-columns";
 import {
   Table,
   TableBody,
@@ -39,7 +39,9 @@ export default function RolePermissionsForm({
 }) {
   const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
-  const roleSelection = useRolesStore((state) => state.selectedRows);
+  const roleSelection = useManufacturersPropertiesCategoriesStore(
+    (state) => state.selectedRows
+  );
   const rowSelection = useRolePermissionStore((state) => state.selectedRows);
   const setSelectedRows = useRolePermissionStore(
     (state) => state.setSelectedRows
