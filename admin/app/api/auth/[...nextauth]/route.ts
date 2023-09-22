@@ -2,6 +2,7 @@ import { trpcClient } from "@admin/utils/trpc-server";
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import dayjs from "dayjs";
 
 const authOptions: AuthOptions = {
   debug: true,
@@ -32,9 +33,29 @@ const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 2 * 60 * 60 },
   callbacks: {
     async jwt({ token, user }) {
+      if (token && token.exp) {
+        const differenceInMinutes = dayjs
+          .unix(token!.exp!)
+          .diff(dayjs(), "minute");
+
+        if (differenceInMinutes < 30) {
+          const res = await trpcClient.users.refreshToken.mutate({
+            refreshToken: token.refreshToken as string,
+          });
+          if (typeof res !== "undefined") {
+            token = {
+              ...token,
+              ...res.data,
+              accessToken: res.accessToken,
+              refreshToken: res.refreshToken,
+              rights: res.rights,
+            };
+          }
+        }
+      }
       if (typeof user !== "undefined") {
         token = {
           ...token,

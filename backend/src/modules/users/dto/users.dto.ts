@@ -6,6 +6,10 @@ export const loginInput = z.object({
   password: z.string(),
 });
 
+export const refreshTokenInput = z.object({
+  refreshToken: z.string(),
+});
+
 export const typeLoginOutput = z.object({
   data: UsersSchema,
   refreshToken: z.string(),
