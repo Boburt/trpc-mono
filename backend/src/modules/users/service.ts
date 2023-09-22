@@ -13,9 +13,14 @@ import {
   hashPassword,
   md5hash,
   signJwt,
+  verifyJwt,
 } from "@backend/lib/bcrypt";
 import { z } from "zod";
-import { loginInput, typeLoginOutput } from "./dto/users.dto";
+import {
+  loginInput,
+  refreshTokenInput,
+  typeLoginOutput,
+} from "./dto/users.dto";
 import { TRPCError } from "@trpc/server";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
@@ -171,6 +176,77 @@ export class UsersService {
     );
 
     console.log("accessToken", accessToken);
+
+    // getting rights
+    let permissions: string[] = [];
+    if (user.users_roles_usersTousers_roles_user_id.length > 0) {
+      const roleId = user.users_roles_usersTousers_roles_user_id[0].role_id;
+      permissions = await this.cacheController.getPermissionsByRoleId(roleId);
+    }
+    return {
+      data: user,
+      refreshToken,
+      accessToken,
+      rights: permissions,
+    };
+  }
+
+  async refreshToken(
+    input: z.infer<typeof refreshTokenInput>
+  ): Promise<z.infer<typeof typeLoginOutput>> {
+    let jwtResult = await verifyJwt(input.refreshToken);
+    if (!jwtResult) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
+    }
+
+    if (!jwtResult.payload) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
+    }
+    const user = await this.prisma.users.findUnique({
+      where: {
+        id: jwtResult.payload.id as string,
+      },
+      include: {
+        users_roles_usersTousers_roles_user_id: {
+          include: {
+            roles: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // generate tokens
+
+    const accessToken = await signJwt(
+      {
+        id: user.id,
+        login: user.login,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
+      process.env.JWT_EXPIRES_IN
+    );
+
+    const refreshToken = await signJwt(
+      {
+        id: user.id,
+        login: user.login,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
+      process.env.JWT_REFRESH_EXPIRES_IN
+    );
 
     // getting rights
     let permissions: string[] = [];
