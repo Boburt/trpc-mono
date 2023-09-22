@@ -8,7 +8,7 @@ import {
   UsersUpdateArgsSchema,
   Users_rolesUncheckedCreateInputSchema,
 } from "@backend/lib/zod";
-import { loginInput } from "./dto/users.dto";
+import { loginInput, refreshTokenInput } from "./dto/users.dto";
 
 export const usersRouter = publicRouter({
   add: publicProcedure
@@ -44,6 +44,11 @@ export const usersRouter = publicRouter({
       return ctx.usersService.assignRole(input);
     }),
 
+  refreshToken: publicProcedure
+    .input(refreshTokenInput)
+    .mutation(({ input, ctx }) => {
+      return ctx.usersService.refreshToken(input);
+    }),
   login: publicProcedure.input(loginInput).mutation(({ input, ctx }) => {
     console.log("try login");
     return ctx.usersService.login(input);
