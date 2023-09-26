@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "@admin/components/ui/select";
 import short from "short-uuid";
+import { AdditionalDataItem } from "@admin/types/ui-types";
 
 const propertyTypesLabel = {
   string: "Строка",
@@ -56,11 +57,6 @@ const formFactory = createFormFactory<
     type: "string",
   },
 });
-
-type AdditionalDataItem = {
-  id: string;
-  value: string;
-};
 
 export default function ManufacturersPropertiesForm({
   children,
@@ -284,7 +280,6 @@ export default function ManufacturersPropertiesForm({
                             <form.Field name="additional_data">
                               {(field) => {
                                 let val = field.getValue();
-                                console.log(val);
                                 if (val && typeof val == "string") {
                                   val = JSON.parse(
                                     val as string
