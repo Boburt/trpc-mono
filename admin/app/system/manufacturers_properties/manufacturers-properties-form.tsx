@@ -38,6 +38,7 @@ import {
 } from "@admin/components/ui/select";
 import short from "short-uuid";
 import { AdditionalDataItem } from "@admin/types/ui-types";
+import { toast } from "sonner";
 
 const propertyTypesLabel = {
   string: "Строка",
@@ -65,7 +66,6 @@ export default function ManufacturersPropertiesForm({
   children: React.ReactNode;
   recordId?: string;
 }) {
-  const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
   const roleSelection = useManufacturersPropertiesCategoriesStore(
     (state) => state.selectedRows
@@ -76,22 +76,13 @@ export default function ManufacturersPropertiesForm({
   }, [roleSelection]);
 
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `Property ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Property ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {

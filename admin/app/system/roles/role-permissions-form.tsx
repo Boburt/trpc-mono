@@ -31,13 +31,13 @@ import { useRolePermissionStore } from "@admin/store/states/role_permissions";
 import { useCreateManyRolePermissions } from "@admin/store/apis/role_permissions";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { toast } from "sonner";
 
 export default function RolePermissionsForm({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
   const roleSelection = useRolesStore((state) => state.selectedRows);
   const rowSelection = useRolePermissionStore((state) => state.selectedRows);
@@ -89,11 +89,7 @@ export default function RolePermissionsForm({
     error,
   } = useCreateManyRolePermissions({
     onSuccess: () => {
-      toast({
-        title: "Success",
-        description: `Role permissions added`,
-        duration: 5000,
-      });
+      toast.success(`Role permissions added`);
       setSelectedRows({});
       setOpen(false);
     },

@@ -20,9 +20,13 @@ import { AdditionalDataItem } from "@admin/types/ui-types";
 import { trpc } from "@admin/utils/trpc";
 import { manufacturers_properties_typesSchema } from "@backend/lib/zod";
 import dayjs from "dayjs";
-import { CalendarIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CalendarIcon, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useImmer } from "use-immer";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import { toast } from "sonner";
+
+dayjs.extend(localizedFormat);
 
 export const ManufacturerPropertiesForm = ({
   recordId,
@@ -39,12 +43,60 @@ export const ManufacturerPropertiesForm = ({
       data: manufacturerProperties,
       isLoading: isLoadingManufacturerProperties,
     },
+    {
+      data: manufacturerPropertyValues,
+      isLoading: isLoadingManufacturerPropertyValues,
+    },
   ] = trpc.useQueries((t) => [
     t.manufacturersPropertiesCategories.cachedManufacturerPropertiesCategories(
       {}
     ),
     t.manufacturersProperties.cachedManufacturerProperties({}),
+    t.manufacturersProperties.getManufacturerPropertyValues({
+      where: {
+        manufacturer_id: recordId,
+      },
+    }),
   ]);
+
+  const {
+    mutateAsync: setManufacturerProperties,
+    isLoading: isLoadingSetManufacturerProperties,
+  } = trpc.manufacturersProperties.setPropertiesValues.useMutation({
+    onSettled: () => {
+      toast.success("Свойства успешно обновлены");
+    },
+  });
+
+  const onSubmit = useCallback(async () => {
+    try {
+      const result = await setManufacturerProperties({
+        manufacturerId: recordId,
+        properties: Object.keys(propertyValues).map((key: number) => {
+          return {
+            propertyId: key.toString(),
+            value:
+              typeof propertyValues[key] === "object"
+                ? JSON.stringify(propertyValues[key])
+                : (propertyValues[key] as string),
+          };
+        }),
+      });
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [propertyValues, recordId]);
+
+  useEffect(() => {
+    if (manufacturerPropertyValues) {
+      setPropertyValues((prev) => {
+        manufacturerPropertyValues.forEach((property) => {
+          prev[property.property_id] = property.value;
+        });
+      });
+    }
+  }, [manufacturerPropertyValues]);
 
   const formGroupedFields = useMemo(() => {
     if (manufacturerPropertiesCategories && manufacturerProperties) {
@@ -69,105 +121,149 @@ export const ManufacturerPropertiesForm = ({
     }
     return [];
   }, [manufacturerPropertiesCategories, manufacturerProperties]);
-  console.log("formGroupedFields", formGroupedFields);
+
   return (
     <>
-      {formGroupedFields.map((category) => (
-        <div key={category.label}>
-          <div className="border-b-2 my-4 text-lg font-bold uppercase">
-            <h2>{category.label}</h2>
-          </div>
-          <div className="space-y-3">
-            {category.fields.map((field) => (
-              <div key={field.value} className="flex flex-col space-y-2">
-                <Label>{field.label}</Label>
-                {field.type ===
-                  manufacturers_properties_typesSchema.Values.string && (
-                  <Input />
-                )}
-                {field.type ==
-                  manufacturers_properties_typesSchema.Values.number && (
-                  <Input
-                    type="number"
-                    onChange={(e) => {
-                      setPropertyValues((prev) => {
-                        prev[field.value] = e.target.value;
-                      });
-                    }}
-                  />
-                )}
-                {field.type ===
-                  manufacturers_properties_typesSchema.Values.boolean && (
-                  <div className="flex items-center space-x-2">
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">Да</SelectItem>
-                        <SelectItem value="false">Нет</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                {field.type ==
-                  manufacturers_properties_typesSchema.Values.list && (
-                  <div className="flex items-center space-x-2">
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {field.additional_data?.map(
-                          (item: AdditionalDataItem) => (
-                            <SelectItem key={item.id} value={item.id}>
-                              {item.value}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                {field.type ===
-                  manufacturers_properties_typesSchema.Values.date && (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[280px] justify-start text-left font-normal",
-                          !propertyValues[field.value] &&
-                            "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {propertyValues[field.value] ? (
-                          `${dayjs(propertyValues[field.value]).format("LL")}`
-                        ) : (
-                          <span>Выберите дату</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={propertyValues[field.value]}
-                        onSelect={(date) => {
+      <div className="relative h-[calc(100dvh-120px)]">
+        <div className="pb-36 max-h-[calc(92dvh)] overflow-y-auto">
+          {formGroupedFields.map((category) => (
+            <div key={category.label}>
+              <div className="border-b-2 my-4 text-lg font-bold uppercase">
+                <h2>{category.label}</h2>
+              </div>
+              <div className="space-y-3">
+                {category.fields.map((field) => (
+                  <div key={field.value} className="flex flex-col space-y-2">
+                    <Label>{field.label}</Label>
+                    {field.type ===
+                      manufacturers_properties_typesSchema.Values.string && (
+                      <Input
+                        defaultValue={propertyValues[field.value]}
+                        onChange={(e) => {
                           setPropertyValues((prev) => {
-                            prev[field.value] = date;
+                            prev[field.value] = e.target.value;
                           });
                         }}
-                        initialFocus
                       />
-                    </PopoverContent>
-                  </Popover>
-                )}
+                    )}
+                    {field.type ==
+                      manufacturers_properties_typesSchema.Values.number && (
+                      <Input
+                        type="number"
+                        defaultValue={propertyValues[field.value]}
+                        onChange={(e) => {
+                          setPropertyValues((prev) => {
+                            prev[field.value] = e.target.value;
+                          });
+                        }}
+                      />
+                    )}
+                    {field.type ===
+                      manufacturers_properties_typesSchema.Values.boolean && (
+                      <div className="flex items-center space-x-2">
+                        <Select
+                          defaultValue={propertyValues[field.value]}
+                          value={propertyValues[field.value]}
+                          onValueChange={(value) => {
+                            setPropertyValues((prev) => {
+                              prev[field.value] = value;
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">Да</SelectItem>
+                            <SelectItem value="false">Нет</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {field.type ==
+                      manufacturers_properties_typesSchema.Values.list && (
+                      <div className="flex items-center space-x-2">
+                        <Select
+                          defaultValue={propertyValues[field.value]}
+                          onValueChange={(value) => {
+                            setPropertyValues((prev) => {
+                              prev[field.value] = value;
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {field.additional_data?.map(
+                              (item: AdditionalDataItem) => (
+                                <SelectItem key={item.id} value={item.id}>
+                                  {item.value}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {field.type ===
+                      manufacturers_properties_typesSchema.Values.date && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[280px] justify-start text-left font-normal",
+                              !propertyValues[field.value] &&
+                                "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {propertyValues[field.value] ? (
+                              `${dayjs(
+                                propertyValues[field.value].replaceAll('"', "")
+                              ).format("LL")}`
+                            ) : (
+                              <span>Выберите дату</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              propertyValues[field.value] &&
+                              dayjs(
+                                propertyValues[field.value].replaceAll('"', "")
+                              ).toDate()
+                            }
+                            onSelect={(date) => {
+                              setPropertyValues((prev) => {
+                                prev[field.value] = date;
+                              });
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+        <div className="absolute bottom-0 left-0 w-full bg-background py-4">
+          <div className="flex">
+            <Button onClick={onSubmit}>
+              {/* {isLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )} */}
+              Submit
+            </Button>
           </div>
         </div>
-      ))}
+      </div>
     </>
   );
 };
