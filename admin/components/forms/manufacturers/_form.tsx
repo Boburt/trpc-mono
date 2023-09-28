@@ -30,6 +30,7 @@ import {
   TabsTrigger,
 } from "@admin/components/ui/tabs";
 import { ManufacturerPropertiesForm } from "./manufacturer_properties_form";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<
   z.infer<typeof ManufacturersUncheckedCreateInputSchema>
@@ -50,7 +51,6 @@ export default function ManufacturersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
   const closeForm = () => {
     form.reset();
     setOpen(false);
@@ -60,11 +60,7 @@ export default function ManufacturersForm({
   const [imageId, setImageId] = useState<string | null>(null);
 
   const onAddSuccess = (actionText: string, data: any) => {
-    toast({
-      title: "Success",
-      description: `Manufacturer ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Manufacturer ${actionText}`);
     if (selectedCategories.length > 0)
       assignCategories(
         selectedCategories.map((category_id) => ({
@@ -75,12 +71,7 @@ export default function ManufacturersForm({
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const { mutateAsync: asyncAssignCategories } =
