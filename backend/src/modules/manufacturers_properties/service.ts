@@ -13,11 +13,13 @@ import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { SetPropertiesValuesDto } from "./dto/set_properties_values.dto";
+import { Queue } from "bullmq";
 
 export class ManufacturersPropertiesService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService
+    private readonly cacheControl: CacheControlService,
+    private readonly indexQueue: Queue
   ) {}
 
   async create(
@@ -152,6 +154,16 @@ export class ManufacturersPropertiesService {
         });
       }
     }
+
+    this.indexQueue.add(
+      manufacturerId,
+      {
+        id: manufacturerId,
+      },
+      {
+        removeOnComplete: true,
+      }
+    );
   }
 
   async getManufacturerPropertyValues(

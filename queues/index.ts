@@ -31,6 +31,7 @@ const indexManufacturersQueueWorker = new Worker(
   indexManufacturersQueueName,
   async (job) => {
     const { data } = job;
+    console.log("job data", data);
     await processIndexManufacturer(data.id);
   },
   {
