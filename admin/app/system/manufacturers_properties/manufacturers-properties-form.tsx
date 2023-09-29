@@ -39,6 +39,7 @@ import {
 import short from "short-uuid";
 import { AdditionalDataItem } from "@admin/types/ui-types";
 import { toast } from "sonner";
+import { Switch } from "@admin/components/ui/switch";
 
 const propertyTypesLabel = {
   string: "Строка",
@@ -56,6 +57,8 @@ const formFactory = createFormFactory<
     code: "",
     i18n_name: {},
     type: "string",
+    show_in_filter: false,
+    show_in_list: false,
   },
 });
 
@@ -150,6 +153,8 @@ export default function ManufacturersPropertiesForm({
       form.setFieldValue("name", record.name);
       form.setFieldValue("i18n_name", record.i18n_name ?? {});
       form.setFieldValue("type", record.type);
+      form.setFieldValue("show_in_filter", record.show_in_filter);
+      form.setFieldValue("show_in_list", record.show_in_list);
       form.setFieldValue("additional_data", record.additional_data ?? {});
     }
   }, [record]);
@@ -227,6 +232,42 @@ export default function ManufacturersPropertiesForm({
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
+                  <div className="space-y-2">
+                    <div>
+                      <Label>Показывать в фильтре</Label>
+                    </div>
+                    <form.Field name="show_in_filter">
+                      {(field) => {
+                        return (
+                          <>
+                            <Switch
+                              {...field.getInputProps()}
+                              checked={field.getValue()}
+                              onCheckedChange={field.setValue}
+                            />
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <Label>Показывать в списке</Label>
+                    </div>
+                    <form.Field name="show_in_list">
+                      {(field) => {
+                        return (
+                          <>
+                            <Switch
+                              {...field.getInputProps()}
+                              checked={field.getValue()}
+                              onCheckedChange={field.setValue}
+                            />
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </div>
                   <div className="space-y-2">
                     <div>
                       <Label>Тип</Label>
