@@ -10,6 +10,7 @@ import * as z from "zod";
 import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<z.infer<typeof RolesCreateInputSchema>>({
   defaultValues: {
@@ -26,25 +27,14 @@ export default function RolesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
-
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `Role ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Role ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {

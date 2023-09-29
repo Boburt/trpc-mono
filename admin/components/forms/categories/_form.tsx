@@ -21,6 +21,7 @@ import {
 } from "@admin/components/ui/accordion";
 import { useCachedLangsQuery } from "@admin/store/apis/langs";
 import { Textarea } from "@admin/components/ui/textarea";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<
   z.infer<typeof CategoriesCreateInputSchema>
@@ -40,8 +41,6 @@ export default function CategoriesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
-
   // const form = useForm<z.infer<typeof PermissionsCreateInputSchema>>({
   //   resolver: zodResolver(PermissionsCreateInputSchema),
   //   defaultValues: {
@@ -52,22 +51,13 @@ export default function CategoriesForm({
   // });
 
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `Category ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Category ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {

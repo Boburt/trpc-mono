@@ -14,6 +14,7 @@ import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@admin/components/ui/textarea";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<z.infer<typeof CitiesCreateInputSchema>>({
   defaultValues: {
@@ -30,34 +31,14 @@ export default function CitiesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
-
-  // const form = useForm<z.infer<typeof PermissionsCreateInputSchema>>({
-  //   resolver: zodResolver(PermissionsCreateInputSchema),
-  //   defaultValues: {
-  //     active: true,
-  //     slug: "",
-  //     description: "",
-  //   },
-  // });
-
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `City ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`City ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {

@@ -332,6 +332,8 @@ model ManufacturersProperties {
   code            String
   i18n_name       Json?
   category_id     String                         @db.Uuid
+  show_in_list    Boolean                        @default(false)
+  show_in_filter  Boolean                        @default(false)
   type            manufacturers_properties_types
   additional_data Json?
   created_at      DateTime                       @default(now()) @db.Timestamptz(5)
