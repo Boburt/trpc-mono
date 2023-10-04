@@ -24,6 +24,8 @@ import { AssetsService } from "./modules/assets/service";
 import { ManufacturersService } from "./modules/manufacturers/service";
 import { ManufacturersCategoriesService } from "./modules/manufacturers_categories/service";
 import { CitiesService } from "./modules/cities/service";
+import { ManufacturersPropertiesCategoriesService } from "./modules/manufacturers_properties_categories/service";
+import { ManufacturersPropertiesService } from "./modules/manufacturers_properties/service";
 
 // redis
 export const client = new Redis({
@@ -35,6 +37,13 @@ export type RedisClientType = typeof client;
 
 export const newAssetsAddedQueue = new Queue(
   `${process.env.PROJECT_PREFIX}new_assets_added`,
+  {
+    connection: client,
+  }
+);
+
+export const newIndexManufacturersQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}index_manufacturers`,
   {
     connection: client,
   }
@@ -61,6 +70,13 @@ const manufacturersService = new ManufacturersService(db, cacheControlService);
 const citiesService = new CitiesService(db, cacheControlService);
 
 const manufacturersCategories = new ManufacturersCategoriesService(db);
+const manufacturersPropertiesCategories =
+  new ManufacturersPropertiesCategoriesService(db, cacheControlService);
+const manufacturersProperties = new ManufacturersPropertiesService(
+  db,
+  cacheControlService,
+  newIndexManufacturersQueue
+);
 
 interface Meta {
   permission?: string;
@@ -86,6 +102,8 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     manufacturersCategories,
     assetsService,
     citiesService,
+    manufacturersPropertiesCategoriesService: manufacturersPropertiesCategories,
+    manufacturersPropertiesService: manufacturersProperties,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
   };
 };

@@ -22,6 +22,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@components/ui/select";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<z.infer<typeof UsersCreateInputSchema>>({
   defaultValues: {
@@ -38,7 +39,6 @@ export default function UsersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
   const [changedRoleId, setChangedRoleId] = useState<string | null>(null);
 
   const closeForm = () => {
@@ -47,21 +47,12 @@ export default function UsersForm({
   };
 
   const onAddSuccess = (actionText: string, successData: any) => {
-    toast({
-      title: "Success",
-      description: `Role ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Role ${actionText}`);
     assignRole(successData);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {
