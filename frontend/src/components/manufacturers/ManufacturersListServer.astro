@@ -37,6 +37,8 @@ const manufacturers = await trpcClient.manufacturers.publicList.query({
     },
   ],
 });
+
+console.log("manufacturers", manufacturers);
 ---
 
 <ManufacturersListClientProvider
