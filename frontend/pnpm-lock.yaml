@@ -31,13 +31,21 @@ dependencies:
     version: 0.5.10(tailwindcss@3.3.3)
   '@tanstack/react-query':
     specifier: ^4.35.3
+<<<<<<< HEAD
     version: 4.35.7(react-dom@18.2.0)(react@18.2.0)
+=======
+    version: 4.35.3(react-dom@18.2.0)(react@18.2.0)
+>>>>>>> origin/main
   '@trpc/client':
     specifier: ^10.38.3
     version: 10.38.5(@trpc/server@10.38.5)
   '@trpc/react-query':
     specifier: ^10.38.3
+<<<<<<< HEAD
     version: 10.38.5(@tanstack/react-query@4.35.7)(@trpc/client@10.38.5)(@trpc/server@10.38.5)(react-dom@18.2.0)(react@18.2.0)
+=======
+    version: 10.38.5(@tanstack/react-query@4.35.3)(@trpc/client@10.38.5)(@trpc/server@10.38.5)(react-dom@18.2.0)(react@18.2.0)
+>>>>>>> origin/main
   '@trpc/server':
     specifier: ^10.38.3
     version: 10.38.5
@@ -73,7 +81,15 @@ dependencies:
     version: 1.8.1
   flowbite-react:
     specifier: ^0.6.0
+<<<<<<< HEAD
     version: 0.6.3(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
+=======
+<<<<<<< HEAD
+    version: 0.6.0(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
+=======
+    version: 0.6.1(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
+>>>>>>> origin
+>>>>>>> origin/main
   react:
     specifier: ^18.0.0
     version: 18.2.0
@@ -964,17 +980,42 @@ packages:
       readable-stream: 4.4.2
     dev: false
 
+<<<<<<< HEAD
   /@floating-ui/core@1.5.0:
     resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
       '@floating-ui/utils': 0.1.6
+=======
+<<<<<<< HEAD
+  /@floating-ui/core@1.4.1:
+    resolution: {integrity: sha512-jk3WqquEJRlcyu7997NtR5PibI+y5bi+LS3hPmguVClypenMsCY3CBa3LAQnozRCtCrYWSEtAdiskpamuJRFOQ==}
+    dependencies:
+      '@floating-ui/utils': 0.1.1
+    dev: false
+
+  /@floating-ui/dom@1.5.1:
+    resolution: {integrity: sha512-KwvVcPSXg6mQygvA1TjbN/gh///36kKtllIF8SUm0qpFj8+rvYrpvlYdL1JoA71SHpDqgSSdGOSoQ0Mp3uY5aw==}
+    dependencies:
+      '@floating-ui/core': 1.4.1
+      '@floating-ui/utils': 0.1.1
+=======
+  /@floating-ui/core@1.5.0:
+    resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
+    dependencies:
+      '@floating-ui/utils': 0.1.4
+>>>>>>> origin/main
     dev: false
 
   /@floating-ui/dom@1.5.3:
     resolution: {integrity: sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==}
     dependencies:
       '@floating-ui/core': 1.5.0
+<<<<<<< HEAD
       '@floating-ui/utils': 0.1.6
+=======
+      '@floating-ui/utils': 0.1.4
+>>>>>>> origin
+>>>>>>> origin/main
     dev: false
 
   /@floating-ui/react-dom@2.0.2(react-dom@18.2.0)(react@18.2.0):
@@ -983,7 +1024,15 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
+<<<<<<< HEAD
       '@floating-ui/dom': 1.5.3
+=======
+<<<<<<< HEAD
+      '@floating-ui/dom': 1.5.1
+=======
+      '@floating-ui/dom': 1.5.3
+>>>>>>> origin
+>>>>>>> origin/main
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
@@ -1001,8 +1050,18 @@ packages:
       tabbable: 6.2.0
     dev: false
 
+<<<<<<< HEAD
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
+=======
+<<<<<<< HEAD
+  /@floating-ui/utils@0.1.1:
+    resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
+=======
+  /@floating-ui/utils@0.1.4:
+    resolution: {integrity: sha512-qprfWkn82Iw821mcKofJ5Pk9wgioHicxcQMxx+5zt5GSKoqdWvgG5AxVmpmUUjzTLPVSH5auBrhI93Deayn/DA==}
+>>>>>>> origin
+>>>>>>> origin/main
     dev: false
 
   /@jimp/bmp@0.14.0(@jimp/custom@0.14.0):
@@ -1437,6 +1496,10 @@ packages:
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
     dev: false
 
   /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
@@ -1451,12 +1514,39 @@ packages:
       tailwindcss: 3.3.3
     dev: false
 
+<<<<<<< HEAD
   /@tanstack/query-core@4.35.7:
     resolution: {integrity: sha512-PgDJtX75ubFS0WCYFM7DqEoJ4QbxU3S5OH3gJSI40xr7UVVax3/J4CM3XUMOTs+EOT5YGEfssi3tfRVGte4DEw==}
     dev: false
 
   /@tanstack/react-query@4.35.7(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-0MankquP/6EOM2ATfEov6ViiKemey5uTbjGlFMX1xGotwNaqC76YKDMJdHumZupPbZcZPWAeoPGEHQmVKIKoOQ==}
+=======
+  /@tanstack/query-core@4.33.0:
+    resolution: {integrity: sha512-qYu73ptvnzRh6se2nyBIDHGBQvPY1XXl3yR769B7B6mIDD7s+EZhdlWHQ67JI6UOTFRaI7wupnTnwJ3gE0Mr/g==}
+=======
+>>>>>>> origin
+    dev: false
+
+  /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.3.3
+    dev: false
+
+  /@tanstack/query-core@4.35.3:
+    resolution: {integrity: sha512-PS+WEjd9wzKTyNjjQymvcOe1yg8f3wYc6mD+vb6CKyZAKvu4sIJwryfqfBULITKCla7P9C4l5e9RXePHvZOZeQ==}
+    dev: false
+
+  /@tanstack/react-query@4.35.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-UgTPioip/rGG3EQilXfA2j4BJkhEQsR+KAbF+KIuvQ7j4MkgnTCJF01SfRpIRNtQTlEfz/+IL7+jP8WA8bFbsw==}
+>>>>>>> origin/main
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -1467,7 +1557,11 @@ packages:
       react-native:
         optional: true
     dependencies:
+<<<<<<< HEAD
       '@tanstack/query-core': 4.35.7
+=======
+      '@tanstack/query-core': 4.35.3
+>>>>>>> origin/main
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       use-sync-external-store: 1.2.0(react@18.2.0)
@@ -1485,7 +1579,11 @@ packages:
       '@trpc/server': 10.38.5
     dev: false
 
+<<<<<<< HEAD
   /@trpc/react-query@10.38.5(@tanstack/react-query@4.35.7)(@trpc/client@10.38.5)(@trpc/server@10.38.5)(react-dom@18.2.0)(react@18.2.0):
+=======
+  /@trpc/react-query@10.38.5(@tanstack/react-query@4.35.3)(@trpc/client@10.38.5)(@trpc/server@10.38.5)(react-dom@18.2.0)(react@18.2.0):
+>>>>>>> origin/main
     resolution: {integrity: sha512-cGpKfiQen3ba3lTII3+Y6Hm3KnC60AS9n2AYt07I7LZx/GknsGHq4h570imdIxr6Qb5LtYe3DFV13kzbm+yGeA==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
@@ -1494,7 +1592,11 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
+<<<<<<< HEAD
       '@tanstack/react-query': 4.35.7(react-dom@18.2.0)(react@18.2.0)
+=======
+      '@tanstack/react-query': 4.35.3(react-dom@18.2.0)(react@18.2.0)
+>>>>>>> origin/main
       '@trpc/client': 10.38.5(@trpc/server@10.38.5)
       '@trpc/server': 10.38.5
       react: 18.2.0
@@ -2797,8 +2899,18 @@ packages:
       pkg-dir: 4.2.0
     dev: false
 
+<<<<<<< HEAD
   /flowbite-react@0.6.3(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3):
     resolution: {integrity: sha512-xiRQdovcHNa3kTe00pVIULTeWt4eDU8c4iyx0ytSF2wRsNc4kai5BM0on3wEg+FEq3EmzrUmuCiD24QxU9rofw==}
+=======
+<<<<<<< HEAD
+  /flowbite-react@0.6.0(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-nupIRMNbCgoomIPxD/Do5FIqWHz8FQ8kkpnUQER7aZbO92AyITqT3riMwNwKc27zdbit3PY5iEvO5EXiGlmaow==}
+=======
+  /flowbite-react@0.6.1(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-UuAdxmEx5sA8bQ7VKPvGWCY1V6j8a9RPnvBx7Hm/uqTJO8Iq3jLymAgC3uTMcB21G2Qco0Euf1xXPEKuJPTgMQ==}
+>>>>>>> origin
+>>>>>>> origin/main
     peerDependencies:
       react: ^18
       react-dom: ^18
