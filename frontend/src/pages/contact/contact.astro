@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import React from "react";
+import FormElement from "../../components/Map/FormElement";
+import { Controller, useForm } from "react-hook-form";
+
+---
+
+<BaseLayout title="Contacts">
+
+    <h1>Contacts</h1>
+
+    <Controller
+            name="name"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+                <FormElement
+                type="text"
+                label="Name"
+                placeholder="Enter name here..."
+                fieldRef={field}
+                hasError={errors.name?.type === "required"}
+                />
+                )}
+    />
+
+</BaseLayout>
