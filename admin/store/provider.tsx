@@ -60,6 +60,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <trpc.Provider
       client={trpcClient}
+      /** @ts-ignore */
       queryClient={queryClient.client}
       key={queryClient.key}
     >
