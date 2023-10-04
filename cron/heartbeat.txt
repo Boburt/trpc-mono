@@ -1005,6 +1005,8 @@ heartbeat
 heartbeat
 heartbeat
 heartbeat
+<<<<<<< HEAD
+=======
 heartbeat
 heartbeat
 heartbeat
@@ -1863,6 +1865,7 @@ heartbeat
 heartbeat
 heartbeat
 heartbeat
+<<<<<<< HEAD
 heartbeat
 heartbeat
 heartbeat
@@ -3753,3 +3756,6 @@ heartbeat
 heartbeat
 heartbeat
 heartbeat
+=======
+>>>>>>> origin/main
+>>>>>>> origin/main
