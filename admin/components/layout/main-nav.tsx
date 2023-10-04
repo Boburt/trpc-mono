@@ -78,6 +78,10 @@ const settingsMenu: { title: string; href: string }[] = [
     title: "Города",
     href: "/system/cities",
   },
+  {
+    title: "Свойства производителей",
+    href: "/system/manufacturers_properties",
+  },
 ];
 
 export function NavigationMenuDemo() {

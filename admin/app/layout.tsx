@@ -6,7 +6,7 @@ import { NavigationMenuDemo } from "@components/layout/main-nav";
 import { Search } from "lucide-react";
 import { UserNav } from "@components/layout/user-nav";
 import { ModeToggle } from "@components/layout/mode-toggle";
-import { Toaster } from "@components/ui/toaster";
+import { Toaster } from "sonner";
 import { Providers } from "@admin/store/provider";
 import SessionLocalProvider from "@admin/store/session-provider";
 
@@ -41,7 +41,7 @@ export default function RootLayout({
                 </div>
                 <div className="mx-4 mt-10 mb-4">{children}</div>
               </div>
-              <Toaster />
+              <Toaster richColors />
             </ThemeProvider>
           </Providers>
         </SessionLocalProvider>

@@ -9,6 +9,7 @@
     "bull": "^4.11.3",
     "cluster": "^0.7.7",
     "typescript": "4.6.2-insiders.20220225",
+    "undici": "^5.25.2",
     "zod": "3.21.1"
   }
 }
