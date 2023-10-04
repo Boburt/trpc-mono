@@ -37,6 +37,9 @@ import {
   SelectValue,
 } from "@admin/components/ui/select";
 import short from "short-uuid";
+import { AdditionalDataItem } from "@admin/types/ui-types";
+import { toast } from "sonner";
+import { Switch } from "@admin/components/ui/switch";
 
 const propertyTypesLabel = {
   string: "Строка",
@@ -54,13 +57,10 @@ const formFactory = createFormFactory<
     code: "",
     i18n_name: {},
     type: "string",
+    show_in_filter: false,
+    show_in_list: false,
   },
 });
-
-type AdditionalDataItem = {
-  id: string;
-  value: string;
-};
 
 export default function ManufacturersPropertiesForm({
   children,
@@ -69,7 +69,6 @@ export default function ManufacturersPropertiesForm({
   children: React.ReactNode;
   recordId?: string;
 }) {
-  const { toast } = useToast();
   const [open, setOpen] = useState<boolean>(false);
   const roleSelection = useManufacturersPropertiesCategoriesStore(
     (state) => state.selectedRows
@@ -80,22 +79,13 @@ export default function ManufacturersPropertiesForm({
   }, [roleSelection]);
 
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `Property ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Property ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {
@@ -163,6 +153,8 @@ export default function ManufacturersPropertiesForm({
       form.setFieldValue("name", record.name);
       form.setFieldValue("i18n_name", record.i18n_name ?? {});
       form.setFieldValue("type", record.type);
+      form.setFieldValue("show_in_filter", record.show_in_filter);
+      form.setFieldValue("show_in_list", record.show_in_list);
       form.setFieldValue("additional_data", record.additional_data ?? {});
     }
   }, [record]);
@@ -242,6 +234,42 @@ export default function ManufacturersPropertiesForm({
                   </Accordion>
                   <div className="space-y-2">
                     <div>
+                      <Label>Показывать в фильтре</Label>
+                    </div>
+                    <form.Field name="show_in_filter">
+                      {(field) => {
+                        return (
+                          <>
+                            <Switch
+                              {...field.getInputProps()}
+                              checked={field.getValue()}
+                              onCheckedChange={field.setValue}
+                            />
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <Label>Показывать в списке</Label>
+                    </div>
+                    <form.Field name="show_in_list">
+                      {(field) => {
+                        return (
+                          <>
+                            <Switch
+                              {...field.getInputProps()}
+                              checked={field.getValue()}
+                              onCheckedChange={field.setValue}
+                            />
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
                       <Label>Тип</Label>
                     </div>
                     <form.Field name="type">
@@ -284,7 +312,6 @@ export default function ManufacturersPropertiesForm({
                             <form.Field name="additional_data">
                               {(field) => {
                                 let val = field.getValue();
-                                console.log(val);
                                 if (val && typeof val == "string") {
                                   val = JSON.parse(
                                     val as string

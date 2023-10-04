@@ -4,7 +4,9 @@ import {
   ManufacturersPropertiesFindManyArgsSchema,
   ManufacturersPropertiesFindUniqueArgsSchema,
   ManufacturersPropertiesUpdateArgsSchema,
+  ManufacturersPropertiesValuesFindManyArgsSchema,
 } from "@backend/lib/zod";
+import { SetPropertiesValuesDto } from "./dto/set_properties_values.dto";
 
 export const manufacturersPropertiesRouter = publicRouter({
   add: publicProcedure
@@ -65,6 +67,30 @@ export const manufacturersPropertiesRouter = publicRouter({
     .input(ManufacturersPropertiesFindManyArgsSchema)
     .query(async ({ input, ctx }) => {
       return await ctx.manufacturersPropertiesService.cachedManufacturersProperties(
+        input
+      );
+    }),
+
+  setPropertiesValues: publicProcedure
+    .meta({
+      permission: "manufacturers_properties.edit",
+    })
+    .use(checkPermission)
+    .input(SetPropertiesValuesDto)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.manufacturersPropertiesService.setPropertiesValues(
+        input
+      );
+    }),
+
+  getManufacturerPropertyValues: publicProcedure
+    .meta({
+      permission: "manufacturers_properties.edit",
+    })
+    .use(checkPermission)
+    .input(ManufacturersPropertiesValuesFindManyArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.manufacturersPropertiesService.getManufacturerPropertyValues(
         input
       );
     }),

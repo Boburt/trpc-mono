@@ -23,6 +23,7 @@ import {
   AccordionTrigger,
 } from "@admin/components/ui/accordion";
 import { useCachedLangsQuery } from "@admin/store/apis/langs";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<
   z.infer<typeof ManufacturersPropertiesCategoriesCreateInputSchema>
@@ -41,25 +42,14 @@ export default function ManufacturersPropertiesCategoriesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
-
   const onAddSuccess = (actionText: string) => {
-    toast({
-      title: "Success",
-      description: `Manufacturers Properties Category ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Manufacturers Properties Category ${actionText}`);
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const {

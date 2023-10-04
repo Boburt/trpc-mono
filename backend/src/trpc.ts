@@ -42,6 +42,13 @@ export const newAssetsAddedQueue = new Queue(
   }
 );
 
+export const newIndexManufacturersQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}index_manufacturers`,
+  {
+    connection: client,
+  }
+);
+
 // services
 export const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
@@ -67,7 +74,8 @@ const manufacturersPropertiesCategories =
   new ManufacturersPropertiesCategoriesService(db, cacheControlService);
 const manufacturersProperties = new ManufacturersPropertiesService(
   db,
-  cacheControlService
+  cacheControlService,
+  newIndexManufacturersQueue
 );
 
 interface Meta {
