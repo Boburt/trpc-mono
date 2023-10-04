@@ -111,11 +111,13 @@ export default function ManufacturersPropertiesForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
         updateManufacturersProperty({
+          /** @ts-ignore */
           data: { ...values, category_id: selectedRoleId },
           where: { id: recordId },
         });
       } else {
         createManufacturersProperty({
+          /** @ts-ignore */
           data: { ...values, category_id: selectedRoleId },
         });
       }
@@ -278,6 +280,7 @@ export default function ManufacturersPropertiesForm({
                           <>
                             <Select
                               {...field.getInputProps()}
+                              /** @ts-ignore */
                               onValueChange={field.setValue}
                               defaultValue={field.getValue() ?? ""}
                             >
@@ -322,48 +325,52 @@ export default function ManufacturersPropertiesForm({
                                 return (
                                   <>
                                     <div className="space-y-2">
-                                      {items.map(
-                                        (
-                                          item: AdditionalDataItem,
-                                          index: number
-                                        ) => (
-                                          <div
-                                            className="flex space-x-2"
-                                            key={item.id}
-                                          >
-                                            <Input
-                                              value={item.value}
-                                              onChange={(e) => {
-                                                const newItems = [
-                                                  ...items,
-                                                ] as AdditionalDataItem[];
-                                                newItems[index].value =
-                                                  e.target.value;
-                                                field.setValue(newItems);
-                                              }}
-                                            />
-                                            <Button
-                                              variant="destructive"
-                                              className="cursor-pointer"
-                                              onClick={() => {
-                                                const newItems = [
-                                                  ...items,
-                                                ] as AdditionalDataItem[];
-                                                newItems.splice(index, 1);
-                                                field.setValue(newItems);
-                                              }}
-                                              asChild
+                                      {
+                                        /** @ts-ignore */
+                                        items.map(
+                                          (
+                                            item: AdditionalDataItem,
+                                            index: number
+                                          ) => (
+                                            <div
+                                              className="flex space-x-2"
+                                              key={item.id}
                                             >
-                                              <span>Delete</span>
-                                            </Button>
-                                          </div>
+                                              <Input
+                                                value={item.value}
+                                                onChange={(e) => {
+                                                  const newItems = [
+                                                    ...items,
+                                                  ] as AdditionalDataItem[];
+                                                  newItems[index].value =
+                                                    e.target.value;
+                                                  field.setValue(newItems);
+                                                }}
+                                              />
+                                              <Button
+                                                variant="destructive"
+                                                className="cursor-pointer"
+                                                onClick={() => {
+                                                  const newItems = [
+                                                    ...items,
+                                                  ] as AdditionalDataItem[];
+                                                  newItems.splice(index, 1);
+                                                  field.setValue(newItems);
+                                                }}
+                                                asChild
+                                              >
+                                                <span>Delete</span>
+                                              </Button>
+                                            </div>
+                                          )
                                         )
-                                      )}
+                                      }
                                     </div>
                                     <Button
                                       className="cursor-pointer"
                                       onClick={() => {
                                         field.setValue([
+                                          /** @ts-ignore */
                                           ...items,
                                           {
                                             id: short.generate(),
