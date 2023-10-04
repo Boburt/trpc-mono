@@ -167,6 +167,9 @@ export default async function processIndexManufacturer(id: string) {
             description: {
               type: "text",
             },
+            city: {
+              type: "keyword",
+            },
             categories: {
               type: "nested",
               properties: {
@@ -182,27 +185,8 @@ export default async function processIndexManufacturer(id: string) {
               },
             },
             properties: {
-              type: "nested",
-              properties: {
-                id: {
-                  type: "keyword",
-                },
-                name: {
-                  type: "keyword",
-                },
-                code: {
-                  type: "keyword",
-                },
-                show_in_filter: {
-                  type: "boolean",
-                },
-                show_in_list: {
-                  type: "boolean",
-                },
-                value: {
-                  type: "text",
-                },
-              },
+              type: "object",
+              dynamic: true,
             },
           },
         },
@@ -225,6 +209,11 @@ export default async function processIndexManufacturer(id: string) {
         id,
       },
       include: {
+        cities: {
+          select: {
+            name: true,
+          },
+        },
         manufacturers_categories: {
           select: {
             manufacturers_categories_categories: {
@@ -247,6 +236,7 @@ export default async function processIndexManufacturer(id: string) {
                 id: true,
                 show_in_filter: true,
                 show_in_list: true,
+                type: true,
               },
             },
           },
@@ -257,11 +247,36 @@ export default async function processIndexManufacturer(id: string) {
     if (manufacturer) {
       // index manufacturer in elasticsearch using fetch
       const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_doc/${manufacturer.id}`;
+      let properties: { [key: string]: any } = {};
+      manufacturer.manyfacturers_properties_values_manufacturers_properties.forEach(
+        (property) => {
+          if (
+            property.manufacturers_properties_values_manufacturers_properties
+              .show_in_filter
+          ) {
+            let val: any = property.value;
+            console.log(
+              property.manufacturers_properties_values_manufacturers_properties
+                .type
+            );
+            if (
+              property.manufacturers_properties_values_manufacturers_properties
+                .type == "number"
+            ) {
+              val = parseFloat(val);
+            }
+            properties[
+              property.manufacturers_properties_values_manufacturers_properties.code
+            ] = val;
+          }
+        }
+      );
       const indexBody = {
         id: manufacturer.id,
         name: manufacturer.name,
         short_name: manufacturer.short_name,
         description: manufacturer.description,
+        city: manufacturer.cities?.name,
         categories: manufacturer.manufacturers_categories.map((item) => {
           return {
             id: item.manufacturers_categories_categories.id,
@@ -269,28 +284,7 @@ export default async function processIndexManufacturer(id: string) {
             code: item.manufacturers_categories_categories.code,
           };
         }),
-        properties:
-          manufacturer.manyfacturers_properties_values_manufacturers_properties.map(
-            (item) => {
-              return {
-                id: item
-                  .manufacturers_properties_values_manufacturers_properties.id,
-                name: item
-                  .manufacturers_properties_values_manufacturers_properties
-                  .name,
-                code: item
-                  .manufacturers_properties_values_manufacturers_properties
-                  .code,
-                show_in_filter:
-                  item.manufacturers_properties_values_manufacturers_properties
-                    .show_in_filter,
-                show_in_list:
-                  item.manufacturers_properties_values_manufacturers_properties
-                    .show_in_list,
-                value: item.value,
-              };
-            }
-          ),
+        properties,
       };
       console.log("before indexing");
       const response = await fetch(indexUrl, {
