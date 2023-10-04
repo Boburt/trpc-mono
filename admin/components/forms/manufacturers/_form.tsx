@@ -6,24 +6,13 @@ import {
 import { Button } from "@components/ui/button";
 import { Switch } from "@components/ui/switch";
 import { trpc } from "@admin/utils/trpc";
-import {
-  Manufacturers,
-  ManufacturersCreateInputSchema,
-  ManufacturersUncheckedCreateInputSchema,
-} from "@backend/lib/zod";
+import { ManufacturersUncheckedCreateInputSchema } from "@backend/lib/zod";
 import { useMemo, useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
 import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@admin/components/ui/accordion";
-import { useCachedLangsQuery } from "@admin/store/apis/langs";
 import { Textarea } from "@admin/components/ui/textarea";
 import MultiSelect from "../elements/multiSelect";
 import FileUploadField from "../elements/file-upload";
@@ -34,6 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@admin/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@admin/components/ui/tabs";
+import { ManufacturerPropertiesForm } from "./manufacturer_properties_form";
+import { toast } from "sonner";
 
 const formFactory = createFormFactory<
   z.infer<typeof ManufacturersUncheckedCreateInputSchema>
@@ -54,7 +51,6 @@ export default function ManufacturersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const { toast } = useToast();
   const closeForm = () => {
     form.reset();
     setOpen(false);
@@ -64,11 +60,7 @@ export default function ManufacturersForm({
   const [imageId, setImageId] = useState<string | null>(null);
 
   const onAddSuccess = (actionText: string, data: any) => {
-    toast({
-      title: "Success",
-      description: `Manufacturer ${actionText}`,
-      duration: 5000,
-    });
+    toast.success(`Manufacturer ${actionText}`);
     if (selectedCategories.length > 0)
       assignCategories(
         selectedCategories.map((category_id) => ({
@@ -79,12 +71,7 @@ export default function ManufacturersForm({
   };
 
   const onError = (error: any) => {
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive",
-      duration: 5000,
-    });
+    toast.error(error.message);
   };
 
   const { mutateAsync: asyncAssignCategories } =
@@ -204,131 +191,146 @@ export default function ManufacturersForm({
   }, [record, form, manufacturerCategories]);
 
   return (
-    <form.Provider>
-      <form {...form.getFormProps()} className="space-y-8">
-        <div className="space-y-2">
-          <div>
-            <Label>Активность</Label>
-          </div>
-          <form.Field name="active">
-            {(field) => {
-              return (
-                <>
-                  <Switch
-                    checked={field.getValue()}
-                    onCheckedChange={field.setValue}
-                  />
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Лого</Label>
-          </div>
-          <FileUploadField
-            model="manufacturers"
-            model_id={recordId}
-            onValueChange={(item) => setImageId(item)}
-            code="logo"
-          />
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Короткое название</Label>
-          </div>
-          <form.Field name="short_name">
-            {(field) => {
-              return (
-                <>
-                  <Input
-                    {...field.getInputProps()}
-                    value={field.getValue() ?? ""}
-                  />
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Название</Label>
-          </div>
-          <form.Field name="name">
-            {(field) => {
-              return (
-                <>
-                  <Input
-                    {...field.getInputProps()}
-                    value={field.getValue() ?? ""}
-                  />
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Город</Label>
-          </div>
-          <form.Field name="city_id">
-            {(field) => {
-              return (
-                <>
-                  <Select
-                    {...field.getInputProps()}
-                    onValueChange={(value: string) => field.setValue(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cities?.items.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Категории</Label>
-          </div>
-          <MultiSelect
-            data={categoriesSelectData}
-            value={selectedCategories}
-            onValueChange={(value) => setSelectedCategories(value)}
-          ></MultiSelect>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <Label>Описание</Label>
-          </div>
-          <form.Field name="description">
-            {(field) => {
-              return (
-                <>
-                  <Textarea
-                    {...field.getInputProps()}
-                    value={field.getValue() ?? ""}
-                  />
-                </>
-              );
-            }}
-          </form.Field>
-        </div>
+    <Tabs defaultValue="main" className="w-full mt-4">
+      <TabsList className="w-full flex">
+        <TabsTrigger value="main" className="w-full">
+          Основное
+        </TabsTrigger>
+        <TabsTrigger value="properties" className="w-full">
+          Свойства
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="main">
+        <form.Provider>
+          <form {...form.getFormProps()} className="space-y-8">
+            <div className="space-y-2">
+              <div>
+                <Label>Активность</Label>
+              </div>
+              <form.Field name="active">
+                {(field) => {
+                  return (
+                    <>
+                      <Switch
+                        checked={field.getValue()}
+                        onCheckedChange={field.setValue}
+                      />
+                    </>
+                  );
+                }}
+              </form.Field>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Лого</Label>
+              </div>
+              <FileUploadField
+                model="manufacturers"
+                model_id={recordId}
+                onValueChange={(item) => setImageId(item)}
+                code="logo"
+              />
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Короткое название</Label>
+              </div>
+              <form.Field name="short_name">
+                {(field) => {
+                  return (
+                    <>
+                      <Input
+                        {...field.getInputProps()}
+                        value={field.getValue() ?? ""}
+                      />
+                    </>
+                  );
+                }}
+              </form.Field>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Название</Label>
+              </div>
+              <form.Field name="name">
+                {(field) => {
+                  return (
+                    <>
+                      <Input
+                        {...field.getInputProps()}
+                        value={field.getValue() ?? ""}
+                      />
+                    </>
+                  );
+                }}
+              </form.Field>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Город</Label>
+              </div>
+              <form.Field name="city_id">
+                {(field) => {
+                  return (
+                    <>
+                      <Select
+                        {...field.getInputProps()}
+                        onValueChange={(value: string) => field.setValue(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cities?.items.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </>
+                  );
+                }}
+              </form.Field>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Категории</Label>
+              </div>
+              <MultiSelect
+                data={categoriesSelectData}
+                value={selectedCategories}
+                onValueChange={(value) => setSelectedCategories(value)}
+              ></MultiSelect>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <Label>Описание</Label>
+              </div>
+              <form.Field name="description">
+                {(field) => {
+                  return (
+                    <>
+                      <Textarea
+                        {...field.getInputProps()}
+                        value={field.getValue() ?? ""}
+                      />
+                    </>
+                  );
+                }}
+              </form.Field>
+            </div>
 
-        <Button type="submit" disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Submit
-        </Button>
-      </form>
-    </form.Provider>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit
+            </Button>
+          </form>
+        </form.Provider>
+      </TabsContent>
+      <TabsContent value="properties">
+        {recordId && <ManufacturerPropertiesForm recordId={recordId} />}
+      </TabsContent>
+    </Tabs>
   );
 }
