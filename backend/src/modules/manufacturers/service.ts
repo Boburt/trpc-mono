@@ -183,6 +183,111 @@ export class ManufacturersService {
     );
 
     const filterProperties = properties.filter((p) => p.show_in_filter);
+
+    if (filterProperties.length === 0) {
+      return [];
+    }
+
+    const elasticQuery: {
+      size: number;
+      aggs: {
+        [key: string]: any;
+      };
+    } = {
+      size: 0,
+      aggs: {},
+    };
+
+    filterProperties.forEach((p) => {
+      if (["production-volume", "power"].includes(p.code)) {
+        elasticQuery.aggs[p.code] = {
+          range: {
+            field: `properties.${p.code}`,
+            ranges: [
+              {
+                from: 0,
+                to: 100,
+              },
+              {
+                from: 100,
+                to: 500,
+              },
+              {
+                from: 500,
+                to: 1000,
+              },
+              {
+                from: 1000,
+                to: 5000,
+              },
+              {
+                from: 5000,
+                to: 10000,
+              },
+              {
+                from: 10000,
+                to: 50000,
+              },
+              {
+                from: 50000,
+              },
+            ],
+          },
+        };
+      } else {
+        elasticQuery.aggs[p.name] = {
+          terms: {
+            field: `properties.${p.name}.keyword`,
+            size: 10000,
+          },
+        };
+      }
+    });
+    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
+
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}`;
+    const elasticResponse = await fetch(elasticUrl, {
+      method: "POST",
+      body: JSON.stringify(elasticQuery),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+    });
+
+    const elasticResponseJson = await elasticResponse.json();
+
+    const facets: {
+      [key: string]: {
+        name: string;
+        code: string;
+        value: {
+          [key: string]: any;
+        };
+      };
+    } = {};
+
+    filterProperties.forEach((p) => {
+      if (["production-volume", "power"].includes(p.code)) {
+        facets[p.code] = {
+          name: p.name,
+          code: p.code,
+          value: {},
+        };
+        elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
+          facets[p.code]["value"][`${b.from}-${b.to}`] = b.doc_count;
+        });
+      } else {
+        facets[p.code] = {
+          name: p.name,
+          code: p.code,
+          value: {},
+        };
+        elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
+          facets[p.code]["value"][b.key] = b.doc_count;
+        });
+      }
+    });
   }
 
   // async cachedLangs(
