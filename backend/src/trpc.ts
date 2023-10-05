@@ -49,6 +49,13 @@ export const newIndexManufacturersQueue = new Queue(
   }
 );
 
+export const newDeleteManufacturersQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}delete_manufacturers`,
+  {
+    connection: client,
+  }
+);
+
 // services
 export const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
@@ -66,7 +73,11 @@ const langsService = new LangsService(db, cacheControlService);
 const categoriesService = new CategoriesService(db, cacheControlService);
 const imageSizesService = new ImageSizesService(db, cacheControlService);
 export const assetsService = new AssetsService(db, newAssetsAddedQueue);
-const manufacturersService = new ManufacturersService(db, cacheControlService);
+const manufacturersService = new ManufacturersService(
+  db,
+  cacheControlService,
+  newDeleteManufacturersQueue
+);
 const citiesService = new CitiesService(db, cacheControlService);
 
 const manufacturersCategories = new ManufacturersCategoriesService(db);
