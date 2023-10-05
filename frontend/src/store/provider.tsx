@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { httpBatchLink } from "@trpc/client";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({}));
+  const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() => {
     return trpc.createClient({
       links: [

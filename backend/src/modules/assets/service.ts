@@ -68,6 +68,7 @@ export class AssetsService {
       },
     });
     await fs.mkdirSync(`../uploads/sources/${asset.id}`, { recursive: true });
+    /** @ts-ignore */
     Bun.write(`../uploads/sources/${asset.id}/${name}`, file);
 
     file.type.split("/")[0] === "image" &&

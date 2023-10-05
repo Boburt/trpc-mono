@@ -15,11 +15,13 @@ import {
   ManufacturersWithImagesSchema,
 } from "./dto/list.dto";
 import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
+import { Queue } from "bullmq";
 
 export class ManufacturersService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService
+    private readonly cacheControl: CacheControlService,
+    private readonly deleteManufacturerQueue: Queue
   ) {}
 
   async create(
@@ -148,8 +150,39 @@ export class ManufacturersService {
   }
 
   async delete(input: Prisma.ManufacturersDeleteArgs) {
+    let id = input.where.id;
+    await this.prisma.manufacturersPropertiesValues.deleteMany({
+      where: {
+        manufacturer_id: input.where.id,
+      },
+    });
+
+    await this.prisma.manufacturersCategories.deleteMany({
+      where: {
+        manufacturer_id: input.where.id,
+      },
+    });
     const res = await this.prisma.manufacturers.delete(input);
+
+    await this.deleteManufacturerQueue.add(
+      id!,
+      {
+        id,
+      },
+      {
+        removeOnComplete: true,
+      }
+    );
+
     return res;
+  }
+
+  async getFacetFilter() {
+    const properties = await this.cacheControl.getCachedManufacturersProperties(
+      {}
+    );
+
+    const filterProperties = properties.filter((p) => p.show_in_filter);
   }
 
   // async cachedLangs(

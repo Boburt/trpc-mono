@@ -46,6 +46,7 @@ const authOptions: AuthOptions = {
             refreshToken: token.refreshToken as string,
           });
           if (typeof res !== "undefined") {
+            /** @ts-ignore */
             token = {
               ...token,
               ...res.data,

@@ -72,7 +72,7 @@ export const ManufacturerPropertiesForm = ({
     try {
       const result = await setManufacturerProperties({
         manufacturerId: recordId,
-        properties: Object.keys(propertyValues).map((key: number) => {
+        properties: Object.keys(propertyValues).map((key: string) => {
           return {
             propertyId: key.toString(),
             value:
