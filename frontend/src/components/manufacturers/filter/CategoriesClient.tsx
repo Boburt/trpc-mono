@@ -1,6 +1,10 @@
 import { RouterOutputs, trpc } from "../../../utils/trpc";
 import clsx from "clsx";
+import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
+import { FilterFacetedDropdown } from "../../filter-ui/faceted-dropdown";
+import { Flowbite } from "flowbite-react";
+import { useManufacturersFilterStore } from "@frontend/src/store/manufacturers_filter";
 
 export default function CategoriesFilterClient({
   initialData,
@@ -21,13 +25,20 @@ export default function CategoriesFilterClient({
       }
     );
 
+  const [facets, values, isValuesFilled] = useManufacturersFilterStore(
+    (state) => [state.facets, state.values, state.isValuesFilled()]
+  );
+  const [setValue, removeValue, resetValues] = useManufacturersFilterStore(
+    (state) => [state.setValue, state.removeValue, state.resetValues]
+  );
+
   const isHome = useMemo(() => {
     return pathname === "/";
   }, [pathname]);
 
   return (
     <>
-      <div className="sticky top-0 bg-white mx-auto rounded-md items-center p-4 mb-2">
+      <div className=" bg-white mx-auto rounded-md items-center p-4 mb-2">
         <div className="flex gap-4">
           <a
             href="/"
@@ -55,10 +66,47 @@ export default function CategoriesFilterClient({
         </div>
         <div className="divider my-2"></div>
         <div className="flex items-center gap-2">
-          <div className="rounded-md border px-2">Verified</div>
-          <div className="rounded-md border px-2">Verified</div>
-          <div className="rounded-md border px-2">Verified</div>
-          <div className="rounded-md border px-2">Verified</div>
+          {facets &&
+            facets.map((facet) => (
+              <FilterFacetedDropdown
+                items={facet.value}
+                value={values[facet.code] ?? []}
+                multiple={facet.multiple}
+                key={facet.code}
+                label={facet.name}
+                searchInputName={facet.code}
+                setValue={(value) => {
+                  setValue(facet.code, value);
+                }}
+                removeValue={(value) => {
+                  removeValue(facet.code, value);
+                }}
+              />
+            ))}
+          {isValuesFilled && (
+            <button
+              className="btn btn-outline btn-sm flex"
+              onClick={() => {
+                resetValues();
+              }}
+            >
+              <span>Сбросить фильтр</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </>

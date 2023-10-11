@@ -1,16 +1,22 @@
 ---
 import { trpcClient } from "@frontend/src/utils/trpc-server";
 import CategoriesClientProvider from "./CategoriesClientProvider";
+import { parseQueryParams } from "@frontend/src/utils/manufacturers_filter_fn";
 
 const categories = await trpcClient.categories.activeCachedCategories.query({
   take: 100,
 });
 
 const pathname = new URL(Astro.request.url).pathname;
+const searchParams = new URL(Astro.request.url).search;
+const facets = await trpcClient.manufacturers.getFacetFilter.query();
+const manufacturersFilterValues = parseQueryParams(searchParams);
 ---
 
 <CategoriesClientProvider
   categories={categories}
   pathname={pathname}
+  facets={facets}
+  filterValues={manufacturersFilterValues?.manufacturers_filter ?? {}}
   client:load
 />
