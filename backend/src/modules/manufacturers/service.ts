@@ -195,7 +195,21 @@ export class ManufacturersService {
       };
     } = {
       size: 0,
-      aggs: {},
+      aggs: {
+        city: {
+          nested: {
+            path: "city",
+          },
+          aggs: {
+            city: {
+              terms: {
+                field: "city.keyword_name.keyword",
+                size: 100,
+              },
+            },
+          },
+        },
+      },
     };
 
     filterProperties.forEach((p) => {
@@ -235,7 +249,7 @@ export class ManufacturersService {
           },
         };
       } else {
-        elasticQuery.aggs[p.name] = {
+        elasticQuery.aggs[p.code] = {
           terms: {
             field: `properties.${p.name}.keyword`,
             size: 10000,
@@ -245,7 +259,7 @@ export class ManufacturersService {
     });
     const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
 
-    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}`;
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
     const elasticResponse = await fetch(elasticUrl, {
       method: "POST",
       body: JSON.stringify(elasticQuery),
@@ -261,33 +275,78 @@ export class ManufacturersService {
       [key: string]: {
         name: string;
         code: string;
+        multiple: boolean;
         value: {
-          [key: string]: any;
-        };
+          value: string;
+          count: number;
+        }[];
       };
     } = {};
-
     filterProperties.forEach((p) => {
       if (["production-volume", "power"].includes(p.code)) {
         facets[p.code] = {
           name: p.name,
           code: p.code,
-          value: {},
+          multiple: false,
+          value: [],
         };
         elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
-          facets[p.code]["value"][`${b.from}-${b.to}`] = b.doc_count;
+          facets[p.code]["value"].push({
+            value: b.key,
+            count: b.doc_count,
+          });
         });
       } else {
         facets[p.code] = {
           name: p.name,
           code: p.code,
-          value: {},
+          multiple: true,
+          value: [],
         };
         elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
-          facets[p.code]["value"][b.key] = b.doc_count;
+          facets[p.code]["value"].push({
+            value: b.key,
+            count: b.doc_count,
+          });
         });
       }
     });
+
+    let cityFacet: {
+      name: string;
+      code: string;
+      multiple: boolean;
+      value: {
+        value: string;
+        count: number;
+      }[];
+    } = {
+      name: "Город",
+      code: "city",
+      multiple: true,
+      value: [],
+    };
+
+    elasticResponseJson.aggregations.city.city.buckets.forEach((b: any) => {
+      cityFacet["value"].push({
+        value: b.key,
+        count: b.doc_count,
+      });
+    });
+
+    let resultFacets = [];
+
+    if (cityFacet.value.length > 0) {
+      resultFacets.push(cityFacet);
+    }
+
+    resultFacets.push(
+      ...Object.values(facets).filter((f) => f.value.length > 0)
+    );
+
+    console.log("resultFacets", resultFacets);
+
+    return resultFacets;
   }
 
   // async cachedLangs(

@@ -49,7 +49,7 @@ export function ManufactureCard({
                 className="link link-hover"
                 href={`/manufacturer/item/${item.id}`}
               >
-                <h3 className="card-title uppercase" itemProp="name">
+                <h3 className="card-title uppercase " itemProp="name">
                   {item.short_name}
                 </h3>
               </a>
