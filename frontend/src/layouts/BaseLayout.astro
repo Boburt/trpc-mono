@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer";
 import { Breadcrumbs } from "astro-breadcrumbs";
 import CategoriesFilterServer from "../components/manufacturers/filter/CategoriesServer.astro";
 import { ViewTransitions } from "astro:transitions";
+import { trpcClient } from "../utils/trpc-server";
 
 const { title, showHeaderFilter = false } = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;

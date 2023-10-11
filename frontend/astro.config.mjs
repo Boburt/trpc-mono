@@ -17,5 +17,10 @@ export default defineConfig({
     port: 4000,
     host: true,
   },
-  integrations: [tailwind(), react()],
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
+    react(),
+  ],
 });
