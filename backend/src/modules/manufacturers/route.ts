@@ -70,4 +70,8 @@ export const manufacturersRouter = publicRouter({
     .query(({ input, ctx }) => {
       return ctx.manufacturersService.findOne(input);
     }),
+
+  getFacetFilter: publicProcedure.query(({ input, ctx }) => {
+    return ctx.manufacturersService.getFacetFilter();
+  }),
 });

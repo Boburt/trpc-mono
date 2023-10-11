@@ -168,7 +168,21 @@ export default async function processIndexManufacturer(id: string) {
               type: "text",
             },
             city: {
-              type: "keyword",
+              type: "nested",
+              properties: {
+                name: {
+                  type: "text",
+                },
+                name_keyword: {
+                  type: "keyword",
+                },
+                slug: {
+                  type: "keyword",
+                },
+                id: {
+                  type: "keyword",
+                },
+              },
             },
             categories: {
               type: "nested",
@@ -178,6 +192,9 @@ export default async function processIndexManufacturer(id: string) {
                 },
                 name: {
                   type: "text",
+                },
+                keyword_name: {
+                  type: "keyword",
                 },
                 code: {
                   type: "keyword",
@@ -212,6 +229,8 @@ export default async function processIndexManufacturer(id: string) {
         cities: {
           select: {
             name: true,
+            slug: true,
+            id: true,
           },
         },
         manufacturers_categories: {
@@ -276,11 +295,19 @@ export default async function processIndexManufacturer(id: string) {
         name: manufacturer.name,
         short_name: manufacturer.short_name,
         description: manufacturer.description,
-        city: manufacturer.cities?.name,
+        city: manufacturer.cities
+          ? {
+              id: manufacturer.cities.id,
+              name: manufacturer.cities.name,
+              keyword_name: manufacturer.cities.name,
+              slug: manufacturer.cities.slug,
+            }
+          : null,
         categories: manufacturer.manufacturers_categories.map((item) => {
           return {
             id: item.manufacturers_categories_categories.id,
             name: item.manufacturers_categories_categories.name,
+            keyword_name: item.manufacturers_categories_categories.name,
             code: item.manufacturers_categories_categories.code,
           };
         }),
