@@ -10,7 +10,7 @@ const app = new Elysia()
       pattern: "0 * * * * *",
       async run() {
         console.log("heartbeat cron is working");
-        await fs.appendFileSync("heartbeat.txt", "heartbeat\n");
+        // await fs.appendFileSync("heartbeat.txt", "heartbeat\n");
       },
     })
   )
