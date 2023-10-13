@@ -27,12 +27,11 @@ import { CitiesService } from "./modules/cities/service";
 import { ManufacturersPropertiesCategoriesService } from "./modules/manufacturers_properties_categories/service";
 import { ManufacturersPropertiesService } from "./modules/manufacturers_properties/service";
 
-
 // redis
 export const client = new Redis({
-port: 6379, // Redis port
+  port: 6379, // Redis port
   host: "127.0.0.1", // Redis host
-//   maxRetriesPerRequest: null,
+  //   maxRetriesPerRequest: null,
 });
 export type RedisClientType = typeof client;
 
