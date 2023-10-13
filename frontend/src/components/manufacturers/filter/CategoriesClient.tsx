@@ -1,10 +1,16 @@
 import { RouterOutputs, trpc } from "../../../utils/trpc";
 import clsx from "clsx";
-import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
 import { FilterFacetedDropdown } from "../../filter-ui/faceted-dropdown";
-import { Flowbite } from "flowbite-react";
-import { useManufacturersFilterStore } from "@frontend/src/store/manufacturers_filter";
+import {
+  $values,
+  $facets,
+  $isValuesFilled,
+  setValue,
+  removeValue,
+  resetValues,
+} from "@frontend/src/store/manufacturers_filter";
+import { useStore } from "@nanostores/react";
 
 export default function CategoriesFilterClient({
   initialData,
@@ -24,13 +30,9 @@ export default function CategoriesFilterClient({
         refetchOnReconnect: false,
       }
     );
-
-  const [facets, values, isValuesFilled] = useManufacturersFilterStore(
-    (state) => [state.facets, state.values, state.isValuesFilled()]
-  );
-  const [setValue, removeValue, resetValues] = useManufacturersFilterStore(
-    (state) => [state.setValue, state.removeValue, state.resetValues]
-  );
+  const facets = useStore($facets);
+  const values = useStore($values);
+  const isValuesFilled = useStore($isValuesFilled);
 
   const isHome = useMemo(() => {
     return pathname === "/";

@@ -2,15 +2,21 @@ import { ManufacturersWhereInputSchema } from "@backend/lib/zod";
 import { RouterOutputs, trpc } from "@frontend/src/utils/trpc";
 import { z } from "zod";
 import { ManufactureCard } from "./Card";
+import { $values } from "@frontend/src/store/manufacturers_filter";
+import { useShallow } from "zustand/react/shallow";
+import { useStore } from "@nanostores/react";
 
 export default function ManufacturersListClient({
   categorySlug,
   initialData,
 }: {
   categorySlug?: string;
-  initialData: RouterOutputs["manufacturers"]["list"];
+  initialData: RouterOutputs["manufacturers"]["publicList"];
 }) {
+  console.log("davr");
+  const values = useStore($values);
   const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
+  console.log("filter values", values);
   if (categorySlug) {
     where.manufacturers_categories = {
       some: {
@@ -26,6 +32,7 @@ export default function ManufacturersListClient({
     trpc.manufacturers.publicList.useQuery(
       {
         where,
+        facets: values,
       },
       {
         initialData,
