@@ -40,5 +40,6 @@ if (!category) return Astro.redirect("/404");
   <ManufacturersListClientProvider
     initialData={manufacturers}
     categorySlug={slug}
+    client:load
   />
 </BaseLayout>

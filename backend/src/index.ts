@@ -22,7 +22,6 @@ const checkRestPermission = async ({
 }: Parameters<HookHandler>[0] & {
   permission?: string;
 }) => {
-  console.log("permission", permission);
   const token = headers.get("authorization")?.split(" ")[1] ?? null;
   if (!token) {
     set.status = 401;
