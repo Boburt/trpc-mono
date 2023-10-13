@@ -13,7 +13,7 @@
     "@elysiajs/trpc": "^0.7.0",
     "@elysiajs/websocket": "^0.2.8",
     "@prisma/client": "^5.1.1",
-    "@trpc/server": "^10.38.3",
+    "@trpc/server": "latest",
     "bullmq": "^4.8.0",
     "elysia": "0.7.4",
     "ioredis": "^5.3.2",

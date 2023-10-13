@@ -6,6 +6,8 @@ import processDeleteManufacturer from "./processors/delete_manufacturers";
 
 export const redisClient = new Redis({
   maxRetriesPerRequest: null,
+port: 6379, // Redis port
+  host: "127.0.0.1", // Redis host
 });
 
 const imageProcessQueueName = `${process.env.PROJECT_PREFIX}new_assets_added`;
