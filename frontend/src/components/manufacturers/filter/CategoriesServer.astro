@@ -10,6 +10,7 @@ const categories = await trpcClient.categories.activeCachedCategories.query({
 const pathname = new URL(Astro.request.url).pathname;
 const searchParams = new URL(Astro.request.url).search;
 const facets = await trpcClient.manufacturers.getFacetFilter.query();
+console.log("facets", facets);
 const manufacturersFilterValues = parseQueryParams(searchParams);
 ---
 
