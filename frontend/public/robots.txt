@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+Sitemap: https://web.fungeek.net/sitemap-index.xml
