@@ -25,7 +25,7 @@ export default function Footer() {
           <a className="link link-hover" href="/terms">
             Terms of use
           </a>
-          <a className="link link-hover">Cookie policy</a>
+          <a href="/cookies"  className="link link-hover">Cookie policy</a>
           <a href="/faq" className="link link-hover">FAQ</a>
         </div>
       </footer>

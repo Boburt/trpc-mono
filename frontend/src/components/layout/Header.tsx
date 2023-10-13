@@ -25,10 +25,13 @@ export default function Header({
           <nav>
             <ul className="flex space-x-4">
               <li>
-                <a href="/">Home</a>
+                <a href="/" class="focus:border-b-4">Home</a>
               </li>
               <li>
-                <a href="/about">About</a>
+                <a href="/about" class="focus:border-b-4">About</a>
+              </li>
+              <li>
+                <a href="/news" class="focus:border-b-4">News</a>
               </li>
             </ul>
           </nav>
