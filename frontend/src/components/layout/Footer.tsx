@@ -26,6 +26,7 @@ export default function Footer() {
             Terms of use
           </a>
           <a className="link link-hover">Cookie policy</a>
+          <a href="/faq" className="link link-hover">FAQ</a>
         </div>
       </footer>
       <footer className="footer py-4 border-t text-base-content border-base-300 container mx-auto">
