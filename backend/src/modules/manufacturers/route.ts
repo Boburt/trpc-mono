@@ -6,7 +6,10 @@ import {
 } from "@backend/lib/zod";
 import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
 import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
-import { ManufacturersWithImagesFindManyArgsSchema } from "./dto/list.dto";
+import {
+  ManufacturersWithImagesFindManyArgsSchema,
+  manufacturersFacetsSchema,
+} from "./dto/list.dto";
 import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
 
 export const manufacturersRouter = publicRouter({
@@ -63,7 +66,7 @@ export const manufacturersRouter = publicRouter({
   publicList: publicProcedure
     .input(ManufacturersWithImagesFindManyArgsSchema)
     .query(({ input, ctx }) => {
-      return ctx.manufacturersService.findMany(input);
+      return ctx.manufacturersService.findManyWithFacet(input);
     }),
   publicOne: publicProcedure
     .input(ManufacturersFindUniqueWithImageArgsSchema)
@@ -71,7 +74,10 @@ export const manufacturersRouter = publicRouter({
       return ctx.manufacturersService.findOne(input);
     }),
 
-  getFacetFilter: publicProcedure.query(({ input, ctx }) => {
-    return ctx.manufacturersService.getFacetFilter();
-  }),
+  getFacetFilter: publicProcedure
+    .input(manufacturersFacetsSchema)
+    .query(({ input, ctx }) => {
+      console.log("facets input", input);
+      return ctx.manufacturersService.getFacetFilter(input);
+    }),
 });

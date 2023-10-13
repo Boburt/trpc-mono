@@ -5,7 +5,6 @@ import react from "@astrojs/react";
 import nodejs from "@astrojs/node";
 
 import sitemap from "@astrojs/sitemap";
-console.log("davr", process.env.WEB_URL);
 // https://astro.build/config
 export default defineConfig({
   adapter: nodejs({
