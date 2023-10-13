@@ -71,7 +71,7 @@ export const manufacturersRouter = publicRouter({
       return ctx.manufacturersService.findOne(input);
     }),
 
-  getFacetFilter: publicProcedure.query(({ input, ctx }) => {
+  getFacetFilter: publicProcedure.input().query(({ input, ctx }) => {
     return ctx.manufacturersService.getFacetFilter();
   }),
 });
