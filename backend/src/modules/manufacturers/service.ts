@@ -107,6 +107,7 @@ export class ManufacturersService {
     input: z.infer<typeof ManufacturersWithImagesFindManyArgsSchema>
   ): Promise<PaginationType<z.infer<typeof ManufacturersWithImagesSchema>>> {
     let facets = input.facets;
+    console.log("facets", facets);
     let take = input.take ?? 20;
 
     if (facets && Object.keys(facets).length > 0) {
@@ -124,7 +125,7 @@ export class ManufacturersService {
           };
         };
       } = {
-        size: take,
+        size: 10000,
         query: {
           bool: {
             filter: [],
