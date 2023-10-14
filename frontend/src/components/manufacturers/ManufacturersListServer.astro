@@ -46,5 +46,6 @@ const manufacturers = await trpcClient.manufacturers.publicList.query({
 <ManufacturersListClientProvider
   initialData={manufacturers}
   categorySlug={categorySlug}
+  searchParams={searchParams}
   client:load
 />

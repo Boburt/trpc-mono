@@ -5,6 +5,7 @@ import { ManufactureCard } from "./Card";
 import { $values } from "@frontend/src/store/manufacturers_filter";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@nanostores/react";
+import ManufacturersPagination from "./Pagination";
 
 export default function ManufacturersListClient({
   categorySlug,
@@ -13,10 +14,8 @@ export default function ManufacturersListClient({
   categorySlug?: string;
   initialData: RouterOutputs["manufacturers"]["publicList"];
 }) {
-  console.log("davr");
   const values = useStore($values);
   const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
-  console.log("filter values", values);
   if (categorySlug) {
     where.manufacturers_categories = {
       some: {
@@ -40,12 +39,17 @@ export default function ManufacturersListClient({
         refetchOnReconnect: false,
       }
     );
-
   return (
     <div className="relative mt-8 flex flex-col">
       {manufacturers.items.map((item) => (
         <ManufactureCard item={item} key={item.id} />
       ))}
+      {!isLoading && (
+        <ManufacturersPagination
+          paginationMeta={manufacturers.meta}
+          categorySlug={categorySlug}
+        />
+      )}
     </div>
   );
 }

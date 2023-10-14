@@ -4,7 +4,10 @@ import { ManufacturersWhereInputSchema } from "@backend/lib/zod/index";
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
 import { z } from "zod";
 import ManufacturersListClientProvider from "@frontend/src/components/manufacturers/ManufacturersListClientProvider";
+import { parseQueryParams } from "@frontend/src/utils/manufacturers_filter_fn";
 const { slug } = Astro.params;
+const searchParams = new URL(Astro.request.url).search;
+const manufacturersFilterValues = parseQueryParams(searchParams);
 
 const manufacturers = await trpcClient.manufacturers.publicList.query({
   where: {
@@ -25,6 +28,7 @@ const manufacturers = await trpcClient.manufacturers.publicList.query({
       size_code: "300_300",
     },
   ],
+  facets: manufacturersFilterValues?.manufacturers_filter ?? null,
 });
 const category = await trpcClient.categories.publicOne.query({
   where: {
@@ -40,6 +44,7 @@ if (!category) return Astro.redirect("/404");
   <ManufacturersListClientProvider
     initialData={manufacturers}
     categorySlug={slug}
+    searchParams={searchParams}
     client:load
   />
 </BaseLayout>
