@@ -1,8 +1,4 @@
-import {
-  useManufacturersFilterStore,
-  $facets,
-  $values,
-} from "@frontend/src/store/manufacturers_filter";
+import { $facets, $values } from "@frontend/src/store/manufacturers_filter";
 import { RouterOutputs } from "../../../utils/trpc";
 import CategoriesFilterClient from "./CategoriesClient";
 import Providers from "@frontend/src/store/provider";
