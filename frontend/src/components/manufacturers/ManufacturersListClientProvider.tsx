@@ -7,7 +7,7 @@ export default function ManufacturersListClientProvider({
   initialData,
 }: {
   categorySlug?: string;
-  initialData: RouterOutputs["manufacturers"]["list"];
+  initialData: RouterOutputs["manufacturers"]["publicList"];
 }) {
   return (
     <Providers>
