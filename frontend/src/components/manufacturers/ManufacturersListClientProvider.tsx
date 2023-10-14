@@ -14,6 +14,8 @@ export default function ManufacturersListClientProvider({
 }) {
   if (searchParams) {
     $searchParams.set(searchParams);
+  } else {
+    $searchParams.set("");
   }
 
   return (
