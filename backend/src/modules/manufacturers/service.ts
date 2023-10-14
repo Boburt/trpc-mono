@@ -13,6 +13,7 @@ import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
 import {
   ManufacturersWithImagesFindManyArgsSchema,
   ManufacturersWithImagesSchema,
+  manufacturersFacetsSchema,
 } from "./dto/list.dto";
 import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
 import { Queue } from "bullmq";
@@ -58,6 +59,173 @@ export class ManufacturersService {
     delete input.take;
     delete input.skip;
     delete input.imageSizes;
+    const [permissions, meta] = (await this.prisma.manufacturers
+      .paginate(input)
+      .withPages({
+        limit: take,
+        page: skip,
+        includePageCount: true,
+      })) as [z.infer<typeof ManufacturersWithImagesSchema>[], any];
+
+    if (image_sizes && image_sizes.length > 0) {
+      const images = await this.prisma.assets.findMany({
+        where: {
+          OR: image_sizes.map((i) => ({
+            code: {
+              equals: i.image_code,
+            },
+            resize_code: {
+              equals: i.size_code,
+            },
+            model: {
+              equals: "manufacturers",
+            },
+            model_id: {
+              in: permissions.map((p) => p.id),
+            },
+          })),
+        },
+      });
+
+      permissions.forEach((p) => {
+        p.images = images
+          .filter((i) => i.model_id === p.id)
+          .map((i) => ({
+            path: `/public/${i.path}/${i.parent_id}/${i.name}`,
+            code: i.code ?? "",
+          }));
+      });
+    }
+
+    return {
+      items: permissions,
+      meta,
+    };
+  }
+
+  async findManyWithFacet(
+    input: z.infer<typeof ManufacturersWithImagesFindManyArgsSchema>
+  ): Promise<PaginationType<z.infer<typeof ManufacturersWithImagesSchema>>> {
+    let facets = input.facets;
+    let take = input.take ?? 20;
+
+    if (facets && Object.keys(facets).length > 0) {
+      const cachedProperties = (
+        await this.cacheControl.getCachedManufacturersProperties({})
+      ).filter((property) => property.show_in_filter);
+      let elasticQuery: {
+        size: number;
+        aggs: {
+          [key: string]: any;
+        };
+        query: {
+          bool: {
+            filter: any[];
+          };
+        };
+      } = {
+        size: take,
+        query: {
+          bool: {
+            filter: [],
+          },
+        },
+        aggs: {
+          city: {
+            nested: {
+              path: "city",
+            },
+            aggs: {
+              city: {
+                terms: {
+                  field: "city.keyword_name.keyword",
+                  size: 100,
+                },
+              },
+            },
+          },
+        },
+      };
+
+      if (facets.city && facets.city.length > 0) {
+        elasticQuery.query.bool.filter.push({
+          nested: {
+            path: "city",
+            query: {
+              bool: {
+                filter: [
+                  {
+                    terms: {
+                      "city.keyword_name.keyword": facets.city,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        });
+      }
+
+      cachedProperties.forEach((property) => {
+        if (facets![property.code] && facets![property.code].length > 0) {
+          if (property.type === "number") {
+            elasticQuery.query.bool.filter.push({
+              range: {
+                [`properties.${property.code}`]: {
+                  gte: facets![property.code][0].split("-")[0],
+                  lte: facets![property.code][0].split("-")[1],
+                },
+              },
+            });
+          } else {
+            elasticQuery.query.bool.filter.push({
+              terms: {
+                [`properties.${property.code}.keyword`]: facets![property.code],
+              },
+            });
+          }
+        }
+      });
+
+      const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
+
+      const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+
+      const elasticResponse = await fetch(elasticUrl, {
+        method: "POST",
+        body: JSON.stringify(elasticQuery),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+      });
+
+      const elasticResponseJson = await elasticResponse.json();
+
+      const ids = elasticResponseJson.hits.hits.map((h: any) => h._id);
+
+      if (!input.where) {
+        input.where = {
+          id: {
+            in: ids,
+          },
+        };
+      } else {
+        input.where.id = {
+          in: ids,
+        };
+      }
+    }
+
+    let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    const image_sizes = input.imageSizes;
+    if (input.skip && input.skip > 0) {
+      skip++;
+    }
+    delete input.take;
+    delete input.skip;
+    delete input.imageSizes;
+    delete input.facets;
     const [permissions, meta] = (await this.prisma.manufacturers
       .paginate(input)
       .withPages({
@@ -177,7 +345,7 @@ export class ManufacturersService {
     return res;
   }
 
-  async getFacetFilter() {
+  async getFacetFilter(input: z.infer<typeof manufacturersFacetsSchema>) {
     const properties = await this.cacheControl.getCachedManufacturersProperties(
       {}
     );
@@ -193,6 +361,7 @@ export class ManufacturersService {
       aggs: {
         [key: string]: any;
       };
+      query?: any;
     } = {
       size: 0,
       aggs: {
@@ -211,6 +380,25 @@ export class ManufacturersService {
         },
       },
     };
+
+    if (input.manufacturers_categories) {
+      elasticQuery.query = {
+        nested: {
+          path: "categories",
+          query: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    "categories.code": input.manufacturers_categories,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      };
+    }
 
     filterProperties.forEach((p) => {
       if (["production-volume", "power"].includes(p.code)) {
@@ -290,7 +478,6 @@ export class ManufacturersService {
           multiple: false,
           value: [],
         };
-console.log('elasticResponseJson', JSON.stringify(elasticResponseJson));
         elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
           facets[p.code]["value"].push({
             value: b.key,
@@ -344,8 +531,6 @@ console.log('elasticResponseJson', JSON.stringify(elasticResponseJson));
     resultFacets.push(
       ...Object.values(facets).filter((f) => f.value.length > 0)
     );
-
-    console.log("resultFacets", resultFacets);
 
     return resultFacets;
   }

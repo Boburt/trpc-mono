@@ -52,5 +52,10 @@ export const ManufacturersWithImagesFindManyArgsSchema = z
         ManufacturersScalarFieldEnumSchema.array(),
       ])
       .optional(),
+    facets: z.record(z.string(), z.array(z.string())).optional().nullable(),
   })
   .merge(imageAssetsSelectObj);
+
+export const manufacturersFacetsSchema = z.object({
+  manufacturers_categories: z.string().optional().nullable(),
+});
