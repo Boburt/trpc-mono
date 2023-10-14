@@ -15,7 +15,6 @@ const facets = await trpcClient.manufacturers.getFacetFilter.query({
 });
 
 const manufacturersFilterValues = parseQueryParams(searchParams);
-console.log("manufacturersFilterValues", manufacturersFilterValues);
 ---
 
 <CategoriesClientProvider
