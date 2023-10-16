@@ -8,7 +8,7 @@ export default function Footer() {
           <a className="link link-hover">Branding</a>
           <a className="link link-hover">Design</a>
           <a className="link link-hover">Marketing</a>
-          <a className="link link-hover">Advertisement</a>
+          <a className="link link-hover" href="/blog">Blog</a>
         </div>
         <div>
           <span className="footer-title">Company</span>
