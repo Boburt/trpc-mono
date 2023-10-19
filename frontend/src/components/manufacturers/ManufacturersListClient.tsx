@@ -10,9 +10,11 @@ import ManufacturersPagination from "./Pagination";
 export default function ManufacturersListClient({
   categorySlug,
   initialData,
+  pathname,
 }: {
   categorySlug?: string;
   initialData: RouterOutputs["manufacturers"]["publicList"];
+  pathname?: string;
 }) {
   const values = useStore($values);
   const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
@@ -31,12 +33,28 @@ export default function ManufacturersListClient({
     trpc.manufacturers.publicList.useQuery(
       {
         where,
+        take: 20,
+        include: {
+          cities: true,
+          manufacturers_categories: {
+            include: {
+              manufacturers_categories_categories: true,
+            },
+          },
+        },
+        imageSizes: [
+          {
+            image_code: "logo",
+            size_code: "300_300",
+          },
+        ],
         facets: values,
       },
       {
         initialData,
         refetchOnMount: false,
         refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
       }
     );
   return (
@@ -44,7 +62,7 @@ export default function ManufacturersListClient({
       {manufacturers.items.map((item) => (
         <ManufactureCard item={item} key={item.id} />
       ))}
-      {!isLoading && (
+      {!isLoading && pathname != "/" && (
         <ManufacturersPagination
           paginationMeta={manufacturers.meta}
           categorySlug={categorySlug}

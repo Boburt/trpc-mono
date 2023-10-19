@@ -28,6 +28,7 @@ export default function CategoriesFilterClient({
         initialData,
         refetchOnMount: false,
         refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
       }
     );
   const facets = useStore($facets);
