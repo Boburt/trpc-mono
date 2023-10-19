@@ -21,6 +21,14 @@ const manufacturers = await trpcClient.manufacturers.publicList.query({
       },
     },
   },
+  include: {
+    cities: true,
+    manufacturers_categories: {
+      include: {
+        manufacturers_categories_categories: true,
+      },
+    },
+  },
   take: 20,
   imageSizes: [
     {

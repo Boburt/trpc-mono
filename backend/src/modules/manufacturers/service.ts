@@ -11,6 +11,7 @@ import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
 import {
+  ManufacturersWithImagesAndPropertiesSchema,
   ManufacturersWithImagesFindManyArgsSchema,
   ManufacturersWithImagesSchema,
   manufacturersFacetsSchema,
@@ -273,13 +274,15 @@ export class ManufacturersService {
 
   async findOne(
     input: z.infer<typeof ManufacturersFindUniqueWithImageArgsSchema>
-  ): Promise<z.infer<typeof ManufacturersWithImagesSchema> | null> {
+  ): Promise<z.infer<
+    typeof ManufacturersWithImagesAndPropertiesSchema
+  > | null> {
     const image_sizes = input.imageSizes;
     delete input.imageSizes;
-    const permission = (await this.prisma.manufacturers.findFirst(
+    const manufacturer = (await this.prisma.manufacturers.findFirst(
       input
-    )) as z.infer<typeof ManufacturersWithImagesSchema>;
-    if (permission) {
+    )) as z.infer<typeof ManufacturersWithImagesAndPropertiesSchema>;
+    if (manufacturer) {
       if (image_sizes && image_sizes.length > 0) {
         const images = await this.prisma.assets.findMany({
           where: {
@@ -294,19 +297,45 @@ export class ManufacturersService {
                 equals: "manufacturers",
               },
               model_id: {
-                equals: permission.id,
+                equals: manufacturer.id,
               },
             })),
           },
         });
 
-        permission.images = images.map((i) => ({
+        manufacturer.images = images.map((i) => ({
           path: `/public/${i.path}/${i.parent_id}/${i.name}`,
           code: i.code ?? "",
         }));
       }
+      const properties =
+        await this.prisma.manufacturersPropertiesValues.findMany({
+          where: {
+            manufacturer_id: manufacturer.id,
+          },
+          select: {
+            id: true,
+            property_id: true,
+            value: true,
+            manufacturers_properties_values_manufacturers_properties: {
+              select: {
+                name: true,
+                code: true,
+                type: true,
+                manufacturers_properties_categories: {
+                  select: {
+                    name: true,
+                    code: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      // @ts-ignore
+      manufacturer.properties = properties;
     }
-    return permission;
+    return manufacturer;
   }
 
   async update(input: Prisma.ManufacturersUpdateArgs): Promise<Manufacturers> {

@@ -1,9 +1,8 @@
 ---
-
 import { trpcClient } from "@frontend/src/utils/trpc-server";
 import { Image } from "astro:assets";
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
-import CardComponent from "../../../components/CardComponent";
+import CardComponent from "../../../components/manufacturers/CardComponent";
 import clsx from "clsx";
 
 const { id } = Astro.params;
@@ -44,7 +43,7 @@ const categories = manufacturer.manufacturers_categories
 
 const totalStars = Array.from({ length: 5 * 2 }, (_, index) => index + 1);
 const selectedStars = Math.round(manufacturer.rating * 2);
-
+console.log(manufacturer);
 ---
 
 <BaseLayout title={manufacturer.name}>
@@ -210,13 +209,6 @@ const selectedStars = Math.round(manufacturer.rating * 2);
       </div>
     </div>
 
-    <div class="tabs">
-      <CardComponent client:visible/>
-    </div>
-
-
-
-
-
+    <CardComponent client:visible manufacturer={manufacturer} />
   </div>
 </BaseLayout>
