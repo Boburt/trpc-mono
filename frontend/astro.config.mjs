@@ -6,21 +6,29 @@ import nodejs from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import partytown from "@astrojs/partytown";
 
+import auth from "auth-astro";
+
 // https://astro.build/config
 export default defineConfig({
   adapter: nodejs({
-    mode: "middleware"
+    mode: "middleware",
   }),
   output: "hybrid",
   image: {
-    service: sharpImageService()
+    service: sharpImageService(),
   },
   server: {
     port: 4000,
-    host: true
+    host: true,
   },
   site: process.env.WEB_URL,
-  integrations: [tailwind({
-    applyBaseStyles: false
-  }), react(), sitemap(), partytown()]
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
+    react(),
+    sitemap(),
+    partytown(),
+    auth(),
+  ],
 });

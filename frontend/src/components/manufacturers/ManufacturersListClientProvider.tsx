@@ -7,10 +7,12 @@ export default function ManufacturersListClientProvider({
   categorySlug,
   initialData,
   searchParams,
+  pathname,
 }: {
   categorySlug?: string;
   initialData: RouterOutputs["manufacturers"]["publicList"];
   searchParams?: string;
+  pathname?: string;
 }) {
   if (searchParams) {
     $searchParams.set(searchParams);
@@ -23,6 +25,7 @@ export default function ManufacturersListClientProvider({
       <ManufacturersListClient
         categorySlug={categorySlug}
         initialData={initialData}
+        pathname={pathname}
       />
     </Providers>
   );

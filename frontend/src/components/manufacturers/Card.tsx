@@ -12,11 +12,9 @@ export function ManufactureCard({
     return item.images?.find((image) => image.code === "logo");
   }, [item.images]);
   const categories = useMemo(() => {
-    return item.manufacturers_categories
-      ?.map((category) =>
-        category.manufacturers_categories_categories.name.toLowerCase()
-      )
-      .join(", ");
+    return item.manufacturers_categories?.map((category) =>
+      category.manufacturers_categories_categories.name.toLowerCase()
+    );
   }, [item.manufacturers_categories]);
 
   return (
@@ -57,14 +55,32 @@ export function ManufactureCard({
               <div className="mt-2 flex space-x-2">
                 {item.city_id && (
                   <>
-                    <span>{item.cities?.name}</span>
+                    <a
+                      className="link link-hover"
+                      href={`/?manufacturers_filter[city][]=${item.cities?.name}`}
+                    >
+                      {item.cities?.name}
+                    </a>
                     <div className="divider divider-horizontal"></div>
                   </>
                 )}
                 {item.manufacturers_categories &&
                   item.manufacturers_categories.length > 0 && (
                     <>
-                      <span>Категории: {categories}</span>
+                      <span>
+                        Категории:{" "}
+                        {item.manufacturers_categories.map((category, i) => (
+                          <span key={category.id}>
+                            {i > 0 && ", "}{" "}
+                            <a
+                              href={`/manufacturer/categories/${category.manufacturers_categories_categories.code}/`}
+                              className="link link-hover"
+                            >
+                              {category.manufacturers_categories_categories.name.toLowerCase()}
+                            </a>
+                          </span>
+                        ))}
+                      </span>
                       <div className="divider divider-horizontal"></div>
                     </>
                   )}

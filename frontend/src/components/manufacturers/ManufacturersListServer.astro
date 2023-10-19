@@ -8,6 +8,7 @@ const { categorySlug } = Astro.props;
 
 const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
 const searchParams = new URL(Astro.request.url).search;
+const pathname = new URL(Astro.request.url).pathname;
 
 const manufacturersFilterValues = parseQueryParams(searchParams);
 if (categorySlug) {
@@ -47,5 +48,6 @@ const manufacturers = await trpcClient.manufacturers.publicList.query({
   initialData={manufacturers}
   categorySlug={categorySlug}
   searchParams={searchParams}
+  pathname={pathname}
   client:load
 />
