@@ -6,6 +6,7 @@ import {
   ManufacturersFindManyArgsSchema,
   ManufacturersIncludeSchema,
   ManufacturersOrderByWithRelationInputSchema,
+  ManufacturersPropertiesValuesWithRelationsSchema,
   ManufacturersScalarFieldEnumSchema,
   ManufacturersSchema,
   ManufacturersSelectSchema,
@@ -31,6 +32,13 @@ export const ManufacturersWithImagesSchema = ManufacturersSchema.merge(
     )
     .optional(),
 });
+
+export const ManufacturersWithImagesAndPropertiesSchema =
+  ManufacturersWithImagesSchema.extend({
+    properties: z
+      .array(ManufacturersPropertiesValuesWithRelationsSchema)
+      .optional(),
+  });
 
 export const ManufacturersWithImagesFindManyArgsSchema = z
   .object({
