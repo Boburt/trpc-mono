@@ -17,7 +17,7 @@
     "@astrojs/react": "^3.0.0",
     "@astrojs/sitemap": "^3.0.2",
     "@astrojs/tailwind": "^5.0.0",
-    "@auth/core": "^0.5.1",
+    "@auth/core": "^0.17.0",
     "@elysiajs/static": "^0.6.0",
     "@fastify/middie": "^8.3.0",
     "@fastify/static": "^6.10.2",
