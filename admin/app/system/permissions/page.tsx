@@ -1,5 +1,4 @@
 "use client";
-import { trpc } from "@admin/utils/trpc";
 import { DataTable } from "./data-table";
 import { permissionsColumns } from "./columns";
 import { Button } from "@components/ui/button";

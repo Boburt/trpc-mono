@@ -67,3 +67,7 @@ export const ManufacturersWithImagesFindManyArgsSchema = z
 export const manufacturersFacetsSchema = z.object({
   manufacturers_categories: z.string().optional().nullable(),
 });
+
+export const manufacturerReviewsCountArgsSchema = z.object({
+  id: z.string(),
+});

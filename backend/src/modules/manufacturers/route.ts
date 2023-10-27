@@ -4,13 +4,22 @@ import {
   ManufacturersFindUniqueArgsSchema,
   ManufacturersUpdateArgsSchema,
 } from "@backend/lib/zod";
-import { checkPermission, publicProcedure, publicRouter } from "@backend/trpc";
+import {
+  checkPermission,
+  checkUser,
+  publicProcedure,
+  publicRouter,
+} from "@backend/trpc";
 import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
 import {
   ManufacturersWithImagesFindManyArgsSchema,
+  manufacturerReviewsCountArgsSchema,
   manufacturersFacetsSchema,
 } from "./dto/list.dto";
-import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
+import {
+  ManufacturerAddReviewArgsSchema,
+  ManufacturersFindUniqueWithImageArgsSchema,
+} from "./dto/one.dto";
 
 export const manufacturersRouter = publicRouter({
   add: publicProcedure
@@ -79,5 +88,18 @@ export const manufacturersRouter = publicRouter({
     .query(({ input, ctx }) => {
       console.log("facets input", input);
       return ctx.manufacturersService.getFacetFilter(input);
+    }),
+
+  addReview: publicProcedure
+    .use(checkUser)
+    .input(ManufacturerAddReviewArgsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.manufacturersService.addReview(input, ctx.user!);
+    }),
+
+  getReviewsCount: publicProcedure
+    .input(manufacturerReviewsCountArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.manufacturersService.getReviewsCount(input);
     }),
 });

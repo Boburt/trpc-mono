@@ -126,7 +126,7 @@ export class UsersService {
   async login(
     input: z.infer<typeof loginInput>
   ): Promise<z.infer<typeof typeLoginOutput>> {
-    const user = await this.prisma.users.findUnique({
+    let user = await this.prisma.users.findUnique({
       where: {
         login: input.login,
       },
@@ -135,7 +135,10 @@ export class UsersService {
       },
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
     }
 
     // check password
@@ -183,8 +186,13 @@ export class UsersService {
       const roleId = user.users_roles_usersTousers_roles_user_id[0].role_id;
       permissions = await this.cacheController.getPermissionsByRoleId(roleId);
     }
+    const resultUser = this.exclude(user, [
+      "password",
+      "salt",
+      "users_roles_usersTousers_roles_user_id",
+    ]);
     return {
-      data: user,
+      data: resultUser,
       refreshToken,
       accessToken,
       rights: permissions,
