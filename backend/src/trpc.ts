@@ -26,6 +26,8 @@ import { ManufacturersCategoriesService } from "./modules/manufacturers_categori
 import { CitiesService } from "./modules/cities/service";
 import { ManufacturersPropertiesCategoriesService } from "./modules/manufacturers_properties_categories/service";
 import { ManufacturersPropertiesService } from "./modules/manufacturers_properties/service";
+import { UsersWithRelations } from "./lib/zod";
+import { ManufacturersReviewsService } from "./modules/manufacturers_reviews/service";
 
 // redis
 export const client = new Redis({
@@ -58,6 +60,13 @@ export const newDeleteManufacturersQueue = new Queue(
   }
 );
 
+export const newIndexManufacturerReviewQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}index_manufacturer_review`,
+  {
+    connection: client,
+  }
+);
+
 // services
 export const cacheControlService = new CacheControlService(db, client);
 const permissionsService = new PermissionsService(db, cacheControlService);
@@ -78,7 +87,8 @@ export const assetsService = new AssetsService(db, newAssetsAddedQueue);
 const manufacturersService = new ManufacturersService(
   db,
   cacheControlService,
-  newDeleteManufacturersQueue
+  newDeleteManufacturersQueue,
+  newIndexManufacturerReviewQueue
 );
 const citiesService = new CitiesService(db, cacheControlService);
 
@@ -89,6 +99,10 @@ const manufacturersProperties = new ManufacturersPropertiesService(
   db,
   cacheControlService,
   newIndexManufacturersQueue
+);
+const manufacturersReviewsService = new ManufacturersReviewsService(
+  db,
+  newIndexManufacturerReviewQueue
 );
 
 interface Meta {
@@ -117,7 +131,9 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     citiesService,
     manufacturersPropertiesCategoriesService: manufacturersPropertiesCategories,
     manufacturersPropertiesService: manufacturersProperties,
+    manufacturersReviewsService,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
+    user: null as Omit<UsersWithRelations, "password"> | null,
   };
 };
 
@@ -199,6 +215,49 @@ export const checkPermission = t.middleware(async ({ meta, next, ctx }) => {
   } else {
     return next();
   }
+});
+
+export const checkUser = t.middleware(async ({ next, ctx }) => {
+  if (!ctx.token) {
+    new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+  }
+
+  let jwtResult = await verifyJwt(ctx.token!);
+  if (!jwtResult) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+  }
+
+  if (!jwtResult.payload) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+  }
+
+  let user = await ctx.usersService.findOne({
+    where: {
+      id: jwtResult.payload.id as string,
+    },
+    include: {
+      users_roles_usersTousers_roles_user_id: true,
+    },
+  });
+
+  if (!user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+  }
+
+  ctx.user = user;
+  return next();
 });
 
 export const publicProcedure = t.procedure;

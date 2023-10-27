@@ -15,3 +15,9 @@ export const ManufacturersFindUniqueWithImageArgsSchema = z
     where: ManufacturersWhereInputSchema,
   })
   .merge(imageAssetsSelectObj);
+
+export const ManufacturerAddReviewArgsSchema = z.object({
+  id: z.string(),
+  review: z.string(),
+  rating: z.optional(z.number()),
+});

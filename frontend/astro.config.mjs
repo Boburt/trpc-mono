@@ -17,6 +17,7 @@ export default defineConfig({
   image: {
     service: sharpImageService(),
   },
+  
   server: {
     port: 4000,
     host: true,
