@@ -5,6 +5,7 @@ import {
   ManufacturersFindManyArgsSchema,
   ManufacturersFindUniqueArgsSchema,
   Manufacturers,
+  UsersWithRelations,
 } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
@@ -14,16 +15,21 @@ import {
   ManufacturersWithImagesAndPropertiesSchema,
   ManufacturersWithImagesFindManyArgsSchema,
   ManufacturersWithImagesSchema,
+  manufacturerReviewsCountArgsSchema,
   manufacturersFacetsSchema,
 } from "./dto/list.dto";
-import { ManufacturersFindUniqueWithImageArgsSchema } from "./dto/one.dto";
+import {
+  ManufacturerAddReviewArgsSchema,
+  ManufacturersFindUniqueWithImageArgsSchema,
+} from "./dto/one.dto";
 import { Queue } from "bullmq";
 
 export class ManufacturersService {
   constructor(
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
-    private readonly deleteManufacturerQueue: Queue
+    private readonly deleteManufacturerQueue: Queue,
+    private readonly indexReviewQueue: Queue
   ) {}
 
   async create(
@@ -565,6 +571,81 @@ export class ManufacturersService {
     return resultFacets;
   }
 
+  async addReview(
+    input: z.infer<typeof ManufacturerAddReviewArgsSchema>,
+    user: Omit<UsersWithRelations, "password">
+  ) {
+    const res = await this.prisma.manufacturersReviews.create({
+      data: {
+        rating: input.rating,
+        comment: input.review,
+        manufacturer_id: input.id,
+        user_id: user.id,
+      },
+    });
+
+    await this.indexReviewQueue.add(
+      res.id,
+      {
+        id: res.id,
+      },
+      {
+        removeOnComplete: true,
+      }
+    );
+    return res;
+  }
+
+  async getReviewsCount(
+    input: z.infer<typeof manufacturerReviewsCountArgsSchema>
+  ): Promise<number> {
+    let res = 0;
+
+    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturer_reviews`;
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+
+    const response = await fetch(elasticUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify({
+        size: 0,
+        query: {
+          bool: {
+            must: [
+              {
+                term: {
+                  active: true,
+                },
+              },
+              {
+                term: {
+                  manufacturer_id: input.id,
+                },
+              },
+            ],
+          },
+        },
+        aggs: {
+          active_reviews_count: {
+            value_count: {
+              field: "manufacturer_id",
+            },
+          },
+        },
+      }),
+    });
+
+    const responseJson = await response.json();
+    console.log("responseJson", responseJson);
+    if (responseJson?.aggregations?.active_reviews_count?.value) {
+      res = responseJson.aggregations.active_reviews_count.value;
+    }
+
+    return res;
+  }
   // async cachedLangs(
   //   input: z.infer<typeof ManufacturersFindManyArgsSchema>
   // ): Promise<Manufacturers[]> {

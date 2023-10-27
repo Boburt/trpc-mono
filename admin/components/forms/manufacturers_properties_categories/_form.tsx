@@ -161,7 +161,6 @@ export default function ManufacturersPropertiesCategoriesForm({
           </div>
           <form.Field name="code">
             {(field) => {
-              console.log(field);
               return (
                 <>
                   <Input

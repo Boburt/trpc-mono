@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer";
 import { Breadcrumbs } from "astro-breadcrumbs";
 import CategoriesFilterServer from "../components/manufacturers/filter/CategoriesServer.astro";
 import { ViewTransitions } from "astro:transitions";
+import { Toaster } from "sonner";
 import { trpcClient } from "../utils/trpc-server";
 
 const { title, showHeaderFilter = false } = Astro.props;
@@ -31,7 +32,8 @@ const pathname = new URL(Astro.request.url).pathname;
       {showHeaderFilter && <CategoriesFilterServer />}
       <slot />
     </div>
-    <Footer />
+    <Footer client:load />
+    <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>
   </body>
 </html>

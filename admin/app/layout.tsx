@@ -22,6 +22,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("davr");
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>

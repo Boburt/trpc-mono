@@ -340,9 +340,9 @@ model ManufacturersReviews {
   id              String   @id(map: "PK_manufacturers_reviews_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufacturer_id String   @db.Uuid
   user_id         String   @db.Uuid
-  rating          Float    @default(0)
+  rating          Float?
   comment         String?
-  active          Boolean  @default(true)
+  active          Boolean  @default(false)
   created_at      DateTime @default(now()) @db.Timestamptz(5)
   updated_at      DateTime @default(now()) @db.Timestamptz(5)
 
@@ -351,6 +351,17 @@ model ManufacturersReviews {
   manufacturers_reviews_users Users @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "FK_manufacturers_reviews_user_id")
 
   @@map("manufacturers_reviews")
+}
+
+model SeoLinks {
+  id          String   @id(map: "PK_seo_links_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  link        String
+  description String?
+  created_at  DateTime @default(now()) @db.Timestamptz(5)
+  updated_at  DateTime @default(now()) @db.Timestamptz(5)
+
+  @@map("seo_links")
 }
 
 enum user_status {

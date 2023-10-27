@@ -90,6 +90,8 @@ export const ManufacturersPropertiesValuesScalarFieldEnumSchema = z.enum(['id','
 
 export const ManufacturersReviewsScalarFieldEnumSchema = z.enum(['id','manufacturer_id','user_id','rating','comment','active','created_at','updated_at']);
 
+export const SeoLinksScalarFieldEnumSchema = z.enum(['id','title','link','description','created_at','updated_at']);
+
 export const SortOrderSchema = z.enum(['asc','desc']);
 
 export const JsonNullValueInputSchema = z.enum(['JsonNull',]);
@@ -757,7 +759,7 @@ export const ManufacturersReviewsSchema = z.object({
   id: z.string(),
   manufacturer_id: z.string(),
   user_id: z.string(),
-  rating: z.number(),
+  rating: z.number().nullish(),
   comment: z.string().nullish(),
   active: z.boolean(),
   created_at: z.coerce.date(),
@@ -780,6 +782,21 @@ export const ManufacturersReviewsWithRelationsSchema: z.ZodType<ManufacturersRev
   manufacturers_reviews_manufacturers: z.lazy(() => ManufacturersWithRelationsSchema),
   manufacturers_reviews_users: z.lazy(() => UsersWithRelationsSchema),
 }))
+
+/////////////////////////////////////////
+// SEO LINKS SCHEMA
+/////////////////////////////////////////
+
+export const SeoLinksSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  link: z.string(),
+  description: z.string().nullish(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+})
+
+export type SeoLinks = z.infer<typeof SeoLinksSchema>
 
 /////////////////////////////////////////
 // SELECT & INCLUDE
@@ -1427,6 +1444,18 @@ export const ManufacturersReviewsSelectSchema: z.ZodType<Prisma.ManufacturersRev
   updated_at: z.boolean().optional(),
   manufacturers_reviews_manufacturers: z.union([z.boolean(),z.lazy(() => ManufacturersArgsSchema)]).optional(),
   manufacturers_reviews_users: z.union([z.boolean(),z.lazy(() => UsersArgsSchema)]).optional(),
+}).strict()
+
+// SEO LINKS
+//------------------------------------------------------
+
+export const SeoLinksSelectSchema: z.ZodType<Prisma.SeoLinksSelect> = z.object({
+  id: z.boolean().optional(),
+  title: z.boolean().optional(),
+  link: z.boolean().optional(),
+  description: z.boolean().optional(),
+  created_at: z.boolean().optional(),
+  updated_at: z.boolean().optional(),
 }).strict()
 
 
@@ -3042,7 +3071,7 @@ export const ManufacturersReviewsWhereInputSchema: z.ZodType<Prisma.Manufacturer
   id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  rating: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  rating: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   comment: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   active: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -3055,7 +3084,7 @@ export const ManufacturersReviewsOrderByWithRelationInputSchema: z.ZodType<Prism
   id: z.lazy(() => SortOrderSchema).optional(),
   manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
   user_id: z.lazy(() => SortOrderSchema).optional(),
-  rating: z.lazy(() => SortOrderSchema).optional(),
+  rating: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   comment: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   active: z.lazy(() => SortOrderSchema).optional(),
   created_at: z.lazy(() => SortOrderSchema).optional(),
@@ -3074,7 +3103,7 @@ export const ManufacturersReviewsWhereUniqueInputSchema: z.ZodType<Prisma.Manufa
   NOT: z.union([ z.lazy(() => ManufacturersReviewsWhereInputSchema),z.lazy(() => ManufacturersReviewsWhereInputSchema).array() ]).optional(),
   manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  rating: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  rating: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   comment: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   active: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -3087,7 +3116,7 @@ export const ManufacturersReviewsOrderByWithAggregationInputSchema: z.ZodType<Pr
   id: z.lazy(() => SortOrderSchema).optional(),
   manufacturer_id: z.lazy(() => SortOrderSchema).optional(),
   user_id: z.lazy(() => SortOrderSchema).optional(),
-  rating: z.lazy(() => SortOrderSchema).optional(),
+  rating: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   comment: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   active: z.lazy(() => SortOrderSchema).optional(),
   created_at: z.lazy(() => SortOrderSchema).optional(),
@@ -3106,9 +3135,69 @@ export const ManufacturersReviewsScalarWhereWithAggregatesInputSchema: z.ZodType
   id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
   manufacturer_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
   user_id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
-  rating: z.union([ z.lazy(() => FloatWithAggregatesFilterSchema),z.number() ]).optional(),
+  rating: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
   comment: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   active: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const SeoLinksWhereInputSchema: z.ZodType<Prisma.SeoLinksWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => SeoLinksWhereInputSchema),z.lazy(() => SeoLinksWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => SeoLinksWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => SeoLinksWhereInputSchema),z.lazy(() => SeoLinksWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  link: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const SeoLinksOrderByWithRelationInputSchema: z.ZodType<Prisma.SeoLinksOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  link: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SeoLinksWhereUniqueInputSchema: z.ZodType<Prisma.SeoLinksWhereUniqueInput> = z.object({
+  id: z.string()
+})
+.and(z.object({
+  id: z.string().optional(),
+  AND: z.union([ z.lazy(() => SeoLinksWhereInputSchema),z.lazy(() => SeoLinksWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => SeoLinksWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => SeoLinksWhereInputSchema),z.lazy(() => SeoLinksWhereInputSchema).array() ]).optional(),
+  title: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  link: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updated_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict());
+
+export const SeoLinksOrderByWithAggregationInputSchema: z.ZodType<Prisma.SeoLinksOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  link: z.lazy(() => SortOrderSchema).optional(),
+  description: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => SeoLinksCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => SeoLinksMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => SeoLinksMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const SeoLinksScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.SeoLinksScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => SeoLinksScalarWhereWithAggregatesInputSchema),z.lazy(() => SeoLinksScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => SeoLinksScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => SeoLinksScalarWhereWithAggregatesInputSchema),z.lazy(() => SeoLinksScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => UuidWithAggregatesFilterSchema),z.string() ]).optional(),
+  title: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  link: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  description: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   created_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updated_at: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
@@ -4625,7 +4714,7 @@ export const ManufacturersPropertiesValuesUncheckedUpdateManyInputSchema: z.ZodT
 
 export const ManufacturersReviewsCreateInputSchema: z.ZodType<Prisma.ManufacturersReviewsCreateInput> = z.object({
   id: z.string().optional(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -4638,7 +4727,7 @@ export const ManufacturersReviewsUncheckedCreateInputSchema: z.ZodType<Prisma.Ma
   id: z.string().optional(),
   manufacturer_id: z.string(),
   user_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -4647,7 +4736,7 @@ export const ManufacturersReviewsUncheckedCreateInputSchema: z.ZodType<Prisma.Ma
 
 export const ManufacturersReviewsUpdateInputSchema: z.ZodType<Prisma.ManufacturersReviewsUpdateInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4660,7 +4749,7 @@ export const ManufacturersReviewsUncheckedUpdateInputSchema: z.ZodType<Prisma.Ma
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4671,7 +4760,7 @@ export const ManufacturersReviewsCreateManyInputSchema: z.ZodType<Prisma.Manufac
   id: z.string().optional(),
   manufacturer_id: z.string(),
   user_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -4680,7 +4769,7 @@ export const ManufacturersReviewsCreateManyInputSchema: z.ZodType<Prisma.Manufac
 
 export const ManufacturersReviewsUpdateManyMutationInputSchema: z.ZodType<Prisma.ManufacturersReviewsUpdateManyMutationInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4691,9 +4780,72 @@ export const ManufacturersReviewsUncheckedUpdateManyInputSchema: z.ZodType<Prism
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SeoLinksCreateInputSchema: z.ZodType<Prisma.SeoLinksCreateInput> = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  link: z.string(),
+  description: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const SeoLinksUncheckedCreateInputSchema: z.ZodType<Prisma.SeoLinksUncheckedCreateInput> = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  link: z.string(),
+  description: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const SeoLinksUpdateInputSchema: z.ZodType<Prisma.SeoLinksUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SeoLinksUncheckedUpdateInputSchema: z.ZodType<Prisma.SeoLinksUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SeoLinksCreateManyInputSchema: z.ZodType<Prisma.SeoLinksCreateManyInput> = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  link: z.string(),
+  description: z.string().optional().nullable(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional()
+}).strict();
+
+export const SeoLinksUpdateManyMutationInputSchema: z.ZodType<Prisma.SeoLinksUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SeoLinksUncheckedUpdateManyInputSchema: z.ZodType<Prisma.SeoLinksUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  description: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updated_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -5977,6 +6129,33 @@ export const ManufacturersReviewsMinOrderByAggregateInputSchema: z.ZodType<Prism
 
 export const ManufacturersReviewsSumOrderByAggregateInputSchema: z.ZodType<Prisma.ManufacturersReviewsSumOrderByAggregateInput> = z.object({
   rating: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SeoLinksCountOrderByAggregateInputSchema: z.ZodType<Prisma.SeoLinksCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  link: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SeoLinksMaxOrderByAggregateInputSchema: z.ZodType<Prisma.SeoLinksMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  link: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SeoLinksMinOrderByAggregateInputSchema: z.ZodType<Prisma.SeoLinksMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  title: z.lazy(() => SortOrderSchema).optional(),
+  link: z.lazy(() => SortOrderSchema).optional(),
+  description: z.lazy(() => SortOrderSchema).optional(),
+  created_at: z.lazy(() => SortOrderSchema).optional(),
+  updated_at: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInputSchema: z.ZodType<Prisma.UsersCreateNestedOneWithoutPermissions_permissions_updated_byTousersInput> = z.object({
@@ -10029,7 +10208,7 @@ export const Users_rolesCreateManyUsers_usersTousers_roles_user_idInputEnvelopeS
 
 export const ManufacturersReviewsCreateWithoutManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsCreateWithoutManufacturers_reviews_usersInput> = z.object({
   id: z.string().optional(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -10040,7 +10219,7 @@ export const ManufacturersReviewsCreateWithoutManufacturers_reviews_usersInputSc
 export const ManufacturersReviewsUncheckedCreateWithoutManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedCreateWithoutManufacturers_reviews_usersInput> = z.object({
   id: z.string().optional(),
   manufacturer_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -10407,7 +10586,7 @@ export const ManufacturersReviewsScalarWhereInputSchema: z.ZodType<Prisma.Manufa
   id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   manufacturer_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
   user_id: z.union([ z.lazy(() => UuidFilterSchema),z.string() ]).optional(),
-  rating: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  rating: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
   comment: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   active: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   created_at: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -12796,7 +12975,7 @@ export const ManufacturersPropertiesValuesCreateManyManyfacturers_properties_val
 
 export const ManufacturersReviewsCreateWithoutManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsCreateWithoutManufacturers_reviews_manufacturersInput> = z.object({
   id: z.string().optional(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -12807,7 +12986,7 @@ export const ManufacturersReviewsCreateWithoutManufacturers_reviews_manufacturer
 export const ManufacturersReviewsUncheckedCreateWithoutManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedCreateWithoutManufacturers_reviews_manufacturersInput> = z.object({
   id: z.string().optional(),
   user_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -13927,7 +14106,7 @@ export const Users_rolesCreateManyUsers_usersTousers_roles_user_idInputSchema: z
 export const ManufacturersReviewsCreateManyManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsCreateManyManufacturers_reviews_usersInput> = z.object({
   id: z.string().optional(),
   manufacturer_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -14357,7 +14536,7 @@ export const Users_rolesUncheckedUpdateManyWithoutUsers_usersTousers_roles_user_
 
 export const ManufacturersReviewsUpdateWithoutManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUpdateWithoutManufacturers_reviews_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -14368,7 +14547,7 @@ export const ManufacturersReviewsUpdateWithoutManufacturers_reviews_usersInputSc
 export const ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -14378,7 +14557,7 @@ export const ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_use
 export const ManufacturersReviewsUncheckedUpdateManyWithoutManufacturers_reviews_usersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedUpdateManyWithoutManufacturers_reviews_usersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   manufacturer_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -14457,7 +14636,7 @@ export const ManufacturersPropertiesValuesCreateManyManyfacturers_properties_val
 export const ManufacturersReviewsCreateManyManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsCreateManyManufacturers_reviews_manufacturersInput> = z.object({
   id: z.string().optional(),
   user_id: z.string(),
-  rating: z.number().optional(),
+  rating: z.number().optional().nullable(),
   comment: z.string().optional().nullable(),
   active: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -14505,7 +14684,7 @@ export const ManufacturersPropertiesValuesUncheckedUpdateManyWithoutManyfacturer
 
 export const ManufacturersReviewsUpdateWithoutManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUpdateWithoutManufacturers_reviews_manufacturersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -14516,7 +14695,7 @@ export const ManufacturersReviewsUpdateWithoutManufacturers_reviews_manufacturer
 export const ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_manufacturersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -14526,7 +14705,7 @@ export const ManufacturersReviewsUncheckedUpdateWithoutManufacturers_reviews_man
 export const ManufacturersReviewsUncheckedUpdateManyWithoutManufacturers_reviews_manufacturersInputSchema: z.ZodType<Prisma.ManufacturersReviewsUncheckedUpdateManyWithoutManufacturers_reviews_manufacturersInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   user_id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  rating: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  rating: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   comment: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   active: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   created_at: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -15895,6 +16074,63 @@ export const ManufacturersReviewsFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.M
   where: ManufacturersReviewsWhereUniqueInputSchema,
 }).strict()
 
+export const SeoLinksFindFirstArgsSchema: z.ZodType<Prisma.SeoLinksFindFirstArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereInputSchema.optional(),
+  orderBy: z.union([ SeoLinksOrderByWithRelationInputSchema.array(),SeoLinksOrderByWithRelationInputSchema ]).optional(),
+  cursor: SeoLinksWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SeoLinksScalarFieldEnumSchema,SeoLinksScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const SeoLinksFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SeoLinksFindFirstOrThrowArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereInputSchema.optional(),
+  orderBy: z.union([ SeoLinksOrderByWithRelationInputSchema.array(),SeoLinksOrderByWithRelationInputSchema ]).optional(),
+  cursor: SeoLinksWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SeoLinksScalarFieldEnumSchema,SeoLinksScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const SeoLinksFindManyArgsSchema: z.ZodType<Prisma.SeoLinksFindManyArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereInputSchema.optional(),
+  orderBy: z.union([ SeoLinksOrderByWithRelationInputSchema.array(),SeoLinksOrderByWithRelationInputSchema ]).optional(),
+  cursor: SeoLinksWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ SeoLinksScalarFieldEnumSchema,SeoLinksScalarFieldEnumSchema.array() ]).optional(),
+}).strict()
+
+export const SeoLinksAggregateArgsSchema: z.ZodType<Prisma.SeoLinksAggregateArgs> = z.object({
+  where: SeoLinksWhereInputSchema.optional(),
+  orderBy: z.union([ SeoLinksOrderByWithRelationInputSchema.array(),SeoLinksOrderByWithRelationInputSchema ]).optional(),
+  cursor: SeoLinksWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const SeoLinksGroupByArgsSchema: z.ZodType<Prisma.SeoLinksGroupByArgs> = z.object({
+  where: SeoLinksWhereInputSchema.optional(),
+  orderBy: z.union([ SeoLinksOrderByWithAggregationInputSchema.array(),SeoLinksOrderByWithAggregationInputSchema ]).optional(),
+  by: SeoLinksScalarFieldEnumSchema.array(),
+  having: SeoLinksScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const SeoLinksFindUniqueArgsSchema: z.ZodType<Prisma.SeoLinksFindUniqueArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereUniqueInputSchema,
+}).strict()
+
+export const SeoLinksFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.SeoLinksFindUniqueOrThrowArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereUniqueInputSchema,
+}).strict()
+
 export const PermissionsCreateArgsSchema: z.ZodType<Prisma.PermissionsCreateArgs> = z.object({
   select: PermissionsSelectSchema.optional(),
   include: PermissionsIncludeSchema.optional(),
@@ -16705,4 +16941,41 @@ export const ManufacturersReviewsUpdateManyArgsSchema: z.ZodType<Prisma.Manufact
 
 export const ManufacturersReviewsDeleteManyArgsSchema: z.ZodType<Prisma.ManufacturersReviewsDeleteManyArgs> = z.object({
   where: ManufacturersReviewsWhereInputSchema.optional(),
+}).strict()
+
+export const SeoLinksCreateArgsSchema: z.ZodType<Prisma.SeoLinksCreateArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  data: z.union([ SeoLinksCreateInputSchema,SeoLinksUncheckedCreateInputSchema ]),
+}).strict()
+
+export const SeoLinksUpsertArgsSchema: z.ZodType<Prisma.SeoLinksUpsertArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereUniqueInputSchema,
+  create: z.union([ SeoLinksCreateInputSchema,SeoLinksUncheckedCreateInputSchema ]),
+  update: z.union([ SeoLinksUpdateInputSchema,SeoLinksUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const SeoLinksCreateManyArgsSchema: z.ZodType<Prisma.SeoLinksCreateManyArgs> = z.object({
+  data: z.union([ SeoLinksCreateManyInputSchema,SeoLinksCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const SeoLinksDeleteArgsSchema: z.ZodType<Prisma.SeoLinksDeleteArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  where: SeoLinksWhereUniqueInputSchema,
+}).strict()
+
+export const SeoLinksUpdateArgsSchema: z.ZodType<Prisma.SeoLinksUpdateArgs> = z.object({
+  select: SeoLinksSelectSchema.optional(),
+  data: z.union([ SeoLinksUpdateInputSchema,SeoLinksUncheckedUpdateInputSchema ]),
+  where: SeoLinksWhereUniqueInputSchema,
+}).strict()
+
+export const SeoLinksUpdateManyArgsSchema: z.ZodType<Prisma.SeoLinksUpdateManyArgs> = z.object({
+  data: z.union([ SeoLinksUpdateManyMutationInputSchema,SeoLinksUncheckedUpdateManyInputSchema ]),
+  where: SeoLinksWhereInputSchema.optional(),
+}).strict()
+
+export const SeoLinksDeleteManyArgsSchema: z.ZodType<Prisma.SeoLinksDeleteManyArgs> = z.object({
+  where: SeoLinksWhereInputSchema.optional(),
 }).strict()

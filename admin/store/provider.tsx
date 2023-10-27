@@ -24,7 +24,6 @@ function useContextualQueryClient() {
   const token = useToken();
 
   const key = token ? "token" : "__no_token__";
-
   // Get or create a query client
   let queryClient = queryClientMap[key];
   if (!queryClient) {
@@ -56,7 +55,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
       ],
     });
   }, [token]);
-
   return (
     <trpc.Provider
       client={trpcClient}
