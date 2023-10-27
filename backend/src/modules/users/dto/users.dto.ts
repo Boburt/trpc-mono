@@ -11,7 +11,7 @@ export const refreshTokenInput = z.object({
 });
 
 export const typeLoginOutput = z.object({
-  data: UsersSchema,
+  data: UsersSchema.omit({ password: true, salt: true }),
   refreshToken: z.string(),
   accessToken: z.string(),
   rights: z.array(z.string()),

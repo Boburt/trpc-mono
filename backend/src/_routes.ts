@@ -6,6 +6,7 @@ import { manufacturersRouter } from "./modules/manufacturers/route";
 import { manufacturersCategoriesRouter } from "./modules/manufacturers_categories/route";
 import { manufacturersPropertiesRouter } from "./modules/manufacturers_properties/route";
 import { manufacturersPropertiesCategoriesRouter } from "./modules/manufacturers_properties_categories/route";
+import { manufacturersReviewsRouter } from "./modules/manufacturers_reviews/route";
 import { permissionsRouter } from "./modules/permissions/route";
 import { rolesRouter } from "./modules/roles/route";
 import { rolesPermissionsRouter } from "./modules/roles_permissions/route";
@@ -33,6 +34,7 @@ export const router = publicRouter({
   cities: citiesRouter,
   manufacturersPropertiesCategories: manufacturersPropertiesCategoriesRouter,
   manufacturersProperties: manufacturersPropertiesRouter,
+  manufacturersReviews: manufacturersReviewsRouter,
 });
 
 export type Router = typeof router;

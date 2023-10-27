@@ -39,7 +39,7 @@ import { RouterOutputs, trpc } from "@admin/utils/trpc";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<
-    RouterOutputs["permissions"]["list"]["items"][0],
+    RouterOutputs["manufacturersReviews"]["list"]["items"][0],
     TValue
   >[];
 }
@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
     pageSize: 10,
   });
 
-  const { data, isLoading } = trpc.permissions.list.useQuery({
+  const { data, isLoading } = trpc.manufacturersReviews.list.useQuery({
     take: pageSize,
     skip: pageIndex * pageSize,
   });
