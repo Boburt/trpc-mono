@@ -82,6 +82,10 @@ const settingsMenu: { title: string; href: string }[] = [
     title: "Свойства производителей",
     href: "/system/manufacturers_properties",
   },
+  {
+    title: "СЕО ссылки",
+    href: "/system/seo_links",
+  },
 ];
 
 export function NavigationMenuDemo() {
