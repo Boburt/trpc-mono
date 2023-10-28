@@ -2,7 +2,6 @@ import { DB } from "@backend/db";
 import {
   RolesWithRelations,
   Permissions,
-  Api_tokens,
   Scheduled_reports,
   Langs,
 } from "@backend/lib/zod";
@@ -96,27 +95,6 @@ export class CacheControlService {
     return role.roles_permissions.map((rolePermission) => {
       return rolePermission.permissions.slug;
     });
-  }
-
-  async cacheApiTokens() {
-    const apiTokens = await this.prisma.api_tokens.findMany();
-    await this.redis.set(
-      `${process.env.PROJECT_PREFIX}api_tokens`,
-      JSON.stringify(apiTokens)
-    );
-  }
-
-  async getCachedApiTokens({ take }: { take?: number }): Promise<Api_tokens[]> {
-    const apiTokens = await this.redis.get(
-      `${process.env.PROJECT_PREFIX}api_tokens`
-    );
-    let res = JSON.parse(apiTokens ?? "[]");
-
-    if (take && res.length > take) {
-      res = res.slice(0, take);
-    }
-
-    return res;
   }
 
   async cacheLangs() {
