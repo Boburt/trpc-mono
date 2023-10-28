@@ -9,8 +9,10 @@ import Providers from "@frontend/src/store/provider";
 
 export default function CardComponent({
   manufacturer,
+  reviewsCount,
 }: {
   manufacturer: RouterOutputs["manufacturers"]["publicOne"];
+  reviewsCount: number;
 }) {
   const [activetab, setActiveTab] = useState("profile");
 
@@ -108,7 +110,10 @@ export default function CardComponent({
             ))}
           {activetab === "document" && <p>Document</p>}
           {activetab === "reviews" && (
-            <CommentComponent manufacturerId={manufacturer!.id} />
+            <CommentComponent
+              manufacturerId={manufacturer!.id}
+              reviewsCount={reviewsCount}
+            />
           )}
         </div>
       </div>

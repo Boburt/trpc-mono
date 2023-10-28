@@ -14,6 +14,7 @@ import { ManufacturersCreateArgsSchemaWithAsset } from "./dto/create.dto";
 import {
   ManufacturersWithImagesFindManyArgsSchema,
   manufacturerReviewsCountArgsSchema,
+  manufacturerReviewsPaginatedArgsSchema,
   manufacturersFacetsSchema,
 } from "./dto/list.dto";
 import {
@@ -101,5 +102,17 @@ export const manufacturersRouter = publicRouter({
     .input(manufacturerReviewsCountArgsSchema)
     .query(async ({ input, ctx }) => {
       return await ctx.manufacturersService.getReviewsCount(input);
+    }),
+
+  getRatingsPercentage: publicProcedure
+    .input(manufacturerReviewsCountArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.manufacturersService.getRatingsPercentage(input);
+    }),
+
+  getReviews: publicProcedure
+    .input(manufacturerReviewsPaginatedArgsSchema)
+    .query(async ({ input, ctx }) => {
+      return await ctx.manufacturersService.getReviews(input);
     }),
 });
