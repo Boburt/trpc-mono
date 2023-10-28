@@ -14,7 +14,6 @@ import { UsersPermissionsService } from "./modules/users_permissions/service";
 import { UsersRolesService } from "./modules/users_roles/service";
 import { CacheControlService } from "./modules/cache_control/service";
 import { SessionsService } from "./modules/sessions/service";
-import { ApiTokensService } from "./modules/api_tokens/service";
 import { db } from "./db";
 import { verifyJwt } from "./lib/bcrypt";
 import { LangsService } from "./modules/langs/service";
@@ -80,7 +79,6 @@ export const usersService = new UsersService(db, cacheControlService);
 const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const sessionsService = new SessionsService(db);
-const apiTokensService = new ApiTokensService(db, cacheControlService);
 const langsService = new LangsService(db, cacheControlService);
 const categoriesService = new CategoriesService(db, cacheControlService);
 const imageSizesService = new ImageSizesService(db, cacheControlService);
@@ -123,7 +121,6 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     usersRolesService,
     cacheControlService,
     sessionsService,
-    apiTokensService,
     langsService,
     categoriesService,
     imageSizesService,
