@@ -269,6 +269,7 @@ export class CacheControlService {
 
   async cacheSEOLinks(id: string, beforeLink?: string) {
     if (beforeLink) {
+      // @ts-ignore
       const beforeLinkHash = Bun.hash(beforeLink);
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}seo_links:${beforeLinkHash}`
@@ -282,6 +283,7 @@ export class CacheControlService {
       },
     });
     if (seoLinks) {
+      // @ts-ignore
       const linkHash = Bun.hash(seoLinks?.link);
       await this.redis.set(
         `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`,
@@ -299,6 +301,7 @@ export class CacheControlService {
       },
     });
     if (seoLinks) {
+      // @ts-ignore
       const linkHash = Bun.hash(seoLinks?.link);
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
@@ -307,6 +310,7 @@ export class CacheControlService {
   }
 
   async getCachedSEOLinks(link: string): Promise<SeoLinks | null> {
+    // @ts-ignore
     const linkHash = Bun.hash(link);
     const seoLinks = await this.redis.get(
       `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
