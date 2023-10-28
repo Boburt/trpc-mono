@@ -13,6 +13,7 @@ import {
   ImageSizes,
   ManufacturersProperties,
   ManufacturersPropertiesCategories,
+  SeoLinks,
 } from "@prisma/client";
 
 export class CacheControlService {
@@ -286,5 +287,56 @@ export class CacheControlService {
     }
 
     return res;
+  }
+
+  async cacheSEOLinks(id: string, beforeLink?: string) {
+    if (beforeLink) {
+      const beforeLinkHash = Bun.hash(beforeLink);
+      await this.redis.del(
+        `${process.env.PROJECT_PREFIX}seo_links:${beforeLinkHash}`
+      );
+    }
+    const seoLinks = await this.prisma.seoLinks.findFirst({
+      where: {
+        id: {
+          equals: id,
+        },
+      },
+    });
+    if (seoLinks) {
+      const linkHash = Bun.hash(seoLinks?.link);
+      await this.redis.set(
+        `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`,
+        JSON.stringify(seoLinks)
+      );
+    }
+  }
+
+  async deleteSEOLinks(id: string) {
+    const seoLinks = await this.prisma.seoLinks.findFirst({
+      where: {
+        id: {
+          equals: id,
+        },
+      },
+    });
+    if (seoLinks) {
+      const linkHash = Bun.hash(seoLinks?.link);
+      await this.redis.del(
+        `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
+      );
+    }
+  }
+
+  async getCachedSEOLinks(link: string): Promise<SeoLinks | null> {
+    const linkHash = Bun.hash(link);
+    const seoLinks = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
+    );
+    if (seoLinks) {
+      return JSON.parse(seoLinks);
+    } else {
+      return null;
+    }
   }
 }

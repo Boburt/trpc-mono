@@ -16,6 +16,7 @@ import {
   ManufacturersWithImagesFindManyArgsSchema,
   ManufacturersWithImagesSchema,
   manufacturerReviewsCountArgsSchema,
+  manufacturerReviewsPaginatedArgsSchema,
   manufacturersFacetsSchema,
 } from "./dto/list.dto";
 import {
@@ -639,16 +640,169 @@ export class ManufacturersService {
     });
 
     const responseJson = await response.json();
-    console.log("responseJson", responseJson);
     if (responseJson?.aggregations?.active_reviews_count?.value) {
       res = responseJson.aggregations.active_reviews_count.value;
     }
 
     return res;
   }
-  // async cachedLangs(
-  //   input: z.infer<typeof ManufacturersFindManyArgsSchema>
-  // ): Promise<Manufacturers[]> {
-  //   return await this.cacheControl.getCachedLangs(input);
-  // }
+
+  async getRatingsPercentage(input: { id: string }): Promise<
+    {
+      rating: number;
+      percent: number;
+    }[]
+  > {
+    let res = {
+      5: {
+        rating: 5,
+        percent: 0,
+      },
+      4: {
+        rating: 4,
+        percent: 0,
+      },
+      3: {
+        rating: 3,
+        percent: 0,
+      },
+      2: {
+        rating: 2,
+        percent: 0,
+      },
+      1: {
+        rating: 1,
+        percent: 0,
+      },
+    };
+
+    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturer_reviews`;
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+
+    const response = await fetch(elasticUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify({
+        size: 0,
+        query: {
+          bool: {
+            must: [
+              {
+                term: {
+                  active: true,
+                },
+              },
+              {
+                term: {
+                  manufacturer_id: input.id,
+                },
+              },
+            ],
+          },
+        },
+        aggs: {
+          total_doc_count: {
+            value_count: {
+              field: "rating",
+            },
+          },
+          ratings_breakdown: {
+            terms: {
+              field: "rating",
+              size: 5,
+              order: {
+                _key: "desc",
+              },
+            },
+          },
+        },
+      }),
+    });
+
+    const responseJson = await response.json();
+    if (
+      responseJson?.aggregations?.ratings_breakdown?.buckets &&
+      responseJson?.hits?.total?.value > 0
+    ) {
+      responseJson.aggregations.ratings_breakdown.buckets.forEach(
+        (bucket: { key: number; doc_count: number }) => {
+          // @ts-ignore
+          res[bucket.key].percent = (
+            (bucket.doc_count / responseJson.hits.total.value) *
+            100
+          ).toFixed(0);
+        }
+      );
+    }
+
+    return Object.values(res).sort((a, b) => b.rating - a.rating);
+  }
+
+  async getReviews(
+    input: z.infer<typeof manufacturerReviewsPaginatedArgsSchema>
+  ): Promise<{
+    total: number;
+    items: {
+      id: string;
+      manufacturer_id: string;
+      user_id: string;
+      active: boolean;
+      rating: number;
+      review: string;
+      created_at: string;
+      user_data: {
+        id: string;
+        first_name: string;
+        last_name: string;
+      };
+    }[];
+  }> {
+    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturer_reviews`;
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+    const response = await fetch(elasticUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify({
+        size: 10,
+        from: input.from ?? 0,
+        query: {
+          bool: {
+            must: [
+              {
+                term: {
+                  active: true,
+                },
+              },
+              {
+                term: {
+                  manufacturer_id: input.id,
+                },
+              },
+            ],
+          },
+        },
+        sort: [
+          {
+            created_at: {
+              order: "desc",
+            },
+          },
+        ],
+      }),
+    });
+
+    const responseJson = await response.json();
+    console.log(responseJson);
+
+    return {
+      total: responseJson.hits.total.value,
+      items: responseJson.hits.hits.map((h: any) => h._source),
+    };
+  }
 }
