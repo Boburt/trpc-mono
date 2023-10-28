@@ -28,6 +28,7 @@ import { ManufacturersPropertiesCategoriesService } from "./modules/manufacturer
 import { ManufacturersPropertiesService } from "./modules/manufacturers_properties/service";
 import { UsersWithRelations } from "./lib/zod";
 import { ManufacturersReviewsService } from "./modules/manufacturers_reviews/service";
+import { SeoLinksService } from "./modules/seo_links/service";
 
 // redis
 export const client = new Redis({
@@ -83,6 +84,7 @@ const apiTokensService = new ApiTokensService(db, cacheControlService);
 const langsService = new LangsService(db, cacheControlService);
 const categoriesService = new CategoriesService(db, cacheControlService);
 const imageSizesService = new ImageSizesService(db, cacheControlService);
+const seoLinksService = new SeoLinksService(db, cacheControlService);
 export const assetsService = new AssetsService(db, newAssetsAddedQueue);
 const manufacturersService = new ManufacturersService(
   db,
@@ -132,6 +134,7 @@ export const createContext = async (opts: FetchCreateContextFnOptions) => {
     manufacturersPropertiesCategoriesService: manufacturersPropertiesCategories,
     manufacturersPropertiesService: manufacturersProperties,
     manufacturersReviewsService,
+    seoLinksService,
     token: opts.req.headers.get("authorization")?.split(" ")[1] ?? null,
     user: null as Omit<UsersWithRelations, "password"> | null,
   };

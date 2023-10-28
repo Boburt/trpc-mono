@@ -71,3 +71,8 @@ export const manufacturersFacetsSchema = z.object({
 export const manufacturerReviewsCountArgsSchema = z.object({
   id: z.string(),
 });
+
+export const manufacturerReviewsPaginatedArgsSchema = z.object({
+  id: z.string(),
+  from: z.number().optional(),
+});

@@ -3,14 +3,24 @@ import "../styles/global.css";
 
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import { trpcClient } from "@frontend/src/utils/trpc-server";
 import { Breadcrumbs } from "astro-breadcrumbs";
 import CategoriesFilterServer from "../components/manufacturers/filter/CategoriesServer.astro";
 import { ViewTransitions } from "astro:transitions";
 import { Toaster } from "sonner";
 import { trpcClient } from "../utils/trpc-server";
 
-const { title, showHeaderFilter = false } = Astro.props;
+let { title, showHeaderFilter = false } = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;
+const url = Astro.url.pathname + Astro.url.search;
+console.log("url", url);
+const seoLink = await trpcClient.seoLinks.getByLink.query({
+  link: url,
+});
+console.log("seoLink", seoLink);
+if (seoLink) {
+  title = seoLink.title;
+}
 ---
 
 <html lang="en">

@@ -109,13 +109,6 @@ export function ManufactureCard({
                   <p className="ml-2 font-bold text-gray-900 dark:text-white">
                     {item.rating}
                   </p>
-                  <span className="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span>
-                  <a
-                    href="#"
-                    className="font-medium text-gray-900 underline hover:no-underline dark:text-white"
-                  >
-                    73 reviews
-                  </a>
                 </div>
               </div>
               {/* <p>

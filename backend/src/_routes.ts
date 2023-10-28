@@ -10,6 +10,7 @@ import { manufacturersReviewsRouter } from "./modules/manufacturers_reviews/rout
 import { permissionsRouter } from "./modules/permissions/route";
 import { rolesRouter } from "./modules/roles/route";
 import { rolesPermissionsRouter } from "./modules/roles_permissions/route";
+import { seoLinksRouter } from "./modules/seo_links/route";
 import { sessionsRouter } from "./modules/sessions/route";
 import { usersRouter } from "./modules/users/route";
 import { usersPermissionsRouter } from "./modules/users_permissions/route";
@@ -32,6 +33,7 @@ export const router = publicRouter({
   manufacturersCategories: manufacturersCategoriesRouter,
   assets: assetsRouter,
   cities: citiesRouter,
+  seoLinks: seoLinksRouter,
   manufacturersPropertiesCategories: manufacturersPropertiesCategoriesRouter,
   manufacturersProperties: manufacturersPropertiesRouter,
   manufacturersReviews: manufacturersReviewsRouter,
