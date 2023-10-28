@@ -52,6 +52,7 @@ const propertyTypesLabel = {
 const formFactory = createFormFactory<
   z.infer<typeof ManufacturersPropertiesCreateInputSchema>
 >({
+  // @ts-ignore
   defaultValues: {
     name: "",
     code: "",
