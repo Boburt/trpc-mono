@@ -3,7 +3,7 @@ import {
   $nextStep,
 } from "@frontend/src/store/sign_new_manufacturer_wizard";
 import { useStore } from "@nanostores/react";
-import { AiOutlineClose, AiFillCheckCircle } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { IoIosArrowForward } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { VscOrganization, VscPerson } from "react-icons/vsc";
@@ -109,9 +109,7 @@ export const SignNewManufacturerWizard = () => {
             {steps.map((step, index) => (
               <div className="flex items-center space-x-3" key={index}>
                 <div>
-                  {step.number < currentStep && (
-                    <AiFillCheckCircle size={24} color="#3BC592" />
-                  )}
+                  {step.number < currentStep && <span></span>}
                   {step.number == currentStep && (
                     <div className="w-6 aspect-square text-sm bg-primary text-white rounded-full font-bold flex items-center justify-around">
                       {step.number}
