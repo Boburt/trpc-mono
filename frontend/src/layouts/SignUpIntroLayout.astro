@@ -1,0 +1,62 @@
+---
+import "../styles/global.css";
+
+import { GoogleFontsOptimizer } from "astro-google-fonts-optimizer";
+import { ViewTransitions } from "astro:transitions";
+import { VscOrganization, VscPerson } from "react-icons/vsc";
+
+let { title, showHeaderFilter = false } = Astro.props;
+const pathname = new URL(Astro.request.url).pathname;
+const url = Astro.url.pathname + Astro.url.search;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <GoogleFontsOptimizer
+      url="https://fonts.googleapis.com/css2?family=Damion&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&family=Sonsie+One&display=swap"
+    />
+    <ViewTransitions />
+    <title>{title ?? "Лёгкая промышленность"}</title>
+  </head>
+  <body>
+    <div class="grid h-screen grid-cols-1 lg:grid-cols-2">
+      <div class="flex justify-center items-center">
+        <div class="max-w-md">
+          <h1 class="text-4xl uppercase text-balance text-center">
+            Присоединиться к компании
+          </h1>
+
+          <div class="flex space-x-5 justify-around mt-5">
+            <a
+              href="/sign-up/existing"
+              class="w-44 aspect-square shadow-lg rounded-xl bg-primary flex flex-col space-y-3 justify-center items-center text-white font-bold text-lg cursor-pointer hover:bg-opacity-80 transition-colors duration-300 ease-in-out"
+            >
+              <span>
+                <VscOrganization size="4rem" />
+              </span>
+              <span>Существующей</span>
+            </a>
+
+            <a
+              href="/sign-up/new"
+              class="w-44 aspect-square shadow-lg rounded-xl bg-primary flex flex-col space-y-3 justify-center items-center text-white font-bold text-lg cursor-pointer hover:bg-opacity-80 transition-colors duration-300 ease-in-out"
+            >
+              <span>
+                <VscPerson size="4rem" />
+              </span>
+              <span> Новой</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-center items-center bg-primary">
+        <div class="max-w-md">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
