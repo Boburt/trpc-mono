@@ -4,7 +4,7 @@ import { ManufactureCard } from "./manufacturers/Card";
 
 export default function Proez() {
   return (
-    <div className="relative mt-8 flex flex-col">
+    <div className="relative mt-8 flex flex-col m-auto">
       {dbData.map((item: any) => (
         <ManufactureCard item={item} key={item.id} />
       ))}

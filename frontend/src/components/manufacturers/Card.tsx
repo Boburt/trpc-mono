@@ -52,7 +52,7 @@ export function ManufactureCard({
                 </h3>
               </a>
               <span>{item.name}</span>
-              <div className="mt-2 flex space-x-2">
+              <div className="mt-2 flex space-x-2 hidden sm:block">
                 {item.city_id && (
                   <>
                     <a
