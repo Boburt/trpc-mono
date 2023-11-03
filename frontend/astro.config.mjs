@@ -17,19 +17,11 @@ export default defineConfig({
   image: {
     service: sharpImageService(),
   },
-  
+
   server: {
     port: 4000,
     host: true,
   },
   site: process.env.WEB_URL,
-  integrations: [
-    tailwind({
-      applyBaseStyles: false,
-    }),
-    react(),
-    sitemap(),
-    partytown(),
-    auth(),
-  ],
+  integrations: [tailwind(), react(), sitemap(), partytown(), auth()],
 });
