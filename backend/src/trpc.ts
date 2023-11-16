@@ -28,6 +28,7 @@ import { ManufacturersPropertiesService } from "./modules/manufacturers_properti
 import { UsersWithRelations } from "./lib/zod";
 import { ManufacturersReviewsService } from "./modules/manufacturers_reviews/service";
 import { SeoLinksService } from "./modules/seo_links/service";
+import { drizzleDb } from "@backend/lib/db";
 
 // redis
 export const client = new Redis({
@@ -90,7 +91,7 @@ const manufacturersService = new ManufacturersService(
   newDeleteManufacturersQueue,
   newIndexManufacturerReviewQueue
 );
-const citiesService = new CitiesService(db, cacheControlService);
+const citiesService = new CitiesService(db, cacheControlService, drizzleDb);
 
 const manufacturersCategories = new ManufacturersCategoriesService(db);
 const manufacturersPropertiesCategories =

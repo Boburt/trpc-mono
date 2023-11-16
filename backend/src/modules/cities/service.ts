@@ -9,11 +9,14 @@ import {
 import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
+import {DrizzleDB} from "@backend/lib/db";
+import {cities} from "@backend/drizzle/schema";
 
 export class CitiesService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService
+    private readonly cacheControl: CacheControlService,
+    private readonly drizzle: DrizzleDB
   ) {}
 
   async create(input: Prisma.CitiesCreateArgs): Promise<Cities> {
@@ -32,6 +35,9 @@ export class CitiesService {
     }
     delete input.take;
     delete input.skip;
+
+    // const permissions = await this.drizzle.select().from(cities);
+
     const [permissions, meta] = await this.prisma.cities
       .paginate(input)
       .withPages({
