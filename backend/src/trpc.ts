@@ -70,8 +70,12 @@ export const newIndexManufacturerReviewQueue = new Queue(
 
 // services
 export const cacheControlService = new CacheControlService(db, client);
-const permissionsService = new PermissionsService(db, cacheControlService);
-const rolesService = new RolesService(db, cacheControlService);
+const permissionsService = new PermissionsService(
+  db,
+  cacheControlService,
+  drizzleDb
+);
+const rolesService = new RolesService(db, cacheControlService, drizzleDb);
 const rolesPermissionsService = new RolesPermissionsService(
   db,
   cacheControlService
@@ -82,8 +86,12 @@ const usersRolesService = new UsersRolesService(db);
 const sessionsService = new SessionsService(db);
 const langsService = new LangsService(db, cacheControlService, drizzleDb);
 const categoriesService = new CategoriesService(db, cacheControlService);
-const imageSizesService = new ImageSizesService(db, cacheControlService);
-const seoLinksService = new SeoLinksService(db, cacheControlService);
+const imageSizesService = new ImageSizesService(
+  db,
+  cacheControlService,
+  drizzleDb
+);
+const seoLinksService = new SeoLinksService(db, cacheControlService, drizzleDb);
 export const assetsService = new AssetsService(db, newAssetsAddedQueue);
 const manufacturersService = new ManufacturersService(
   db,
@@ -93,17 +101,28 @@ const manufacturersService = new ManufacturersService(
 );
 const citiesService = new CitiesService(db, cacheControlService, drizzleDb);
 
-const manufacturersCategories = new ManufacturersCategoriesService(db);
+const manufacturersCategories = new ManufacturersCategoriesService(
+  db,
+  cacheControlService,
+  drizzleDb
+);
 const manufacturersPropertiesCategories =
-  new ManufacturersPropertiesCategoriesService(db, cacheControlService);
+  new ManufacturersPropertiesCategoriesService(
+    db,
+    cacheControlService,
+    drizzleDb
+  );
 const manufacturersProperties = new ManufacturersPropertiesService(
   db,
   cacheControlService,
-  newIndexManufacturersQueue
+  newIndexManufacturersQueue,
+  drizzleDb
 );
 const manufacturersReviewsService = new ManufacturersReviewsService(
   db,
-  newIndexManufacturerReviewQueue
+  newIndexManufacturerReviewQueue,
+  cacheControlService,
+  drizzleDb
 );
 
 interface Meta {

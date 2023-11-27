@@ -14,12 +14,16 @@ import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { SetPropertiesValuesDto } from "./dto/set_properties_values.dto";
 import { Queue } from "bullmq";
+import { DrizzleDB } from "@backend/lib/db";
+import { manufacturers_properties } from "@backend/../drizzle/schema";
+import { InferSelectModel, sql } from "drizzle-orm";
 
 export class ManufacturersPropertiesService {
   constructor(
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
-    private readonly indexQueue: Queue
+    private readonly indexQueue: Queue,
+    private readonly drizzle: DrizzleDB
   ) {}
 
   async create(
@@ -32,24 +36,52 @@ export class ManufacturersPropertiesService {
 
   async findMany(
     input: z.infer<typeof ManufacturersPropertiesFindManyArgsSchema>
-  ): Promise<PaginationType<ManufacturersProperties>> {
+  ): Promise<
+    PaginationType<InferSelectModel<typeof manufacturers_properties>>
+  > {
     let take = input.take ?? 20;
-    let skip = !input.skip ? 1 : Math.round(input.skip / take);
-    if (input.skip && input.skip > 0) {
-      skip++;
-    }
+    let skip = input.skip ?? 0;
+    // let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    // if (input.skip && input.skip > 0) {
+    //   skip++;
+    // }
     delete input.take;
     delete input.skip;
-    const [roles, meta] = await this.prisma.manufacturersProperties
-      .paginate(input)
-      .withPages({
-        limit: take,
-        page: skip,
-        includePageCount: true,
-      });
+
+    const rolesCount = await this.drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(manufacturers_properties)
+      .execute();
+
+    const rolesList = await this.drizzle
+      .select()
+      .from(manufacturers_properties)
+      .limit(take)
+      .offset(skip);
+
+    const isLastPage = skip + take >= +rolesCount[0].count;
+
+    const paginationMeta = {
+      isFirstPage: skip === 0,
+      isLastPage,
+      currentPage: skip == 0 ? 1 : skip / take + 1,
+      previousPage: skip == 0 ? 0 : skip / take,
+      nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
+      pageCount: Math.ceil(+rolesCount[0].count / take),
+      totalCount: +rolesCount[0].count,
+    };
+
+    // const [roles, meta] = await this.prisma.manufacturersProperties
+    //   .paginate(input)
+    //   .withPages({
+    //     limit: take,
+    //     page: skip,
+    //     includePageCount: true,
+    //   });
+
     return {
-      items: roles,
-      meta,
+      items: rolesList,
+      meta: paginationMeta,
     };
   }
 
