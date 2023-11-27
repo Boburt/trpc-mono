@@ -11,7 +11,7 @@ import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { DrizzleDB } from "@backend/lib/db";
 import { langs } from "@backend/../drizzle/schema";
-import { InferInsertModel, sql } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 
 export class LangsService {
   constructor(
@@ -28,7 +28,7 @@ export class LangsService {
 
   async findMany(
     input: z.infer<typeof LangsFindManyArgsSchema>
-  ): Promise<PaginationType<InferInsertModel<typeof langs>>> {
+  ): Promise<PaginationType<InferSelectModel<typeof langs>>> {
     let take = input.take ?? 20;
     let skip = input.skip ?? 0; //: Math.round(input.skip / take);
     // if (input.skip && input.skip > 0) {

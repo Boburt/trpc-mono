@@ -11,7 +11,7 @@ import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
 import { DrizzleDB } from "@backend/lib/db";
 import { permissions } from "@backend/../drizzle/schema";
-import { InferInsertModel, sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 
 export class PermissionsService {
   constructor(
@@ -28,53 +28,53 @@ export class PermissionsService {
 
   async findMany(
     input: z.infer<typeof PermissionsFindManyArgsSchema>
-    // ): Promise<PaginationType<InferInsertModel<typeof permissions>>> {
-  ): Promise<PaginationType<Permissions>> {
+    ): Promise<PaginationType<InferSelectModel<typeof permissions>>> {
+  // ): Promise<PaginationType<Permissions>> {
     let take = input.take ?? 20;
-    // let skip = input.skip ?? 0;
-    let skip = !input.skip ? 1 : Math.round(input.skip / take);
-    if (input.skip && input.skip > 0) {
-      skip++;
-    }
+    let skip = input.skip ?? 0;
+    // let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    // if (input.skip && input.skip > 0) {
+    //   skip++;
+    // }
     delete input.take;
     delete input.skip;
 
-/*create new objact variable  */
-    
-    // const permissionsCount = await this.drizzle
-    //   .select({ count: sql<number>`count(*)` })
-    //   .from(permissions)
-    //   .execute();
+    const permissionsCount = await this.drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(permissions)
+      .execute();
 
-    // const permissionsList = await this.drizzle
-    //   .select()
-    //   .from(permissions)
-    //   .limit(take)
-    //   .offset(skip);
+    const permissionsList = await this.drizzle
+      .select()
+      .from(permissions)
+      .limit(take)
+      .offset(skip);
 
-    // const isLastPage = skip + take >= +permissionsCount[0].count;
+    const isLastPage = skip + take >= +permissionsCount[0].count;
 
-    // const paginationMeta = {
-    //   isFirstPage: skip === 0,
-    //   isLastPage,
-    //   currentPage: skip == 0 ? 1 : skip / take + 1,
-    //   previousPage: skip == 0 ? 0 : skip / take,
-    //   nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
-    //   pageCount: Math.ceil(+permissionsCount[0].count / take),
-    //   totalCount: +permissionsCount[0].count,
-    // };
+    const paginationMeta = {
+      isFirstPage: skip === 0,
+      isLastPage,
+      currentPage: skip == 0 ? 1 : skip / take + 1,
+      previousPage: skip == 0 ? 0 : skip / take,
+      nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
+      pageCount: Math.ceil(+permissionsCount[0].count / take),
+      totalCount: +permissionsCount[0].count,
+    };
 
-    const [permissions, meta] = await this.prisma.permissions
-      .paginate(input)
-      .withPages({
-        limit: take,
-        page: skip,
-        includePageCount: true,
-      });
+    // const [permissions, meta] = await this.prisma.permissions
+    //   .paginate(input)
+    //   .withPages({
+    //     limit: take,
+    //     page: skip,
+    //     includePageCount: true,
+    //   });
 
     return {
-      items: permissions,
-      meta,
+      // items: permissions,
+      // meta,
+      items: permissionsList,
+      meta: paginationMeta,
     };
   }
 
