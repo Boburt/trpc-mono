@@ -9,11 +9,15 @@ import {
 import { PaginationType } from "@backend/lib/pagination_interface";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
+import { DrizzleDB } from "@backend/lib/db";
+import { InferSelectModel, sql } from "drizzle-orm";
+import { categories } from "@backend/../drizzle/schema";
 
 export class CategoriesService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheControl: CacheControlService
+    private readonly cacheControl: CacheControlService,
+    private readonly drizzle: DrizzleDB
   ) {}
 
   async create(input: Prisma.CategoriesCreateArgs): Promise<Categories> {
@@ -24,25 +28,50 @@ export class CategoriesService {
 
   async findMany(
     input: z.infer<typeof CategoriesFindManyArgsSchema>
-  ): Promise<PaginationType<Categories>> {
+  ): Promise<PaginationType<InferSelectModel<typeof categories>>> {
     let take = input.take ?? 20;
-    let skip = !input.skip ? 1 : Math.round(input.skip / take);
-    if (input.skip && input.skip > 0) {
-      skip++;
-    }
+    let skip = input.skip ?? 0; //: Math.round(input.skip / take);
+    // let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    // if (input.skip && input.skip > 0) {
+    //   skip++;
+    // }
     delete input.take;
     delete input.skip;
-    const [permissions, meta] = await this.prisma.categories
-      .paginate(input)
-      .withPages({
-        limit: take,
-        page: skip,
-        includePageCount: true,
-      });
+
+    const categoriesCount = await this.drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(categories)
+      .execute();
+
+    const categoriesList = await this.drizzle
+      .select()
+      .from(categories)
+      .limit(take)
+      .offset(skip);
+
+    const isLastPage = skip + take >= +categoriesCount[0].count;
+
+    const paginationMeta = {
+      isFirstPage: skip === 0,
+      isLastPage,
+      currentPage: skip == 0 ? 1 : skip / take + 1,
+      previousPage: skip == 0 ? 0 : skip / take,
+      nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
+      pageCount: Math.ceil(+categoriesCount[0].count / take),
+      totalCount: +categoriesCount[0].count,
+    };
+
+    // const [permissions, meta] = await this.prisma.categories
+    //   .paginate(input)
+    //   .withPages({
+    //     limit: take,
+    //     page: skip,
+    //     includePageCount: true,
+    //   });
 
     return {
-      items: permissions,
-      meta,
+      items: categoriesList,
+      meta: paginationMeta,
     };
   }
 
