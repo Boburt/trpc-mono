@@ -85,7 +85,11 @@ const usersPermissionsService = new UsersPermissionsService(db);
 const usersRolesService = new UsersRolesService(db);
 const sessionsService = new SessionsService(db);
 const langsService = new LangsService(db, cacheControlService, drizzleDb);
-const categoriesService = new CategoriesService(db, cacheControlService);
+const categoriesService = new CategoriesService(
+  db,
+  cacheControlService,
+  drizzleDb
+);
 const imageSizesService = new ImageSizesService(
   db,
   cacheControlService,
