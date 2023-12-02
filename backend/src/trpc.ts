@@ -80,9 +80,13 @@ const rolesPermissionsService = new RolesPermissionsService(
   db,
   cacheControlService
 );
-export const usersService = new UsersService(db, cacheControlService);
-const usersPermissionsService = new UsersPermissionsService(db);
-const usersRolesService = new UsersRolesService(db);
+export const usersService = new UsersService(
+  db,
+  cacheControlService,
+  drizzleDb
+);
+const usersPermissionsService = new UsersPermissionsService(db, drizzleDb);
+const usersRolesService = new UsersRolesService(db, drizzleDb);
 const sessionsService = new SessionsService(db);
 const langsService = new LangsService(db, cacheControlService, drizzleDb);
 const categoriesService = new CategoriesService(
@@ -96,7 +100,11 @@ const imageSizesService = new ImageSizesService(
   drizzleDb
 );
 const seoLinksService = new SeoLinksService(db, cacheControlService, drizzleDb);
-export const assetsService = new AssetsService(db, newAssetsAddedQueue);
+export const assetsService = new AssetsService(
+  db,
+  newAssetsAddedQueue,
+  drizzleDb
+);
 const manufacturersService = new ManufacturersService(
   db,
   cacheControlService,

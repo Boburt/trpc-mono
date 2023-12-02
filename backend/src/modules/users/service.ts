@@ -24,11 +24,15 @@ import {
 import { TRPCError } from "@trpc/server";
 import { CacheControlService } from "../cache_control/service";
 import { DB } from "@backend/db";
+import { InferSelectModel, getTableColumns, sql } from "drizzle-orm";
+import { users } from "@backend/../drizzle/schema";
+import { DrizzleDB } from "@backend/lib/db";
 
 export class UsersService {
   constructor(
     private readonly prisma: DB,
-    private readonly cacheController: CacheControlService
+    private readonly cacheController: CacheControlService,
+    private readonly drizzle: DrizzleDB
   ) {}
 
   async create(input: Prisma.UsersCreateArgs): Promise<usersSchema> {
@@ -42,27 +46,58 @@ export class UsersService {
 
   async findMany(
     input: z.infer<typeof UsersFindManyArgsSchema>
-  ): Promise<PaginationType<Omit<usersSchema, "password">>> {
+  ): Promise<PaginationType<Omit<InferSelectModel<typeof users>, "password">>> {
+    // ): Promise<PaginationType<Omit<usersSchema, "password">>> {
     let take = input.take ?? 20;
-    let skip = !input.skip ? 1 : Math.round(input.skip / take);
-    if (input.skip && input.skip > 0) {
-      skip++;
-    }
+    let skip = input.skip ?? 0;
+    // let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    // if (input.skip && input.skip > 0) {
+    //   skip++;
+    // }
+
     delete input.take;
     delete input.skip;
-    const [users, meta] = await this.prisma.users.paginate(input).withPages({
-      limit: take,
-      page: skip,
-      includePageCount: true,
-    });
+
+    const { password, ...rest } = getTableColumns(users);
+
+    const usersCount = await this.drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(users)
+      .execute();
+
+    const usersList = await this.drizzle
+      .select({ ...rest })
+      .from(users)
+      .limit(take)
+      .offset(skip);
+
+    const isLastPage = skip + take >= +usersCount[0].count;
+    const paginationMeta = {
+      isFirstPage: skip === 0,
+      isLastPage,
+      currentPage: skip == 0 ? 1 : skip / take + 1,
+      previousPage: skip == 0 ? 0 : skip / take,
+      nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
+      pageCount: Math.ceil(+usersCount[0].count / take),
+      totalCount: +usersCount[0].count,
+    };
+
+    // const [users, meta] = await this.prisma.users.paginate(input).withPages({
+    //   limit: take,
+    //   page: skip,
+    //   includePageCount: true,
+    // });
+
     return {
-      items: users.map((user) => {
-        return this.exclude(user, ["password"]) as Omit<
-          usersSchema,
-          "password"
-        >;
-      }),
-      meta,
+      items: usersList,
+      meta: paginationMeta,
+      // items: users.map((user) => {
+      //   return this.exclude(user, ["password"]) as Omit<
+      //     usersSchema,
+      //     "password"
+      //   >;
+      // }),
+      // meta,
     };
   }
 

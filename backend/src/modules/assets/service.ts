@@ -6,9 +6,16 @@ import { DB } from "@backend/db";
 import { Queue } from "bullmq";
 import { Assets, AssetsFindManyArgsSchema } from "@backend/lib/zod";
 import { PaginationType } from "@backend/lib/pagination_interface";
+import { DrizzleDB } from "@backend/lib/db";
+import { assets } from "@backend/../drizzle/schema";
+import { InferSelectModel, sql } from "drizzle-orm";
 
 export class AssetsService {
-  constructor(private readonly prisma: DB, private readonly queue: Queue) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly queue: Queue,
+    private readonly drizzle: DrizzleDB
+  ) {}
 
   async addAsset({
     model,
@@ -86,23 +93,48 @@ export class AssetsService {
 
   async listAssets(
     input: Zod.infer<typeof AssetsFindManyArgsSchema>
-  ): Promise<PaginationType<Assets>> {
+    //): Promise<PaginationType<Assets>> {
+  ): Promise<PaginationType<InferSelectModel<typeof assets>>> {
     let take = input.take ?? 20;
-    let skip = !input.skip ? 1 : Math.round(input.skip / take);
-    if (input.skip && input.skip > 0) {
-      skip++;
-    }
+    let skip = input.skip ?? 0;
+    // let skip = !input.skip ? 1 : Math.round(input.skip / take);
+    // if (input.skip && input.skip > 0) {
+    //   skip++;
+    // }
     delete input.take;
     delete input.skip;
-    const [assets, meta] = await this.prisma.assets.paginate(input).withPages({
-      limit: take,
-      page: skip,
-      includePageCount: true,
-    });
+
+    const assetsCount = await this.drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(assets)
+      .execute();
+
+    const assetsList = await this.drizzle
+      .select()
+      .from(assets)
+      .limit(take)
+      .offset(skip);
+
+    const isLastPage = skip + take >= +assetsCount[0].count;
+    const paginationMeta = {
+      isFirstPage: skip === 0,
+      isLastPage,
+      currentPage: skip == 0 ? 1 : skip / take + 1,
+      previousPage: skip == 0 ? 0 : skip / take,
+      nextPage: skip == 0 ? 2 : isLastPage ? skip / take + 1 : skip / take + 2,
+      pageCount: Math.ceil(+assetsCount[0].count / take),
+      totalCount: +assetsCount[0].count,
+    };
+
+    // const [assets, meta] = await this.prisma.assets.paginate(input).withPages({
+    //   limit: take,
+    //   page: skip,
+    //   includePageCount: true,
+    // });
 
     return {
-      items: assets,
-      meta,
+      items: assetsList,
+      meta: paginationMeta,
     };
   }
 }
