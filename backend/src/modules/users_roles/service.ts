@@ -7,10 +7,16 @@ import {
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { createManyRolesForUserSchema } from "@backend/lib/custom_zod_objects/createManyRolesForUser";
-import { DB } from "@backend/db";
+import { DB, db } from "@backend/db";
+import { DrizzleDB } from "@backend/lib/db";
+import { users_roles } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
 export class UsersRolesService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly drizzle: DrizzleDB
+  ) {}
 
   async create(input: Prisma.Users_rolesCreateArgs): Promise<Users_roles> {
     return await this.prisma.users_roles.create(input);
@@ -19,13 +25,24 @@ export class UsersRolesService {
   async findMany(
     input: z.infer<typeof Users_rolesFindManyArgsSchema>
   ): Promise<Users_rolesWithRelations[]> {
-    const users_roles = await this.prisma.users_roles.findMany({
-      ...input,
-      include: {
-        roles: true,
-      },
-    });
-    return users_roles as Users_rolesWithRelations[];
+    const users_rolesList = await this.drizzle
+      .select()
+      .from(users_roles)
+      .execute();
+
+    // const users_roles = await this.drizzle.users_roles.findMany({
+    //   ...input,
+    //   include: {
+    //     roles: true,
+    //   },
+
+    // const users_roles = await this.prisma.users_roles.findMany({
+    //   ...input,
+    //   include: {
+    //     roles: true,
+    //   },
+    // });
+    return users_rolesList as Users_rolesWithRelations[];
   }
 
   async findOne(

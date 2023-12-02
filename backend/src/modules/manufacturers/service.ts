@@ -67,6 +67,7 @@ export class ManufacturersService {
     delete input.take;
     delete input.skip;
     delete input.imageSizes;
+    
     const [permissions, meta] = (await this.prisma.manufacturers
       .paginate(input)
       .withPages({

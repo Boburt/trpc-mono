@@ -8,9 +8,15 @@ import {
 import { z } from "zod";
 import { createManyPermissionsForOneUser } from "@backend/lib/custom_zod_objects/createManyPermissionsForOneUser";
 import { DB } from "@backend/db";
+import { DrizzleDB } from "@backend/lib/db";
+import { InferSelectModel, sql } from "drizzle-orm";
+import { users_permissions } from "@backend/../drizzle/schema";
 
 export class UsersPermissionsService {
-  constructor(private readonly prisma: DB) {}
+  constructor(
+    private readonly prisma: DB,
+    private readonly drizzle: DrizzleDB
+  ) {}
 
   async create(
     input: Prisma.Users_permissionsCreateArgs
@@ -21,13 +27,25 @@ export class UsersPermissionsService {
   async findMany(
     input: z.infer<typeof Users_permissionsFindManyArgsSchema>
   ): Promise<Users_permissionsWithRelations[]> {
-    const users_permissions = await this.prisma.users_permissions.findMany({
-      ...input,
-      include: {
-        permissions: true,
-      },
-    });
-    return users_permissions as Users_permissionsWithRelations[];
+    const users_permissionsList = await this.drizzle
+      .select()
+      .from(users_permissions)
+      .execute();
+
+    // const users_permissions = await this.drizzle.query.users_permissions.findMany({
+    //   ...input,
+    //   with: {
+    //     permissions: true,
+    //   },
+
+    //   // const users_permissions = await this.prisma.users_permissions.findMany({
+    //   //   ...input,
+    //   //   include: {
+    //   //     permissions: true,
+    //   //   },
+    // });
+
+    return users_permissionsList as Users_permissionsWithRelations[];
   }
 
   async findOne(
@@ -36,6 +54,7 @@ export class UsersPermissionsService {
     const users_permissions = await this.prisma.users_permissions.findUnique(
       input
     );
+
     return users_permissions;
   }
 
