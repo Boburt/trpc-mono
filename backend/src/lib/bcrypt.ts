@@ -1,5 +1,7 @@
 import { randomBytes, pbkdf2, createHash } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
+import { JwtPayload } from "./jwt-payload.dto";
+import { TokenDto } from "@backend/modules/users/dto/users.dto";
 async function hashPassword(
   password: string
 ): Promise<{ hash: string; salt: string }> {
@@ -58,4 +60,20 @@ async function verifyJwt(token: string) {
   });
 }
 
-export { hashPassword, comparePassword, md5hash, signJwt, verifyJwt };
+
+async function generateAuthToken(payload: JwtPayload): Promise<TokenDto> {
+  const accessTokenExpires = process.env.ACCESS_TOKEN_EXPIRES_IN!;
+  const refreshTokenExpires = process.env.REFRESH_TOKEN_EXPIRES_IN!;
+  const tokenType = process.env.TOKEN_TYPE!;
+  const accessToken = await signJwt(payload, accessTokenExpires);
+  const refreshToken = await signJwt(payload, refreshTokenExpires);
+
+  return {
+    tokenType,
+    accessToken,
+    accessTokenExpires,
+    refreshToken,
+  };
+}
+
+export { hashPassword, comparePassword, md5hash, signJwt, verifyJwt, generateAuthToken };

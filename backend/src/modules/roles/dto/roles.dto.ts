@@ -20,3 +20,14 @@ export const rolesFindManyZod = paginatedZodObj.extend({
     })
     .optional(),
 });
+
+
+import { PermissionResponseDto } from "@backend/modules/permissions/dto/permissions.dto";
+
+export interface RoleResponseDto {
+  name: string;
+
+  permissions: PermissionResponseDto[];
+
+  active: boolean;
+}
