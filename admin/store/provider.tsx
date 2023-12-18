@@ -1,11 +1,11 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { trpc } from "@admin/utils/trpc";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { httpBatchLink } from "@trpc/client";
 import { useSession } from "next-auth/react";
 import { getCookie } from "cookies-next";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 function useToken() {
   const { data: sessionData } = useSession();
@@ -37,34 +37,11 @@ function useContextualQueryClient() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const token = useToken();
   const queryClient = useContextualQueryClient();
-
-  const trpcClient = useMemo(() => {
-    return trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: `${process.env.TRPC_API_URL}/trpc`, // you should update this to use env variables
-          headers() {
-            if (!token) return {};
-            return {
-              Authorization: `Bearer ${token}`,
-            };
-          },
-        }),
-      ],
-    });
-  }, [token]);
+  console.log("queryClient", queryClient.client);
   return (
-    <trpc.Provider
-      client={trpcClient}
-      /** @ts-ignore */
-      queryClient={queryClient.client}
-      key={queryClient.key}
-    >
-      <QueryClientProvider client={queryClient.client}>
-        {children}
-      </QueryClientProvider>
-    </trpc.Provider>
+    <QueryClientProvider client={queryClient.client}>
+      {children}
+    </QueryClientProvider>
   );
 }

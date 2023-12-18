@@ -1,7 +1,23 @@
+import { apiClient } from "@admin/utils/eden";
 import { trpc, ReactQueryOptions } from "@admin/utils/trpc";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "../get-token";
 
 export function usePermissionsQuery(filter: any) {
-  return trpc.permissions.list.useQuery(filter);
+  const token = useToken();
+  return useQuery({
+    enabled: !!token,
+    queryKey: ["permissions", filter],
+    queryFn: async () => {
+      const { data } = await apiClient.api.permissions.get(filter, {
+        query: filter,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
+  });
 }
 
 export function usePermissionsCreate(

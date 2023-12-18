@@ -29,10 +29,13 @@ import {
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { permissions } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof PermissionsCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof permissions>>({
   defaultValues: {
     active: true,
     slug: "",
@@ -47,6 +50,7 @@ export default function PermissionsForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`Permission ${actionText}`);
     // form.reset();
@@ -57,21 +61,33 @@ export default function PermissionsForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createPermission,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = usePermissionsCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof permissions>) => {
+      return apiClient.api.permissions.post({
+        data: newTodo,
+        fields: ["id", "slug", "description", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updatePermission,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = usePermissionsUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof permissions>;
+      id: string;
+    }) => {
+      return apiClient.api.permissions[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "slug", "description", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -79,34 +95,40 @@ export default function PermissionsForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updatePermission({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createPermission({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.permissions.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId,
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["permissions", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.permissions[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
       }
-    );
+    },
+    enabled: !!recordId && !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("active", record.active);
-      form.setFieldValue("slug", record.slug);
-      form.setFieldValue("description", record.description);
+    if (record?.data && "id" in record.data) {
+      form.setFieldValue("active", record.data.active);
+      form.setFieldValue("slug", record.data.slug);
+      form.setFieldValue("description", record.data.description);
     }
-  }, [record]);
+  }, [record?.data]);
 
   return (
     <form.Provider>
