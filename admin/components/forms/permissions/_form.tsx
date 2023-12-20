@@ -103,7 +103,7 @@ export default function PermissionsForm({
   });
 
   const { data: record, isLoading: isRecordLoading } = useQuery({
-    queryKey: ["permissions", recordId],
+    queryKey: ["one_permission", recordId],
     queryFn: () => {
       if (recordId) {
         return apiClient.api.permissions[recordId].get({

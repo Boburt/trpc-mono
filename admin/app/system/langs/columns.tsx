@@ -7,10 +7,10 @@ import LangsFormSheet from "@admin/components/forms/langs/sheet";
 import DeleteAction from "./delete-action";
 import { Switch } from "@components/ui/switch";
 import CanAccess from "@admin/components/can-access";
+import { InferSelectModel } from "drizzle-orm";
+import { langs } from "backend/drizzle/schema";
 
-export const langsColumns: ColumnDef<
-  RouterOutputs["langs"]["list"]["items"][0]
->[] = [
+export const langsColumns: ColumnDef<InferSelectModel<typeof langs>>[] = [
   {
     accessorKey: "is_default",
     header: "По умолчанию",

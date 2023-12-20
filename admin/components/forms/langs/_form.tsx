@@ -11,8 +11,13 @@ import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { langs } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<z.infer<typeof LangsCreateInputSchema>>({
+const formFactory = createFormFactory<InferInsertModel<typeof langs>>({
   defaultValues: {
     name: "",
     code: "",
@@ -27,6 +32,7 @@ export default function LangsForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`Langs ${actionText}`);
     // form.reset();
@@ -37,21 +43,33 @@ export default function LangsForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createLang,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useLangsCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof langs>) => {
+      return apiClient.api.langs.post({
+        data: newTodo,
+        fields: ["id", "name", "code", "is_default"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateLang,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useLangsUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof langs>;
+      id: string;
+    }) => {
+      return apiClient.api.langs[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "name", "code", "is_default"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -59,31 +77,38 @@ export default function LangsForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateLang({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createLang({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } = trpc.langs.one.useQuery(
-    {
-      where: { id: recordId },
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_lang", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.langs[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
+      }
     },
-    {
-      enabled: !!recordId,
-    }
-  );
+    enabled: !!recordId && !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("is_default", record.is_default);
-      form.setFieldValue("code", record.code);
-      form.setFieldValue("name", record.name);
+    if (record?.data && "id" in record.data) {
+      form.setFieldValue("is_default", record.data.is_default);
+      form.setFieldValue("code", record.data.code);
+      form.setFieldValue("name", record.data.name);
     }
   }, [record]);
 

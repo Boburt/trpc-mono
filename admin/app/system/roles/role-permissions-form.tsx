@@ -28,16 +28,22 @@ import {
   TableRow,
 } from "@components/ui/table";
 import { useRolePermissionStore } from "@admin/store/states/role_permissions";
-import { useCreateManyRolePermissions } from "@admin/store/apis/role_permissions";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { toast } from "sonner";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { permissions } from "backend/drizzle/schema";
+import { InferInsertModel } from "drizzle-orm";
 
 export default function RolePermissionsForm({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const token = useToken();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState<boolean>(false);
   const roleSelection = useRolesStore((state) => state.selectedRows);
   const rowSelection = useRolePermissionStore((state) => state.selectedRows);
@@ -52,43 +58,91 @@ export default function RolePermissionsForm({
 
   const [
     { data: selectedPermissions, isLoading: selectedPermissionsLoading },
-    { data: permissions, isLoading: permissionsLoading },
-  ] = trpc.useQueries((t) => [
-    t.rolesPermissions.list(
+    { data: permissionsList, isLoading: permissionsLoading },
+  ] = useQueries({
+    queries: [
       {
-        where: {
-          role_id: {
-            equals: selectedRoleId,
+        enabled: !!token && Object.keys(roleSelection).length > 0 && open,
+        queryKey: [
+          "roles_permissions_form",
+          {
+            limit: 1000,
+            offset: 0,
+            open,
+            fields:
+              "id,role_id,permission_id,permissions.id,permissions.description,permissions.slug",
           },
-        },
-        take: 1000,
-        orderBy: {
-          permissions: {
-            slug: "asc",
-          },
+        ],
+        queryFn: async () => {
+          const { data } = await apiClient.api.roles_permissions.get({
+            $query: {
+              limit: "1000",
+              offset: "0",
+              fields:
+                "id,role_id,permission_id,permissions.id,permissions.description,permissions.slug",
+              filters: JSON.stringify([
+                {
+                  field: "role_id",
+                  operator: "=",
+                  value: selectedRoleId,
+                },
+              ]),
+            },
+            $headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return data;
         },
       },
       {
-        enabled: Object.keys(roleSelection).length > 0 && open,
-      }
-    ),
-    t.permissions.list(
-      {
-        take: 1000,
+        enabled: !!token,
+        queryKey: [
+          "permissions",
+          {
+            limit: "1000",
+            offset: "0",
+            fields: "id,slug,description,active",
+          },
+        ],
+        queryFn: async () => {
+          const { data } = await apiClient.api.permissions.get({
+            $query: {
+              limit: "1000",
+              offset: "0",
+              fields: "id,slug,description,active",
+            },
+            $headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return data;
+        },
       },
-      {
-        enabled: open,
-      }
-    ),
-  ]);
+    ],
+  });
 
-  const {
-    mutateAsync: assignPermissions,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useCreateManyRolePermissions({
+  const createMutation = useMutation({
+    mutationFn: ({
+      role_id,
+      permissions_ids,
+    }: {
+      role_id: string;
+      permissions_ids: string[];
+    }) => {
+      return apiClient.api.roles_permissions.assign_permissions.post({
+        role_id,
+        permissions_ids,
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => {
+      console.log("assign success");
+      queryClient.invalidateQueries({
+        queryKey: ["roles_permissions"],
+      });
       toast.success(`Role permissions added`);
       setSelectedRows({});
       setOpen(false);
@@ -102,15 +156,19 @@ export default function RolePermissionsForm({
   const defaultData = useMemo(() => [], []);
 
   const isSaveLoading = useMemo(() => {
-    return isLoading || isAddLoading || Object.keys(rowSelection).length === 0;
-  }, [isAddLoading, isLoading, rowSelection]);
+    return (
+      isLoading ||
+      createMutation.isPending ||
+      Object.keys(rowSelection).length === 0
+    );
+  }, [createMutation.isPending, isLoading, rowSelection]);
 
   const selectedRowsIds = useMemo(() => {
     return Object.keys(rowSelection);
   }, [rowSelection]);
 
   const table = useReactTable({
-    data: permissions?.items ?? defaultData,
+    data: permissionsList?.data ?? defaultData,
     columns: linkedRolesPermissionsColumns,
     state: {
       rowSelection,
@@ -133,11 +191,11 @@ export default function RolePermissionsForm({
 
   useEffect(() => {
     if (selectedPermissions) {
-      const selectedRows = selectedPermissions.reduce((acc, item) => {
+      const selectedRows = selectedPermissions?.data?.reduce((acc, item) => {
         acc[item.permission_id] = true;
         return acc;
       }, {} as { [key: string]: boolean });
-      setSelectedRows(selectedRows);
+      if (selectedRows) setSelectedRows(selectedRows);
     }
   }, [selectedPermissions]);
 
@@ -242,7 +300,7 @@ export default function RolePermissionsForm({
               variant="default"
               disabled={isSaveLoading}
               onClick={() =>
-                assignPermissions({
+                createMutation.mutate({
                   role_id: selectedRoleId,
                   permissions_ids: selectedRowsIds,
                 })

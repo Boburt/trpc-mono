@@ -36,24 +36,49 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { RouterOutputs, trpc } from "@admin/utils/trpc";
+import { seo_links } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["seoLinks"]["list"]["items"][0], TValue>[];
+  columns: ColumnDef<InferSelectModel<typeof seo_links>, TValue>[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading } = trpc.seoLinks.list.useQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token,
+    queryKey: [
+      "seo_links",
+      {
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        fields: "id,title,description,link",
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.seo_links.get({
+        $query: {
+          limit: pageSize.toString(),
+          offset: (pageIndex * pageSize).toString(),
+          fields: "id,title,description,link",
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
   });
-
   const defaultData = useMemo(() => [], []);
 
   const pagination = useMemo(
@@ -65,9 +90,9 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
     },

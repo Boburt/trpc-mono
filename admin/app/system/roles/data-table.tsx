@@ -37,14 +37,20 @@ import {
 } from "@radix-ui/react-icons";
 import { useRolesStore } from "@admin/store/states/roles";
 import { RouterOutputs } from "@admin/utils/trpc";
+import { roles } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["roles"]["list"]["items"][0], TValue>[];
+  columns: ColumnDef<InferSelectModel<typeof roles>, TValue>[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const rowSelection = useRolesStore((state) => state.selectedRows);
   const setRowSelection = useRolesStore((state) => state.toggleSelected);
 
@@ -52,10 +58,29 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
-
-  const { data, isLoading } = useRolesQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token,
+    queryKey: [
+      "roles",
+      {
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        fields: "id,name,code,active",
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.roles.get({
+        $query: {
+          limit: pageSize.toString(),
+          offset: (pageIndex * pageSize).toString(),
+          fields: "id,name,code,active",
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
   });
 
   const defaultData = useMemo(() => [], []);
@@ -69,9 +94,9 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
       rowSelection,

@@ -1,8 +1,28 @@
 import { DeleteButton } from "@components/ui/delete-button";
-import { useImageSizesDestroy } from "@admin/store/apis/image_sizes";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 export default function DeleteAction({ recordId }: { recordId: string }) {
-  const { mutateAsync: deletePermission } = useImageSizesDestroy({});
+  const queryClient = useQueryClient();
+  const token = useToken();
+  const createMutation = useMutation({
+    mutationFn: () => {
+      return apiClient.api.image_sizes[recordId].delete({
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["image_sizes"] });
+    },
+  });
 
-  return <DeleteButton recordId={recordId} deleteRecord={deletePermission} />;
+  return (
+    <DeleteButton
+      recordId={recordId}
+      deleteRecord={() => createMutation.mutate()}
+    />
+  );
 }

@@ -6,10 +6,10 @@ import { RouterOutputs } from "@admin/utils/trpc";
 import DeleteAction from "./delete-action";
 import CanAccess from "@admin/components/can-access";
 import CitiesFormSheet from "@admin/components/forms/cities/sheet";
+import { cities } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-export const citiesColumns: ColumnDef<
-  RouterOutputs["cities"]["list"]["items"][0]
->[] = [
+export const citiesColumns: ColumnDef<InferSelectModel<typeof cities>>[] = [
   {
     accessorKey: "slug",
     header: "Код",

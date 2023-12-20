@@ -6,9 +6,11 @@ import { RouterOutputs } from "@admin/utils/trpc";
 import DeleteAction from "./delete-action";
 import ImageSizesFormSheet from "@admin/components/forms/image_sizes/sheet";
 import CanAccess from "@admin/components/can-access";
+import { image_sizes } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
 export const imageSizesColumns: ColumnDef<
-  RouterOutputs["imageSizes"]["list"]["items"][0]
+  InferSelectModel<typeof image_sizes>
 >[] = [
   {
     accessorKey: "code",
