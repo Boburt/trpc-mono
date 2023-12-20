@@ -24,10 +24,13 @@ import {
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { seo_links } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof SeoLinksCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof seo_links>>({
   defaultValues: {
     link: "",
     title: "",
@@ -42,6 +45,7 @@ export default function PermissionsForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`Permission ${actionText}`);
     // form.reset();
@@ -52,21 +56,33 @@ export default function PermissionsForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createSeoLink,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useSeoLinksCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof seo_links>) => {
+      return apiClient.api.seo_links.post({
+        data: newTodo,
+        fields: ["id", "title", "description", "link"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateSeoLink,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useSeoLinksUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof seo_links>;
+      id: string;
+    }) => {
+      return apiClient.api.seo_links[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "title", "description", "link"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -74,32 +90,38 @@ export default function PermissionsForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateSeoLink({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createSeoLink({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.seoLinks.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId,
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_seo_link", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.seo_links[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
       }
-    );
+    },
+    enabled: !!recordId && !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("link", record.link);
-      form.setFieldValue("title", record.title);
-      form.setFieldValue("description", record.description);
+    if (record?.data && "id" in record?.data) {
+      form.setFieldValue("link", record.data.link);
+      form.setFieldValue("title", record.data.title);
+      form.setFieldValue("description", record.data.description);
     }
   }, [record]);
 

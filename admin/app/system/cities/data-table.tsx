@@ -36,22 +36,48 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { RouterOutputs } from "@admin/utils/trpc";
+import { cities } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["cities"]["list"]["items"][0], TValue>[];
+  columns: ColumnDef<InferSelectModel<typeof cities>, TValue>[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading } = useCitiesQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token,
+    queryKey: [
+      "cities",
+      {
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        fields: "id,name,slug,description",
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.cities.get({
+        $query: {
+          limit: pageSize.toString(),
+          offset: (pageIndex * pageSize).toString(),
+          fields: "id,name,slug,description",
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
   });
 
   const defaultData = useMemo(() => [], []);
@@ -65,9 +91,9 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
     },

@@ -7,9 +7,11 @@ import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 import CategoriesFormSheet from "@admin/components/forms/categories/sheet";
 import CanAccess from "@admin/components/can-access";
+import { categories } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
 export const categoriesColumns: ColumnDef<
-  RouterOutputs["categories"]["list"]["items"][0]
+  InferSelectModel<typeof categories>
 >[] = [
   {
     accessorKey: "active",

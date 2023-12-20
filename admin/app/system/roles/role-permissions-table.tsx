@@ -19,37 +19,64 @@ import {
 import { useMemo } from "react";
 import { useRolesStore } from "@admin/store/states/roles";
 import { RouterOutputs, trpc } from "@admin/utils/trpc";
+import { RolesPermissionsRelation } from "@backend/modules/roles_permissions/dto/roles_permissions.dto";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["rolesPermissions"]["list"][0], TValue>[];
+  columns: ColumnDef<RolesPermissionsRelation, TValue>[];
 }
 
 export function RolesPermissionsDataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const rowSelection = useRolesStore((state) => state.selectedRows);
 
   const selectedRoleId = useMemo(() => {
     return Object.keys(rowSelection)[0];
   }, [rowSelection]);
 
-  const { data, isLoading } = trpc.rolesPermissions.list.useQuery(
-    {
-      where: {
-        role_id: {
-          equals: selectedRoleId,
-        },
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token && Object.keys(rowSelection).length > 0,
+    queryKey: [
+      "roles_permissions",
+      {
+        limit: 1000,
+        offset: 0,
+        selectedRoleId,
+        fields:
+          "id,role_id,permission_id,permissions.id,permissions.description,permissions.slug",
       },
-      take: 1000,
+    ],
+    queryFn: async () => {
+      console.log("fetching");
+      const { data } = await apiClient.api.roles_permissions.get({
+        $query: {
+          limit: "1000",
+          offset: "0",
+          fields:
+            "id,role_id,permission_id,permissions.id,permissions.description,permissions.slug",
+          filters: JSON.stringify([
+            {
+              field: "role_id",
+              operator: "=",
+              value: selectedRoleId,
+            },
+          ]),
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
-    {
-      enabled: Object.keys(rowSelection).length > 0,
-    }
-  );
+  });
 
   const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: data ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
     // onRowSelectionChange: function (stateUpdater) {
     //   console.log(arguments);

@@ -22,10 +22,13 @@ import {
 import { useCachedLangsQuery } from "@admin/store/apis/langs";
 import { Textarea } from "@admin/components/ui/textarea";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { categories } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof CategoriesCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof categories>>({
   defaultValues: {
     active: true,
     name: "",
@@ -41,15 +44,7 @@ export default function CategoriesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  // const form = useForm<z.infer<typeof PermissionsCreateInputSchema>>({
-  //   resolver: zodResolver(PermissionsCreateInputSchema),
-  //   defaultValues: {
-  //     active: true,
-  //     slug: "",
-  //     description: "",
-  //   },
-  // });
-
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`Category ${actionText}`);
     // form.reset();
@@ -60,21 +55,33 @@ export default function CategoriesForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createCategory,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useCategoriesCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof categories>) => {
+      return apiClient.api.categories.post({
+        data: newTodo,
+        fields: ["id", "name", "code", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateCategory,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useCategoriesUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof categories>;
+      id: string;
+    }) => {
+      return apiClient.api.categories[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "name", "code", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -82,37 +89,58 @@ export default function CategoriesForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateCategory({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createCategory({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.categories.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId,
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_category", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.categories[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
       }
-    );
+    },
+    enabled: !!recordId && !!token,
+  });
 
-  const { data: langs, isLoading: isLangsLoading } = useCachedLangsQuery({});
+  const { data: langs, isLoading: isLangsLoading } = useQuery({
+    queryKey: ["cached_langs"],
+    queryFn: async () => {
+      const { data } = await apiClient.api.langs.cached.get({
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return data;
+    },
+    enabled: !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("active", record.active);
-      form.setFieldValue("code", record.code);
-      form.setFieldValue("name", record.name);
-      form.setFieldValue("i18n_name", record.i18n_name ?? {});
-      form.setFieldValue("description", record.description);
-      form.setFieldValue("i18n_description", record.i18n_description ?? {});
+    if (record?.data && "id" in record?.data) {
+      form.setFieldValue("active", record.data.active);
+      form.setFieldValue("code", record.data.code);
+      form.setFieldValue("name", record.data.name);
+      form.setFieldValue("i18n_name", record.data.i18n_name ?? {});
+      form.setFieldValue("description", record.data.description);
+      form.setFieldValue(
+        "i18n_description",
+        record.data.i18n_description ?? {}
+      );
     }
   }, [record]);
 

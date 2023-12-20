@@ -15,8 +15,13 @@ import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@admin/components/ui/textarea";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { cities } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<z.infer<typeof CitiesCreateInputSchema>>({
+const formFactory = createFormFactory<InferInsertModel<typeof cities>>({
   defaultValues: {
     name: "",
     slug: "",
@@ -31,6 +36,7 @@ export default function CitiesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`City ${actionText}`);
     // form.reset();
@@ -41,21 +47,33 @@ export default function CitiesForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createCity,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useCitiesCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof cities>) => {
+      return apiClient.api.cities.post({
+        data: newTodo,
+        fields: ["id", "slug", "description"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateCity,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useCitiesUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof cities>;
+      id: string;
+    }) => {
+      return apiClient.api.cities[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "slug", "description"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -63,31 +81,38 @@ export default function CitiesForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateCity({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createCity({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } = trpc.cities.one.useQuery(
-    {
-      where: { id: recordId },
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_city", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.cities[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
+      }
     },
-    {
-      enabled: !!recordId,
-    }
-  );
+    enabled: !!recordId && !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("description", record.description);
-      form.setFieldValue("slug", record.slug);
-      form.setFieldValue("name", record.name);
+    if (record?.data && "id" in record?.data) {
+      form.setFieldValue("description", record.data.description);
+      form.setFieldValue("slug", record.data.slug);
+      form.setFieldValue("name", record.data.name);
     }
   }, [record]);
 

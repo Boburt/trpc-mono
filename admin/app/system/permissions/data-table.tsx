@@ -20,7 +20,6 @@ import {
 
 import { Button } from "@components/ui/button";
 
-import { usePermissionsQuery } from "@admin/store/apis/permission";
 import { useMemo, useState } from "react";
 import {
   Select,
@@ -66,7 +65,6 @@ export function DataTable<TData, TValue>({
       },
     ],
     queryFn: async () => {
-      console.log("fetching");
       const { data } = await apiClient.api.permissions.get({
         $query: {
           limit: pageSize.toString(),
@@ -81,8 +79,6 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  console.log("permissions", data);
-
   const defaultData = useMemo(() => [], []);
 
   const pagination = useMemo(
@@ -96,7 +92,7 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.total ? Math.round(data!.total! / pageSize) : -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
     },

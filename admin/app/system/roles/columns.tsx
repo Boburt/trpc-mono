@@ -7,10 +7,10 @@ import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 import RolesFormSheet from "@admin/components/forms/roles/sheet";
 import CanAccess from "@admin/components/can-access";
+import { roles } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-export const rolesColumns: ColumnDef<
-  RouterOutputs["roles"]["list"]["items"][0]
->[] = [
+export const rolesColumns: ColumnDef<InferSelectModel<typeof roles>>[] = [
   {
     accessorKey: "active",
     header: "Активен",

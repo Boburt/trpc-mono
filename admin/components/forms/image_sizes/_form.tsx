@@ -14,10 +14,13 @@ import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { image_sizes } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof ImageSizesCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof image_sizes>>({
   defaultValues: {
     code: "",
     width: 500,
@@ -32,6 +35,7 @@ export default function ImageSizesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const onAddSuccess = (actionText: string) => {
     toast.success(`Image Sizes ${actionText}`);
     // form.reset();
@@ -42,21 +46,33 @@ export default function ImageSizesForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createImageSizes,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useImageSizesCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof image_sizes>) => {
+      return apiClient.api.image_sizes.post({
+        data: newTodo,
+        fields: ["id", "code", "width", "height"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateImageSizes,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useImageSizesUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof image_sizes>;
+      id: string;
+    }) => {
+      return apiClient.api.image_sizes[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "code", "width", "height"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -72,32 +88,38 @@ export default function ImageSizesForm({
       }
 
       if (recordId) {
-        updateImageSizes({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createImageSizes({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.imageSizes.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId,
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_image_size", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.image_sizes[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
       }
-    );
+    },
+    enabled: !!recordId && !!token,
+  });
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("code", record.code);
-      form.setFieldValue("width", record.width);
-      form.setFieldValue("height", record.height);
+    if (record?.data && "id" in record?.data) {
+      form.setFieldValue("code", record.data.code);
+      form.setFieldValue("width", record.data.width);
+      form.setFieldValue("height", record.data.height);
     }
   }, [record]);
 
