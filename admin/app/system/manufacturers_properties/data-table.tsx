@@ -37,10 +37,15 @@ import {
 } from "@radix-ui/react-icons";
 import { useManufacturersPropertiesCategoriesStore } from "@admin/store/states/manufacturersPropertiesCategories";
 import { RouterOutputs } from "@admin/utils/trpc";
+import { manufacturers_properties_categories } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<
-    RouterOutputs["manufacturersPropertiesCategories"]["list"]["items"][0],
+    InferSelectModel<typeof manufacturers_properties_categories>,
     TValue
   >[];
 }
@@ -48,6 +53,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const rowSelection = useManufacturersPropertiesCategoriesStore(
     (state) => state.selectedRows
   );
@@ -60,11 +66,31 @@ export function DataTable<TData, TValue>({
     pageSize: 10,
   });
 
-  const { data, isLoading } = useManufacturersPropertiesCategoriesQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token,
+    queryKey: [
+      "manufacturers_properties_categories",
+      {
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        fields: "id,name,code",
+      },
+    ],
+    queryFn: async () => {
+      const { data } =
+        await apiClient.api.manufacturers_properties_categories.get({
+          $query: {
+            limit: pageSize.toString(),
+            offset: (pageIndex * pageSize).toString(),
+            fields: "id,name,code",
+          },
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      return data;
+    },
   });
-
   const defaultData = useMemo(() => [], []);
 
   const pagination = useMemo(
@@ -76,9 +102,9 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
       rowSelection,

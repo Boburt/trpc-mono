@@ -4,16 +4,14 @@ import { RouterOutputs } from "@admin/utils/trpc";
 import { Button } from "@admin/components/ui/button";
 import { Edit2Icon } from "lucide-react";
 import ManufacturersPropertiesForm from "./manufacturers-properties-form";
+import { manufacturers_properties } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
 export const manufacturersPropertiesColumns: ColumnDef<
-  RouterOutputs["manufacturersProperties"]["list"]["items"][0]
+  InferSelectModel<typeof manufacturers_properties>
 >[] = [
   {
     accessorKey: "name",
-    cell: ({ row }) => {
-      const record = row.original;
-      return record.name;
-    },
     header: "Заголовок",
   },
   {
@@ -35,18 +33,5 @@ export const manufacturersPropertiesColumns: ColumnDef<
         </div>
       );
     },
-  },
-];
-
-export const linkedRolesPermissionsColumns: ColumnDef<
-  RouterOutputs["permissions"]["list"]["items"][0]
->[] = [
-  {
-    accessorKey: "name",
-    cell: ({ row }) => {
-      const record = row.original;
-      return record.description;
-    },
-    header: "Заголовок",
   },
 ];

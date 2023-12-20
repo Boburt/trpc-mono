@@ -23,12 +23,19 @@ import {
   SelectItem,
 } from "@components/ui/select";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { users } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<z.infer<typeof UsersCreateInputSchema>>({
+const formFactory = createFormFactory<InferInsertModel<typeof users>>({
   defaultValues: {
     status: "active",
     login: "",
     password: "",
+    first_name: "",
+    last_name: "",
   },
 });
 
@@ -39,6 +46,7 @@ export default function UsersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const [changedRoleId, setChangedRoleId] = useState<string | null>(null);
 
   const closeForm = () => {
@@ -55,21 +63,47 @@ export default function UsersForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createUser,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useUsersCreate({
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof users>) => {
+      return apiClient.api.users.post({
+        data: newTodo,
+        fields: [
+          "id",
+          "status",
+          "login",
+          "password",
+          "first_name",
+          "last_name",
+        ],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: (data) => onAddSuccess("added", data),
     onError,
   });
 
-  const {
-    mutateAsync: updateUser,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useUsersUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof users>;
+      id: string;
+    }) => {
+      return apiClient.api.users[newTodo.id].put({
+        data: newTodo.data,
+        fields: [
+          "id",
+          "status",
+          "login",
+          "password",
+          "first_name",
+          "last_name",
+        ],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: (data) => onAddSuccess("updated", data),
     onError,
   });
@@ -82,9 +116,9 @@ export default function UsersForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateUser({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createUser({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
@@ -93,32 +127,70 @@ export default function UsersForm({
     { data: record, isLoading: isRecordLoading },
     { data: rolesData, isLoading: isRolesLoading },
     { data: userRolesData, isLoading: isUserRolesLoading },
-  ] = trpc.useQueries((t) => [
-    t.users.one(
+  ] = useQueries({
+    queries: [
       {
-        where: { id: recordId },
+        queryKey: ["one_user", recordId],
+        queryFn: () => {
+          if (recordId) {
+            return apiClient.api.users[recordId].get({
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          } else {
+            return null;
+          }
+        },
+        enabled: !!recordId && !!token,
       },
       {
-        enabled: !!recordId,
-      }
-    ),
-    t.roles.list({}),
-    t.usersRoles.list(
-      {
-        where: {
-          user_id: {
-            equals: recordId,
-          },
+        enabled: !!token,
+        queryKey: ["roles_cached"],
+        queryFn: async () => {
+          const { data } = await apiClient.api.roles.cached.get({
+            $headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return data;
         },
       },
       {
-        enabled: !!recordId,
-      }
-    ),
-  ]);
+        enabled: !!recordId && !!token,
+        queryKey: ["users_roles", recordId],
+        queryFn: () => {
+          if (recordId) {
+            return apiClient.api.users_roles.get({
+              $query: {
+                limit: "30",
+                offset: "0",
+                filters: JSON.stringify([
+                  {
+                    field: "user_id",
+                    operator: "=",
+                    value: recordId,
+                  },
+                ]),
+              },
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          } else {
+            return null;
+          }
+        },
+      },
+    ],
+  });
 
   const userRoleId = useMemo(() => {
-    return userRolesData?.[0].role_id;
+    if (userRolesData && userRolesData.data) {
+      return userRolesData.data[0].role_id;
+    } else {
+      return null;
+    }
   }, [userRolesData]);
 
   const assignRole = useCallback(
@@ -139,8 +211,10 @@ export default function UsersForm({
   );
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading || isRolesLoading;
-  }, [isAddLoading, isUpdateLoading, isRolesLoading]);
+    return (
+      createMutation.isPending || updateMutation.isPending || isRolesLoading
+    );
+  }, [createMutation.isPending, updateMutation.isPending, isRolesLoading]);
 
   useEffect(() => {
     if (record) {

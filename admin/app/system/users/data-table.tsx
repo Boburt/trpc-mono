@@ -36,22 +36,48 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { RouterOutputs } from "@admin/utils/trpc";
+import { users } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<RouterOutputs["users"]["list"]["items"][0], TValue>[];
+  columns: ColumnDef<InferSelectModel<typeof users>, TValue>[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading } = useUsersQuery({
-    take: pageSize,
-    skip: pageIndex * pageSize,
+  const { data, isLoading } = useQuery({
+    enabled: !!token,
+    queryKey: [
+      "users",
+      {
+        limit: pageSize,
+        offset: pageIndex * pageSize,
+        fields: "id,login,status,first_name,last_name",
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.users.get({
+        $query: {
+          limit: pageSize.toString(),
+          offset: (pageIndex * pageSize).toString(),
+          fields: "id,login,status,first_name,last_name",
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
   });
 
   const defaultData = useMemo(() => [], []);
@@ -65,9 +91,9 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    pageCount: data?.meta?.pageCount ?? -1,
+    pageCount: data?.total ? Math.ceil(data!.total! / pageSize) : -1,
     state: {
       pagination,
     },

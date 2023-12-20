@@ -5,10 +5,10 @@ import { Button } from "@components/ui/button";
 import UsersFormSheet from "@components/forms/users/sheet";
 import { RouterOutputs } from "@admin/utils/trpc";
 import { Badge } from "@components/ui/badge";
+import { users } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-export const usersColumns: ColumnDef<
-  RouterOutputs["users"]["list"]["items"][0]
->[] = [
+export const usersColumns: ColumnDef<InferSelectModel<typeof users>>[] = [
   {
     accessorKey: "status",
     header: "Статус",

@@ -15,58 +15,37 @@ export const roles = pgTable("roles", {
 	active: boolean("active").default(true).notNull(),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 },
-(table) => {
-	return {
-		UQ_648e3f5447f725579d7d4ffdfb7: uniqueIndex("UQ_648e3f5447f725579d7d4ffdfb7").on(table.name),
-		UQ_0e2c0e1b4b0b0b0b0b0b0b0b0b0: uniqueIndex("UQ_0e2c0e1b4b0b0b0b0b0b0b0b0b0").on(table.code),
-	}
-});
+	(table) => {
+		return {
+			UQ_648e3f5447f725579d7d4ffdfb7: uniqueIndex("UQ_648e3f5447f725579d7d4ffdfb7").on(table.name),
+			UQ_0e2c0e1b4b0b0b0b0b0b0b0b0b0: uniqueIndex("UQ_0e2c0e1b4b0b0b0b0b0b0b0b0b0").on(table.code),
+		}
+	});
 
 export const users = pgTable("users", {
-	id: uuid("id").primaryKey().notNull(),
-	phone: varchar("phone", { length: 20 }),
-	email: varchar("email", { length: 100 }),
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
 	login: varchar("login", { length: 100 }).notNull(),
 	first_name: varchar("first_name", { length: 100 }),
 	last_name: varchar("last_name", { length: 100 }),
 	password: varchar("password").notNull(),
 	salt: varchar("salt"),
-	is_super_user: boolean("is_super_user").default(false).notNull(),
 	status: user_status("status").notNull(),
-	card_name: varchar("card_name", { length: 100 }),
-	card_number: varchar("card_number", { length: 100 }),
-	birth_date: timestamp("birth_date", { precision: 5, withTimezone: true, mode: 'string' }),
-	car_model: varchar("car_model", { length: 100 }),
-	car_number: varchar("car_number", { length: 100 }),
-	is_online: boolean("is_online").default(false).notNull(),
-	latitude: doublePrecision("latitude"),
-	longitude: doublePrecision("longitude"),
-	fcm_token: varchar("fcm_token", { length: 250 }),
-	wallet_balance: doublePrecision("wallet_balance").notNull(),
-	max_active_order_count: integer("max_active_order_count"),
-	doc_files: text("doc_files").array(),
-	order_start_date: timestamp("order_start_date", { precision: 5, withTimezone: true, mode: 'string' }),
-	app_version: varchar("app_version", { length: 100 }),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	api_token: varchar("api_token", { length: 250 }),
-	tg_id: varchar("tg_id", { length: 250 }),
 },
-(table) => {
-	return {
-		UQ_a000cca60bcf04454e727699490: uniqueIndex("UQ_a000cca60bcf04454e727699490").on(table.phone),
-		UQ_0e2c0e1b4b5b0b0b0b0b0b0b0b0: uniqueIndex("UQ_0e2c0e1b4b5b0b0b0b0b0b0b0b0").on(table.email),
-		UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0: uniqueIndex("UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0").on(table.login),
-		fki_users_login: index("fki_users_login").on(table.login),
-	}
-});
+	(table) => {
+		return {
+			UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0: uniqueIndex("UQ_0e2c0e1b3b0b0b0b0b0b0b0b0b0").on(table.login),
+			fki_users_login: index("fki_users_login").on(table.login),
+		}
+	});
 
 export const sessions = pgTable("sessions", {
 	id: uuid("id").primaryKey().notNull(),
-	user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "cascade" } ),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "restrict", onUpdate: "cascade" }),
 	user_agent: text("user_agent").notNull(),
 	device_name: text("device_name").notNull(),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
@@ -94,8 +73,8 @@ export const scheduled_reports = pgTable("scheduled_reports", {
 
 export const scheduled_reports_subscription = pgTable("scheduled_reports_subscription", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	report_id: uuid("report_id").notNull().references(() => scheduled_reports.id, { onUpdate: "cascade" } ),
-	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" } ),
+	report_id: uuid("report_id").notNull().references(() => scheduled_reports.id, { onUpdate: "cascade" }),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" }),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
@@ -108,11 +87,11 @@ export const langs = pgTable("langs", {
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 },
-(table) => {
-	return {
-		code_key: uniqueIndex("langs_code_key").on(table.code),
-	}
-});
+	(table) => {
+		return {
+			code_key: uniqueIndex("langs_code_key").on(table.code),
+		}
+	});
 
 export const categories = pgTable("categories", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
@@ -126,11 +105,11 @@ export const categories = pgTable("categories", {
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 },
-(table) => {
-	return {
-		code_key: uniqueIndex("categories_code_key").on(table.code),
-	}
-});
+	(table) => {
+		return {
+			code_key: uniqueIndex("categories_code_key").on(table.code),
+		}
+	});
 
 export const image_sizes = pgTable("image_sizes", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
@@ -138,11 +117,11 @@ export const image_sizes = pgTable("image_sizes", {
 	width: integer("width").notNull(),
 	height: integer("height").notNull(),
 },
-(table) => {
-	return {
-		code_key: uniqueIndex("image_sizes_code_key").on(table.code),
-	}
-});
+	(table) => {
+		return {
+			code_key: uniqueIndex("image_sizes_code_key").on(table.code),
+		}
+	});
 
 export const assets = pgTable("assets", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
@@ -156,15 +135,15 @@ export const assets = pgTable("assets", {
 	model_id: text("model_id"),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 	code: text("code"),
 });
 
 export const manufacturers_categories = pgTable("manufacturers_categories", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" } ),
-	category_id: uuid("category_id").notNull().references(() => categories.id, { onUpdate: "cascade" } ),
+	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" }),
+	category_id: uuid("category_id").notNull().references(() => categories.id, { onUpdate: "cascade" }),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
@@ -190,7 +169,7 @@ export const manufacturers_properties = pgTable("manufacturers_properties", {
 	name: text("name").notNull(),
 	code: text("code").notNull(),
 	i18n_name: jsonb("i18n_name"),
-	category_id: uuid("category_id").notNull().references(() => manufacturers_properties_categories.id, { onUpdate: "cascade" } ),
+	category_id: uuid("category_id").notNull().references(() => manufacturers_properties_categories.id, { onUpdate: "cascade" }),
 	type: manufacturers_properties_types("type").notNull(),
 	additional_data: jsonb("additional_data"),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
@@ -201,15 +180,15 @@ export const manufacturers_properties = pgTable("manufacturers_properties", {
 
 export const manufacturers_properties_values = pgTable("manufacturers_properties_values", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	property_id: uuid("property_id").notNull().references(() => manufacturers_properties.id, { onUpdate: "cascade" } ),
-	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" } ),
+	property_id: uuid("property_id").notNull().references(() => manufacturers_properties.id, { onUpdate: "cascade" }),
+	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" }),
 	value: text("value").notNull(),
 });
 
 export const manufacturers_reviews = pgTable("manufacturers_reviews", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" } ),
-	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" } ),
+	manufacturer_id: uuid("manufacturer_id").notNull().references(() => manufacturers.id, { onUpdate: "cascade" }),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" }),
 	rating: doublePrecision("rating"),
 	comment: text("comment"),
 	active: boolean("active").default(false).notNull(),
@@ -233,14 +212,14 @@ export const permissions = pgTable("permissions", {
 	active: boolean("active").default(true).notNull(),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 },
-(table) => {
-	return {
-		UQ_d090ad82a0e97ce764c06c7b312: uniqueIndex("UQ_d090ad82a0e97ce764c06c7b312").on(table.slug),
-	}
-});
+	(table) => {
+		return {
+			UQ_d090ad82a0e97ce764c06c7b312: uniqueIndex("UQ_d090ad82a0e97ce764c06c7b312").on(table.slug),
+		}
+	});
 
 export const manufacturers = pgTable("manufacturers", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
@@ -250,42 +229,42 @@ export const manufacturers = pgTable("manufacturers", {
 	active: boolean("active").default(true).notNull(),
 	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	city_id: uuid("city_id").references(() => cities.id, { onUpdate: "cascade" } ),
+	city_id: uuid("city_id").references(() => cities.id, { onUpdate: "cascade" }),
 	rating: doublePrecision("rating").notNull(),
 });
 
 export const roles_permissions = pgTable("roles_permissions", {
-	role_id: uuid("role_id").notNull().references(() => roles.id, { onUpdate: "cascade" } ),
-	permission_id: uuid("permission_id").notNull().references(() => permissions.id, { onUpdate: "cascade" } ),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	role_id: uuid("role_id").notNull().references(() => roles.id, { onUpdate: "cascade" }),
+	permission_id: uuid("permission_id").notNull().references(() => permissions.id, { onUpdate: "cascade" }),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 },
-(table) => {
-	return {
-		PK_0cd11f0b35c4d348c6ebb9b36b7: primaryKey(table.role_id, table.permission_id)
-	}
-});
+	(table) => {
+		return {
+			PK_0cd11f0b35c4d348c6ebb9b36b7: primaryKey(table.role_id, table.permission_id)
+		}
+	});
 
 export const users_permissions = pgTable("users_permissions", {
-	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" } ),
-	permission_id: uuid("permission_id").notNull().references(() => permissions.id, { onUpdate: "cascade" } ),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" }),
+	permission_id: uuid("permission_id").notNull().references(() => permissions.id, { onUpdate: "cascade" }),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 },
-(table) => {
-	return {
-		PK_7f3736984cd8546a1e418005561: primaryKey(table.user_id, table.permission_id)
-	}
-});
+	(table) => {
+		return {
+			PK_7f3736984cd8546a1e418005561: primaryKey(table.user_id, table.permission_id)
+		}
+	});
 
 export const users_roles = pgTable("users_roles", {
-	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" } ),
-	role_id: uuid("role_id").notNull().references(() => roles.id, { onUpdate: "cascade" } ),
-	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" } ),
-	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" } ),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" }),
+	role_id: uuid("role_id").notNull().references(() => roles.id, { onUpdate: "cascade" }),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
 },
-(table) => {
-	return {
-		PK_c525e9373d63035b9919e578a9c: primaryKey(table.user_id, table.role_id)
-	}
-});
+	(table) => {
+		return {
+			PK_c525e9373d63035b9919e578a9c: primaryKey(table.user_id, table.role_id)
+		}
+	});

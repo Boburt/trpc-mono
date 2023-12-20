@@ -26,50 +26,6 @@ import { ctx } from "@backend/context";
 
 type UsersModel = InferSelectModel<typeof users>;
 
-type RollCallCourier = {
-    id: string;
-
-    first_name: string | null;
-
-    drive_type?: string | null;
-
-    last_name: string | null;
-
-    created_at?: string | null;
-
-    date?: string | null;
-
-    is_late?: boolean | null;
-
-    is_online?: boolean | null;
-
-    phone?: string | null;
-
-    app_version?: string | null;
-};
-
-type RollCallUser = {
-    id: string;
-    first_name: string | null;
-    last_name: string | null;
-    is_online: boolean;
-    drive_type: string | null;
-    phone: string;
-    app_version?: string;
-    timesheet_users: {
-        id: string | null;
-        date: string | null;
-        created_at: string | null;
-        is_late: boolean | null;
-    };
-};
-
-
-const userByPhone = drizzleDb.query.users
-    .findFirst({
-        where: (users, { eq }) => eq(users.phone, sql.placeholder("phone")),
-    })
-    .prepare("userByPhone");
 const userById = drizzleDb.query.users
     .findFirst({
         where: (users, { eq }) => eq(users.id, sql.placeholder("id")),
@@ -105,9 +61,9 @@ function exclude<User extends Record<string, unknown>, Key extends keyof User>(
 
 export const usersController = new Elysia({
     name: "@api/users"
-}).use(ctx).post(
-    "/users/login",
-    async ({
+})
+    .use(ctx)
+    .post("/users/login", async ({
         body: { login, password },
         set,
         cacheController
@@ -182,13 +138,13 @@ export const usersController = new Elysia({
             rights: permissions,
         };
     },
-    {
-        body: t.Object({
-            login: t.String(),
-            password: t.String(),
-        }),
-    }
-)
+        {
+            body: t.Object({
+                login: t.String(),
+                password: t.String(),
+            }),
+        }
+    )
     .post(
         "/users/refresh_token",
         async ({ body: { refreshToken }, set, cacheController }) => {

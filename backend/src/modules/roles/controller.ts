@@ -67,7 +67,7 @@ export const rolesController = new Elysia({
       }),
     }
   )
-  .get("/roles/cached", async ({ redis, user, set }) => {
+  .get("/roles/cached", async ({ redis, user, set, cacheController }) => {
     if (!user) {
       set.status = 401;
       return {
@@ -81,8 +81,8 @@ export const rolesController = new Elysia({
         message: "You don't have permissions",
       };
     }
-    const res = await redis.get(`${process.env.PROJECT_PREFIX}_roles`);
-    return JSON.parse(res || "[]") as InferSelectModel<typeof roles>[];
+    const res = await cacheController.getCachedRoles({});
+    return res;
   })
   .get(
     "/roles/:id",

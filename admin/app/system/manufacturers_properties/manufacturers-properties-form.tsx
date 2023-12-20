@@ -40,6 +40,11 @@ import short from "short-uuid";
 import { AdditionalDataItem } from "@admin/types/ui-types";
 import { toast } from "sonner";
 import { Switch } from "@admin/components/ui/switch";
+import { InferInsertModel } from "drizzle-orm";
+import { manufacturers_properties } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const propertyTypesLabel = {
   string: "Строка",
@@ -50,9 +55,8 @@ const propertyTypesLabel = {
 };
 
 const formFactory = createFormFactory<
-  z.infer<typeof ManufacturersPropertiesCreateInputSchema>
+  InferInsertModel<typeof manufacturers_properties>
 >({
-  // @ts-ignore
   defaultValues: {
     name: "",
     code: "",
@@ -60,6 +64,8 @@ const formFactory = createFormFactory<
     type: "string",
     show_in_filter: false,
     show_in_list: false,
+    additional_data: {},
+    category_id: "",
   },
 });
 
@@ -70,6 +76,7 @@ export default function ManufacturersPropertiesForm({
   children: React.ReactNode;
   recordId?: string;
 }) {
+  const token = useToken();
   const [open, setOpen] = useState<boolean>(false);
   const roleSelection = useManufacturersPropertiesCategoriesStore(
     (state) => state.selectedRows
@@ -89,21 +96,35 @@ export default function ManufacturersPropertiesForm({
     toast.error(error.message);
   };
 
-  const {
-    mutateAsync: createManufacturersProperty,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useManufacturersPropertiesCreate({
+  const createMutation = useMutation({
+    mutationFn: (
+      newTodo: InferInsertModel<typeof manufacturers_properties>
+    ) => {
+      return apiClient.api.manufacturers_properties.post({
+        data: newTodo,
+        fields: ["id"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const {
-    mutateAsync: updateManufacturersProperty,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useManufacturersPropertiesUpdate({
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof manufacturers_properties>;
+      id: string;
+    }) => {
+      return apiClient.api.manufacturers_properties[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
@@ -111,31 +132,45 @@ export default function ManufacturersPropertiesForm({
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateManufacturersProperty({
-          /** @ts-ignore */
+        updateMutation.mutate({
           data: { ...values, category_id: selectedRoleId },
-          where: { id: recordId },
+          id: recordId,
         });
       } else {
-        createManufacturersProperty({
-          /** @ts-ignore */
-          data: { ...values, category_id: selectedRoleId },
-        });
+        createMutation.mutate({ ...values, category_id: selectedRoleId });
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } =
-    trpc.manufacturersProperties.one.useQuery(
-      {
-        where: { id: recordId },
-      },
-      {
-        enabled: !!recordId,
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_manufacturers_properties", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.manufacturers_properties[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        return null;
       }
-    );
+    },
+    enabled: !!recordId && !!token,
+  });
 
-  const { data: langs, isLoading: isLangsLoading } = useCachedLangsQuery({});
+  const { data: langs, error: langsError } = useQuery({
+    queryKey: ["cached_langs"],
+    queryFn: async () => {
+      const { data } = await apiClient.api.langs.cached.get({
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return data;
+    },
+    enabled: !!token,
+  });
 
   const beforeOpen = async (open: boolean) => {
     if (open) {
@@ -147,18 +182,18 @@ export default function ManufacturersPropertiesForm({
   };
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   useEffect(() => {
-    if (record) {
-      form.setFieldValue("code", record.code);
-      form.setFieldValue("name", record.name);
-      form.setFieldValue("i18n_name", record.i18n_name ?? {});
-      form.setFieldValue("type", record.type);
-      form.setFieldValue("show_in_filter", record.show_in_filter);
-      form.setFieldValue("show_in_list", record.show_in_list);
-      form.setFieldValue("additional_data", record.additional_data ?? {});
+    if (record?.data && "id" in record?.data) {
+      form.setFieldValue("code", record.data.code);
+      form.setFieldValue("name", record.data.name);
+      form.setFieldValue("i18n_name", record.data.i18n_name ?? {});
+      form.setFieldValue("type", record.data.type);
+      form.setFieldValue("show_in_filter", record.data.show_in_filter);
+      form.setFieldValue("show_in_list", record.data.show_in_list);
+      form.setFieldValue("additional_data", record.data.additional_data ?? {});
     }
   }, [record]);
 
@@ -212,26 +247,28 @@ export default function ManufacturersPropertiesForm({
                     <AccordionItem value="item-1">
                       <AccordionTrigger>Языки заголовка</AccordionTrigger>
                       <AccordionContent>
-                        {langs?.map((lang) => (
-                          <div className="space-y-2" key={lang.id}>
-                            <div>
-                              <Label>{lang.name}</Label>
+                        {!langsError &&
+                          langs?.map((lang) => (
+                            <div className="space-y-2" key={lang.id}>
+                              <div>
+                                <Label>{lang.name}</Label>
+                              </div>
+                              {/* @ts-ignore */}
+                              <form.Field name={`i18n_name.${lang.code}`}>
+                                {(field) => {
+                                  return (
+                                    <>
+                                      <Input
+                                        {...field.getInputProps()}
+                                        // @ts-ignore
+                                        value={field.getValue() ?? ""}
+                                      />
+                                    </>
+                                  );
+                                }}
+                              </form.Field>
                             </div>
-                            <form.Field name={`i18n_name.${lang.code}`}>
-                              {(field) => {
-                                return (
-                                  <>
-                                    <Input
-                                      {...field.getInputProps()}
-                                      // @ts-ignore
-                                      value={field.getValue() ?? ""}
-                                    />
-                                  </>
-                                );
-                              }}
-                            </form.Field>
-                          </div>
-                        ))}
+                          ))}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -341,6 +378,7 @@ export default function ManufacturersPropertiesForm({
                                                 value={item.value}
                                                 onChange={(e) => {
                                                   const newItems = [
+                                                    /** @ts-ignore */
                                                     ...items,
                                                   ] as AdditionalDataItem[];
                                                   newItems[index].value =
@@ -353,6 +391,7 @@ export default function ManufacturersPropertiesForm({
                                                 className="cursor-pointer"
                                                 onClick={() => {
                                                   const newItems = [
+                                                    /** @ts-ignore */
                                                     ...items,
                                                   ] as AdditionalDataItem[];
                                                   newItems.splice(index, 1);

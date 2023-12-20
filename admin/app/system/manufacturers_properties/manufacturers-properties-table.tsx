@@ -19,10 +19,15 @@ import {
 import { useMemo } from "react";
 import { useManufacturersPropertiesCategoriesStore } from "@admin/store/states/manufacturersPropertiesCategories";
 import { RouterOutputs, trpc } from "@admin/utils/trpc";
+import { manufacturers_properties } from "@backend/../drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<
-    RouterOutputs["manufacturersProperties"]["list"]["items"][0],
+    InferSelectModel<typeof manufacturers_properties>,
     TValue
   >[];
 }
@@ -30,6 +35,7 @@ interface DataTableProps<TData, TValue> {
 export function ManufacturersPropertiesDataTable<TData, TValue>({
   columns,
 }: DataTableProps<TData, TValue>) {
+  const token = useToken();
   const rowSelection = useManufacturersPropertiesCategoriesStore(
     (state) => state.selectedRows
   );
@@ -38,29 +44,43 @@ export function ManufacturersPropertiesDataTable<TData, TValue>({
     return Object.keys(rowSelection)[0];
   }, [rowSelection]);
 
-  const { data, isLoading } = trpc.manufacturersProperties.list.useQuery(
-    {
-      where: {
-        category_id: {
-          equals: selectedRoleId,
-        },
+  const { data, isLoading, error } = useQuery({
+    enabled: !!token && Object.keys(rowSelection).length > 0,
+    queryKey: [
+      "manufacturers_properties",
+      {
+        limit: 1000,
+        offset: 0,
+        selectedRoleId,
+        fields: "id,name,code",
       },
-      take: 1000,
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.manufacturers_properties.get({
+        $query: {
+          limit: "1000",
+          offset: "0",
+          fields: "id,name,code",
+          filters: JSON.stringify([
+            {
+              field: "category_id",
+              operator: "=",
+              value: selectedRoleId,
+            },
+          ]),
+        },
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
-    {
-      enabled: Object.keys(rowSelection).length > 0,
-    }
-  );
+  });
 
   const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: data?.items ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
-    // onRowSelectionChange: function (stateUpdater) {
-    //   console.log(arguments);
-    //   // setRowSelection(stateUpdater)
-    // },
-
     getCoreRowModel: getCoreRowModel(),
   });
 
