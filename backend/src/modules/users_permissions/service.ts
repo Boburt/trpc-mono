@@ -16,7 +16,7 @@ export class UsersPermissionsService {
   constructor(
     private readonly prisma: DB,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(
     input: Prisma.Users_permissionsCreateArgs
@@ -54,7 +54,6 @@ export class UsersPermissionsService {
     const users_permissions = await this.prisma.users_permissions.findUnique(
       input
     );
-
     return users_permissions;
   }
 

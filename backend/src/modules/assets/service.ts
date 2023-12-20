@@ -15,7 +15,7 @@ export class AssetsService {
     private readonly prisma: DB,
     private readonly queue: Queue,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async addAsset({
     model,
@@ -59,7 +59,7 @@ export class AssetsService {
           await fs.rmSync(`../uploads/dist/${asset.id}`, {
             recursive: true,
           });
-        } catch (error) {}
+        } catch (error) { }
       }
     }
 

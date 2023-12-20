@@ -19,7 +19,7 @@ export class ImageSizesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.ImageSizesCreateArgs): Promise<ImageSizes> {
     const res = await this.prisma.imageSizes.create(input);

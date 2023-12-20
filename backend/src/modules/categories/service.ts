@@ -18,7 +18,7 @@ export class CategoriesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.CategoriesCreateArgs): Promise<Categories> {
     const res = await this.prisma.categories.create(input);

@@ -16,7 +16,7 @@ export class UsersRolesService {
   constructor(
     private readonly prisma: DB,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.Users_rolesCreateArgs): Promise<Users_roles> {
     return await this.prisma.users_roles.create(input);

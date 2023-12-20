@@ -1,0 +1,52 @@
+{
+  "name": "b2b",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run next_dev",
+    "build": "next build",
+    "start": "next start -p 7000",
+    "lint": "next lint",
+    "next_dev": "next dev -p 7000"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.0.0",
+    "@googlemaps/js-api-loader": "^1.16.2",
+    "@pbe/react-yandex-maps": "^1.2.4",
+    "@tanstack/react-query": "^4.33.0",
+    "@trpc/client": "^10.38.0",
+    "@trpc/react-query": "^10.38.0",
+    "@trpc/server": "^10.38.0",
+    "@types/react-dom": "18.2.7",
+    "autoprefixer": "10.4.14",
+    "cloudinary-react": "^1.8.1",
+    "clsx": "^2.0.0",
+    "eslint": "8.47.0",
+    "eslint-config-next": "13.4.13",
+    "ioredis": "^5.3.2",
+    "leaflet": "^1.9.4",
+    "mapbox-gl": "^2.15.0",
+    "next": "13.4.13",
+    "postcss": "8.4.27",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-form-wizard-component": "^0.1.7",
+    "react-hook-form": "^7.46.1",
+    "react-icons": "^4.11.0",
+    "react-leaflet": "^4.2.1",
+    "react-map-gl": "^7.1.5",
+    "react-responsive-carousel": "^3.2.23",
+    "sharp": "^0.32.5",
+    "swr": "^2.2.1",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss": "3.3.3",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.5.0",
+    "@types/react": "^18.2.20",
+    "daisyui": "^3.5.1",
+    "tailwindcss-animated": "^1.0.1",
+    "typescript": "5.1.6"
+  }
+}
