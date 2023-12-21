@@ -7,21 +7,15 @@
     "start": "bun run ./src/index.ts"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@elysiajs/bearer": "^0.7.0",
     "@elysiajs/cors": "^0.7.0",
     "@elysiajs/jwt": "^0.7.0",
     "@elysiajs/server-timing": "^0.7.1",
-=======
-    "@elysiajs/cors": "^0.7.0",
-    "@elysiajs/jwt": "^0.7.0",
->>>>>>> origin/davr
     "@elysiajs/static": "^0.6.0",
     "@elysiajs/trpc": "^0.7.0",
     "@elysiajs/websocket": "^0.2.8",
     "@prisma/client": "latest",
     "@trpc/server": "10.43.0",
-<<<<<<< HEAD
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "bullmq": "^4.8.0",
@@ -32,12 +26,6 @@
     "ioredis": "^5.3.2",
     "jose": "^4.14.4",
     "postgres": "^3.4.3",
-=======
-    "bullmq": "^4.8.0",
-    "elysia": "0.7.4",
-    "ioredis": "^5.3.2",
-    "jose": "^4.14.4",
->>>>>>> origin/davr
     "prisma-extension-pagination": "^0.4.2",
     "redis": "^4.6.7",
     "zod": "3.21.1",
@@ -46,13 +34,9 @@
   "devDependencies": {
     "@types/bull": "^4.10.0",
     "bun-types": "^0.7.3",
-<<<<<<< HEAD
     "drizzle-kit": "^0.20.7",
     "prisma": "latest",
     "typescript": "^5.3.3"
-=======
-    "prisma": "latest"
->>>>>>> origin/davr
   },
   "module": "src/index.js"
 }

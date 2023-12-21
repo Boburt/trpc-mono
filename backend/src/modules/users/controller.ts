@@ -231,7 +231,6 @@ export const usersController = new Elysia({
     )
     .post('/users/assign_role', async ({
         body: { user_id, role_id },
-        // @ts-ignore
         user,
         set,
         drizzle
@@ -268,7 +267,6 @@ export const usersController = new Elysia({
         "/users",
         async ({
             query: { limit, offset, sort, filters, fields },
-            // @ts-ignore
             user,
             set,
             drizzle
@@ -300,6 +298,7 @@ export const usersController = new Elysia({
             } = {};
             let selectFields: SelectedFields = {};
             if (fields) {
+                fields = fields.split(',').filter(item => item != 'password').join(',');
                 selectFields = parseSelectFields(fields, users, {});
             }
             let whereClause: (SQLWrapper | undefined)[] = [];
@@ -449,7 +448,6 @@ export const usersController = new Elysia({
         async ({
             params: { id },
             body: { data, fields },
-            // @ts-ignore
             user,
             set,
             drizzle
@@ -471,6 +469,17 @@ export const usersController = new Elysia({
             if (fields) {
                 selectFields = parseSelectFields(fields, users, {});
             }
+
+            if (data.password) {
+                let password = data.password;
+                if (typeof password != "string") {
+                    password = password.set!;
+                }
+                const { hash, salt } = await hashPassword(password);
+                data.password = hash;
+                data.salt = salt;
+            }
+
             const result = await drizzle
                 .update(users)
                 .set(data)

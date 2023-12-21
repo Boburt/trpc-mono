@@ -108,8 +108,16 @@ export default function UsersForm({
     onError,
   });
 
-  const { mutateAsync: asyncAssignRole } = trpc.users.assignRole.useMutation({
-    onSuccess: () => closeForm(),
+  const assignRoleMutation = useMutation({
+    mutationFn: (newTodo: { role_id: string; user_id: string }) => {
+      return apiClient.api.users.assign_role.post({
+        ...newTodo,
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: (data) => closeForm(),
     onError,
   });
 
@@ -131,13 +139,14 @@ export default function UsersForm({
     queries: [
       {
         queryKey: ["one_user", recordId],
-        queryFn: () => {
+        queryFn: async () => {
           if (recordId) {
-            return apiClient.api.users[recordId].get({
+            const { data } = await apiClient.api.users[recordId].get({
               $headers: {
                 Authorization: `Bearer ${token}`,
               },
             });
+            return data;
           } else {
             return null;
           }
@@ -159,9 +168,9 @@ export default function UsersForm({
       {
         enabled: !!recordId && !!token,
         queryKey: ["users_roles", recordId],
-        queryFn: () => {
+        queryFn: async () => {
           if (recordId) {
-            return apiClient.api.users_roles.get({
+            const { data } = await apiClient.api.users_roles.get({
               $query: {
                 limit: "30",
                 offset: "0",
@@ -172,11 +181,13 @@ export default function UsersForm({
                     value: recordId,
                   },
                 ]),
+                fields: "role_id,user_id",
               },
               $headers: {
                 Authorization: `Bearer ${token}`,
               },
             });
+            return data;
           } else {
             return null;
           }
@@ -200,7 +211,7 @@ export default function UsersForm({
         if (recordId) {
           userId = recordId;
         }
-        await asyncAssignRole({
+        await assignRoleMutation.mutate({
           user_id: userId,
           role_id: changedRoleId!,
         });
@@ -217,12 +228,12 @@ export default function UsersForm({
   }, [createMutation.isPending, updateMutation.isPending, isRolesLoading]);
 
   useEffect(() => {
-    if (record) {
-      Object.keys(record).forEach((key) => {
+    console.log("record", record);
+    if (record?.data && "id" in record.data) {
+      Object.keys(record.data).forEach((key) => {
         form.setFieldValue(
-          key as keyof typeof record,
-          // @ts-ignore
-          record[key as keyof typeof record]
+          key as keyof typeof record.data,
+          record.data[key as keyof typeof record.data]
         );
       });
     }
@@ -299,12 +310,15 @@ export default function UsersForm({
           <div>
             <Label>Роль</Label>
           </div>
-          <Select onValueChange={setChangedRoleId} defaultValue={userRoleId}>
+          <Select
+            onValueChange={setChangedRoleId}
+            defaultValue={userRoleId ?? ""}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {rolesData?.items.map((item) => (
+              {rolesData?.map((item) => (
                 <SelectItem key={item.id} value={item.id}>
                   {item.name}
                 </SelectItem>
