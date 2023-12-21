@@ -14,7 +14,7 @@ export class ManufacturersCategoriesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async assignCategoriesToManufacturer(
     input: Prisma.ManufacturersCategoriesCreateManyArgs

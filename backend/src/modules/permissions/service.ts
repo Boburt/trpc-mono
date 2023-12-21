@@ -18,7 +18,7 @@ export class PermissionsService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.PermissionsCreateArgs): Promise<Permissions> {
     const res = await this.prisma.permissions.create(input);
@@ -28,8 +28,8 @@ export class PermissionsService {
 
   async findMany(
     input: z.infer<typeof PermissionsFindManyArgsSchema>
-    ): Promise<PaginationType<InferSelectModel<typeof permissions>>> {
-  // ): Promise<PaginationType<Permissions>> {
+  ): Promise<PaginationType<InferSelectModel<typeof permissions>>> {
+    // ): Promise<PaginationType<Permissions>> {
     let take = input.take ?? 20;
     let skip = input.skip ?? 0;
     // let skip = !input.skip ? 1 : Math.round(input.skip / take);

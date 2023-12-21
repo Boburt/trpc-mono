@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({
     pageSize: 10,
   });
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery({
     enabled: !!token,
     queryKey: [
       "permissions",

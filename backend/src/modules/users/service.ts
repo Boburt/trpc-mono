@@ -33,7 +33,7 @@ export class UsersService {
     private readonly prisma: DB,
     private readonly cacheController: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.UsersCreateArgs): Promise<usersSchema> {
     if (input.data.password) {

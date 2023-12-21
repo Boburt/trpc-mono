@@ -16,7 +16,7 @@ export class UsersPermissionsService {
   constructor(
     private readonly prisma: DB,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(
     input: Prisma.Users_permissionsCreateArgs

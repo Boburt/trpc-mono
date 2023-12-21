@@ -20,7 +20,7 @@ export class ManufacturersReviewsService {
     private readonly indexReviewQueue: Queue,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async findMany(
     input: z.infer<typeof ManufacturersReviewsFindManyArgsSchema>

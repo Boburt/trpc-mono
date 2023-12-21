@@ -17,7 +17,7 @@ export class RolesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.RolesCreateArgs): Promise<Roles> {
     const roles = await this.prisma.roles.create(input);

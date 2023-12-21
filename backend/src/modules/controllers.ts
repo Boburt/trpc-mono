@@ -10,12 +10,16 @@ import { seoLinksController } from "./seo_links/controller";
 import { imageSizesController } from "./image_sizes/controller";
 import { categoriesController } from "./categories/controller";
 import { manufacturersPropertiesController } from "./manufacturers_properties/controller";
+import { manufacturersPropertiesCategoriesController } from "./manufacturers_properties_categories/controller";
+import { usersRolesController } from "./users_roles/controller";
+import { manufacturersController } from "./manufacturers/controller";
 
 export const apiController = new Elysia({
   prefix: "/api",
 })
   .use(assetsController)
   .use(usersController)
+  .use(usersRolesController)
   .use(permissionsController)
   .use(rolesController)
   .use(rolesPermissionsController)
@@ -24,4 +28,6 @@ export const apiController = new Elysia({
   .use(seoLinksController)
   .use(imageSizesController)
   .use(categoriesController)
-  .use(manufacturersPropertiesController);
+  .use(manufacturersPropertiesController)
+  .use(manufacturersPropertiesCategoriesController)
+  .use(manufacturersController);

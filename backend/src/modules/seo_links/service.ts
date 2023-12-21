@@ -18,7 +18,7 @@ export class SeoLinksService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.SeoLinksCreateArgs): Promise<SeoLinks> {
     const res = await this.prisma.seoLinks.create(input);

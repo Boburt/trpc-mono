@@ -17,7 +17,7 @@ export class ManufacturersPropertiesCategoriesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(
     input: Prisma.ManufacturersPropertiesCategoriesCreateArgs

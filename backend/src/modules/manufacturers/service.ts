@@ -31,7 +31,7 @@ export class ManufacturersService {
     private readonly cacheControl: CacheControlService,
     private readonly deleteManufacturerQueue: Queue,
     private readonly indexReviewQueue: Queue
-  ) {}
+  ) { }
 
   async create(
     input: z.infer<typeof ManufacturersCreateArgsSchemaWithAsset>
@@ -67,7 +67,6 @@ export class ManufacturersService {
     delete input.take;
     delete input.skip;
     delete input.imageSizes;
-    
     const [permissions, meta] = (await this.prisma.manufacturers
       .paginate(input)
       .withPages({

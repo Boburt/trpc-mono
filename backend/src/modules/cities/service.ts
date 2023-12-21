@@ -18,7 +18,7 @@ export class CitiesService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.CitiesCreateArgs): Promise<Cities> {
     const res = await this.prisma.cities.create(input);

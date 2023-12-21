@@ -18,7 +18,7 @@ export class LangsService {
     private readonly prisma: DB,
     private readonly cacheControl: CacheControlService,
     private readonly drizzle: DrizzleDB
-  ) {}
+  ) { }
 
   async create(input: Prisma.LangsCreateArgs): Promise<Langs> {
     const res = await this.prisma.langs.create(input);

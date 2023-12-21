@@ -31,16 +31,20 @@ import {
 } from "@admin/components/ui/tabs";
 import { ManufacturerPropertiesForm } from "./manufacturer_properties_form";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { manufacturers } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof ManufacturersUncheckedCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof manufacturers>>({
   defaultValues: {
     active: true,
     short_name: "",
     name: "",
     description: "",
     city_id: null,
+    rating: 0,
   },
 });
 
@@ -51,6 +55,7 @@ export default function ManufacturersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const closeForm = () => {
     form.reset();
     setOpen(false);
@@ -92,6 +97,19 @@ export default function ManufacturersForm({
     return closeForm();
   };
 
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof manufacturers>) => {
+      return apiClient.api.manufacturers.post({
+        data: newTodo,
+        fields: ["id", "slug", "description", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: (data) => onAddSuccess("added", data),
+    onError,
+  });
   const {
     mutateAsync: createManufacturer,
     isLoading: isAddLoading,
@@ -159,8 +177,8 @@ export default function ManufacturersForm({
   ]);
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || isUpdateLoading;
+  }, [createMutation.isPending, isUpdateLoading]);
 
   const categoriesSelectData = useMemo(() => {
     if (categories && categories.items) {

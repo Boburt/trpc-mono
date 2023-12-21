@@ -1,20 +1,18 @@
 import { ctx } from "@backend/context";
-import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
-import { manufacturers_properties, permissions, roles_permissions } from "backend/drizzle/schema";
-import { sql, InferSelectModel, eq, SQLWrapper, and } from "drizzle-orm";
+import { manufacturers, permissions } from "backend/drizzle/schema";
+import { sql, InferSelectModel, eq } from "drizzle-orm";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import Elysia, { t } from "elysia";
 
-export const manufacturersPropertiesController = new Elysia({
-    name: '@api/manufacturers_properties'
+export const manufacturersController = new Elysia({
+    name: '@api/manufacturers'
 })
     .use(ctx)
     .get(
-        "/manufacturers_properties",
+        "/manufacturers",
         async ({
-            query: { limit, offset, sort, fields,
-                filters },
+            query: { limit, offset, sort, filter, fields },
             user,
             set,
             drizzle,
@@ -26,7 +24,7 @@ export const manufacturersPropertiesController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("manufacturers_properties.list")) {
+            if (!user.permissions.includes("manufacturers.list")) {
                 set.status = 401;
                 return {
                     message: "You don't have permissions",
@@ -34,26 +32,18 @@ export const manufacturersPropertiesController = new Elysia({
             }
             let selectFields: SelectedFields = {};
             if (fields) {
-                selectFields = parseSelectFields(fields, manufacturers_properties, {});
-            }
-            let whereClause: (SQLWrapper | undefined)[] = [];
-            if (filters) {
-                whereClause = parseFilterFields(filters, manufacturers_properties, {
-                    permissions,
-                });
+                selectFields = parseSelectFields(fields, manufacturers, {});
             }
             const rolesCount = await drizzle
                 .select({ count: sql<number>`count(*)` })
-                .from(manufacturers_properties)
-                .where(and(...whereClause))
+                .from(manufacturers)
                 .execute();
             const rolesList = (await drizzle
                 .select(selectFields)
-                .from(manufacturers_properties)
-                .where(and(...whereClause))
+                .from(manufacturers)
                 .limit(+limit)
                 .offset(+offset)
-                .execute()) as InferSelectModel<typeof manufacturers_properties>[];
+                .execute()) as InferSelectModel<typeof manufacturers>[];
             return {
                 total: rolesCount[0].count,
                 data: rolesList,
@@ -64,30 +54,21 @@ export const manufacturersPropertiesController = new Elysia({
                 limit: t.String(),
                 offset: t.String(),
                 sort: t.Optional(t.String()),
-                filters: t.Optional(t.String()),
+                filter: t.Optional(
+                    t.Object({
+                        id: t.Number(),
+                        name: t.String(),
+                        email: t.String(),
+                        address: t.String(),
+                        phone: t.String(),
+                    })
+                ),
                 fields: t.Optional(t.String()),
             }),
         }
     )
-    .get("/manufacturers_properties/cached", async ({ redis, user, set, cacheController }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                message: "User not found",
-            };
-        }
-
-        if (!user.permissions.includes("manufacturers_properties.list")) {
-            set.status = 401;
-            return {
-                message: "You don't have permissions",
-            };
-        }
-        const res = await cacheController.getCachedManufacturersProperties({});
-        return res;
-    })
     .get(
-        "/manufacturers_properties/:id",
+        "/manufacturers/:id",
         async ({ params: { id }, user, set, drizzle }) => {
             if (!user) {
                 set.status = 401;
@@ -96,7 +77,7 @@ export const manufacturersPropertiesController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("manufacturers_properties.one")) {
+            if (!user.permissions.includes("manufacturers.one")) {
                 set.status = 401;
                 return {
                     message: "You don't have permissions",
@@ -104,8 +85,8 @@ export const manufacturersPropertiesController = new Elysia({
             }
             const permissionsRecord = await drizzle
                 .select()
-                .from(manufacturers_properties)
-                .where(eq(manufacturers_properties.id, id))
+                .from(manufacturers)
+                .where(eq(manufacturers.id, id))
                 .execute();
             return permissionsRecord[0];
         },
@@ -116,7 +97,7 @@ export const manufacturersPropertiesController = new Elysia({
         }
     )
     .delete(
-        "/manufacturers_properties/:id",
+        "/manufacturers/:id",
         async ({ params: { id }, user, set, drizzle }) => {
             if (!user) {
                 set.status = 401;
@@ -125,7 +106,7 @@ export const manufacturersPropertiesController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("manufacturers_properties.delete")) {
+            if (!user.permissions.includes("manufacturers.delete")) {
                 set.status = 401;
                 return {
                     message: "You don't have permissions",
@@ -134,13 +115,13 @@ export const manufacturersPropertiesController = new Elysia({
 
             const permissionsRecord = await drizzle
                 .select({
-                    id: manufacturers_properties.id,
+                    id: manufacturers.id,
                 })
-                .from(manufacturers_properties)
-                .where(eq(manufacturers_properties.id, id))
+                .from(manufacturers)
+                .where(eq(manufacturers.id, id))
                 .execute();
 
-            await drizzle.delete(manufacturers_properties).where(eq(manufacturers_properties.id, id)).execute();
+            await drizzle.delete(manufacturers).where(eq(manufacturers.id, id)).execute();
             return permissionsRecord[0];
         },
         {
@@ -150,7 +131,7 @@ export const manufacturersPropertiesController = new Elysia({
         }
     )
     .post(
-        "/manufacturers_properties",
+        "/manufacturers",
         async ({ body: { data, fields }, user, set, drizzle }) => {
             if (!user) {
                 set.status = 401;
@@ -159,7 +140,7 @@ export const manufacturersPropertiesController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("manufacturers_properties.add")) {
+            if (!user.permissions.includes("manufacturers.add")) {
                 set.status = 401;
                 return {
                     message: "You don't have permissions",
@@ -167,10 +148,10 @@ export const manufacturersPropertiesController = new Elysia({
             }
             let selectFields = {};
             if (fields) {
-                selectFields = parseSelectFields(fields, manufacturers_properties, {});
+                selectFields = parseSelectFields(fields, manufacturers, {});
             }
             const result = await drizzle
-                .insert(manufacturers_properties)
+                .insert(manufacturers)
                 .values(data)
                 .returning(selectFields);
 
@@ -181,21 +162,19 @@ export const manufacturersPropertiesController = new Elysia({
         {
             body: t.Object({
                 data: t.Object({
+                    short_name: t.String(),
                     name: t.String(),
-                    code: t.String(),
-                    i18_name: t.Optional(t.Object(t.Any())),
-                    category_id: t.String(),
-                    type: t.Union([t.Literal('list'), t.Literal('date'), t.Literal('boolean'), t.Literal('number'), t.Literal('string')]),
-                    additional_data: t.Optional(t.Unknown()),
-                    show_in_filter: t.Optional(t.Boolean()),
-                    show_in_list: t.Optional(t.Boolean())
+                    description: t.Optional(t.Nullable(t.String())),
+                    active: t.Optional(t.Boolean()),
+                    city_id: t.String(),
+                    rating: t.Number()
                 }),
                 fields: t.Optional(t.Array(t.String())),
             }),
         }
     )
     .put(
-        "/manufacturers_properties/:id",
+        "/manufacturers/:id",
         async ({ params: { id }, body: { data, fields }, user, set, drizzle }) => {
             if (!user) {
                 set.status = 401;
@@ -204,7 +183,7 @@ export const manufacturersPropertiesController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("manufacturers_properties.edit")) {
+            if (!user.permissions.includes("manufacturers.edit")) {
                 set.status = 401;
                 return {
                     message: "You don't have permissions",
@@ -212,12 +191,12 @@ export const manufacturersPropertiesController = new Elysia({
             }
             let selectFields = {};
             if (fields) {
-                selectFields = parseSelectFields(fields, manufacturers_properties, {});
+                selectFields = parseSelectFields(fields, manufacturers, {});
             }
             const result = await drizzle
-                .update(manufacturers_properties)
+                .update(manufacturers)
                 .set(data)
-                .where(eq(manufacturers_properties.id, id))
+                .where(eq(manufacturers.id, id))
                 .returning(selectFields);
 
             return {
@@ -230,14 +209,11 @@ export const manufacturersPropertiesController = new Elysia({
             }),
             body: t.Object({
                 data: t.Object({
+                    short_name: t.String(),
                     name: t.String(),
-                    code: t.String(),
-                    i18_name: t.Optional(t.Object(t.Any())),
-                    category_id: t.String(),
-                    type: t.Union([t.Literal('list'), t.Literal('date'), t.Literal('boolean'), t.Literal('number'), t.Literal('string')]),
-                    additional_data: t.Optional(t.Unknown()),
-                    show_in_filter: t.Optional(t.Boolean()),
-                    show_in_list: t.Optional(t.Boolean())
+                    description: t.Optional(t.String()),
+                    active: t.Optional(t.Boolean()),
+                    city_id: t.String()
                 }),
                 fields: t.Optional(t.Array(t.String())),
             }),
