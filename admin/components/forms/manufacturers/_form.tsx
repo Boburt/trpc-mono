@@ -31,10 +31,13 @@ import {
 } from "@admin/components/ui/tabs";
 import { ManufacturerPropertiesForm } from "./manufacturer_properties_form";
 import { toast } from "sonner";
+import { InferInsertModel } from "drizzle-orm";
+import { manufacturers } from "backend/drizzle/schema";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-const formFactory = createFormFactory<
-  z.infer<typeof ManufacturersUncheckedCreateInputSchema>
->({
+const formFactory = createFormFactory<InferInsertModel<typeof manufacturers>>({
   defaultValues: {
     active: true,
     short_name: "",

@@ -228,9 +228,10 @@ export default function UsersForm({
   }, [createMutation.isPending, updateMutation.isPending, isRolesLoading]);
 
   useEffect(() => {
-    console.log("record", record);
+    // console.log("record", record);
     if (record?.data && "id" in record.data) {
       Object.keys(record.data).forEach((key) => {
+        console.log(key, record.data[key as keyof typeof record.data]);
         form.setFieldValue(
           key as keyof typeof record.data,
           record.data[key as keyof typeof record.data]
@@ -251,20 +252,22 @@ export default function UsersForm({
               return (
                 <>
                   <Select
-                    onValueChange={(value) =>
-                      field.setValue(value as z.infer<typeof user_statusSchema>)
-                    }
+                    onValueChange={(value) => field.setValue(value)}
                     defaultValue={field.getValue() ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {user_statusSchema.options.map((item) => (
-                        <SelectItem key={item} value={item}>
-                          {item}
-                        </SelectItem>
-                      ))}
+                      <SelectItem key="active" value="active">
+                        active
+                      </SelectItem>
+                      <SelectItem key="blocked" value="blocked">
+                        blocked
+                      </SelectItem>
+                      <SelectItem key="inactive" value="inactive">
+                        inactive
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </>
