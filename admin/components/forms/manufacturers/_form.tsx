@@ -44,6 +44,7 @@ const formFactory = createFormFactory<InferInsertModel<typeof manufacturers>>({
     name: "",
     description: "",
     city_id: null,
+    rating: 0,
   },
 });
 
@@ -54,6 +55,7 @@ export default function ManufacturersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
+  const token = useToken();
   const closeForm = () => {
     form.reset();
     setOpen(false);
@@ -95,6 +97,19 @@ export default function ManufacturersForm({
     return closeForm();
   };
 
+  const createMutation = useMutation({
+    mutationFn: (newTodo: InferInsertModel<typeof manufacturers>) => {
+      return apiClient.api.manufacturers.post({
+        data: newTodo,
+        fields: ["id", "slug", "description", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: (data) => onAddSuccess("added", data),
+    onError,
+  });
   const {
     mutateAsync: createManufacturer,
     isLoading: isAddLoading,
@@ -162,8 +177,8 @@ export default function ManufacturersForm({
   ]);
 
   const isLoading = useMemo(() => {
-    return isAddLoading || isUpdateLoading;
-  }, [isAddLoading, isUpdateLoading]);
+    return createMutation.isPending || isUpdateLoading;
+  }, [createMutation.isPending, isUpdateLoading]);
 
   const categoriesSelectData = useMemo(() => {
     if (categories && categories.items) {

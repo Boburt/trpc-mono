@@ -54,6 +54,7 @@ export class UsersPermissionsService {
     const users_permissions = await this.prisma.users_permissions.findUnique(
       input
     );
+
     return users_permissions;
   }
 

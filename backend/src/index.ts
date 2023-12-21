@@ -1,4 +1,4 @@
-import { Elysia, type HookHandler, t } from "elysia";
+import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { trpc } from "@elysiajs/trpc";
 import { staticPlugin } from "@elysiajs/static";
