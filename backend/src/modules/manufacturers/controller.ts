@@ -166,7 +166,7 @@ export const manufacturersController = new Elysia({
                     name: t.String(),
                     description: t.Optional(t.Nullable(t.String())),
                     active: t.Optional(t.Boolean()),
-                    city_id: t.String(),
+                    city_id: t.Optional(t.Nullable(t.String())),
                     rating: t.Number()
                 }),
                 fields: t.Optional(t.Array(t.String())),
@@ -211,9 +211,9 @@ export const manufacturersController = new Elysia({
                 data: t.Object({
                     short_name: t.String(),
                     name: t.String(),
-                    description: t.Optional(t.String()),
+                    description: t.Optional(t.Nullable(t.String())),
                     active: t.Optional(t.Boolean()),
-                    city_id: t.String()
+                    city_id: t.Optional(t.Nullable(t.String())),
                 }),
                 fields: t.Optional(t.Array(t.String())),
             }),

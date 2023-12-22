@@ -35,7 +35,7 @@ import { InferInsertModel } from "drizzle-orm";
 import { manufacturers } from "backend/drizzle/schema";
 import useToken from "@admin/store/get-token";
 import { apiClient } from "@admin/utils/eden";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 
 const formFactory = createFormFactory<InferInsertModel<typeof manufacturers>>({
   defaultValues: {
@@ -64,37 +64,37 @@ export default function ManufacturersForm({
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [imageId, setImageId] = useState<string | null>(null);
 
-  const onAddSuccess = (actionText: string, data: any) => {
-    toast.success(`Manufacturer ${actionText}`);
-    if (selectedCategories.length > 0)
-      assignCategories(
-        selectedCategories.map((category_id) => ({
-          manufacturer_id: data.id,
-          category_id,
-        }))
-      );
-  };
-
   const onError = (error: any) => {
     toast.error(error.message);
   };
 
-  const { mutateAsync: asyncAssignCategories } =
-    trpc.manufacturersCategories.assignCategoriesToManufacturer.useMutation({
-      onSuccess: () => closeForm(),
-      onError,
-    });
-
-  const assignCategories = async (
-    recordData: {
+  const assignRoleMutation = useMutation({
+    mutationFn: ({
+      category_id,
+      manufacturer_id,
+    }: {
+      category_id: string[];
       manufacturer_id: string;
-      category_id: string;
-    }[]
-  ) => {
-    await asyncAssignCategories({
-      data: recordData,
-    });
-    return closeForm();
+    }) => {
+      return apiClient.api.manufacturers_categories.assign_category.post({
+        category_id,
+        manufacturer_id,
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => closeForm(),
+    onError,
+  });
+
+  const onAddSuccess = (actionText: string, data: any) => {
+    toast.success(`Manufacturer ${actionText}`);
+    if (selectedCategories.length > 0)
+      assignRoleMutation.mutate({
+        manufacturer_id: data.id,
+        category_id: selectedCategories,
+      });
   };
 
   const createMutation = useMutation({
@@ -110,31 +110,30 @@ export default function ManufacturersForm({
     onSuccess: (data) => onAddSuccess("added", data),
     onError,
   });
-  const {
-    mutateAsync: createManufacturer,
-    isLoading: isAddLoading,
-    data,
-    error,
-  } = useManufacturersCreate({
-    onSettled: (data) => onAddSuccess("added", data),
-    onError,
-  });
 
-  const {
-    mutateAsync: updateManufacturer,
-    isLoading: isUpdateLoading,
-    error: updateError,
-  } = useManufacturersUpdate({
-    onSettled: (data) => onAddSuccess("updated", data),
+  const updateMutation = useMutation({
+    mutationFn: (newTodo: {
+      data: InferInsertModel<typeof manufacturers>;
+      id: string;
+    }) => {
+      return apiClient.api.manufacturers[newTodo.id].put({
+        data: newTodo.data,
+        fields: ["id", "slug", "description", "active"],
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: (data) => onAddSuccess("updated", data),
     onError,
   });
 
   const form = formFactory.useForm({
     onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateManufacturer({ data: values, where: { id: recordId } });
+        updateMutation.mutate({ data: values, id: recordId });
       } else {
-        createManufacturer({ data: values });
+        createMutation.mutate(values);
       }
     },
   });
@@ -147,42 +146,94 @@ export default function ManufacturersForm({
       data: manufacturerCategories,
       isLoading: isManufacturerCategoriesLoading,
     },
-  ] = trpc.useQueries((t) => [
-    t.manufacturers.one(
+  ] = useQueries({
+    queries: [
       {
-        where: { id: recordId },
+        queryKey: ["one_manufacturers", recordId],
+        queryFn: async () => {
+          if (recordId) {
+            const { data } = await apiClient.api.manufacturers[recordId].get({
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            return data;
+          } else {
+            return null;
+          }
+        },
+        enabled: !!recordId && !!token,
       },
       {
-        enabled: !!recordId,
-      }
-    ),
-    t.categories.list({
-      take: 1000,
-    }),
-    t.cities.list({
-      take: 1000,
-    }),
-    t.manufacturersCategories.categoriesByManufacturer(
-      {
-        where: {
-          manufacturer_id: {
-            equals: recordId,
-          },
+        enabled: !!token,
+        queryKey: ["categories"],
+        queryFn: async () => {
+          const { data } = await apiClient.api.categories.get({
+            $query: {
+              limit: "1000",
+              offset: "0",
+            },
+            $headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return data;
         },
       },
       {
-        enabled: !!recordId,
-      }
-    ),
-  ]);
+        enabled: !!token,
+        queryKey: ["cities"],
+        queryFn: async () => {
+          const { data } = await apiClient.api.cities.get({
+            $query: {
+              limit: "1000",
+              offset: "0",
+            },
+            $headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return data;
+        },
+      },
+      {
+        enabled: !!recordId && !!token,
+        queryKey: ["manufacturers_categories", recordId],
+        queryFn: async () => {
+          if (recordId) {
+            const { data } = await apiClient.api.manufacturers_categories.get({
+              $query: {
+                limit: "30",
+                offset: "0",
+                filters: JSON.stringify([
+                  {
+                    field: "manufacturer_id",
+                    operator: "=",
+                    value: recordId,
+                  },
+                ]),
+                fields: "category_id,manufacturer_id",
+              },
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            return data;
+          } else {
+            return null;
+          }
+        },
+      },
+    ],
+  });
 
   const isLoading = useMemo(() => {
-    return createMutation.isPending || isUpdateLoading;
-  }, [createMutation.isPending, isUpdateLoading]);
+    return createMutation.isPending || updateMutation.isPending;
+  }, [createMutation.isPending, updateMutation.isPending]);
 
   const categoriesSelectData = useMemo(() => {
-    if (categories && categories.items) {
-      return categories.items.map((category) => {
+    if (categories && categories.data) {
+      return categories.data.map((category) => {
         return {
           label: category.name,
           value: category.id,
@@ -193,7 +244,7 @@ export default function ManufacturersForm({
   }, [categories]);
 
   useEffect(() => {
-    if (record) {
+    if (record && "id" in record) {
       form.setFieldValue("active", record.active);
       form.setFieldValue("name", record.name);
       form.setFieldValue("short_name", record.short_name);
@@ -201,9 +252,9 @@ export default function ManufacturersForm({
       form.setFieldValue("city_id", record.city_id);
     }
 
-    if (manufacturerCategories && manufacturerCategories.items) {
+    if (manufacturerCategories && manufacturerCategories.data) {
       setSelectedCategories(
-        manufacturerCategories.items.map((category) => category.category_id)
+        manufacturerCategories.data.map((category) => category.category_id)
       );
     }
   }, [record, form, manufacturerCategories]);
@@ -299,7 +350,7 @@ export default function ManufacturersForm({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {cities?.items.map((item) => (
+                          {cities?.data?.map((item) => (
                             <SelectItem key={item.id} value={item.id}>
                               {item.name}
                             </SelectItem>

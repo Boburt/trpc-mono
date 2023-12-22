@@ -13,6 +13,7 @@ import { manufacturersPropertiesController } from "./manufacturers_properties/co
 import { manufacturersPropertiesCategoriesController } from "./manufacturers_properties_categories/controller";
 import { usersRolesController } from "./users_roles/controller";
 import { manufacturersController } from "./manufacturers/controller";
+import { manufacturersCategoriesController } from "./manufacturers_categories/controller";
 
 export const apiController = new Elysia({
   prefix: "/api",
@@ -30,4 +31,5 @@ export const apiController = new Elysia({
   .use(categoriesController)
   .use(manufacturersPropertiesController)
   .use(manufacturersPropertiesCategoriesController)
-  .use(manufacturersController);
+  .use(manufacturersController)
+  .use(manufacturersCategoriesController);

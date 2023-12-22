@@ -10,6 +10,9 @@ import { useSession } from "next-auth/react";
 import { UploadCloudIcon } from "lucide-react";
 import { Progress } from "@admin/components/ui/progress";
 import { trpc } from "@admin/utils/trpc";
+import useToken from "@admin/store/get-token";
+import { apiClient } from "@admin/utils/eden";
+import { useQuery } from "@tanstack/react-query";
 
 const UploadProgress = () => {
   const progressData = useItemProgressListener();
@@ -81,7 +84,7 @@ export default function FileUploadField({
   code?: string;
   onValueChange: (value: string) => void;
 }) {
-  const { data: session } = useSession();
+  const token = useToken();
   const [path, setPath] = useState<string | undefined>(undefined);
 
   const listeners = useMemo(
@@ -102,62 +105,92 @@ export default function FileUploadField({
     [onValueChange]
   );
 
-  const { data: assetsData } = trpc.assets.list.useQuery(
-    {
-      where: {
-        model,
-        model_id,
-        code,
-        path: "sources",
+  const queryParams = {
+    limit: "1",
+    offset: "0",
+    fields: "id,name,path,model,model_id,code",
+    filters: JSON.stringify([
+      {
+        field: "model",
+        operator: "=",
+        value: model,
       },
+      {
+        field: "model_id",
+        operator: "=",
+        value: model_id,
+      },
+      {
+        field: "code",
+        operator: "=",
+        value: code,
+      },
+      {
+        field: "path",
+        operator: "=",
+        value: "sources",
+      },
+    ]),
+  };
+
+  const { data: assetsData, isLoading } = useQuery({
+    enabled: !!token && !!model_id,
+    gcTime: 1,
+    staleTime: 1,
+    refetchOnWindowFocus: false,
+    refetchOnMount: "always",
+    queryKey: ["manufacturer_assets", queryParams],
+    queryFn: async () => {
+      const { data } = await apiClient.api.assets.get({
+        $query: queryParams,
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
-    {
-      enabled: !!model_id,
-      cacheTime: 1,
-      staleTime: 1,
-      refetchOnWindowFocus: false,
-      refetchOnMount: "always",
-    }
-  );
+  });
 
   useEffect(() => {
-    if (assetsData?.items && assetsData?.items[0]) {
+    if (assetsData?.data && assetsData?.data[0]) {
       setPath(
-        `${process.env.TRPC_API_URL}/public/${assetsData.items[0]?.path}/${assetsData.items[0]?.id}/${assetsData.items[0]?.name}`
+        `${process.env.TRPC_API_URL}/public/${assetsData.data[0]?.path}/${assetsData.data[0]?.id}/${assetsData.data[0]?.name}`
       );
     }
-  }, [assetsData?.items]);
+  }, [assetsData?.data]);
 
   return (
     <div>
-      <Uploady
-        destination={{
-          url: `${process.env.TRPC_API_URL}/upload-assets`,
-          params: {
-            model: "",
-            model_id: "",
-            name: "",
-            code: "",
-          },
-        }}
-        method="POST"
-        multiple={false}
-        listeners={listeners}
-      >
-        <UploadDropZone
-          className="upload-dropzone"
-          onDragOverClassName="drag-over"
-          grouped={false}
+      {token && (
+        <Uploady
+          destination={{
+            url: `${process.env.TRPC_API_URL}/upload-assets`,
+            params: {
+              model: "",
+              model_id: "",
+              name: "",
+              code: "",
+            },
+          }}
+          method="POST"
+          multiple={false}
+          listeners={listeners}
         >
-          <UploadContainer
-            model={model}
-            model_id={model_id}
-            token={session?.accessToken}
-            path={path}
-            code={code}
-          />
-        </UploadDropZone>
-      </Uploady>
+          <UploadDropZone
+            className="upload-dropzone"
+            onDragOverClassName="drag-over"
+            grouped={false}
+          >
+            <UploadContainer
+              model={model}
+              model_id={model_id}
+              token={token}
+              path={path}
+              code={code}
+            />
+          </UploadDropZone>
+        </Uploady>
+      )}
     </div>
   );
 }
