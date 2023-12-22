@@ -25,6 +25,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useImmer } from "use-immer";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { toast } from "sonner";
+import { apiClient } from "@admin/utils/eden";
+import { useQueries } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
 
 dayjs.extend(localizedFormat);
 
@@ -33,7 +36,9 @@ export const ManufacturerPropertiesForm = ({
 }: {
   recordId: string;
 }) => {
+  const token = useToken();
   const [propertyValues, setPropertyValues] = useImmer<Record<string, any>>({});
+
   const [
     {
       data: manufacturerPropertiesCategories,
@@ -47,17 +52,51 @@ export const ManufacturerPropertiesForm = ({
       data: manufacturerPropertyValues,
       isLoading: isLoadingManufacturerPropertyValues,
     },
-  ] = trpc.useQueries((t) => [
-    t.manufacturersPropertiesCategories.cachedManufacturerPropertiesCategories(
-      {}
-    ),
-    t.manufacturersProperties.cachedManufacturerProperties({}),
-    t.manufacturersProperties.getManufacturerPropertyValues({
-      where: {
-        manufacturer_id: recordId,
+  ] = useQueries({
+    queries: [
+      {
+        enabled: !!token,
+        queryKey: ["manufacturers_properties_categories_cached"],
+        queryFn: async () => {
+          const { data } =
+            await apiClient.api.manufacturers_properties_categories.cached.get({
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          return data;
+        },
       },
-    }),
-  ]);
+      {
+        enabled: !!token,
+        queryKey: ["manufacturers_properties_cached"],
+        queryFn: async () => {
+          const { data } =
+            await apiClient.api.manufacturers_properties.cached.get({
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          return data;
+        },
+      },
+      {
+        enabled: !!token && !!recordId,
+        queryKey: ["manufacturers_properties_values", recordId],
+        queryFn: async () => {
+          const { data } =
+            await apiClient.api.manufacturers_properties.property_value[
+              recordId
+            ].get({
+              $headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          return data;
+        },
+      },
+    ],
+  });
 
   const {
     mutateAsync: setManufacturerProperties,
@@ -88,7 +127,10 @@ export const ManufacturerPropertiesForm = ({
   }, [propertyValues, recordId]);
 
   useEffect(() => {
-    if (manufacturerPropertyValues) {
+    if (
+      manufacturerPropertyValues &&
+      Array.isArray(manufacturerPropertyValues)
+    ) {
       setPropertyValues((prev) => {
         manufacturerPropertyValues.forEach((property) => {
           prev[property.property_id] = property.value;
@@ -98,25 +140,33 @@ export const ManufacturerPropertiesForm = ({
   }, [manufacturerPropertyValues]);
 
   const formGroupedFields = useMemo(() => {
-    if (manufacturerPropertiesCategories && manufacturerProperties) {
-      return manufacturerPropertiesCategories.map((category) => {
-        return {
-          label: category.name,
-          fields: manufacturerProperties
-            .filter((property) => {
-              return property.category_id === category.id;
-            })
-            .map((property) => {
-              return {
-                label: property.name,
-                value: property.id,
-                type: property.type,
-                additional_data:
-                  property.additional_data as AdditionalDataItem[],
-              };
-            }),
-        };
-      });
+    if (
+      manufacturerPropertiesCategories &&
+      manufacturerProperties &&
+      Array.isArray(manufacturerProperties)
+    ) {
+      if (Array.isArray(manufacturerPropertiesCategories)) {
+        return manufacturerPropertiesCategories?.map((category) => {
+          return {
+            label: category.name,
+            fields: manufacturerProperties
+              .filter((property) => {
+                return property.category_id === category.id;
+              })
+              .map((property) => {
+                return {
+                  label: property.name,
+                  value: property.id,
+                  type: property.type,
+                  additional_data:
+                    property.additional_data as AdditionalDataItem[],
+                };
+              }),
+          };
+        });
+      } else {
+        return [];
+      }
     }
     return [];
   }, [manufacturerPropertiesCategories, manufacturerProperties]);

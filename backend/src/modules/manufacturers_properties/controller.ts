@@ -1,10 +1,11 @@
 import { ctx } from "@backend/context";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
-import { manufacturers_properties, permissions, roles_permissions } from "backend/drizzle/schema";
-import { sql, InferSelectModel, eq, SQLWrapper, and } from "drizzle-orm";
+import { manufacturers, manufacturers_properties, manufacturers_properties_values, permissions, roles_permissions } from "backend/drizzle/schema";
+import { sql, InferSelectModel, eq, SQLWrapper, and, inArray } from "drizzle-orm";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import Elysia, { t } from "elysia";
+
 
 export const manufacturersPropertiesController = new Elysia({
     name: '@api/manufacturers_properties'
@@ -13,7 +14,7 @@ export const manufacturersPropertiesController = new Elysia({
     .get(
         "/manufacturers_properties",
         async ({
-            query: { limit, offset, sort, fields,
+            query: { limit, offset, fields,
                 filters },
             user,
             set,
@@ -86,6 +87,35 @@ export const manufacturersPropertiesController = new Elysia({
         const res = await cacheController.getCachedManufacturersProperties({});
         return res;
     })
+    .get('/manufacturers_properties/property_value/:manufacturerId', async ({
+        params: {
+            manufacturerId
+        },
+        drizzle,
+        set,
+        user
+    }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                message: "User not found",
+            };
+        }
+
+        if (!user.permissions.includes("manufacturers_properties.edit")) {
+            set.status = 401;
+            return {
+                message: "You don't have permissions",
+            };
+        }
+        const res = await drizzle.select().from(manufacturers_properties_values).where(eq(manufacturers_properties_values.manufacturer_id, manufacturerId)).execute();
+
+        return res;
+    }, {
+        params: t.Object({
+            manufacturerId: t.String()
+        })
+    })
     .get(
         "/manufacturers_properties/:id",
         async ({ params: { id }, user, set, drizzle }) => {
@@ -149,6 +179,71 @@ export const manufacturersPropertiesController = new Elysia({
             }),
         }
     )
+    .post("/manufacturers_properties/set_properties/:manufacturerId", async ({
+        params: {
+            manufacturerId
+        },
+        body: {
+            properties
+        },
+        user,
+        set,
+        drizzle,
+        cacheController
+    }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                message: "User not found",
+            };
+        }
+
+        if (!user.permissions.includes("manufacturers_properties.edit")) {
+            set.status = 401;
+            return {
+                message: "You don't have permissions",
+            };
+        }
+
+        const manufacturer = await drizzle.query.manufacturers.findFirst({
+            where: eq(manufacturers.id, manufacturerId)
+        });
+
+        if (!manufacturer) {
+            set.status = 404;
+            return {
+                message: 'Manufacturer is not found'
+            }
+        }
+
+        const manufacturerProperties =
+            await cacheController.getCachedManufacturersProperties({});
+
+        // remove all properties by propertyId which are not in manufacturerProperties
+        const propertiesToSet = properties.filter((property) => {
+            return manufacturerProperties.find((p) => p.id === property.propertyId);
+        });
+
+        const propertiesToDelete = manufacturerProperties.filter((property) => {
+            return !properties.find((p) => p.propertyId === property.id);
+        });
+
+        await drizzle.delete(manufacturers_properties_values).where(and(
+            eq(manufacturers_properties_values.manufacturer_id, manufacturerId),
+            inArray(manufacturers_properties_values.property_id, propertiesToDelete.map(p => p.id))
+        ))
+
+    }, {
+        params: t.Object({
+            manufacturerId: t.String()
+        }),
+        body: t.Object({
+            properties: t.Array(t.Object({
+                propertyId: t.String(),
+                value: t.Union([t.String(), t.Number()])
+            }))
+        })
+    })
     .post(
         "/manufacturers_properties",
         async ({ body: { data, fields }, user, set, drizzle }) => {
