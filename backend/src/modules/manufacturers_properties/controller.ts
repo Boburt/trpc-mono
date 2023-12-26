@@ -231,7 +231,9 @@ export const manufacturersPropertiesController = new Elysia({
         await drizzle.delete(manufacturers_properties_values).where(and(
             eq(manufacturers_properties_values.manufacturer_id, manufacturerId),
             inArray(manufacturers_properties_values.property_id, propertiesToDelete.map(p => p.id))
-        ))
+        )).execute();
+
+
 
     }, {
         params: t.Object({

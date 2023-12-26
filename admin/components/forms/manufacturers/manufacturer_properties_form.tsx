@@ -26,7 +26,7 @@ import { useImmer } from "use-immer";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { toast } from "sonner";
 import { apiClient } from "@admin/utils/eden";
-import { useQueries } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import useToken from "@admin/store/get-token";
 
 dayjs.extend(localizedFormat);
@@ -96,6 +96,27 @@ export const ManufacturerPropertiesForm = ({
         },
       },
     ],
+  });
+
+  const setPropertiesMutation = useMutation({
+    mutationFn: ({
+      role_id,
+      permissions_ids,
+    }: {
+      role_id: string;
+      permissions_ids: string[];
+    }) => {
+      return apiClient.api.roles_permissions.assign_permissions.post({
+        role_id,
+        permissions_ids,
+        $headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Свойства успешно обновлены");
+    },
   });
 
   const {
