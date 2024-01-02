@@ -7,11 +7,11 @@
     "start": "bun run ./src/index.ts"
   },
   "dependencies": {
-    "@elysiajs/bearer": "^0.7.0",
-    "@elysiajs/cors": "^0.7.0",
-    "@elysiajs/jwt": "^0.7.0",
-    "@elysiajs/server-timing": "^0.7.1",
-    "@elysiajs/static": "^0.6.0",
+    "@elysiajs/bearer": "^0.8.0",
+    "@elysiajs/cors": "^0.8.0",
+    "@elysiajs/jwt": "^0.8.0",
+    "@elysiajs/server-timing": "^0.8.0",
+    "@elysiajs/static": "^0.8.1",
     "@elysiajs/trpc": "^0.7.0",
     "@elysiajs/websocket": "^0.2.8",
     "@prisma/client": "latest",
@@ -19,9 +19,9 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "bullmq": "^4.8.0",
-    "drizzle-orm": "^0.29.1",
+    "drizzle-orm": "^0.29.2",
     "drizzle-typebox": "^0.1.1",
-    "elysia": "^0.7.30",
+    "elysia": "^0.8.3",
     "eslint-plugin-drizzle": "^0.2.2",
     "ioredis": "^5.3.2",
     "jose": "^4.14.4",
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/bull": "^4.10.0",
     "bun-types": "^0.7.3",
-    "drizzle-kit": "^0.20.7",
+    "drizzle-kit": "^0.20.8",
     "prisma": "latest",
     "typescript": "^5.3.3"
   },
