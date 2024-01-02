@@ -106,6 +106,15 @@ export function NavigationMenuDemo() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <CanAccess permission="sp_tickets.list">
+          <NavigationMenuItem>
+            <Link href="/sp_tickets" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Обращения
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
         <CanAccess permission="categories.list">
           <NavigationMenuItem>
             <Link href="/categories" legacyBehavior passHref>
