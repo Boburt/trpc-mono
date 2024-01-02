@@ -1,4 +1,5 @@
 import { DB } from "@backend/db";
+import { DrizzleDB } from "@backend/lib/db";
 import {
   RolesWithRelations,
   Permissions,
@@ -14,10 +15,12 @@ import {
   ManufacturersPropertiesCategories,
   SeoLinks,
 } from "@prisma/client";
+import { permissions, roles, roles_permissions, seo_links } from "backend/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export class CacheControlService {
   constructor(
-    private readonly prisma: DB,
+    private readonly drizzle: DrizzleDB,
     private readonly redis: RedisClientType
   ) {
     this.cachePermissions();
@@ -28,10 +31,12 @@ export class CacheControlService {
     this.cacheCities();
     this.cacheManufacturersPropertiesCategories();
     this.cacheManufacturersProperties();
+    this.cacheSpTicketCategories();
+    this.cacheSpTicketStatuses();
   }
 
   async cachePermissions() {
-    const permissions = await this.prisma.permissions.findMany();
+    const permissions = await this.drizzle.query.permissions.findMany();
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}permissions`,
       JSON.stringify(permissions)
@@ -56,18 +61,36 @@ export class CacheControlService {
   }
 
   async cacheRoles() {
-    const roles = await this.prisma.roles.findMany({
-      include: {
-        roles_permissions: {
-          include: {
-            permissions: true,
-          },
-        },
-      },
+    const rolesList = await this.drizzle.select({
+      id: roles.id,
+      name: roles.name,
+      code: roles.code,
+      active: roles.active,
+    }).from(roles).execute();
+
+
+    const rolesPermissionsList = await this.drizzle.select({
+      slug: permissions.slug,
+      role_id: roles_permissions.role_id,
+    }).from(roles_permissions).leftJoin(permissions, eq(roles_permissions.permission_id, permissions.id)).execute();
+
+    const rolesPermissions = rolesPermissionsList.reduce((acc: any, cur: any) => {
+      if (!acc[cur.role_id]) {
+        acc[cur.role_id] = [];
+      }
+      acc[cur.role_id].push(cur.slug);
+      return acc;
+    }, {});
+
+    const res = rolesList.map((role: any) => {
+      return {
+        ...role,
+        permissions: rolesPermissions[role.id] || [],
+      };
     });
     await this.redis.set(
-      `${process.env.PROJECT_PREFIX}roles`,
-      JSON.stringify(roles)
+      `${process.env.PROJECT_PREFIX}_roles`,
+      JSON.stringify(res)
     );
   }
 
@@ -98,8 +121,8 @@ export class CacheControlService {
   }
 
   async cacheLangs() {
-    const langs = await this.prisma.langs.findMany({
-      take: 100,
+    const langs = await this.drizzle.query.langs.findMany({
+      limit: 100,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}langs`,
@@ -119,8 +142,8 @@ export class CacheControlService {
   }
 
   async cacheCategories() {
-    const langs = await this.prisma.categories.findMany({
-      take: 100,
+    const langs = await this.drizzle.query.categories.findMany({
+      limit: 100,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}categories`,
@@ -166,8 +189,8 @@ export class CacheControlService {
   }
 
   async cacheImageSizes() {
-    const langs = await this.prisma.imageSizes.findMany({
-      take: 100,
+    const langs = await this.drizzle.query.image_sizes.findMany({
+      limit: 100,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}image_sizes`,
@@ -193,8 +216,8 @@ export class CacheControlService {
   }
 
   async cacheCities() {
-    const langs = await this.prisma.cities.findMany({
-      take: 100,
+    const langs = await this.drizzle.query.cities.findMany({
+      limit: 100,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}cities`,
@@ -214,8 +237,8 @@ export class CacheControlService {
   }
 
   async cacheManufacturersPropertiesCategories() {
-    const langs = await this.prisma.manufacturersPropertiesCategories.findMany({
-      take: 300,
+    const langs = await this.drizzle.query.manufacturers_properties_categories.findMany({
+      limit: 300,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}manufacturersPropertiesCategories`,
@@ -241,8 +264,8 @@ export class CacheControlService {
   }
 
   async cacheManufacturersProperties() {
-    const langs = await this.prisma.manufacturersProperties.findMany({
-      take: 300,
+    const langs = await this.drizzle.query.manufacturers_properties.findMany({
+      limit: 300,
     });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}manufacturersProperties`,
@@ -275,12 +298,8 @@ export class CacheControlService {
         `${process.env.PROJECT_PREFIX}seo_links:${beforeLinkHash}`
       );
     }
-    const seoLinks = await this.prisma.seoLinks.findFirst({
-      where: {
-        id: {
-          equals: id,
-        },
-      },
+    const seoLinks = await this.drizzle.query.seo_links.findFirst({
+      where: eq(seo_links.id, id)
     });
     if (seoLinks) {
       // @ts-ignore
@@ -293,12 +312,8 @@ export class CacheControlService {
   }
 
   async deleteSEOLinks(id: string) {
-    const seoLinks = await this.prisma.seoLinks.findFirst({
-      where: {
-        id: {
-          equals: id,
-        },
-      },
+    const seoLinks = await this.drizzle.query.seo_links.findFirst({
+      where: eq(seo_links.id, id),
     });
     if (seoLinks) {
       // @ts-ignore
@@ -310,7 +325,7 @@ export class CacheControlService {
   }
 
   async getCachedSEOLinks(link: string): Promise<SeoLinks | null> {
-    // @ts-ignore
+    console.log("link", link);
     const linkHash = Bun.hash(link);
     const seoLinks = await this.redis.get(
       `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
@@ -320,5 +335,55 @@ export class CacheControlService {
     } else {
       return null;
     }
+  }
+
+  async cacheSpTicketCategories() {
+    const spTicketCategories = await this.drizzle.query.sp_ticket_categories.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}sp_ticket_categories`,
+      JSON.stringify(spTicketCategories)
+    );
+  }
+
+  async getCachedSpTicketCategories({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Permissions[]> {
+    const spTicketCategories = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}sp_ticket_categories`
+    );
+    let res = JSON.parse(spTicketCategories ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheSpTicketStatuses() {
+    const spTicketStatuses = await this.drizzle.query.sp_ticket_statuses.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}sp_ticket_statuses`,
+      JSON.stringify(spTicketStatuses)
+    );
+  }
+
+  async getCachedSpTicketStatuses({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Permissions[]> {
+    const spTicketStatuses = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}sp_ticket_statuses`
+    );
+    let res = JSON.parse(spTicketStatuses ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
   }
 }

@@ -1,9 +1,13 @@
 import { ctx } from "@backend/context";
+import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
-import { manufacturers, permissions } from "backend/drizzle/schema";
-import { sql, InferSelectModel, eq } from "drizzle-orm";
+import { manufacturers, cities, manufacturers_categories, image_sizes, assets, categories } from "backend/drizzle/schema";
+import { sql, InferSelectModel, eq, SQLWrapper, inArray, and, or } from "drizzle-orm";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import Elysia, { t } from "elysia";
+import { PublicManufacturer } from "./dto/list.dto";
+
+
 
 export const manufacturersController = new Elysia({
     name: '@api/manufacturers'
@@ -67,6 +71,171 @@ export const manufacturersController = new Elysia({
             }),
         }
     )
+    .get('/manufacturers/with_facet', async ({ query: { limit, offset, sort, filters, imageSizes, facets }, user, set, drizzle, cacheController }) => {
+
+        let whereClause: (SQLWrapper | undefined)[] = [];
+        if (filters) {
+            whereClause = parseFilterFields(filters, manufacturers, {
+                cities,
+                manufacturers_categories,
+                categories
+            });
+        }
+        if (facets && Object.keys(facets).length > 0) {
+            const cachedProperties = (
+                await cacheController.getCachedManufacturersProperties({})
+            ).filter((property) => property.show_in_filter);
+
+
+            let elasticQuery: {
+                size: number;
+                aggs: {
+                    [key: string]: any;
+                };
+                query: {
+                    bool: {
+                        filter: any[];
+                    };
+                };
+            } = {
+                size: 10000,
+                query: {
+                    bool: {
+                        filter: [],
+                    },
+                },
+                aggs: {
+                    city: {
+                        nested: {
+                            path: "city",
+                        },
+                        aggs: {
+                            city: {
+                                terms: {
+                                    field: "city.keyword_name.keyword",
+                                    size: 100,
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+
+            if (facets.city && facets.city.length > 0) {
+                elasticQuery.query.bool.filter.push({
+                    nested: {
+                        path: "city",
+                        query: {
+                            bool: {
+                                filter: [
+                                    {
+                                        terms: {
+                                            "city.keyword_name.keyword": facets.city,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                });
+            }
+
+            cachedProperties.forEach((property) => {
+                if (facets![property.code] && facets![property.code].length > 0) {
+                    if (property.type === "number") {
+                        elasticQuery.query.bool.filter.push({
+                            range: {
+                                [`properties.${property.code}`]: {
+                                    gte: facets![property.code][0].split("-")[0],
+                                    lte: facets![property.code][0].split("-")[1],
+                                },
+                            },
+                        });
+                    } else {
+                        elasticQuery.query.bool.filter.push({
+                            terms: {
+                                [`properties.${property.code}.keyword`]: facets![property.code],
+                            },
+                        });
+                    }
+                }
+            });
+
+            const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
+
+            const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+
+            const elasticResponse = await fetch(elasticUrl, {
+                method: "POST",
+                body: JSON.stringify(elasticQuery),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+                },
+            });
+
+            const elasticResponseJson = await elasticResponse.json();
+
+            const ids = elasticResponseJson.hits.hits.map((h: any) => h._id);
+
+            whereClause.push(inArray(manufacturers.id, ids));
+        }
+
+        const manufacturersList = (await drizzle.select({
+            id: manufacturers.id,
+            name: manufacturers.name,
+            short_name: manufacturers.short_name,
+            description: manufacturers.description,
+            active: manufacturers.active,
+            city_id: manufacturers.city_id,
+            rating: manufacturers.rating,
+        }).from(manufacturers)
+            .leftJoin(manufacturers_categories, eq(manufacturers_categories.manufacturer_id, manufacturers.id))
+            .leftJoin(categories, eq(categories.id, manufacturers_categories.category_id))
+            .leftJoin(cities, eq(cities.id, manufacturers.city_id))
+            .where(and(...whereClause))
+            .limit(+limit)
+            .offset(+offset)
+            .execute()) as PublicManufacturer[];
+
+        if (imageSizes && imageSizes.length > 0) {
+            const images = await drizzle.query.assets.findMany({
+                where: or(...imageSizes.map(i => and(
+                    eq(assets.code, i.image_code),
+                    eq(assets.resize_code, i.size_code),
+                    eq(assets.model, "manufacturers"),
+                    inArray(assets.model_id, manufacturersList.map(m => m.id))
+                )))
+            });
+
+            manufacturersList.forEach((p) => {
+                p.images = images
+                    .filter((i) => i.model_id === p.id)
+                    .map((i) => ({
+                        path: `/public/${i.path}/${i.parent_id}/${i.name}`,
+                        code: i.code ?? "",
+                    }));
+            });
+        }
+
+        return { items: manufacturersList }
+    }, {
+        query: t.Object({
+            limit: t.String(),
+            offset: t.String({
+                default: "0"
+            }),
+            sort: t.Optional(t.String()),
+            filters: t.Optional(
+                t.String()
+            ),
+            facets: t.Optional(t.Nullable(t.Record(t.String(), t.Array(t.String())))),
+            imageSizes: t.Optional(t.Array(t.Object({
+                image_code: t.String(),
+                size_code: t.String()
+            })))
+        }),
+    })
     .get(
         "/manufacturers/:id",
         async ({ params: { id }, user, set, drizzle }) => {

@@ -13,6 +13,8 @@ import {
   ManufacturersWhereInputSchema,
   ManufacturersWhereUniqueInputSchema,
 } from "@backend/lib/zod";
+import { manufacturers } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 import { z } from "zod";
 
 export const ManufacturersWithImagesSchema = ManufacturersSchema.merge(
@@ -76,3 +78,10 @@ export const manufacturerReviewsPaginatedArgsSchema = z.object({
   id: z.string(),
   from: z.number().optional(),
 });
+
+export type PublicManufacturer = InferSelectModel<typeof manufacturers> & {
+  images?: {
+    path: string;
+    code: string;
+  }[];
+};

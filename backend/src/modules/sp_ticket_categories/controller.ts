@@ -1,16 +1,16 @@
-import { ctx } from "@backend/context";
-import { parseSelectFields } from "@backend/lib/parseSelectFields";
-import { roles } from "backend/drizzle/schema";
-import { InferSelectModel, sql, eq } from "drizzle-orm";
-import { SelectedFields } from "drizzle-orm/pg-core";
+import { sp_ticket_categories } from "backend/drizzle/schema";
+import { InferSelectModel, eq, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
+import { parseSelectFields } from "@backend/lib/parseSelectFields";
+import { SelectedFields } from "drizzle-orm/pg-core";
+import { ctx } from "@backend/context";
 
-export const rolesController = new Elysia({
-  name: "@api/roles",
+export const spTicketCategoriesController = new Elysia({
+  name: "@api/sp_ticket_categories",
 })
   .use(ctx)
   .get(
-    "/roles",
+    "/sp_ticket_categories",
     async ({
       query: { limit, offset, sort, filter, fields },
       user,
@@ -18,14 +18,13 @@ export const rolesController = new Elysia({
       drizzle,
     }) => {
       if (!user) {
-
         set.status = 401;
         return {
           message: "User not found",
         };
       }
 
-      if (!user.permissions.includes("roles.list")) {
+      if (!user.permissions.includes("sp_ticket_categories.list")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -33,25 +32,24 @@ export const rolesController = new Elysia({
       }
       let selectFields: SelectedFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, roles, {});
+        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
       }
       const rolesCount = await drizzle
         .select({ count: sql<number>`count(*)` })
-        .from(roles)
+        .from(sp_ticket_categories)
         .execute();
       const rolesList = (await drizzle
         .select(selectFields)
-        .from(roles)
+        .from(sp_ticket_categories)
         .limit(+limit)
         .offset(+offset)
-        .execute()) as InferSelectModel<typeof roles>[];
+        .execute()) as InferSelectModel<typeof sp_ticket_categories>[];
       return {
         total: rolesCount[0].count,
         data: rolesList,
       };
     },
     {
-      permission: 'roles.list',
       query: t.Object({
         limit: t.String(),
         offset: t.String(),
@@ -69,7 +67,7 @@ export const rolesController = new Elysia({
       }),
     }
   )
-  .get("/roles/cached", async ({ redis, user, set, cacheController }) => {
+  .get("/sp_ticket_categories/cached", async ({ redis, user, set, cacheController }) => {
     if (!user) {
       set.status = 401;
       return {
@@ -77,17 +75,17 @@ export const rolesController = new Elysia({
       };
     }
 
-    if (!user.permissions.includes("roles.list")) {
+    if (!user.permissions.includes("sp_ticket_categories.list")) {
       set.status = 401;
       return {
         message: "You don't have permissions",
       };
     }
-    const res = await cacheController.getCachedRoles({});
+    const res = await cacheController.getCachedSpTicketCategories({});
     return res;
   })
   .get(
-    "/roles/:id",
+    "/sp_ticket_categories/:id",
     async ({ params: { id }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -96,18 +94,18 @@ export const rolesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("roles.one")) {
+      if (!user.permissions.includes("sp_ticket_categories.one")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
         };
       }
-      const rolesRecord = await drizzle
+      const permissionsRecord = await drizzle
         .select()
-        .from(roles)
-        .where(eq(roles.id, id))
+        .from(sp_ticket_categories)
+        .where(eq(sp_ticket_categories.id, id))
         .execute();
-      return rolesRecord[0];
+      return permissionsRecord[0];
     },
     {
       params: t.Object({
@@ -116,7 +114,7 @@ export const rolesController = new Elysia({
     }
   )
   .delete(
-    "/roles/:id",
+    "/sp_ticket_categories/:id",
     async ({ params: { id }, user, set, drizzle,
       cacheController }) => {
       if (!user) {
@@ -126,22 +124,22 @@ export const rolesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("roles.delete")) {
+      if (!user.permissions.includes("sp_ticket_categories.delete")) {
         set.status = 401;
         return {
-          message: "You don't have roles",
+          message: "You don't have permissions",
         };
       }
 
       const permissionsRecord = await drizzle
         .select({
-          id: roles.id,
+          id: sp_ticket_categories.id,
         })
-        .from(roles)
-        .where(eq(roles.id, id))
+        .from(sp_ticket_categories)
+        .where(eq(sp_ticket_categories.id, id))
         .execute();
 
-      await drizzle.delete(roles).where(eq(roles.id, id)).execute();
+      await drizzle.delete(sp_ticket_categories).where(eq(sp_ticket_categories.id, id)).execute();
       return permissionsRecord[0];
     },
     {
@@ -151,7 +149,7 @@ export const rolesController = new Elysia({
     }
   )
   .post(
-    "/roles",
+    "/sp_ticket_categories",
     async ({ body: { data, fields }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -160,7 +158,7 @@ export const rolesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("roles.add")) {
+      if (!user.permissions.includes("sp_ticket_categories.add")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -168,10 +166,10 @@ export const rolesController = new Elysia({
       }
       let selectFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, roles, {});
+        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
       }
       const result = await drizzle
-        .insert(roles)
+        .insert(sp_ticket_categories)
         .values(data)
         .returning(selectFields);
 
@@ -183,15 +181,15 @@ export const rolesController = new Elysia({
       body: t.Object({
         data: t.Object({
           name: t.String(),
-          code: t.Optional(t.Nullable(t.String())),
-          active: t.Optional(t.Boolean()),
+          description: t.Optional(t.Nullable(t.String())),
+          sort: t.Number(),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
     }
   )
   .put(
-    "/roles/:id",
+    "/sp_ticket_categories/:id",
     async ({ params: { id }, body: { data, fields }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -200,7 +198,7 @@ export const rolesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("roles.edit")) {
+      if (!user.permissions.includes("sp_ticket_categories.edit")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -208,12 +206,12 @@ export const rolesController = new Elysia({
       }
       let selectFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, roles, {});
+        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
       }
       const result = await drizzle
-        .update(roles)
+        .update(sp_ticket_categories)
         .set(data)
-        .where(eq(roles.id, id))
+        .where(eq(sp_ticket_categories.id, id))
         .returning(selectFields);
 
       return {
@@ -227,8 +225,8 @@ export const rolesController = new Elysia({
       body: t.Object({
         data: t.Object({
           name: t.String(),
-          code: t.Optional(t.Nullable(t.String())),
-          active: t.Optional(t.Boolean()),
+          description: t.Optional(t.Nullable(t.String())),
+          sort: t.Number(),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),

@@ -7,64 +7,74 @@ import Elysia, { t } from "elysia";
 
 export const seoLinksController = new Elysia({
     name: '@api/seo_links'
-}).use(ctx).get(
-    "/seo_links",
-    async ({
-        query: { limit, offset, sort, filter, fields },
-        user,
-        set,
-        drizzle,
-    }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                message: "User not found",
-            };
-        }
+})
+    .use(ctx)
+    .get(
+        "/seo_links",
+        async ({
+            query: { limit, offset, sort, filter, fields },
+            user,
+            set,
+            drizzle,
+        }) => {
+            if (!user) {
+                set.status = 401;
+                return {
+                    message: "User not found",
+                };
+            }
 
-        if (!user.permissions.includes("seo_links.list")) {
-            set.status = 401;
+            if (!user.permissions.includes("seo_links.list")) {
+                set.status = 401;
+                return {
+                    message: "You don't have permissions",
+                };
+            }
+            let selectFields: SelectedFields = {};
+            if (fields) {
+                selectFields = parseSelectFields(fields, seo_links, {});
+            }
+            const rolesCount = await drizzle
+                .select({ count: sql<number>`count(*)` })
+                .from(seo_links)
+                .execute();
+            const rolesList = (await drizzle
+                .select(selectFields)
+                .from(seo_links)
+                .limit(+limit)
+                .offset(+offset)
+                .execute()) as InferSelectModel<typeof seo_links>[];
             return {
-                message: "You don't have permissions",
+                total: rolesCount[0].count,
+                data: rolesList,
             };
+        },
+        {
+            query: t.Object({
+                limit: t.String(),
+                offset: t.String(),
+                sort: t.Optional(t.String()),
+                filter: t.Optional(
+                    t.Object({
+                        id: t.Number(),
+                        name: t.String(),
+                        email: t.String(),
+                        address: t.String(),
+                        phone: t.String(),
+                    })
+                ),
+                fields: t.Optional(t.String()),
+            }),
         }
-        let selectFields: SelectedFields = {};
-        if (fields) {
-            selectFields = parseSelectFields(fields, seo_links, {});
-        }
-        const rolesCount = await drizzle
-            .select({ count: sql<number>`count(*)` })
-            .from(seo_links)
-            .execute();
-        const rolesList = (await drizzle
-            .select(selectFields)
-            .from(seo_links)
-            .limit(+limit)
-            .offset(+offset)
-            .execute()) as InferSelectModel<typeof seo_links>[];
-        return {
-            total: rolesCount[0].count,
-            data: rolesList,
-        };
-    },
-    {
+    )
+    .get('/seo_links/by_link', async ({ query: { link }, cacheController }) => {
+        const res = await cacheController.getCachedSEOLinks(link);
+        return res;
+    }, {
         query: t.Object({
-            limit: t.String(),
-            offset: t.String(),
-            sort: t.Optional(t.String()),
-            filter: t.Optional(
-                t.Object({
-                    id: t.Number(),
-                    name: t.String(),
-                    email: t.String(),
-                    address: t.String(),
-                    phone: t.String(),
-                })
-            ),
-            fields: t.Optional(t.String()),
-        }),
-    }
-)
+            link: t.String()
+        })
+    })
     .get(
         "/seo_links/:id",
         async ({ params: { id }, user, set, drizzle }) => {

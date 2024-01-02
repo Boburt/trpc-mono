@@ -7,7 +7,7 @@ import {
 } from "./trpc";
 import { router } from "./_routes";
 import { apiController } from "./modules/controllers";
-import serverTiming from "@elysiajs/server-timing";
+import { serverTiming } from "@elysiajs/server-timing";
 
 const app = new Elysia()
   .use(serverTiming())
@@ -18,12 +18,11 @@ const app = new Elysia()
   )
   .get("/", () => ({ hello: "world" }))
   .use(apiController)
-  .decorate("permission", "assets.add")
-  .use(
-    trpc(router, {
-      createContext,
-    })
-  )
+  // .use(
+  //   trpc(router, {
+  //     createContext,
+  //   })
+  // )
   .listen(3000);
 
 export type App = typeof app;

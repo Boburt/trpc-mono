@@ -268,3 +268,69 @@ export const users_roles = pgTable("users_roles", {
 			PK_c525e9373d63035b9919e578a9c: primaryKey(table.user_id, table.role_id)
 		}
 	});
+
+
+export const sp_ticket_categories = pgTable("sp_ticket_categories", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+	sort: integer("sort").notNull(),
+});
+
+export const sp_ticket_statuses = pgTable("sp_ticket_statuses", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	code: text("code"),
+	color: text("color"),
+	sort: integer("sort").notNull(),
+});
+
+export const sp_tickets = pgTable("sp_tickets", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+	category_id: uuid("category_id").notNull(),
+	status_id: uuid("status_id").notNull(),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});
+
+export const sp_tickets_comments = pgTable("sp_tickets_comments", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	ticket_id: uuid("ticket_id").notNull(),
+	user_id: uuid("user_id").notNull().references(() => users.id, { onUpdate: "cascade" }),
+	comment: text("comment").notNull(),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});
+
+export const sp_tickets_categories_responses = pgTable("sp_tickets_categories_responses", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	user_id: uuid("user_id").notNull(),
+	response_type: text("response_type").notNull(),
+	category_id: uuid("category_id").notNull(),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});
+
+export const sp_tickets_responses = pgTable("sp_tickets_responses", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	user_id: uuid("user_id").notNull(),
+	response_type: text("response_type").notNull(),
+	ticket_id: uuid("ticket_id").notNull(),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});
+
+export const sp_tickets_timeline = pgTable("sp_tickets_timeline", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	ticket_id: uuid("ticket_id").notNull(),
+	user_id: uuid("user_id").notNull(),
+	status_id: uuid("status_id").notNull(),
+	timeline_type: text("timeline_type").notNull(),
+	comment: text("comment").notNull(),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});

@@ -6,6 +6,7 @@ import { $values } from "@frontend/src/store/manufacturers_filter";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@nanostores/react";
 import ManufacturersPagination from "./Pagination";
+import { PublicManufacturer } from "@backend/modules/manufacturers/dto/list.dto";
 
 export default function ManufacturersListClient({
   categorySlug,
@@ -13,7 +14,9 @@ export default function ManufacturersListClient({
   pathname,
 }: {
   categorySlug?: string;
-  initialData: RouterOutputs["manufacturers"]["publicList"];
+  initialData: {
+    items: PublicManufacturer[];
+  };
   pathname?: string;
 }) {
   const values = useStore($values);
