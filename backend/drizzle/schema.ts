@@ -268,3 +268,29 @@ export const users_roles = pgTable("users_roles", {
 			PK_c525e9373d63035b9919e578a9c: primaryKey(table.user_id, table.role_id)
 		}
 	});
+
+
+export const sp_ticket_categories = pgTable("sp_ticket_categories", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+});
+
+export const sp_ticket_statuses = pgTable("sp_ticket_statuses", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	code: text("code"),
+	color: text("color"),
+});
+
+export const sp_tickets = pgTable("sp_tickets", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+	category_id: uuid("category_id").notNull(),
+	status_id: uuid("status_id").notNull(),
+	created_by: uuid("created_by").references(() => users.id, { onUpdate: "cascade" }),
+	updated_by: uuid("updated_by").references(() => users.id, { onUpdate: "cascade" }),
+	created_at: timestamp("created_at", { precision: 5, withTimezone: true, mode: 'string' }),
+	updated_at: timestamp("updated_at", { precision: 5, withTimezone: true, mode: 'string' }),
+});
