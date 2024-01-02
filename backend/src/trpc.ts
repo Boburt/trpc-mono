@@ -31,11 +31,7 @@ import { SeoLinksService } from "./modules/seo_links/service";
 import { drizzleDb } from "@backend/lib/db";
 
 // redis
-export const client = new Redis({
-  port: 6379, // Redis port
-  host: "127.0.0.1", // Redis host
-  //   maxRetriesPerRequest: null,
-});
+
 export type RedisClientType = typeof client;
 
 // bull queues
