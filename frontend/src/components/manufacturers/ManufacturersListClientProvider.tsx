@@ -2,6 +2,7 @@ import { RouterOutputs } from "@frontend/src/utils/trpc";
 import Providers from "@frontend/src/store/provider";
 import ManufacturersListClient from "./ManufacturersListClient";
 import { $searchParams } from "@frontend/src/store/search_params";
+import { PublicManufacturer } from "@backend/modules/manufacturers/dto/list.dto";
 
 export default function ManufacturersListClientProvider({
   categorySlug,
@@ -10,7 +11,9 @@ export default function ManufacturersListClientProvider({
   pathname,
 }: {
   categorySlug?: string;
-  initialData: RouterOutputs["manufacturers"]["publicList"];
+  initialData: {
+    items: PublicManufacturer[];
+  };
   searchParams?: string;
   pathname?: string;
 }) {

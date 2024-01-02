@@ -6,24 +6,40 @@ import { RouterOutputs } from "@admin/utils/trpc";
 import { Switch } from "@components/ui/switch";
 import DeleteAction from "./delete-action";
 import PermissionsFormSheet from "@admin/components/forms/permissions/sheet";
-import { sp_ticket_categories } from "@backend/../drizzle/schema";
+import {
+  sp_ticket_categories,
+  sp_ticket_statuses,
+} from "@backend/../drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
 import SpTicketCategoriesFormSheet from "@admin/components/forms/sp_ticket_categories/sheet";
 
-export const spTicketCategoriesColumns: ColumnDef<
-  InferSelectModel<typeof sp_ticket_categories>
+export const spTicketStatusesColumns: ColumnDef<
+  InferSelectModel<typeof sp_ticket_statuses>
 >[] = [
   {
     accessorKey: "name",
     header: "Название",
   },
   {
-    accessorKey: "description",
-    header: "Описание",
+    accessorKey: "code",
+    header: "Код",
   },
   {
     accessorKey: "sort",
     header: "Сортировка",
+  },
+  {
+    accessorKey: "color",
+    cell: ({ row }) => {
+      const record = row.original;
+
+      return (
+        <div
+          className="w-5 h-5 rounded-full"
+          style={record.color ? { backgroundColor: record.color } : {}}
+        />
+      );
+    },
   },
   {
     id: "actions",

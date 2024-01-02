@@ -32,6 +32,7 @@ export class CacheControlService {
     this.cacheManufacturersPropertiesCategories();
     this.cacheManufacturersProperties();
     this.cacheSpTicketCategories();
+    this.cacheSpTicketStatuses();
   }
 
   async cachePermissions() {
@@ -324,7 +325,7 @@ export class CacheControlService {
   }
 
   async getCachedSEOLinks(link: string): Promise<SeoLinks | null> {
-    // @ts-ignore
+    console.log("link", link);
     const linkHash = Bun.hash(link);
     const seoLinks = await this.redis.get(
       `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
@@ -353,6 +354,31 @@ export class CacheControlService {
       `${process.env.PROJECT_PREFIX}sp_ticket_categories`
     );
     let res = JSON.parse(spTicketCategories ?? "[]");
+
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
+
+    return res;
+  }
+
+  async cacheSpTicketStatuses() {
+    const spTicketStatuses = await this.drizzle.query.sp_ticket_statuses.findMany();
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}sp_ticket_statuses`,
+      JSON.stringify(spTicketStatuses)
+    );
+  }
+
+  async getCachedSpTicketStatuses({
+    take,
+  }: {
+    take?: number;
+  }): Promise<Permissions[]> {
+    const spTicketStatuses = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}sp_ticket_statuses`
+    );
+    let res = JSON.parse(spTicketStatuses ?? "[]");
 
     if (take && res.length > take) {
       res = res.slice(0, take);

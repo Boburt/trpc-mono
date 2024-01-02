@@ -1,16 +1,16 @@
-import { sp_ticket_categories } from "backend/drizzle/schema";
+import { sp_ticket_categories, sp_ticket_statuses } from "backend/drizzle/schema";
 import { InferSelectModel, eq, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import { ctx } from "@backend/context";
 
-export const spTicketCategoriesController = new Elysia({
-  name: "@api/sp_ticket_categories",
+export const spTicketStatusesController = new Elysia({
+  name: "@api/sp_ticket_statuses",
 })
   .use(ctx)
   .get(
-    "/sp_ticket_categories",
+    "/sp_ticket_statuses",
     async ({
       query: { limit, offset, sort, filter, fields },
       user,
@@ -24,7 +24,7 @@ export const spTicketCategoriesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("sp_ticket_categories.list")) {
+      if (!user.permissions.includes("sp_ticket_statuses.list")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -32,18 +32,18 @@ export const spTicketCategoriesController = new Elysia({
       }
       let selectFields: SelectedFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
+        selectFields = parseSelectFields(fields, sp_ticket_statuses, {});
       }
       const rolesCount = await drizzle
         .select({ count: sql<number>`count(*)` })
-        .from(sp_ticket_categories)
+        .from(sp_ticket_statuses)
         .execute();
       const rolesList = (await drizzle
         .select(selectFields)
-        .from(sp_ticket_categories)
+        .from(sp_ticket_statuses)
         .limit(+limit)
         .offset(+offset)
-        .execute()) as InferSelectModel<typeof sp_ticket_categories>[];
+        .execute()) as InferSelectModel<typeof sp_ticket_statuses>[];
       return {
         total: rolesCount[0].count,
         data: rolesList,
@@ -67,7 +67,7 @@ export const spTicketCategoriesController = new Elysia({
       }),
     }
   )
-  .get("/sp_ticket_categories/cached", async ({ redis, user, set, cacheController }) => {
+  .get("/sp_ticket_statuses/cached", async ({ redis, user, set, cacheController }) => {
     if (!user) {
       set.status = 401;
       return {
@@ -75,17 +75,17 @@ export const spTicketCategoriesController = new Elysia({
       };
     }
 
-    if (!user.permissions.includes("sp_ticket_categories.list")) {
+    if (!user.permissions.includes("sp_ticket_statuses.list")) {
       set.status = 401;
       return {
         message: "You don't have permissions",
       };
     }
-    const res = await cacheController.getCachedSpTicketCategories({});
+    const res = await cacheController.getCachedSpTicketStatuses({});
     return res;
   })
   .get(
-    "/sp_ticket_categories/:id",
+    "/sp_ticket_statuses/:id",
     async ({ params: { id }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -94,7 +94,7 @@ export const spTicketCategoriesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("sp_ticket_categories.one")) {
+      if (!user.permissions.includes("sp_ticket_statuses.one")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -102,8 +102,8 @@ export const spTicketCategoriesController = new Elysia({
       }
       const permissionsRecord = await drizzle
         .select()
-        .from(sp_ticket_categories)
-        .where(eq(sp_ticket_categories.id, id))
+        .from(sp_ticket_statuses)
+        .where(eq(sp_ticket_statuses.id, id))
         .execute();
       return permissionsRecord[0];
     },
@@ -114,7 +114,7 @@ export const spTicketCategoriesController = new Elysia({
     }
   )
   .delete(
-    "/sp_ticket_categories/:id",
+    "/sp_ticket_statuses/:id",
     async ({ params: { id }, user, set, drizzle,
       cacheController }) => {
       if (!user) {
@@ -124,7 +124,7 @@ export const spTicketCategoriesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("sp_ticket_categories.delete")) {
+      if (!user.permissions.includes("sp_ticket_statuses.delete")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -133,13 +133,13 @@ export const spTicketCategoriesController = new Elysia({
 
       const permissionsRecord = await drizzle
         .select({
-          id: sp_ticket_categories.id,
+          id: sp_ticket_statuses.id,
         })
-        .from(sp_ticket_categories)
-        .where(eq(sp_ticket_categories.id, id))
+        .from(sp_ticket_statuses)
+        .where(eq(sp_ticket_statuses.id, id))
         .execute();
 
-      await drizzle.delete(sp_ticket_categories).where(eq(sp_ticket_categories.id, id)).execute();
+      await drizzle.delete(sp_ticket_statuses).where(eq(sp_ticket_statuses.id, id)).execute();
       return permissionsRecord[0];
     },
     {
@@ -149,7 +149,7 @@ export const spTicketCategoriesController = new Elysia({
     }
   )
   .post(
-    "/sp_ticket_categories",
+    "/sp_ticket_statuses",
     async ({ body: { data, fields }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -158,7 +158,7 @@ export const spTicketCategoriesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("sp_ticket_categories.add")) {
+      if (!user.permissions.includes("sp_ticket_statuses.add")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -166,10 +166,10 @@ export const spTicketCategoriesController = new Elysia({
       }
       let selectFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
+        selectFields = parseSelectFields(fields, sp_ticket_statuses, {});
       }
       const result = await drizzle
-        .insert(sp_ticket_categories)
+        .insert(sp_ticket_statuses)
         .values(data)
         .returning(selectFields);
 
@@ -180,8 +180,11 @@ export const spTicketCategoriesController = new Elysia({
     {
       body: t.Object({
         data: t.Object({
-          name: t.String(),
-          description: t.Optional(t.Nullable(t.String())),
+          name: t.String({
+            minLength: 1,
+          }),
+          code: t.Optional(t.Nullable(t.String())),
+          color: t.Optional(t.Nullable(t.String())),
           sort: t.Number(),
         }),
         fields: t.Optional(t.Array(t.String())),
@@ -189,7 +192,7 @@ export const spTicketCategoriesController = new Elysia({
     }
   )
   .put(
-    "/sp_ticket_categories/:id",
+    "/sp_ticket_statuses/:id",
     async ({ params: { id }, body: { data, fields }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -198,7 +201,7 @@ export const spTicketCategoriesController = new Elysia({
         };
       }
 
-      if (!user.permissions.includes("sp_ticket_categories.edit")) {
+      if (!user.permissions.includes("sp_ticket_statuses.edit")) {
         set.status = 401;
         return {
           message: "You don't have permissions",
@@ -206,12 +209,12 @@ export const spTicketCategoriesController = new Elysia({
       }
       let selectFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, sp_ticket_categories, {});
+        selectFields = parseSelectFields(fields, sp_ticket_statuses, {});
       }
       const result = await drizzle
-        .update(sp_ticket_categories)
+        .update(sp_ticket_statuses)
         .set(data)
-        .where(eq(sp_ticket_categories.id, id))
+        .where(eq(sp_ticket_statuses.id, id))
         .returning(selectFields);
 
       return {
@@ -224,8 +227,11 @@ export const spTicketCategoriesController = new Elysia({
       }),
       body: t.Object({
         data: t.Object({
-          name: t.String(),
-          description: t.Optional(t.Nullable(t.String())),
+          name: t.String({
+            minLength: 1,
+          }),
+          code: t.Optional(t.Nullable(t.String())),
+          color: t.Optional(t.Nullable(t.String())),
           sort: t.Number(),
         }),
         fields: t.Optional(t.Array(t.String())),

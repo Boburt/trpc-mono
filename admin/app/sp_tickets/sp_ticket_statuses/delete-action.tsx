@@ -9,14 +9,14 @@ export default function DeleteAction({ recordId }: { recordId: string }) {
   const token = useToken();
   const createMutation = useMutation({
     mutationFn: () => {
-      return apiClient.api.sp_ticket_categories[recordId].delete({
+      return apiClient.api.sp_ticket_statuses[recordId].delete({
         $headers: {
           Authorization: `Bearer ${token}`,
         },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sp_ticket_categories"] });
+      queryClient.invalidateQueries({ queryKey: ["sp_ticket_statuses"] });
     },
   });
 

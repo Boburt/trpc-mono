@@ -45,7 +45,7 @@ export function removeQueryParams(paramsToRemove: string[]) {
   history.replaceState(null, "", url.toString());
 }
 
-export function parseQueryParams(query) {
+export function parseQueryParams(query: string) {
   const params = new URLSearchParams(query);
   const obj = {};
 
@@ -53,7 +53,7 @@ export function parseQueryParams(query) {
     const keys = key.match(/([^\[\]]+)/g);
     let currentObj = obj;
 
-    keys.forEach((k, index) => {
+    keys?.forEach((k, index) => {
       if (index === keys.length - 1) {
         if (currentObj[k] instanceof Array) {
           currentObj[k].push(decodeURIComponent(value));

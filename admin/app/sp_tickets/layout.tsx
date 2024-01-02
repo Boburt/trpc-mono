@@ -53,7 +53,7 @@ const SpTicketLayout: FC<SpTicketLayoutProps> = ({ children }) => {
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={90}>
-        <div className="flex h-full items-center p-6">{children}</div>
+        <div className="h-full items-center p-6">{children}</div>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

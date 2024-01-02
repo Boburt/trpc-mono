@@ -4,48 +4,42 @@ import { ManufacturersWhereInputSchema } from "@backend/lib/zod/index";
 import { z } from "zod";
 import ManufacturersListClientProvider from "./ManufacturersListClientProvider";
 import { parseQueryParams } from "@frontend/src/utils/manufacturers_filter_fn";
+import { apiClient } from "@frontend/src/utils/eden";
 const { categorySlug } = Astro.props;
 
-const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
 const searchParams = new URL(Astro.request.url).search;
 const pathname = new URL(Astro.request.url).pathname;
 
 const manufacturersFilterValues = parseQueryParams(searchParams);
+const filters = [];
 if (categorySlug) {
-  where.manufacturers_categories = {
-    some: {
-      manufacturers_categories_categories: {
-        code: {
-          equals: categorySlug,
-        },
-      },
-    },
-  };
+  filters.push({
+    field: 'categories.code',
+    operator: 'eq',
+    value: categorySlug,
+  })
 }
 
-const manufacturers = await trpcClient.manufacturers.publicList.query({
-  where,
-  take: 20,
-  include: {
-    cities: true,
-    manufacturers_categories: {
-      include: {
-        manufacturers_categories_categories: true,
+const {data:manufacturers } = await apiClient.api.manufacturers.with_facet.get({
+  $query: {
+    filters: filters.length ? JSON.stringify(filters) : undefined,
+    limit: '20',
+    facets: manufacturersFilterValues?.manufacturers_filter ?? null,
+    imageSizes: [
+      {
+        image_code: "logo",
+        size_code: "300_300",
       },
-    },
+    ]
   },
-  imageSizes: [
-    {
-      image_code: "logo",
-      size_code: "300_300",
-    },
-  ],
-  facets: manufacturersFilterValues?.manufacturers_filter ?? null,
 });
+
 ---
 
 <ManufacturersListClientProvider
-  initialData={manufacturers}
+  initialData={manufacturers ?? {
+    items: []
+  }}
   categorySlug={categorySlug}
   searchParams={searchParams}
   pathname={pathname}
