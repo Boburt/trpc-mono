@@ -9,7 +9,11 @@ import { ViewTransitions } from "astro:transitions";
 import { Toaster } from "sonner";
 import { apiClient } from "../utils/eden";
 
-let { title, showHeaderFilter = false } = Astro.props;
+let {
+  title,
+  showHeaderFilter = false,
+  disableBreadcrumbs = false,
+} = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;
 const url = Astro.url.pathname + Astro.url.search;
 console.log("url", url);
@@ -18,7 +22,7 @@ const seoLink = await apiClient.api.seo_links.by_link.get({
     link: url,
   },
 });
-if (seoLink && seoLink.data && 'id' in seoLink.data) {
+if (seoLink && seoLink.data && "id" in seoLink.data) {
   title = seoLink.data.title;
 }
 ---
@@ -31,11 +35,11 @@ if (seoLink && seoLink.data && 'id' in seoLink.data) {
     <ViewTransitions />
     <title>{title ?? "Лёгкая промышленность"}</title>
   </head>
-  <body>
-    <Header showHeaderFilter={showHeaderFilter} />
+  <body class="bg-white dark:bg-slate-900">
+    <Header />
     <div class="container min-h-screen mx-auto py-4">
       {
-        pathname !== "/" && (
+        pathname !== "/" && disableBreadcrumbs == false && (
           <Breadcrumbs indexText="Home" mainBemClass="breadcrumbs" />
         )
       }

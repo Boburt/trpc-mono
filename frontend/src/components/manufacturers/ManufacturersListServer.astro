@@ -11,31 +11,29 @@ const manufacturersFilterValues = parseQueryParams(searchParams);
 const filters = [];
 if (categorySlug) {
   filters.push({
-    field: 'categories.code',
-    operator: 'eq',
+    field: "categories.code",
+    operator: "eq",
     value: categorySlug,
-  })
+  });
 }
 
-const {data:manufacturers } = await apiClient.api.manufacturers.with_facet.get({
-  $query: {
+const { data: manufacturers } =
+  await apiClient.api.manufacturers.with_facet.post({
     filters: filters.length ? JSON.stringify(filters) : undefined,
-    limit: '20',
-    facets: manufacturersFilterValues?.manufacturers_filter ?? null,
+    limit: "20",
+    facets: manufacturersFilterValues?.manufacturers_filter ?? undefined,
     imageSizes: [
       {
         image_code: "logo",
         size_code: "300_300",
       },
-    ]
-  },
-});
-
+    ],
+  });
 ---
 
 <ManufacturersListClientProvider
   initialData={manufacturers ?? {
-    items: []
+    items: [],
   }}
   categorySlug={categorySlug}
   searchParams={searchParams}

@@ -1,12 +1,11 @@
-import { ManufacturersWhereInputSchema } from "@backend/lib/zod";
-import { RouterOutputs, trpc } from "@frontend/src/utils/trpc";
 import { z } from "zod";
 import { ManufactureCard } from "./Card";
 import { $values } from "@frontend/src/store/manufacturers_filter";
-import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@nanostores/react";
 import ManufacturersPagination from "./Pagination";
 import { PublicManufacturer } from "@backend/modules/manufacturers/dto/list.dto";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@frontend/src/utils/eden";
 
 export default function ManufacturersListClient({
   categorySlug,
@@ -20,57 +19,65 @@ export default function ManufacturersListClient({
   pathname?: string;
 }) {
   const values = useStore($values);
-  const where: z.infer<typeof ManufacturersWhereInputSchema> = {};
+  const filters: {
+    field: string;
+    operator: string;
+    value: string;
+  }[] = [];
   if (categorySlug) {
-    where.manufacturers_categories = {
-      some: {
-        manufacturers_categories_categories: {
-          code: {
-            equals: categorySlug,
-          },
-        },
-      },
-    };
+    filters.push({
+      field: "categories.code",
+      operator: "eq",
+      value: categorySlug,
+    });
   }
-  const { data: manufacturers, isLoading } =
-    trpc.manufacturers.publicList.useQuery(
+  console.log("values", values);
+  const { data: manufacturers, isLoading } = useQuery({
+    queryKey: [
+      "faceted_manufacturers",
       {
-        where,
-        take: 20,
-        include: {
-          cities: true,
-          manufacturers_categories: {
-            include: {
-              manufacturers_categories_categories: true,
-            },
-          },
-        },
+        filters: filters.length ? JSON.stringify(filters) : undefined,
+        limit: "20",
+        facets: JSON.stringify(values),
         imageSizes: [
           {
             image_code: "logo",
             size_code: "300_300",
           },
         ],
-        facets: values,
       },
-      {
-        initialData,
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.manufacturers.with_facet.post({
+        filters: filters.length ? JSON.stringify(filters) : undefined,
+        limit: "20",
+        facets: values,
+        imageSizes: [
+          {
+            image_code: "logo",
+            size_code: "300_300",
+          },
+        ],
+      });
+      return data;
+    },
+    initialData,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+  console.log("manufacturers?.items", manufacturers?.items);
   return (
     <div className="relative mt-8 flex flex-col">
-      {manufacturers.items.map((item) => (
+      {manufacturers?.items.map((item) => (
         <ManufactureCard item={item} key={item.id} />
       ))}
-      {!isLoading && pathname != "/" && (
+      {/* {!isLoading && pathname != "/" && (
         <ManufacturersPagination
           paginationMeta={manufacturers.meta}
           categorySlug={categorySlug}
         />
-      )}
+      )} */}
     </div>
   );
 }

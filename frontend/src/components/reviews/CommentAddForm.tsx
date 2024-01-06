@@ -1,5 +1,7 @@
-import { trpc } from "@frontend/src/utils/trpc";
-import { trpcClient } from "@frontend/src/utils/trpc-server";
+import { $accessToken } from "@frontend/src/store/auth";
+import { apiClient } from "@frontend/src/utils/eden";
+import { useStore } from "@nanostores/react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 type reviewFormData = {
@@ -12,24 +14,37 @@ export const ManufacturerCommentAddForm = ({
 }: {
   manufacturerId: string;
 }) => {
+  const accessToken = useStore($accessToken);
   const {
     register,
     formState: { errors, isSubmitting },
     handleSubmit,
     reset,
   } = useForm<reviewFormData>({ defaultValues: { rating: 0 } });
-  const { mutateAsync: addReviewAsync, isLoading } =
-    trpc.manufacturers.addReview.useMutation({
-      onSuccess: () => {
-        reset();
-        toast.success("Комментарий успешно добавлен и ожидает модерации");
-      },
-    });
+
+  const reviewCreateMutation = useMutation({
+    mutationFn: (newTodo: {
+      manufacturer_id: string;
+      rating: number;
+      review: string;
+    }) => {
+      return apiClient.api.manufacturers.review.post({
+        ...newTodo,
+        $headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      reset();
+      toast.success("Комментарий успешно добавлен и ожидает модерации");
+    },
+  });
   const onSubmit = handleSubmit(async (data) => {
     console.log(data);
     try {
-      addReviewAsync({
-        id: manufacturerId,
+      reviewCreateMutation.mutate({
+        manufacturer_id: manufacturerId,
         review: data.review,
         rating: +data.rating,
       });
@@ -90,7 +105,9 @@ export const ManufacturerCommentAddForm = ({
         ></textarea>
       </div>
       <button type="submit" className="btn btn-primary btn-sm">
-        {isLoading && <span className="loading loading-spinner"></span>}
+        {reviewCreateMutation.isPending && (
+          <span className="loading loading-spinner"></span>
+        )}
         Добавить комментарий
       </button>
     </form>

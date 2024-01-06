@@ -70,11 +70,13 @@ export const categoriesController = new Elysia({
   .get(
     "/categories/public",
     async ({ cacheController, query }) => {
-      return await cacheController.getActiveCachedCategories(query);
+      return await cacheController.getActiveCachedCategories({
+        take: query.take ? +query.take : undefined,
+      });
     },
     {
       query: t.Object({
-        take: t.Optional(t.Number()),
+        take: t.Optional(t.String()),
       }),
     }
   )

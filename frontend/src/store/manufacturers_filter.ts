@@ -1,4 +1,3 @@
-import { RouterOutputs } from "../utils/trpc";
 import {
   createQueryParams,
   removeQueryParams,
@@ -8,7 +7,15 @@ import { atom, computed, map } from "nanostores";
 
 export const $values = map<Record<string, string[]>>({});
 
-export const $facets = atom<RouterOutputs["manufacturers"]["getFacetFilter"]>(
+export const $facets = atom<{
+  name: string;
+  code: string;
+  multiple: boolean;
+  value: {
+    value: string;
+    count: number;
+  }[];
+}[]>(
   []
 );
 

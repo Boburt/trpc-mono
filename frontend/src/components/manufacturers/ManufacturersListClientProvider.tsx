@@ -25,11 +25,11 @@ export default function ManufacturersListClientProvider({
   return (
     <Providers>
       dd
-      {/* <ManufacturersListClient
+      <ManufacturersListClient
         categorySlug={categorySlug}
         initialData={initialData}
         pathname={pathname}
-      /> */}
+      />
     </Providers>
   );
 }
