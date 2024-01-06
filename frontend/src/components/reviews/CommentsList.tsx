@@ -1,9 +1,10 @@
-import { trpc } from "@frontend/src/utils/trpc";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import "dayjs/locale/ru";
 import clsx from "clsx";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@frontend/src/utils/eden";
 
 dayjs.locale("ru");
 dayjs.extend(relativeTime);
@@ -14,15 +15,32 @@ export const ManufacturersReviewsList = ({
   manufacturerId: string;
 }) => {
   const totalStars = Array.from({ length: 5 * 2 }, (_, index) => index + 1);
-  const { data: reviews, isLoading } = trpc.manufacturers.getReviews.useQuery({
-    id: manufacturerId,
+
+  const { data: reviews, isLoading } = useQuery({
+    queryKey: [
+      "manufacturer_reviews",
+      {
+        id: manufacturerId,
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.manufacturers[
+        manufacturerId
+      ].reviews.get({
+        $query: {},
+      });
+      return data;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 
   return (
     <div className="flex flex-col">
       {isLoading && <div>Загрузка...</div>}
       <div className="space-y-4">
-        {reviews?.items.map((review) => (
+        {reviews?.items.map((review: any) => (
           <article
             key={review.id}
             className="p-6 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900"

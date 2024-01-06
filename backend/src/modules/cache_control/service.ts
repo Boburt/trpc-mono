@@ -15,8 +15,8 @@ import {
   ManufacturersPropertiesCategories,
   SeoLinks,
 } from "@prisma/client";
-import { permissions, roles, roles_permissions, seo_links } from "backend/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { categories, permissions, roles, roles_permissions, seo_links } from "backend/drizzle/schema";
+import { InferSelectModel, eq } from "drizzle-orm";
 
 export class CacheControlService {
   constructor(
@@ -172,20 +172,20 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<Categories[]> {
+  }) {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}categories`
     );
 
-    let res = JSON.parse(langs ?? "[]");
+    let res = JSON.parse(langs ?? "[]") as InferSelectModel<typeof categories>[];
 
-    res = res.filter((category: Categories) => category.active);
+    res = res.filter((category) => category.active);
 
     if (take && res.length > take) {
       res = res.slice(0, take);
     }
 
-    return res.filter((category: Categories) => category.active);
+    return res.filter((category) => category.active);
   }
 
   async cacheImageSizes() {

@@ -11,26 +11,39 @@ import {
   resetValues,
 } from "@frontend/src/store/manufacturers_filter";
 import { useStore } from "@nanostores/react";
+import { useQuery } from "@tanstack/react-query";
+import { categories } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import { apiClient } from "@frontend/src/utils/eden";
 
 export default function CategoriesFilterClient({
   initialData,
   pathname,
 }: {
-  initialData: RouterOutputs["categories"]["activeCachedCategories"];
+  initialData: InferSelectModel<typeof categories>[];
   pathname: string;
 }) {
-  const { data: categories, isLoading } =
-    trpc.categories.activeCachedCategories.useQuery(
+  const { data: categories, isLoading } = useQuery({
+    queryKey: [
+      "public_categories",
       {
         take: 100,
       },
-      {
-        initialData,
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.categories.public.get({
+        $query: {
+          take: 100,
+        },
+      });
+      return data;
+    },
+    initialData,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
   const facets = useStore($facets);
   const values = useStore($values);
   const isValuesFilled = useStore($isValuesFilled);
@@ -49,7 +62,7 @@ export default function CategoriesFilterClient({
           >
             All
           </a>
-          {categories.map((category) => {
+          {categories?.map((category) => {
             const isActive =
               pathname === `/manufacturer/categories/${category.code}/`;
             return (

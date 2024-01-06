@@ -64,7 +64,10 @@ export const usersController = new Elysia({
 })
     .use(ctx)
     .post("/users/login", async ({
-        body: { login, password },
+        body: {
+            login,
+            password
+        },
         set,
         cacheController
     }) => {

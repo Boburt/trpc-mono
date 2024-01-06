@@ -4,6 +4,7 @@ import { persistentAtom } from "@nanostores/persistent";
 import Cookies from "js-cookie";
 import { trpcClient } from "../utils/trpc-server";
 import { RouterOutputs } from "../utils/trpc";
+import { apiClient } from "../utils/eden";
 
 export const $isLoggedIn = persistentAtom<boolean>("isLoggedIn", false, {
   encode(value) {
@@ -74,21 +75,30 @@ export const $userData = persistentAtom<
 export const login = (login: string, password: string) =>
   task(async () => {
     try {
-      const loginResponse = await trpcClient.users.login.mutate({
+      const {
+        data, error
+      } = await apiClient.api.users.login.post({
         login,
-        password,
+        password
       });
-      console.log(loginResponse);
-      if (loginResponse.accessToken) {
-        Cookies.set("x-token", loginResponse.accessToken);
-        $accessToken.set(loginResponse.accessToken);
+
+
+      if (error) {
+        return {
+          error: error.message,
+        };
       }
-      if (loginResponse.refreshToken) {
-        Cookies.set("x-refresh-token", loginResponse.refreshToken);
-        $refreshToken.set(loginResponse.refreshToken);
+
+      if (data.accessToken) {
+        Cookies.set("x-token", data.accessToken);
+        $accessToken.set(data.accessToken);
       }
-      if (loginResponse.data) {
-        $userData.set(loginResponse.data);
+      if (data.refreshToken) {
+        Cookies.set("x-refresh-token", data.refreshToken);
+        $refreshToken.set(data.refreshToken);
+      }
+      if (data.data) {
+        $userData.set(data.data);
       }
       $isLoggedIn.set(true);
     } catch (e: any) {

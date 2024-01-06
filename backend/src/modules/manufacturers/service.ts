@@ -798,7 +798,6 @@ export class ManufacturersService {
     });
 
     const responseJson = await response.json();
-    console.log(responseJson);
 
     return {
       total: responseJson.hits.total.value,

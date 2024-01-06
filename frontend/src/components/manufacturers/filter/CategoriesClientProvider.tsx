@@ -22,7 +22,7 @@ export default function CategoriesClientProvider({
   return (
     <Providers>
       dd
-      {/* <CategoriesFilterClient initialData={categories} pathname={pathname} /> */}
+      <CategoriesFilterClient initialData={categories} pathname={pathname} />
     </Providers>
   );
 }

@@ -63,7 +63,28 @@ const permissionExtension = new Elysia({
             })
         }
     }
-})
+});
+
+export const newIndexManufacturersQueue = new Queue(
+    `${process.env.PROJECT_PREFIX}index_manufacturers`,
+    {
+        connection: client,
+    }
+);
+
+export const newDeleteManufacturersQueue = new Queue(
+    `${process.env.PROJECT_PREFIX}delete_manufacturers`,
+    {
+        connection: client,
+    }
+);
+
+export const newIndexManufacturerReviewQueue = new Queue(
+    `${process.env.PROJECT_PREFIX}index_manufacturer_review`,
+    {
+        connection: client,
+    }
+);
 
 export const ctx = new Elysia({
     name: "@app/ctx",
@@ -73,6 +94,10 @@ export const ctx = new Elysia({
     .decorate("assetsService", assetsService)
     .decorate('drizzle', drizzleDb)
     .decorate('cacheController', cacheControlService)
+    .decorate('newAssetsAddedQueue', newAssetsAddedQueue)
+    .decorate('newIndexManufacturersQueue', newIndexManufacturersQueue)
+    .decorate('newDeleteManufacturersQueue', newDeleteManufacturersQueue)
+    .decorate('newIndexManufacturerReviewQueue', newIndexManufacturerReviewQueue)
     .use(cors({
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     }))
