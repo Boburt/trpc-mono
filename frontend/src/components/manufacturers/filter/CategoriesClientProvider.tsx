@@ -1,5 +1,4 @@
 import { $facets, $values } from "@frontend/src/store/manufacturers_filter";
-import { RouterOutputs } from "../../../utils/trpc";
 import CategoriesFilterClient from "./CategoriesClient";
 import Providers from "@frontend/src/store/provider";
 
@@ -9,9 +8,9 @@ export default function CategoriesClientProvider({
   facets,
   filterValues,
 }: {
-  categories: RouterOutputs["categories"]["activeCachedCategories"];
+  categories: any; // RouterOutputs["categories"]["activeCachedCategories"];
   pathname: string;
-  facets: RouterOutputs["manufacturers"]["getFacetFilter"];
+  facets: any; // RouterOutputs["manufacturers"]["getFacetFilter"];
   filterValues: {
     [key: string]: string[];
   };
@@ -22,7 +21,8 @@ export default function CategoriesClientProvider({
   $values.set(filterValues);
   return (
     <Providers>
-      <CategoriesFilterClient initialData={categories} pathname={pathname} />
+      dd
+      {/* <CategoriesFilterClient initialData={categories} pathname={pathname} /> */}
     </Providers>
   );
 }

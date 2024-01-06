@@ -1,4 +1,3 @@
-import { RouterOutputs } from "@frontend/src/utils/trpc";
 import Providers from "@frontend/src/store/provider";
 import ManufacturersListClient from "./ManufacturersListClient";
 import { $searchParams } from "@frontend/src/store/search_params";
@@ -25,11 +24,12 @@ export default function ManufacturersListClientProvider({
 
   return (
     <Providers>
-      <ManufacturersListClient
+      dd
+      {/* <ManufacturersListClient
         categorySlug={categorySlug}
         initialData={initialData}
         pathname={pathname}
-      />
+      /> */}
     </Providers>
   );
 }
