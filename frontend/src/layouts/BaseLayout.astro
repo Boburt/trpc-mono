@@ -35,9 +35,9 @@ if (seoLink && seoLink.data && "id" in seoLink.data) {
     <ViewTransitions />
     <title>{title ?? "Лёгкая промышленность"}</title>
   </head>
-  <body class="bg-white dark:bg-slate-900">
+  <body class="bg-white dark:bg-slate-900 flex flex-col h-full">
     <Header />
-    <div class="container min-h-screen mx-auto py-4">
+    <main class="container mx-auto py-4 shrink-0">
       {
         pathname !== "/" && disableBreadcrumbs == false && (
           <Breadcrumbs indexText="Home" mainBemClass="breadcrumbs" />
@@ -45,7 +45,7 @@ if (seoLink && seoLink.data && "id" in seoLink.data) {
       }
       {showHeaderFilter && <CategoriesFilterServer />}
       <slot />
-    </div>
+    </main>
     <Footer client:load />
     <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>

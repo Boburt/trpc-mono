@@ -4,8 +4,9 @@ import react from "@astrojs/react";
 import nodejs from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import partytown from "@astrojs/partytown";
-
 import auth from "auth-astro";
+
+import tunnel from "astro-tunnel";
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,11 +17,19 @@ export default defineConfig({
   image: {
     service: sharpImageService(),
   },
-
   server: {
     port: 4000,
     host: true,
   },
   site: process.env.WEB_URL,
-  integrations: [tailwind(), react(), sitemap(), partytown(), auth()],
+  integrations: [
+    tailwind(),
+    react(),
+    sitemap(),
+    partytown(),
+    auth(),
+    tunnel({
+      port: 4000,
+    }),
+  ],
 });
