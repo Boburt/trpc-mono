@@ -198,33 +198,6 @@ export default function Header() {
               Войти
             </a>
           </div>
-<<<<<<< HEAD
-=======
-          <nav>
-            <ul className="flex space-x-4">
-              <li>
-                <a href="/" className="focus:border-b-4">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="active:border-b-4">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="/news" className="focus:border-b-4">
-                  News
-                </a>
-              </li>
-              <li>
-                <a href="/services" className="focus:border-b-4">
-                  Услуги
-                </a>
-              </li>
-            </ul>
-          </nav>
->>>>>>> 681ae06 (commit error)
         </div>
       </nav>
     </header>

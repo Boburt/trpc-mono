@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm";
 import {
   comparePassword,
+  generateRandomPassword,
   hashPassword,
   signJwt,
   verifyJwt,
@@ -98,6 +99,7 @@ export const usersController = new Elysia({
           login: user.login,
           first_name: user.first_name,
           last_name: user.last_name,
+          tg_username: user.tg_username,
         },
         process.env.JWT_EXPIRES_IN
       );
@@ -108,6 +110,7 @@ export const usersController = new Elysia({
           login: user.login,
           first_name: user.first_name,
           last_name: user.last_name,
+          tg_username: user.tg_username,
         },
         process.env.JWT_REFRESH_EXPIRES_IN
       );
@@ -263,8 +266,9 @@ export const usersController = new Elysia({
   )
   .post(
     "/users/tg",
-    async ({ body }) => {
+    async ({ body, drizzle }) => {
       const { hash, ...data } = body;
+      console.log('before bot token');
       const botToken = process.env.BOT_TOKEN;
       const secret = createHash("sha256").update(botToken!).digest();
 
@@ -273,6 +277,7 @@ export const usersController = new Elysia({
         .filter((k) => data[k])
         .map((k) => `${k}=${data[k]}`)
         .join("\n");
+      console.log('checkString', checkString)
       const hmac = createHmac("sha256", secret)
         .update(checkString)
         .digest("hex");
@@ -284,6 +289,67 @@ export const usersController = new Elysia({
       if (new Date().getTime() - Number(data.auth_date) * 1000 > 86400) {
         return error("Unauthorized", { status: 401 });
       }
+
+      let user = await drizzle.select({
+        id: users.id,
+        login: users.login,
+        first_name: users.first_name,
+        last_name: users.last_name,
+        photo_url: users.photo_url,
+        tg_id: users.tg_id,
+        tg_username: users.tg_username,
+      }).from(users).where(eq(users.tg_id, data.id)).execute();
+
+      if (user.length == 0) {
+
+        const { hash: passwordHash, salt } = await hashPassword(generateRandomPassword(12));
+        user = await drizzle.insert(users).values({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          tg_username: data.username,
+          photo_url: data.photo_url,
+          tg_id: data.id,
+          status: "active",
+          password: passwordHash,
+          salt,
+          login: data.username,
+        }).returning({
+          id: users.id,
+          login: users.login,
+          first_name: users.first_name,
+          last_name: users.last_name,
+          photo_url: users.photo_url,
+          tg_username: users.tg_username,
+          tg_id: users.tg_id,
+        }).execute();
+      }
+
+      const accessToken = await signJwt(
+        {
+          id: user[0].id,
+          login: user[0].login,
+          first_name: user[0].first_name,
+          last_name: user[0].last_name,
+          tg_username: user[0].tg_username,
+        },
+        process.env.JWT_EXPIRES_IN
+      );
+
+      const refreshToken = await signJwt(
+        {
+          id: user[0].id,
+          login: user[0].login,
+          first_name: user[0].first_name,
+          last_name: user[0].last_name,
+          tg_username: user[0].tg_username,
+        },
+        process.env.JWT_REFRESH_EXPIRES_IN
+      );
+      return {
+        refreshToken,
+        accessToken,
+      };
+
     },
     {
       body: t.Object({
@@ -396,6 +462,52 @@ export const usersController = new Elysia({
       }),
     }
   )
+  .get("/users/me", async ({ user, set, cacheController }) => {
+    if (!user) {
+      set.status = 401;
+      return {
+        message: "User not found",
+      };
+    }
+    const foundUser = await userById.execute({ id: user.id });
+    const accessToken = await signJwt(
+      {
+        id: foundUser!.id,
+        login: foundUser!.login,
+        first_name: foundUser!.first_name,
+        last_name: foundUser!.last_name,
+        tg_username: foundUser!.tg_username,
+      },
+      process.env.JWT_EXPIRES_IN
+    );
+
+    const refreshToken = await signJwt(
+      {
+        id: foundUser!.id,
+        login: foundUser!.login,
+        first_name: foundUser!.first_name,
+        last_name: foundUser!.last_name,
+        tg_username: foundUser!.tg_username,
+      },
+      process.env.JWT_REFRESH_EXPIRES_IN
+    );
+
+    const userRole = await userFirstRole.execute({ user_id: user.id });
+
+    // getting rights
+    let permissions: string[] = [];
+    if (userRole) {
+      permissions = await cacheController.getPermissionsByRoleId(
+        userRole.role_id
+      );
+    }
+    return {
+      data: foundUser,
+      refreshToken,
+      accessToken,
+      rights: permissions,
+    };
+  })
   .get(
     "/users/:id",
     async ({
