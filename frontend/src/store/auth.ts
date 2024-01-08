@@ -108,6 +108,15 @@ export const login = (login: string, password: string) =>
     }
   });
 
+export const setAuthData = (accessToken: string, refreshToken: string, data: Record<string, any>) => {
+  Cookies.set("x-token", accessToken);
+  $accessToken.set(accessToken);
+  Cookies.set("x-refresh-token", refreshToken);
+  $refreshToken.set(refreshToken);
+  $userData.set(data);
+  $isLoggedIn.set(true);
+}
+
 export const logout = () =>
   task(async () => {
     try {
