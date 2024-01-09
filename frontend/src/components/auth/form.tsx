@@ -2,6 +2,7 @@ import { $isLoggedIn, setAuthData } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
+import TelegramLoginButton from "telegram-login-button";
 
 export default function AuthForm({
   error,
@@ -74,14 +75,16 @@ export default function AuthForm({
           )}
 
           <div className="mt-5">
-            <script
-              async
-              src="https://telegram.org/js/telegram-widget.js?22"
-              data-telegram-login="TexPromUzBot"
-              data-size="large"
-              data-auth-url="/api/tg"
-              data-request-access="write"
-            ></script>
+            <div className="mx-auto">
+              <TelegramLoginButton
+                botName="TexPromUzBot"
+                dataAuthUrl="/api/tg"
+                buttonSize="large"
+                requestAccess
+                usePic
+                cornerRadius={10}
+              />
+            </div>
 
             <div className="py-3 flex items-center text-xs text-gray-400 uppercase before:flex-[1_1_0%] before:border-t before:border-gray-200 before:me-6 after:flex-[1_1_0%] after:border-t after:border-gray-200 after:ms-6 dark:text-gray-500 dark:before:border-gray-600 dark:after:border-gray-600">
               Or

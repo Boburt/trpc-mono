@@ -2,7 +2,6 @@ import { atom, action, task } from "nanostores";
 // Since we need to use "localStorage", we need nanostores persistent
 import { persistentAtom } from "@nanostores/persistent";
 import Cookies from "js-cookie";
-import { trpcClient } from "../utils/trpc-server";
 import { RouterOutputs } from "../utils/trpc";
 import { apiClient } from "../utils/eden";
 
@@ -75,13 +74,10 @@ export const $userData = persistentAtom<
 export const login = (login: string, password: string) =>
   task(async () => {
     try {
-      const {
-        data, error
-      } = await apiClient.api.users.login.post({
+      const { data, error } = await apiClient.api.users.login.post({
         login,
-        password
+        password,
       });
-
 
       if (error) {
         return {
@@ -108,14 +104,18 @@ export const login = (login: string, password: string) =>
     }
   });
 
-export const setAuthData = (accessToken: string, refreshToken: string, data: Record<string, any>) => {
+export const setAuthData = (
+  accessToken: string,
+  refreshToken: string,
+  data: Record<string, any>
+) => {
   Cookies.set("x-token", accessToken);
   $accessToken.set(accessToken);
   Cookies.set("x-refresh-token", refreshToken);
   $refreshToken.set(refreshToken);
   $userData.set(data);
   $isLoggedIn.set(true);
-}
+};
 
 export const logout = () =>
   task(async () => {
