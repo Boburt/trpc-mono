@@ -9,6 +9,7 @@ declare global {
 export default function SetClientData() {
   useEffect(() => {
     if (window.HSStaticMethods) {
+      console.log("HSStaticMethods", window.HSStaticMethods);
       window.HSStaticMethods.autoInit();
     }
   }, [window.HSStaticMethods]);

@@ -46,7 +46,7 @@ if (accessToken) {
   }
 }
 
-console.log("userData", userData);
+console.log("showHeaderFilter", showHeaderFilter);
 ---
 
 <html lang="en" class="h-full">
@@ -58,7 +58,6 @@ console.log("userData", userData);
     <title>{title ?? "Лёгкая промышленность"}</title>
   </head>
   <body class="bg-white dark:bg-slate-900 flex flex-col h-full">
-    <SetClientData client:only />
     <Header />
     <main class="container mx-auto py-4 shrink-0">
       {
@@ -72,6 +71,7 @@ console.log("userData", userData);
     <Footer />
     <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>
-    <script is:inline src="./node_modules/preline/preline.js"></script>
+    <script is:inline src="/node_modules/preline/preline.js"></script>
+    <SetClientData client:only />
   </body>
 </html>
