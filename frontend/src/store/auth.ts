@@ -85,18 +85,28 @@ export const login = (login: string, password: string) =>
         };
       }
 
-      if (data.accessToken) {
-        Cookies.set("x-token", data.accessToken);
-        $accessToken.set(data.accessToken);
+      if (!data) {
+        return {
+          error: "No data",
+        };
       }
-      if (data.refreshToken) {
-        Cookies.set("x-refresh-token", data.refreshToken);
-        $refreshToken.set(data.refreshToken);
+
+      if ('user' in data && data?.user) {
+
+        if (data.accessToken) {
+          Cookies.set("x-token", data.accessToken);
+          $accessToken.set(data.accessToken);
+        }
+        if (data.refreshToken) {
+          Cookies.set("x-refresh-token", data.refreshToken);
+          $refreshToken.set(data.refreshToken);
+        }
+        if (data.user) {
+          $userData.set(data.user);
+        }
+        $isLoggedIn.set(true);
+
       }
-      if (data.data) {
-        $userData.set(data.data);
-      }
-      $isLoggedIn.set(true);
     } catch (e: any) {
       return {
         error: e.message,

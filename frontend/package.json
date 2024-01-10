@@ -45,6 +45,7 @@
     "flowbite-react": "^0.7.2",
     "js-cookie": "^3.0.5",
     "nanostores": "^0.9.5",
+    "preline": "^2.0.3",
     "radash": "^11.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
