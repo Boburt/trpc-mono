@@ -1,5 +1,7 @@
 import { DB } from "@backend/db";
+import { verifyJwt } from "@backend/lib/bcrypt";
 import { DrizzleDB } from "@backend/lib/db";
+import { userById, userFirstRole } from "@backend/lib/prepare_statements";
 import {
   RolesWithRelations,
   Permissions,
@@ -15,7 +17,7 @@ import {
   ManufacturersPropertiesCategories,
   SeoLinks,
 } from "@prisma/client";
-import { categories, permissions, roles, roles_permissions, seo_links } from "backend/drizzle/schema";
+import { categories, permissions, roles, roles_permissions, seo_links, users } from "backend/drizzle/schema";
 import { InferSelectModel, eq } from "drizzle-orm";
 
 export class CacheControlService {
@@ -385,5 +387,77 @@ export class CacheControlService {
     }
 
     return res;
+  }
+
+  async cacheUserDataByToken(accessToken: string, refreshToken: string, userId: any) {
+    const foundUser = await userById.execute({ id: userId }) as InferSelectModel<typeof users>;
+    if (!foundUser) {
+      return null;
+    }
+
+    if (foundUser.status != 'active') {
+      return null;
+    }
+
+    const userRole = await userFirstRole.execute({ user_id: foundUser.id });
+
+    // getting rights
+    let permissions: string[] = [];
+    if (userRole) {
+      permissions = await this.getPermissionsByRoleId(
+        userRole.role_id
+      );
+    }
+    await this.redis.set(
+      `${process.env.PROJECT_PREFIX}user_data:${accessToken}`,
+      JSON.stringify({
+        user: foundUser,
+        accessToken,
+        refreshToken,
+        permissions: permissions,
+      })
+    );
+
+    return {
+      user: foundUser,
+      accessToken,
+      refreshToken,
+      permissions: permissions,
+    };
+  }
+
+  async deleteUserDataByToken(accessToken: string) {
+    try {
+
+      await this.redis.del(
+        `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
+      );
+    } catch (e) {
+    }
+  }
+
+  async getCachedUserDataByToken(accessToken: string): Promise<{
+    user: InferSelectModel<typeof users>;
+    accessToken: string;
+    refreshToken: string;
+    permissions: string[];
+  } | null> {
+    try {
+      let jwtResult = await verifyJwt(accessToken);
+      if (!jwtResult.payload.id) {
+        return null;
+      }
+      const data = await this.redis.get(
+        `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
+      );
+      if (data) {
+        return JSON.parse(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+
   }
 }

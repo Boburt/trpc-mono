@@ -1,4 +1,4 @@
-import { $isLoggedIn, setAuthData } from "@frontend/src/store/auth";
+import { $isLoggedIn, $userData, setAuthData } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
@@ -11,9 +11,11 @@ export default function AuthForm({
   error?: string | null;
   token?: string | null;
 }) {
-  const isLoggedIn = useStore($isLoggedIn);
+  const userData = useStore($userData);
   const [errorMessage, setErrorMessage] = useState(error);
+  const [isLoading, setIsLoading] = useState(false);
   const getMyData = async () => {
+    setIsLoading(true);
     const { data, error } = await apiClient.api.users.me.get({
       $headers: {
         Authorization: `Bearer ${token}`,
@@ -21,10 +23,11 @@ export default function AuthForm({
     });
 
     if (error) {
+      setIsLoading(false);
       setErrorMessage(error.message);
-    } else if (data?.data && "id" in data?.data) {
-      console.log(data);
-      setAuthData(data.accessToken, data.refreshToken, data.data);
+    } else if (data && "user" in data) {
+      setIsLoading(false);
+      setAuthData(data.accessToken, data.refreshToken, data.user);
     }
   };
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function AuthForm({
       getMyData();
     }
   }, []);
-  if (isLoggedIn) {
+  if (userData) {
     return (
       <div className="w-full max-w-md mx-auto p-6">
         <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">

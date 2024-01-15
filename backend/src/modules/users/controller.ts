@@ -22,27 +22,9 @@ import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { createInsertSchema } from "drizzle-typebox";
 import { drizzleDb } from "@backend/lib/db";
 import { ctx } from "@backend/context";
+import { userById, userByLogin, userFirstRole } from "@backend/lib/prepare_statements";
 
 type UsersModel = InferSelectModel<typeof users>;
-
-const userById = drizzleDb.query.users
-  .findFirst({
-    where: (users, { eq }) => eq(users.id, sql.placeholder("id")),
-  })
-  .prepare("userByPhone");
-
-const userByLogin = drizzleDb.query.users
-  .findFirst({
-    where: (users, { eq }) => eq(users.login, sql.placeholder("login")),
-  })
-  .prepare("userByLogin");
-
-const userFirstRole = drizzleDb.query.users_roles
-  .findFirst({
-    where: (users_roles, { eq }) =>
-      eq(users_roles.user_id, sql.placeholder("user_id")),
-  })
-  .prepare("userFirstRole");
 
 function exclude<User extends Record<string, unknown>, Key extends keyof User>(
   user: User,
@@ -65,7 +47,7 @@ export const usersController = new Elysia({
   .post(
     "/users/login",
     async ({ body: { login, password }, set, cacheController }) => {
-      const user = await userByLogin.execute({ login });
+      const user = await userByLogin.execute({ login }) as InferSelectModel<typeof users>;
 
       if (!user) {
         set.status = 401;
@@ -115,27 +97,16 @@ export const usersController = new Elysia({
         process.env.JWT_REFRESH_EXPIRES_IN
       );
 
-      const userRole = await userFirstRole.execute({ user_id: user.id });
-
-      // getting rights
-      let permissions: string[] = [];
-      if (userRole) {
-        permissions = await cacheController.getPermissionsByRoleId(
-          userRole.role_id
-        );
-      }
       const resultUser = exclude(user, [
         "password",
         "salt",
         // @ts-ignore
         "users_roles_usersTousers_roles_user_id",
       ]);
-      return {
-        data: resultUser,
-        refreshToken,
-        accessToken,
-        rights: permissions,
-      };
+
+      const res = await cacheController.cacheUserDataByToken(accessToken,
+        refreshToken, user.id);
+      return res;
     },
     {
       body: t.Object({
@@ -162,7 +133,7 @@ export const usersController = new Elysia({
         };
       }
 
-      const user = await userById.execute({ id: jwtResult.payload.id });
+      const user = await userById.execute({ id: jwtResult.payload.id }) as InferSelectModel<typeof users>;
 
       if (!user) {
         set.status = 401;
@@ -266,7 +237,7 @@ export const usersController = new Elysia({
   )
   .post(
     "/users/tg",
-    async ({ body, drizzle }) => {
+    async ({ body, drizzle, cacheController }) => {
       const { hash, ...data } = body;
       console.log('before bot token');
       const botToken = process.env.BOT_TOKEN;
@@ -345,10 +316,19 @@ export const usersController = new Elysia({
         },
         process.env.JWT_REFRESH_EXPIRES_IN
       );
-      return {
-        refreshToken,
-        accessToken,
-      };
+
+      const userRole = await userFirstRole.execute({ user_id: user[0].id });
+
+      // getting rights
+      let permissions: string[] = [];
+      if (userRole) {
+        permissions = await cacheController.getPermissionsByRoleId(
+          userRole.role_id
+        );
+      }
+      const res = await cacheController.cacheUserDataByToken(accessToken,
+        refreshToken, user[0].id);
+      return res;
 
     },
     {
@@ -469,44 +449,7 @@ export const usersController = new Elysia({
         message: "User not found",
       };
     }
-    const foundUser = await userById.execute({ id: user.id });
-    const accessToken = await signJwt(
-      {
-        id: foundUser!.id,
-        login: foundUser!.login,
-        first_name: foundUser!.first_name,
-        last_name: foundUser!.last_name,
-        tg_username: foundUser!.tg_username,
-      },
-      process.env.JWT_EXPIRES_IN
-    );
-
-    const refreshToken = await signJwt(
-      {
-        id: foundUser!.id,
-        login: foundUser!.login,
-        first_name: foundUser!.first_name,
-        last_name: foundUser!.last_name,
-        tg_username: foundUser!.tg_username,
-      },
-      process.env.JWT_REFRESH_EXPIRES_IN
-    );
-
-    const userRole = await userFirstRole.execute({ user_id: user.id });
-
-    // getting rights
-    let permissions: string[] = [];
-    if (userRole) {
-      permissions = await cacheController.getPermissionsByRoleId(
-        userRole.role_id
-      );
-    }
-    return {
-      data: foundUser,
-      refreshToken,
-      accessToken,
-      rights: permissions,
-    };
+    return user;
   })
   .get(
     "/users/:id",

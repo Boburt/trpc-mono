@@ -6,6 +6,7 @@ const url = new URL(Astro.request.url);
 const params = new URLSearchParams(url.search);
 const token = params.get("token");
 const error = params.get("error");
+export const prerender = false;
 ---
 
 <BaseLayout disableBreadcrumbs={true}>

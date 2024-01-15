@@ -103,7 +103,7 @@ export const ctx = new Elysia({
     }))
     .use(bearer())
     .use(jwt)
-    .derive(async ({ bearer, cacheController, drizzle }) => {
+    .derive(async ({ bearer, cacheController }) => {
         const token = bearer;
         if (!token) {
             return {
@@ -119,53 +119,12 @@ export const ctx = new Elysia({
                 }
             }
 
-            let jwtResult = await verifyJwt(token);
-            if (!jwtResult.payload.id) {
-                return {
-                    user: null,
-                };
-            }
+            console.log('token', token)
 
-            const user = await drizzle.query.users.findFirst({
-                where: eq(users.id, jwtResult.payload!.id! as string),
-            });
-
-            if (!user) {
-                return {
-                    user: null,
-                };
-            }
-
-            if (user.status !== 'active') {
-                return {
-                    user: null,
-                };
-            }
-
-            const userRoles = await drizzle.query.users_roles.findFirst({
-                where: eq(users_roles.user_id, user.id),
-            });
-
-            if (!userRoles) {
-                return {
-                    user: null,
-                };
-            }
-
-            const permissions = await cacheController.getPermissionsByRoleId(userRoles.role_id);
-            if (permissions.length === 0) {
-                return {
-                    user: null,
-                };
-            }
+            const res = await cacheController.getCachedUserDataByToken(token);
 
             return {
-                user: {
-                    id: user.id,
-                    email: user.login,
-                    name: user.status,
-                    permissions: permissions,
-                },
+                user: res
             };
 
         } catch (error) {

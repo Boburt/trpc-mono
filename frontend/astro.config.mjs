@@ -22,6 +22,11 @@ export default defineConfig({
     host: true,
   },
   site: process.env.WEB_URL,
+  vite: {
+    ssr: {
+      noExternal: ["react-icons"],
+    },
+  },
   integrations: [
     tailwind(),
     react(),

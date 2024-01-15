@@ -1,13 +1,15 @@
 ---
 import "../styles/global.css";
 
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
 import { Breadcrumbs } from "astro-breadcrumbs";
 import CategoriesFilterServer from "../components/manufacturers/filter/CategoriesServer.astro";
 import { ViewTransitions } from "astro:transitions";
 import { Toaster } from "sonner";
 import { apiClient } from "../utils/eden";
+import SetClientData from "../components/layout/SetClientData";
+import { $userData } from "../store/auth";
 
 let {
   title,
@@ -16,7 +18,6 @@ let {
 } = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;
 const url = Astro.url.pathname + Astro.url.search;
-console.log("url", url);
 const seoLink = await apiClient.api.seo_links.by_link.get({
   $query: {
     link: url,
@@ -25,9 +26,30 @@ const seoLink = await apiClient.api.seo_links.by_link.get({
 if (seoLink && seoLink.data && "id" in seoLink.data) {
   title = seoLink.data.title;
 }
+
+let userData;
+
+const accessToken = Astro.cookies.get("x-token")?.value;
+
+$userData.set(null);
+console.log("accessToken", accessToken);
+if (accessToken) {
+  const { data, error } = await apiClient.api.users.me.get({
+    $headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  console.log("error", error);
+  console.log("data", data);
+  if (data && "user" in data && data.user) {
+    $userData.set(data.user);
+  }
+}
+
+console.log("showHeaderFilter", showHeaderFilter);
 ---
 
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -46,8 +68,10 @@ if (seoLink && seoLink.data && "id" in seoLink.data) {
       {showHeaderFilter && <CategoriesFilterServer />}
       <slot />
     </main>
-    <Footer client:load />
+    <Footer />
     <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>
+    <script is:inline src="/node_modules/preline/preline.js"></script>
+    <SetClientData client:only />
   </body>
 </html>
