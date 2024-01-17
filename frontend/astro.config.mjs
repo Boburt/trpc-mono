@@ -27,14 +27,5 @@ export default defineConfig({
       noExternal: ["react-icons"],
     },
   },
-  integrations: [
-    tailwind(),
-    react(),
-    sitemap(),
-    partytown(),
-    auth(),
-    tunnel({
-      port: 4000,
-    }),
-  ],
+  integrations: [react(), sitemap(), partytown(), auth()],
 });

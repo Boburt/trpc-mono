@@ -17,7 +17,7 @@ import {
   ManufacturersPropertiesCategories,
   SeoLinks,
 } from "@prisma/client";
-import { categories, permissions, roles, roles_permissions, seo_links, users } from "backend/drizzle/schema";
+import { categories, permissions, roles, roles_permissions, seo_links, sp_ticket_categories, sp_ticket_statuses, users } from "backend/drizzle/schema";
 import { InferSelectModel, eq } from "drizzle-orm";
 
 export class CacheControlService {
@@ -351,11 +351,11 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<Permissions[]> {
+  }) {
     const spTicketCategories = await this.redis.get(
       `${process.env.PROJECT_PREFIX}sp_ticket_categories`
     );
-    let res = JSON.parse(spTicketCategories ?? "[]");
+    let res = JSON.parse(spTicketCategories ?? "[]") as InferSelectModel<typeof sp_ticket_categories>[];
 
     if (take && res.length > take) {
       res = res.slice(0, take);
@@ -376,11 +376,11 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<Permissions[]> {
+  }) {
     const spTicketStatuses = await this.redis.get(
       `${process.env.PROJECT_PREFIX}sp_ticket_statuses`
     );
-    let res = JSON.parse(spTicketStatuses ?? "[]");
+    let res = JSON.parse(spTicketStatuses ?? "[]") as InferSelectModel<typeof sp_ticket_statuses>[];
 
     if (take && res.length > take) {
       res = res.slice(0, take);
