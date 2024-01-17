@@ -1,17 +1,7 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import ProfileMenuLayout from "../../../layouts/ProfileMenuLayout.astro";
+import ProfileLayout from "@frontend/src/layouts/ProfileLayout.astro";
 ---
 
-<BaseLayout>
-  <div class="flex">
-    <ProfileMenuLayout />
-    <div
-      class="card w-full mt-3 rounded-box bg-slate-200 ml-3 dark:bg-slate-500"
-    >
-      <div class="card-body">
-        <h1>My Collegs</h1>
-      </div>
-    </div>
-  </div>
-</BaseLayout>
+<ProfileLayout>
+  <h1>My Collegs</h1>
+</ProfileLayout>

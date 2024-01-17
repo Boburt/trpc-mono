@@ -1,0 +1,64 @@
+---
+import { FaRegUserCircle, FaUsers, FaWpforms } from "react-icons/fa";
+import { BsBuildings } from "react-icons/bs";
+import { MdOutlineSettingsApplications } from "react-icons/md";
+import BaseLayout from "./BaseLayout.astro";
+const pathname = new URL(Astro.request.url).pathname;
+let { title } = Astro.props;
+---
+
+<BaseLayout>
+  <div class="flex space-x-3">
+    <nav class="mt-3">
+      <ul class="menu bg-base-300 w-56 rounded-box">
+        <li>
+          <a href="/profile" class={pathname == "/profile" ? "active" : ""}>
+            <FaRegUserCircle />
+            Profile
+          </a>
+        </li>
+        <li>
+          <a
+            href="/profile/requests"
+            class={pathname == "/profile/requests" ? "active" : ""}
+          >
+            <MdOutlineSettingsApplications />
+            Мои обращения
+          </a>
+        </li>
+        <li>
+          <a
+            href="/profile/company"
+            class={pathname == "/profile/company" ? "active" : ""}
+          >
+            <BsBuildings />
+            My Company
+          </a>
+        </li>
+        <li>
+          <a
+            href="/profile/collegs"
+            class={pathname == "/profile/collegs" ? "active" : ""}
+          >
+            <FaUsers />
+            My Collegs
+          </a>
+        </li>
+        <li>
+          <a
+            href="/profile/forms"
+            class={pathname == "/profile/forms" ? "active" : ""}
+          >
+            <FaWpforms />
+            Forms
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="w-full mt-3">
+      <h1 class="text-2xl font-bold uppercase mb-3">{title}</h1>
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

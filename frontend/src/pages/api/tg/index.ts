@@ -27,7 +27,8 @@ export const GET: APIRoute = async ({ request, redirect }) => {
     auth_date: query["auth_date"],
     hash: query["hash"],
   });
-
+  console.log('data', data);
+  console.log('status', status)
   if (status == 200 && data && "accessToken" in data) {
     return redirect(`/login?token=${data.accessToken}`, 307);
   } else if (status != 200 || error) {

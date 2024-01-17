@@ -16,6 +16,7 @@ import { manufacturersController } from "./manufacturers/controller";
 import { manufacturersCategoriesController } from "./manufacturers_categories/controller";
 import { spTicketCategoriesController } from "./sp_ticket_categories/controller";
 import { spTicketStatusesController } from "./sp_ticket_statuses/controller";
+import { spTicketsController } from "./sp_tickets/controller";
 
 export const apiController = new Elysia({
   prefix: "/api",
@@ -36,4 +37,5 @@ export const apiController = new Elysia({
   .use(manufacturersController)
   .use(manufacturersCategoriesController)
   .use(spTicketCategoriesController)
-  .use(spTicketStatusesController);
+  .use(spTicketStatusesController)
+  .use(spTicketsController);
