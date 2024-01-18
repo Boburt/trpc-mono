@@ -74,15 +74,8 @@ export const spTicketStatusesController = new Elysia({
         message: "User not found",
       };
     }
-
-    if (!user.permissions.includes("sp_ticket_statuses.list")) {
-      set.status = 401;
-      return {
-        message: "You don't have permissions",
-      };
-    }
     const res = await cacheController.getCachedSpTicketStatuses({});
-    return res;
+    return res.sort((a, b) => a.sort - b.sort);
   })
   .get(
     "/sp_ticket_statuses/:id",
