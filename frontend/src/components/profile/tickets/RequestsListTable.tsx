@@ -1,5 +1,4 @@
 import { $accessToken } from "@frontend/src/store/auth";
-import Providers from "@frontend/src/store/provider";
 import { apiClient } from "@frontend/src/utils/eden";
 import { useStore } from "@nanostores/react";
 import {
@@ -15,6 +14,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@nextui-org/spinner";
 import { useCallback, useMemo, useState } from "react";
 import { Pagination } from "@nextui-org/pagination";
+import { SpTicketsRelatedList } from "@backend/modules/sp_tickets/sp_tickets.dto";
+import { Chip } from "@nextui-org/chip";
+import { Tooltip } from "@nextui-org/tooltip";
+import { Eye } from "lucide-react";
 
 export const RequestsListTable = () => {
   const accessToken = useStore($accessToken);
@@ -35,7 +38,8 @@ export const RequestsListTable = () => {
       {
         limit: pageSize,
         offset: (page - 1) * pageSize,
-        fields: "id,short_name,name,active",
+        fields:
+          "id,name,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
       },
     ],
     queryFn: async () => {
@@ -43,7 +47,8 @@ export const RequestsListTable = () => {
         $query: {
           limit: pageSize.toString(),
           offset: ((page - 1) * pageSize).toString(),
-          fields: "id,short_name,name,active",
+          fields:
+            "id,name,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
         },
         $headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -59,6 +64,58 @@ export const RequestsListTable = () => {
     }
     return Math.ceil(data?.total / pageSize);
   }, [data?.total, pageSize]);
+
+  const renderCell = useCallback(
+    (ticket: SpTicketsRelatedList, columnKey: React.Key) => {
+      const cellValue = ticket[columnKey as keyof SpTicketsRelatedList];
+      switch (columnKey) {
+        case "name":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{ticket.name}</p>
+            </div>
+          );
+        case "sp_ticket_statuses":
+          return (
+            <Chip
+              classNames={{
+                base: "border-small border-white/50 px-2",
+                content: "drop-shadow shadow-black text-white",
+              }}
+              style={{
+                backgroundColor: ticket.sp_ticket_statuses.color!,
+              }}
+              size="sm"
+              variant="shadow"
+            >
+              {ticket.sp_ticket_statuses.name}
+            </Chip>
+          );
+        case "sp_ticket_categories":
+          return (
+            <div className="relative flex items-center gap-2">
+              {ticket.sp_ticket_categories.name}
+            </div>
+          );
+
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              <a href={`/profile/requests/${ticket.id}`}>
+                <Tooltip content="Подробнее">
+                  <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                    <Eye />
+                  </span>
+                </Tooltip>
+              </a>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    []
+  );
 
   return (
     <div className="space-y-3">
@@ -99,17 +156,17 @@ export const RequestsListTable = () => {
         }
       >
         <TableHeader>
+          <TableColumn key="sp_ticket_statuses" allowsSorting>
+            Статус
+          </TableColumn>
           <TableColumn key="name" allowsSorting>
-            Name
+            Тема
           </TableColumn>
-          <TableColumn key="height" allowsSorting>
-            Height
+          <TableColumn key="sp_ticket_categories" allowsSorting>
+            Категория
           </TableColumn>
-          <TableColumn key="mass" allowsSorting>
-            Mass
-          </TableColumn>
-          <TableColumn key="birth_year" allowsSorting>
-            Birth year
+          <TableColumn key="actions" allowsSorting>
+            {" "}
           </TableColumn>
         </TableHeader>
         <TableBody
@@ -121,7 +178,7 @@ export const RequestsListTable = () => {
           {(item) => (
             <TableRow key={item.name}>
               {(columnKey) => (
-                <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}

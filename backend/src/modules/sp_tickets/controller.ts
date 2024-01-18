@@ -1,9 +1,11 @@
 import { sp_ticket_categories, sp_ticket_statuses, sp_tickets } from "backend/drizzle/schema";
-import { InferSelectModel, and, eq, getTableColumns, sql } from "drizzle-orm";
+import { InferSelectModel, SQLWrapper, and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import { ctx } from "@backend/context";
+import { SpTicketsRelatedList } from "./sp_tickets.dto";
+import { parseFilterFields } from "@backend/lib/parseFilterFields";
 
 export const spTicketsController = new Elysia({
   name: "@api/sp_tickets",
@@ -12,7 +14,7 @@ export const spTicketsController = new Elysia({
   .get(
     "/sp_tickets",
     async ({
-      query: { limit, offset, sort, filter, fields },
+      query: { limit, offset, sort, filters, fields },
       user,
       set,
       drizzle,
@@ -26,24 +28,40 @@ export const spTicketsController = new Elysia({
 
       let selectFields: SelectedFields = {};
       if (fields) {
-        selectFields = parseSelectFields(fields, sp_tickets, {});
+        selectFields = parseSelectFields(fields, sp_tickets, {
+          sp_ticket_statuses,
+          sp_ticket_categories,
+        });
       }
+      let whereClause: (SQLWrapper | undefined)[] = [];
+      if (filters) {
+        whereClause = parseFilterFields(filters, sp_tickets, {
+          sp_ticket_statuses,
+          sp_ticket_categories
+        });
+      }
+      whereClause.push(eq(sp_tickets.created_by, user.user.id))
       const rolesCount = await drizzle
         .select({ count: sql<number>`count(*)` })
         .from(sp_tickets)
+        .leftJoin(sp_ticket_statuses, eq(sp_ticket_statuses.id, sp_tickets.status_id))
+        .leftJoin(sp_ticket_categories, eq(sp_ticket_categories.id, sp_tickets.category_id))
         .where(and(
-          eq(sp_tickets.created_by, user.user.id)
+          ...whereClause
         ))
         .execute();
       const rolesList = (await drizzle
         .select(selectFields)
         .from(sp_tickets)
+        .leftJoin(sp_ticket_statuses, eq(sp_ticket_statuses.id, sp_tickets.status_id))
+        .leftJoin(sp_ticket_categories, eq(sp_ticket_categories.id, sp_tickets.category_id))
         .where(and(
-          eq(sp_tickets.created_by, user.user.id)
+          ...whereClause
         ))
         .limit(+limit)
         .offset(+offset)
-        .execute()) as InferSelectModel<typeof sp_tickets>[];
+        .orderBy(desc(sp_tickets.created_at))
+        .execute()) as SpTicketsRelatedList[];
       return {
         total: rolesCount[0].count,
         data: rolesList,
@@ -54,15 +72,7 @@ export const spTicketsController = new Elysia({
         limit: t.String(),
         offset: t.String(),
         sort: t.Optional(t.String()),
-        filter: t.Optional(
-          t.Object({
-            id: t.Number(),
-            name: t.String(),
-            email: t.String(),
-            address: t.String(),
-            phone: t.String(),
-          })
-        ),
+        filters: t.Optional(t.String()),
         fields: t.Optional(t.String()),
       }),
     }
@@ -214,11 +224,12 @@ export const spTicketsController = new Elysia({
       }),
       body: t.Object({
         data: t.Object({
-          name: t.String({
+          name: t.Optional(t.Nullable(t.String({
             minLength: 1,
-          }),
+          }))),
           description: t.Optional(t.Nullable(t.String())),
-          category_id: t.String(),
+          category_id: t.Optional(t.Nullable(t.String())),
+          status_id: t.Optional(t.Nullable(t.String())),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
