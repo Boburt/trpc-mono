@@ -28,7 +28,7 @@ export default function KanbanLane({ status }: KanbanLaneProps) {
           limit: "50",
           offset: "0",
           fields:
-            "id,name,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
+            "id,name,created_at,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
           filters: JSON.stringify([
             {
               field: "sp_ticket_statuses.id",
@@ -46,19 +46,16 @@ export default function KanbanLane({ status }: KanbanLaneProps) {
   });
 
   return (
-    <div className="flex flex-col flex-[3] p-1 min-h-40">
+    <div className="flex flex-col flex-[3] m-1 min-h-40 bg-gray-200 space-x-2 rounded-md">
       <div
-        className="font-bold text-xl mb-3 py-3 rounded-md shadow-md px-2 text-slate-200"
+        className="font-bold text-xl mb-3 py-3 rounded-md shadow-md px-2 text-white"
         style={{
           backgroundColor: status.color!,
         }}
       >
         {status.name}
       </div>
-      <div
-        className="flex flex-1 flex-col p-1 rounded-lg bg-gray-200"
-        ref={setNodeRef}
-      >
+      <div className="flex flex-1 flex-col p-1" ref={setNodeRef}>
         {isLoading && <Spinner label="Загрузка..." color="primary" />}
         {Array.isArray(data?.data) && data?.data.length === 0 && (
           <div className="text-center text-gray-500">Нет заявок</div>
@@ -71,6 +68,7 @@ export default function KanbanLane({ status }: KanbanLaneProps) {
                 key={item.id}
                 index={item.id}
                 parent={status.id}
+                item={item}
               />
             ))}
           </>

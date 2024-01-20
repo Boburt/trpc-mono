@@ -22,7 +22,7 @@ import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { createInsertSchema } from "drizzle-typebox";
 import { drizzleDb } from "@backend/lib/db";
 import { ctx } from "@backend/context";
-import { userById, userByLogin, userFirstRole } from "@backend/lib/prepare_statements";
+import { userById, userByLogin, userFirstRole, userPasswordByLogin } from "@backend/lib/prepare_statements";
 
 type UsersModel = InferSelectModel<typeof users>;
 
@@ -55,10 +55,13 @@ export const usersController = new Elysia({
           message: "User not found",
         };
       }
+
+      const userPasswords = await userPasswordByLogin.execute({ login });
+
       const isPasswordSame = await comparePassword(
         password,
-        user.salt!,
-        user.password
+        userPasswords!.salt!,
+        userPasswords!.password
       );
 
       if (!isPasswordSame) {
@@ -74,7 +77,6 @@ export const usersController = new Elysia({
           message: "User is blocked",
         };
       }
-
       const accessToken = await signJwt(
         {
           id: user.id,
@@ -96,13 +98,6 @@ export const usersController = new Elysia({
         },
         process.env.JWT_REFRESH_EXPIRES_IN
       );
-
-      const resultUser = exclude(user, [
-        "password",
-        "salt",
-        // @ts-ignore
-        "users_roles_usersTousers_roles_user_id",
-      ]);
 
       const res = await cacheController.cacheUserDataByToken(accessToken,
         refreshToken, user.id);
