@@ -104,7 +104,9 @@ export default function KanbanBoard() {
       >
         <div className="flex">
           {Array.isArray(spTicketsStatuses) &&
-            spTicketsStatuses?.map((status) => <KanbanLane status={status} />)}
+            spTicketsStatuses?.map((status) => (
+              <KanbanLane key={status.id} status={status} />
+            ))}
         </div>
       </DndContext>
     );

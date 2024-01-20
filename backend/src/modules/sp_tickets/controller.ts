@@ -1,5 +1,5 @@
-import { sp_ticket_categories, sp_ticket_statuses, sp_tickets } from "backend/drizzle/schema";
-import { InferSelectModel, SQLWrapper, and, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { sp_ticket_categories, sp_ticket_statuses, sp_tickets, sp_tickets_timeline } from "backend/drizzle/schema";
+import { InferSelectModel, SQLWrapper, and, desc, eq, getTableColumns, isNotNull, or, sql } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
@@ -40,7 +40,14 @@ export const spTicketsController = new Elysia({
           sp_ticket_categories
         });
       }
-      whereClause.push(eq(sp_tickets.created_by, user.user.id))
+      if (user.permissions.includes("sp_tickets.edit")) {
+        whereClause.push(or(
+          eq(sp_tickets.created_by, user.user.id),
+          isNotNull(sp_tickets.created_by)
+        ));
+      } else {
+        whereClause.push(eq(sp_tickets.created_by, user.user.id))
+      }
       const rolesCount = await drizzle
         .select({ count: sql<number>`count(*)` })
         .from(sp_tickets)
@@ -190,7 +197,7 @@ export const spTicketsController = new Elysia({
   )
   .put(
     "/sp_tickets/:id",
-    async ({ params: { id }, body: { data, fields }, user, set, drizzle }) => {
+    async ({ params: { id }, body: { data, fields }, user, set, drizzle, cacheController }) => {
       if (!user) {
         set.status = 401;
         return {
@@ -208,11 +215,58 @@ export const spTicketsController = new Elysia({
       if (fields) {
         selectFields = parseSelectFields(fields, sp_tickets, {});
       }
+
+      const prevData = await drizzle
+        .select()
+        .from(sp_tickets)
+        .where(eq(sp_tickets.id, id))
+        .execute();
+
+      if (!prevData[0]) {
+        set.status = 404;
+        return {
+          message: "Not found",
+        };
+      }
+
       const result = await drizzle
         .update(sp_tickets)
         .set(data)
         .where(eq(sp_tickets.id, id))
         .returning(selectFields);
+      if (prevData[0].status_id !== data.status_id) {
+        const spTicketStatuses = await cacheController.getCachedSpTicketStatuses({});
+        const prevStatus = spTicketStatuses.find((status) => status.id === prevData[0].status_id);
+        const nextStatus = spTicketStatuses.find((status) => status.id === data.status_id);
+        if (prevStatus && nextStatus) {
+          console.log('inserting timeline', {
+            ticket_id: id,
+            user_id: user.user.id,
+            timeline_type: 'status',
+            before_value: prevStatus.name,
+            after_value: nextStatus.name,
+            created_at: new Date().toISOString(),
+            comment: ''
+          });
+          try {
+            await drizzle
+              .insert(sp_tickets_timeline)
+              .values({
+                ticket_id: id,
+                user_id: user.user.id,
+                timeline_type: 'status',
+                before_value: prevStatus.name,
+                after_value: nextStatus.name,
+                created_at: new Date().toISOString(),
+                comment: ''
+              })
+              .execute();
+
+          } catch (e) {
+            console.log('e', e)
+          }
+        }
+      }
 
       return {
         data: result[0],

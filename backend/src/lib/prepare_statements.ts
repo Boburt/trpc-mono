@@ -36,3 +36,11 @@ export const userFirstRole = drizzleDb.query.users_roles
             eq(users_roles.user_id, sql.placeholder("user_id")),
     })
     .prepare("userFirstRole");
+
+export const userPasswordByLogin = drizzleDb.query.users.findFirst({
+    where: (users, { eq }) => eq(users.login, sql.placeholder("login")),
+    columns: {
+        password: true,
+        salt: true,
+    },
+}).prepare("userPasswordByLogin");

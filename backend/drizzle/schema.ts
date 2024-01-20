@@ -699,7 +699,8 @@ export const sp_tickets_timeline = pgTable("sp_tickets_timeline", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   ticket_id: uuid("ticket_id").notNull(),
   user_id: uuid("user_id").notNull(),
-  status_id: uuid("status_id").notNull(),
+  before_value: text("before_value").notNull(),
+  after_value: text("after_value").notNull(),
   timeline_type: text("timeline_type").notNull(),
   comment: text("comment").notNull(),
   created_at: timestamp("created_at", {
