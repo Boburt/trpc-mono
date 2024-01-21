@@ -1,29 +1,25 @@
-import { DB } from "@backend/db";
 import { verifyJwt } from "@backend/lib/bcrypt";
 import { DrizzleDB } from "@backend/lib/db";
 import { userById, userFirstRole } from "@backend/lib/prepare_statements";
+import { Permissions, Scheduled_reports, Langs } from "@backend/lib/zod";
 import {
-  RolesWithRelations,
-  Permissions,
-  Scheduled_reports,
-  Langs,
-} from "@backend/lib/zod";
-import { RedisClientType } from "@backend/trpc";
-import {
-  Categories,
-  Cities,
-  ImageSizes,
-  ManufacturersProperties,
-  ManufacturersPropertiesCategories,
-  SeoLinks,
-} from "@prisma/client";
-import { categories, permissions, roles, roles_permissions, seo_links, sp_ticket_categories, sp_ticket_statuses, users } from "backend/drizzle/schema";
+  categories,
+  permissions,
+  roles,
+  roles_permissions,
+  seo_links,
+  sp_ticket_categories,
+  sp_ticket_statuses,
+  users,
+} from "backend/drizzle/schema";
 import { InferSelectModel, eq } from "drizzle-orm";
+import { Redis } from "ioredis";
+import { RolesWithRelations } from "../roles/dto/roles.dto";
 
 export class CacheControlService {
   constructor(
     private readonly drizzle: DrizzleDB,
-    private readonly redis: RedisClientType
+    private readonly redis: Redis
   ) {
     this.cachePermissions();
     this.cacheRoles();
@@ -63,26 +59,38 @@ export class CacheControlService {
   }
 
   async cacheRoles() {
-    const rolesList = await this.drizzle.select({
-      id: roles.id,
-      name: roles.name,
-      code: roles.code,
-      active: roles.active,
-    }).from(roles).execute();
+    const rolesList = await this.drizzle
+      .select({
+        id: roles.id,
+        name: roles.name,
+        code: roles.code,
+        active: roles.active,
+      })
+      .from(roles)
+      .execute();
 
+    const rolesPermissionsList = await this.drizzle
+      .select({
+        slug: permissions.slug,
+        role_id: roles_permissions.role_id,
+      })
+      .from(roles_permissions)
+      .leftJoin(
+        permissions,
+        eq(roles_permissions.permission_id, permissions.id)
+      )
+      .execute();
 
-    const rolesPermissionsList = await this.drizzle.select({
-      slug: permissions.slug,
-      role_id: roles_permissions.role_id,
-    }).from(roles_permissions).leftJoin(permissions, eq(roles_permissions.permission_id, permissions.id)).execute();
-
-    const rolesPermissions = rolesPermissionsList.reduce((acc: any, cur: any) => {
-      if (!acc[cur.role_id]) {
-        acc[cur.role_id] = [];
-      }
-      acc[cur.role_id].push(cur.slug);
-      return acc;
-    }, {});
+    const rolesPermissions = rolesPermissionsList.reduce(
+      (acc: any, cur: any) => {
+        if (!acc[cur.role_id]) {
+          acc[cur.role_id] = [];
+        }
+        acc[cur.role_id].push(cur.slug);
+        return acc;
+      },
+      {}
+    );
 
     const res = rolesList.map((role: any) => {
       return {
@@ -96,13 +104,11 @@ export class CacheControlService {
     );
   }
 
-  async getCachedRoles({
-    take,
-  }: {
-    take?: number;
-  }): Promise<RolesWithRelations[]> {
-    const roles = await this.redis.get(`${process.env.PROJECT_PREFIX}roles`);
-    let res = JSON.parse(roles ?? "[]");
+  async getCachedRoles({ take }: { take?: number }) {
+    const rolesList = await this.redis.get(
+      `${process.env.PROJECT_PREFIX}_roles`
+    );
+    let res = JSON.parse(rolesList ?? "[]") as RolesWithRelations[];
 
     if (take && res.length > take) {
       res = res.slice(0, take);
@@ -112,14 +118,11 @@ export class CacheControlService {
   }
   async getPermissionsByRoleId(roleId: string) {
     const roles = await this.getCachedRoles({});
-    // console.log("roles", roles);
     const role = roles.find((role) => role.id === roleId);
     if (!role) {
       return [];
     }
-    return role.roles_permissions.map((rolePermission) => {
-      return rolePermission.permissions.slug;
-    });
+    return role.permissions;
   }
 
   async cacheLangs() {
@@ -153,33 +156,31 @@ export class CacheControlService {
     );
   }
 
-  async getCachedCategories({
-    take,
-  }: {
-    take?: number;
-  }): Promise<Categories[]> {
-    const langs = await this.redis.get(
-      `${process.env.PROJECT_PREFIX}categories`
-    );
-    let res = JSON.parse(langs ?? "[]");
+  // async getCachedCategories({
+  //   take,
+  // }: {
+  //   take?: number;
+  // }): Promise<Categories[]> {
+  //   const langs = await this.redis.get(
+  //     `${process.env.PROJECT_PREFIX}categories`
+  //   );
+  //   let res = JSON.parse(langs ?? "[]");
 
-    if (take && res.length > take) {
-      res = res.slice(0, take);
-    }
+  //   if (take && res.length > take) {
+  //     res = res.slice(0, take);
+  //   }
 
-    return res;
-  }
+  //   return res;
+  // }
 
-  async getActiveCachedCategories({
-    take,
-  }: {
-    take?: number;
-  }) {
+  async getActiveCachedCategories({ take }: { take?: number }) {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}categories`
     );
 
-    let res = JSON.parse(langs ?? "[]") as InferSelectModel<typeof categories>[];
+    let res = JSON.parse(langs ?? "[]") as InferSelectModel<
+      typeof categories
+    >[];
 
     res = res.filter((category) => category.active);
 
@@ -200,11 +201,7 @@ export class CacheControlService {
     );
   }
 
-  async getCachedImageSizes({
-    take,
-  }: {
-    take?: number;
-  }): Promise<ImageSizes[]> {
+  async getCachedImageSizes({ take }: { take?: number }) {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}image_sizes`
     );
@@ -227,21 +224,22 @@ export class CacheControlService {
     );
   }
 
-  async getCachedCities({ take }: { take?: number }): Promise<Cities[]> {
-    const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
-    let res = JSON.parse(langs ?? "[]");
+  // async getCachedCities({ take }: { take?: number }): Promise<Cities[]> {
+  //   const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
+  //   let res = JSON.parse(langs ?? "[]");
 
-    if (take && res.length > take) {
-      res = res.slice(0, take);
-    }
+  //   if (take && res.length > take) {
+  //     res = res.slice(0, take);
+  //   }
 
-    return res;
-  }
+  //   return res;
+  // }
 
   async cacheManufacturersPropertiesCategories() {
-    const langs = await this.drizzle.query.manufacturers_properties_categories.findMany({
-      limit: 300,
-    });
+    const langs =
+      await this.drizzle.query.manufacturers_properties_categories.findMany({
+        limit: 300,
+      });
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}manufacturersPropertiesCategories`,
       JSON.stringify(langs)
@@ -252,7 +250,7 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<ManufacturersPropertiesCategories[]> {
+  }) {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}manufacturersPropertiesCategories`
     );
@@ -275,11 +273,7 @@ export class CacheControlService {
     );
   }
 
-  async getCachedManufacturersProperties({
-    take,
-  }: {
-    take?: number;
-  }): Promise<ManufacturersProperties[]> {
+  async getCachedManufacturersProperties({ take }: { take?: number }) {
     const langs = await this.redis.get(
       `${process.env.PROJECT_PREFIX}manufacturersProperties`
     );
@@ -301,7 +295,7 @@ export class CacheControlService {
       );
     }
     const seoLinks = await this.drizzle.query.seo_links.findFirst({
-      where: eq(seo_links.id, id)
+      where: eq(seo_links.id, id),
     });
     if (seoLinks) {
       // @ts-ignore
@@ -326,7 +320,7 @@ export class CacheControlService {
     }
   }
 
-  async getCachedSEOLinks(link: string): Promise<SeoLinks | null> {
+  async getCachedSEOLinks(link: string) {
     console.log("link", link);
     const linkHash = Bun.hash(link);
     const seoLinks = await this.redis.get(
@@ -340,22 +334,21 @@ export class CacheControlService {
   }
 
   async cacheSpTicketCategories() {
-    const spTicketCategories = await this.drizzle.query.sp_ticket_categories.findMany();
+    const spTicketCategories =
+      await this.drizzle.query.sp_ticket_categories.findMany();
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}sp_ticket_categories`,
       JSON.stringify(spTicketCategories)
     );
   }
 
-  async getCachedSpTicketCategories({
-    take,
-  }: {
-    take?: number;
-  }) {
+  async getCachedSpTicketCategories({ take }: { take?: number }) {
     const spTicketCategories = await this.redis.get(
       `${process.env.PROJECT_PREFIX}sp_ticket_categories`
     );
-    let res = JSON.parse(spTicketCategories ?? "[]") as InferSelectModel<typeof sp_ticket_categories>[];
+    let res = JSON.parse(spTicketCategories ?? "[]") as InferSelectModel<
+      typeof sp_ticket_categories
+    >[];
 
     if (take && res.length > take) {
       res = res.slice(0, take);
@@ -365,22 +358,21 @@ export class CacheControlService {
   }
 
   async cacheSpTicketStatuses() {
-    const spTicketStatuses = await this.drizzle.query.sp_ticket_statuses.findMany();
+    const spTicketStatuses =
+      await this.drizzle.query.sp_ticket_statuses.findMany();
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}sp_ticket_statuses`,
       JSON.stringify(spTicketStatuses)
     );
   }
 
-  async getCachedSpTicketStatuses({
-    take,
-  }: {
-    take?: number;
-  }) {
+  async getCachedSpTicketStatuses({ take }: { take?: number }) {
     const spTicketStatuses = await this.redis.get(
       `${process.env.PROJECT_PREFIX}sp_ticket_statuses`
     );
-    let res = JSON.parse(spTicketStatuses ?? "[]") as InferSelectModel<typeof sp_ticket_statuses>[];
+    let res = JSON.parse(spTicketStatuses ?? "[]") as InferSelectModel<
+      typeof sp_ticket_statuses
+    >[];
 
     if (take && res.length > take) {
       res = res.slice(0, take);
@@ -389,13 +381,19 @@ export class CacheControlService {
     return res;
   }
 
-  async cacheUserDataByToken(accessToken: string, refreshToken: string, userId: any) {
-    const foundUser = await userById.execute({ id: userId }) as InferSelectModel<typeof users>;
+  async cacheUserDataByToken(
+    accessToken: string,
+    refreshToken: string,
+    userId: any
+  ) {
+    const foundUser = (await userById.execute({
+      id: userId,
+    })) as InferSelectModel<typeof users>;
     if (!foundUser) {
       return null;
     }
 
-    if (foundUser.status != 'active') {
+    if (foundUser.status != "active") {
       return null;
     }
 
@@ -404,9 +402,7 @@ export class CacheControlService {
     // getting rights
     let permissions: string[] = [];
     if (userRole) {
-      permissions = await this.getPermissionsByRoleId(
-        userRole.role_id
-      );
+      permissions = await this.getPermissionsByRoleId(userRole.role_id);
     }
     await this.redis.set(
       `${process.env.PROJECT_PREFIX}user_data:${accessToken}`,
@@ -428,12 +424,10 @@ export class CacheControlService {
 
   async deleteUserDataByToken(accessToken: string) {
     try {
-
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
       );
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   async getCachedUserDataByToken(accessToken: string): Promise<{
@@ -458,6 +452,5 @@ export class CacheControlService {
     } catch (e) {
       return null;
     }
-
   }
 }
