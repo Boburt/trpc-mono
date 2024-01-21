@@ -1,6 +1,30 @@
 ---
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
 import { CreateNewFormPage } from "@frontend/src/components/profile/forms/CreateNewFormPage";
+import { apiClient } from "@frontend/src/utils/eden";
+import { statusRender } from "@frontend/src/utils/status";
+export const prerender = false;
+const accessToken = Astro.cookies.get("x-token")?.value;
+
+const { id } = Astro.params;
+
+const { data, status } = await apiClient.api.forms[id].get({
+  $headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
+console.log("staus", status);
+if (status == 404 || status == 500) {
+  return statusRender(404, `${Astro.site}404`);
+}
+
+if (status == 401) {
+  return Astro.redirect("/login");
+}
+console.log(`${Astro.site}403`);
+if (status == 403) {
+  return statusRender(403, `${Astro.site}403`);
+}
 ---
 
 <BaseLayout>

@@ -119,8 +119,6 @@ export const ctx = new Elysia({
                 }
             }
 
-            console.log('token', token)
-
             const res = await cacheController.getCachedUserDataByToken(token);
 
             return {

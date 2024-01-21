@@ -1,25 +1,40 @@
+import { SpTicketsRelatedList } from "@backend/modules/sp_tickets/sp_tickets.dto";
 import { $accessToken } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
 import { useStore } from "@nanostores/react";
+import { Chip } from "@nextui-org/chip";
+import { Spinner } from "@nextui-org/spinner";
 import {
-  Table,
   TableHeader,
-  TableBody,
   TableColumn,
+  TableBody,
   TableRow,
   TableCell,
-  getKeyValue,
+  Table,
 } from "@nextui-org/table";
 import { useQuery } from "@tanstack/react-query";
-import { Spinner } from "@nextui-org/spinner";
-import { useCallback, useMemo, useState } from "react";
+import { Eye, Edit2 } from "lucide-react";
+import { useState, useCallback, useMemo } from "react";
 import { Pagination } from "@nextui-org/pagination";
-import { SpTicketsRelatedList } from "@backend/modules/sp_tickets/sp_tickets.dto";
-import { Chip } from "@nextui-org/chip";
 import { Tooltip } from "@nextui-org/tooltip";
-import { Eye } from "lucide-react";
+import { forms } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
+import dayjs from "dayjs";
 
-export const RequestsListTable = () => {
+const statuses = {
+  new: {
+    name: "Новое",
+    color: "#FFB800",
+  },
+};
+
+const scheduleTypes = {
+  later: "Позже вручную",
+  now: "Сейчас",
+  scheduled: "Запланировать",
+};
+
+export const ProfileFormsListTable = () => {
   const accessToken = useStore($accessToken);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -34,21 +49,19 @@ export const RequestsListTable = () => {
   const { data, isLoading } = useQuery({
     enabled: !!accessToken,
     queryKey: [
-      "sp_tickets",
+      "forms",
       {
         limit: pageSize,
         offset: (page - 1) * pageSize,
-        fields:
-          "id,name,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
+        fields: "id,name,status,created_at,schedule_type,schedule_time",
       },
     ],
     queryFn: async () => {
-      const { data } = await apiClient.api.sp_tickets.get({
+      const { data } = await apiClient.api.forms.get({
         $query: {
           limit: pageSize.toString(),
           offset: ((page - 1) * pageSize).toString(),
-          fields:
-            "id,name,sp_ticket_categories.name,sp_ticket_statuses.name,sp_ticket_statuses.color",
+          fields: "id,name,status,created_at,schedule_type,schedule_time",
         },
         $headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -66,8 +79,9 @@ export const RequestsListTable = () => {
   }, [data?.total, pageSize]);
 
   const renderCell = useCallback(
-    (ticket: SpTicketsRelatedList, columnKey: React.Key) => {
-      const cellValue = ticket[columnKey as keyof SpTicketsRelatedList];
+    (ticket: InferSelectModel<typeof forms>, columnKey: React.Key) => {
+      const cellValue =
+        ticket[columnKey as keyof InferSelectModel<typeof forms>];
       switch (columnKey) {
         case "name":
           return (
@@ -75,7 +89,7 @@ export const RequestsListTable = () => {
               <p className="text-bold text-small capitalize">{ticket.name}</p>
             </div>
           );
-        case "sp_ticket_statuses":
+        case "status":
           return (
             <Chip
               classNames={{
@@ -83,28 +97,54 @@ export const RequestsListTable = () => {
                 content: "drop-shadow shadow-black text-white",
               }}
               style={{
-                backgroundColor: ticket.sp_ticket_statuses.color!,
+                backgroundColor:
+                  statuses[ticket.status as keyof typeof statuses].color,
               }}
               size="sm"
               variant="shadow"
             >
-              {ticket.sp_ticket_statuses.name}
+              {statuses[ticket.status as keyof typeof statuses].name}
             </Chip>
           );
-        case "sp_ticket_categories":
+
+        case "schedule_type":
           return (
-            <div className="relative flex items-center gap-2">
-              {ticket.sp_ticket_categories.name}
+            <div className="flex flex-col">
+              <p className="text-bold text-small uppercase">
+                {
+                  scheduleTypes[
+                    ticket.schedule_type as keyof typeof scheduleTypes
+                  ]
+                }
+              </p>
+            </div>
+          );
+
+        case "schedule_time":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small uppercase">
+                {ticket.schedule_time
+                  ? dayjs(ticket.schedule_time).format("DD.MM.YYYY HH:mm")
+                  : ""}
+              </p>
             </div>
           );
 
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
-              <a href={`/profile/requests/${ticket.id}`}>
+              <a href={`/profile/forms/show/${ticket.id}`}>
                 <Tooltip content="Подробнее">
                   <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    <Eye />
+                    <Eye className="w-5 h-5" />
+                  </span>
+                </Tooltip>
+              </a>
+              <a href={`/profile/forms/edit/${ticket.id}`}>
+                <Tooltip content="Редактировать">
+                  <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                    <Edit2 className="w-5 h-5" />
                   </span>
                 </Tooltip>
               </a>
@@ -116,7 +156,6 @@ export const RequestsListTable = () => {
     },
     []
   );
-
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
@@ -138,16 +177,13 @@ export const RequestsListTable = () => {
       </div>
       <Table
         isHeaderSticky
-        classNames={{
-          table: "min-h-[400px]",
-        }}
         bottomContent={
           <div className="flex w-full justify-center">
             <Pagination
               isCompact
               showControls
               showShadow
-              color="primary"
+              initialPage={page}
               page={page}
               total={pages}
               onChange={(page) => setPage(page)}
@@ -156,17 +192,20 @@ export const RequestsListTable = () => {
         }
       >
         <TableHeader>
-          <TableColumn key="sp_ticket_statuses" allowsSorting>
+          <TableColumn key="status" allowsSorting>
             Статус
           </TableColumn>
           <TableColumn key="name" allowsSorting>
-            Тема
+            Название формы
           </TableColumn>
-          <TableColumn key="sp_ticket_categories" allowsSorting>
-            Категория
+          <TableColumn key="schedule_type" allowsSorting>
+            Время отправки
+          </TableColumn>
+          <TableColumn key="schedule_time" allowsSorting>
+            Запланированное время
           </TableColumn>
           <TableColumn key="actions" allowsSorting>
-            {" "}
+            Действия
           </TableColumn>
         </TableHeader>
         <TableBody

@@ -714,3 +714,33 @@ export const sp_tickets_timeline = pgTable("sp_tickets_timeline", {
     mode: "string",
   }),
 });
+
+export const forms = pgTable("forms", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  form_json: jsonb("form_json").notNull(),
+  form_recipients: jsonb("form_recipients").notNull(),
+  status: text("status").notNull(),
+  schedule_type: text("schedule_type").notNull(),
+  schedule_time: timestamp("schedule_time", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  created_by: uuid("created_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  updated_by: uuid("updated_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});
