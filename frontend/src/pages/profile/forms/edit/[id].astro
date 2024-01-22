@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
-import { CreateNewFormPage } from "@frontend/src/components/profile/forms/CreateNewFormPage";
+import { ProfileFormsListPage } from "@frontend/src/components/profile/forms/edit/page";
 import { apiClient } from "@frontend/src/utils/eden";
 import { statusRender } from "@frontend/src/utils/status";
 export const prerender = false;
@@ -28,7 +28,7 @@ if (status == 403) {
 ---
 
 <BaseLayout>
-  <CreateNewFormPage client:only />
+  <ProfileFormsListPage formItem={data} client:only />
 </BaseLayout>
 <style is:global>
   .svg-font-color svg > path {

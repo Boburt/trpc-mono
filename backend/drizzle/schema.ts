@@ -744,3 +744,53 @@ export const forms = pgTable("forms", {
     mode: "string",
   }),
 });
+
+
+export const manufacturers_users = pgTable("manufacturers_users", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  manufacturer_id: uuid("manufacturer_id")
+    .notNull()
+    .references(() => manufacturers.id, { onUpdate: "cascade" }),
+  user_id: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onUpdate: "cascade" }),
+  post: text("post"),
+  is_admin: boolean("is_admin").default(false).notNull(),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});
+
+
+export const forms_sent_items = pgTable("forms_sent_items", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  form_id: uuid("form_id")
+    .notNull()
+    .references(() => forms.id, { onUpdate: "cascade" }),
+  model: text("model").notNull(),
+  model_id: text("model_id").notNull(),
+  status: text("status").notNull(),
+  opened_by: uuid("opened_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  applied_by: uuid("applied_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});

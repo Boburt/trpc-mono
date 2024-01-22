@@ -21,8 +21,9 @@ export const rolesFindManyZod = paginatedZodObj.extend({
     .optional(),
 });
 
-
 import { PermissionResponseDto } from "@backend/modules/permissions/dto/permissions.dto";
+import { InferSelectModel } from "drizzle-orm";
+import { roles, roles_permissions } from "backend/drizzle/schema";
 
 export interface RoleResponseDto {
   name: string;
@@ -31,3 +32,7 @@ export interface RoleResponseDto {
 
   active: boolean;
 }
+
+export type RolesWithRelations = InferSelectModel<typeof roles> & {
+  permissions: string[];
+};

@@ -1,5 +1,20 @@
-import { sp_ticket_categories, sp_ticket_statuses, sp_tickets, sp_tickets_timeline } from "backend/drizzle/schema";
-import { InferSelectModel, SQLWrapper, and, desc, eq, getTableColumns, isNotNull, or, sql } from "drizzle-orm";
+import {
+  sp_ticket_categories,
+  sp_ticket_statuses,
+  sp_tickets,
+  sp_tickets_timeline,
+} from "backend/drizzle/schema";
+import {
+  InferSelectModel,
+  SQLWrapper,
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  isNotNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import Elysia, { t } from "elysia";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
@@ -37,34 +52,44 @@ export const spTicketsController = new Elysia({
       if (filters) {
         whereClause = parseFilterFields(filters, sp_tickets, {
           sp_ticket_statuses,
-          sp_ticket_categories
+          sp_ticket_categories,
         });
       }
       if (user.permissions.includes("sp_tickets.edit")) {
-        whereClause.push(or(
-          eq(sp_tickets.created_by, user.user.id),
-          isNotNull(sp_tickets.created_by)
-        ));
+        whereClause.push(
+          or(
+            eq(sp_tickets.created_by, user.user.id),
+            isNotNull(sp_tickets.created_by)
+          )
+        );
       } else {
-        whereClause.push(eq(sp_tickets.created_by, user.user.id))
+        whereClause.push(eq(sp_tickets.created_by, user.user.id));
       }
       const rolesCount = await drizzle
         .select({ count: sql<number>`count(*)` })
         .from(sp_tickets)
-        .leftJoin(sp_ticket_statuses, eq(sp_ticket_statuses.id, sp_tickets.status_id))
-        .leftJoin(sp_ticket_categories, eq(sp_ticket_categories.id, sp_tickets.category_id))
-        .where(and(
-          ...whereClause
-        ))
+        .leftJoin(
+          sp_ticket_statuses,
+          eq(sp_ticket_statuses.id, sp_tickets.status_id)
+        )
+        .leftJoin(
+          sp_ticket_categories,
+          eq(sp_ticket_categories.id, sp_tickets.category_id)
+        )
+        .where(and(...whereClause))
         .execute();
       const rolesList = (await drizzle
         .select(selectFields)
         .from(sp_tickets)
-        .leftJoin(sp_ticket_statuses, eq(sp_ticket_statuses.id, sp_tickets.status_id))
-        .leftJoin(sp_ticket_categories, eq(sp_ticket_categories.id, sp_tickets.category_id))
-        .where(and(
-          ...whereClause
-        ))
+        .leftJoin(
+          sp_ticket_statuses,
+          eq(sp_ticket_statuses.id, sp_tickets.status_id)
+        )
+        .leftJoin(
+          sp_ticket_categories,
+          eq(sp_ticket_categories.id, sp_tickets.category_id)
+        )
+        .where(and(...whereClause))
         .limit(+limit)
         .offset(+offset)
         .orderBy(desc(sp_tickets.created_at))
@@ -115,8 +140,7 @@ export const spTicketsController = new Elysia({
   )
   .delete(
     "/sp_tickets/:id",
-    async ({ params: { id }, user, set, drizzle,
-      cacheController }) => {
+    async ({ params: { id }, user, set, drizzle, cacheController }) => {
       if (!user) {
         set.status = 401;
         return {
@@ -164,17 +188,21 @@ export const spTicketsController = new Elysia({
         selectFields = getTableColumns(sp_tickets);
       }
 
-      const spTicketStatuses = await cacheController.getCachedSpTicketStatuses({});
+      const spTicketStatuses = await cacheController.getCachedSpTicketStatuses(
+        {}
+      );
 
-      const firstTicketStatus = spTicketStatuses.find((status) => status.sort == 1);
-      console.log('firstTicketStatus', firstTicketStatus)
+      const firstTicketStatus = spTicketStatuses.find(
+        (status) => status.sort == 1
+      );
+      console.log("firstTicketStatus", firstTicketStatus);
       const result = await drizzle
         .insert(sp_tickets)
         .values({
           ...data,
           created_by: user.user.id,
           created_at: new Date().toISOString(),
-          status_id: firstTicketStatus!.id
+          status_id: firstTicketStatus!.id,
         })
         .returning(selectFields);
 
@@ -197,14 +225,21 @@ export const spTicketsController = new Elysia({
   )
   .put(
     "/sp_tickets/:id",
-    async ({ params: { id }, body: { data, fields }, user, set, drizzle, cacheController }) => {
+    async ({
+      params: { id },
+      body: { data, fields },
+      user,
+      set,
+      drizzle,
+      cacheController,
+    }) => {
       if (!user) {
         set.status = 401;
         return {
           message: "User not found",
         };
       }
-
+      console.log("user.permissions", user.permissions);
       if (!user.permissions.includes("sp_tickets.edit")) {
         set.status = 401;
         return {
@@ -235,18 +270,23 @@ export const spTicketsController = new Elysia({
         .where(eq(sp_tickets.id, id))
         .returning(selectFields);
       if (prevData[0].status_id !== data.status_id) {
-        const spTicketStatuses = await cacheController.getCachedSpTicketStatuses({});
-        const prevStatus = spTicketStatuses.find((status) => status.id === prevData[0].status_id);
-        const nextStatus = spTicketStatuses.find((status) => status.id === data.status_id);
+        const spTicketStatuses =
+          await cacheController.getCachedSpTicketStatuses({});
+        const prevStatus = spTicketStatuses.find(
+          (status) => status.id === prevData[0].status_id
+        );
+        const nextStatus = spTicketStatuses.find(
+          (status) => status.id === data.status_id
+        );
         if (prevStatus && nextStatus) {
-          console.log('inserting timeline', {
+          console.log("inserting timeline", {
             ticket_id: id,
             user_id: user.user.id,
-            timeline_type: 'status',
+            timeline_type: "status",
             before_value: prevStatus.name,
             after_value: nextStatus.name,
             created_at: new Date().toISOString(),
-            comment: ''
+            comment: "",
           });
           try {
             await drizzle
@@ -254,16 +294,15 @@ export const spTicketsController = new Elysia({
               .values({
                 ticket_id: id,
                 user_id: user.user.id,
-                timeline_type: 'status',
+                timeline_type: "status",
                 before_value: prevStatus.name,
                 after_value: nextStatus.name,
                 created_at: new Date().toISOString(),
-                comment: ''
+                comment: "",
               })
               .execute();
-
           } catch (e) {
-            console.log('e', e)
+            console.log("e", e);
           }
         }
       }
@@ -278,9 +317,13 @@ export const spTicketsController = new Elysia({
       }),
       body: t.Object({
         data: t.Object({
-          name: t.Optional(t.Nullable(t.String({
-            minLength: 1,
-          }))),
+          name: t.Optional(
+            t.Nullable(
+              t.String({
+                minLength: 1,
+              })
+            )
+          ),
           description: t.Optional(t.Nullable(t.String())),
           category_id: t.Optional(t.Nullable(t.String())),
           status_id: t.Optional(t.Nullable(t.String())),

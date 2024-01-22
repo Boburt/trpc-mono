@@ -5,11 +5,11 @@ import {
 } from "@react-form-builder/designer";
 import { rSuiteComponents } from "@react-form-builder/components-rsuite";
 import { BiDi, IFormViewer, Language } from "@react-form-builder/core";
-import ru_RU from "./ru_RU";
-import uz_UZ from "./uz_UZ";
+import ru_RU from "../ru_RU";
+import uz_UZ from "../uz_UZ";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { IndexedDbFormStorage } from "./IndexedDbFormStorage";
+import { IndexedDbFormStorage } from "../IndexedDbFormStorage";
 import { toast } from "sonner";
 import { useForm } from "@tanstack/react-form";
 import type { Field, RuleGroupType } from "react-querybuilder";
@@ -20,7 +20,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useStore } from "@nanostores/react";
 import { $accessToken } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
-import { formsRoles } from "@backend/lib/forms_roles";
+import { forms } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
 const components = rSuiteComponents.map((c) => c.build());
 const builderView = new BuilderView(components);
@@ -84,10 +85,24 @@ const fields: Field[] = [
     name: "role",
     label: "Роль",
     valueEditorType: "select",
-    values: formsRoles.map((role) => ({
-      name: role.code,
-      label: role.label,
-    })),
+    values: [
+      {
+        name: "manufacturer",
+        label: "Производитель",
+      },
+      {
+        name: "customer",
+        label: "Заказчик",
+      },
+      {
+        name: "lawyer",
+        label: "Юрист",
+      },
+      {
+        name: "logistic",
+        label: "Логист",
+      },
+    ],
   },
   { name: "created_at", label: "Дата регистрации", inputType: "date" },
 ];
@@ -113,13 +128,30 @@ const operators = [
   { name: "notBetween", label: "Не между" },
 ];
 
-export const CreateNewForm = () => {
+export const ProfileFormsEditForm = ({
+  formItem,
+}: {
+  formItem: InferSelectModel<typeof forms>;
+}) => {
+  let formRecipients: any = {};
+
+  if (
+    formItem.form_recipients &&
+    typeof formItem.form_recipients === "string" &&
+    formItem.form_recipients.length > 0
+  ) {
+    formRecipients = JSON.parse(formItem.form_recipients);
+  } else if (formItem.form_recipients) {
+    formRecipients = formItem.form_recipients;
+  } else {
+    formRecipients = initialQuery;
+  }
   const accessToken = useStore($accessToken);
   const ref = useRef<IFormViewer>(null);
   const [activeIndex, setActiveIndex] = useState(1);
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState(formRecipients);
 
-  const createMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: async (newTodo: {
       name: string;
       form_json: string;
@@ -127,7 +159,9 @@ export const CreateNewForm = () => {
       schedule_type: string;
       schedule_time?: string;
     }) => {
-      const { data, error, status } = await apiClient.api.forms.post({
+      const { data, error, status } = await apiClient.api.forms[
+        formItem.id
+      ].put({
         data: newTodo,
         $headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -141,7 +175,7 @@ export const CreateNewForm = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Форма успешно создана");
+      toast.success("Форма успешно сохранена");
       location.href = "/profile/forms";
     },
     onError: (error: any) => {
@@ -157,19 +191,24 @@ export const CreateNewForm = () => {
     name: string;
     schedule_type: string;
     schedule_time?: string;
-    appliers: Record<string, string>;
+    appliers?: any;
   }>({
     defaultValues: {
-      name: "",
-      schedule_type: "",
-      appliers: {},
+      name: formItem.name,
+      schedule_type: formItem.schedule_type,
+      schedule_time: formItem.schedule_time ?? "",
+      appliers:
+        formItem.form_recipients &&
+        Object.values(formItem.form_recipients).length > 0
+          ? formItem.form_recipients
+          : initialQuery,
     },
     onSubmit: async ({ value }) => {
       const formJson = await formStorage?.getForm(formName);
       const form_json = formJson;
       const form_recipients = formatQuery(query);
       console.log("value", value);
-      createMutation.mutate({
+      updateMutation.mutate({
         name: value.name,
         form_json,
         form_recipients,
@@ -206,8 +245,8 @@ export const CreateNewForm = () => {
   const activeStep = steps[activeIndex - 1];
 
   useEffect(() => {
-    formStorage.saveForm(formName, emptyForm);
-  }, []);
+    formStorage.saveForm(formName, JSON.stringify(formItem.form_json));
+  }, [formItem]);
 
   return (
     <>
@@ -284,6 +323,7 @@ export const CreateNewForm = () => {
               viewerRef={ref}
               formName="form_builder"
               initialData={{}}
+              getForm={(_) => JSON.stringify(formItem.form_json)}
               i18n={{
                 languages: [ruLanguage, uzLanguage],
                 getData: (locale) => {
@@ -442,6 +482,7 @@ export const CreateNewForm = () => {
                                   onChange={(e) =>
                                     field.handleChange(e.target.value)
                                   }
+                                  checked={field.state.value === "later"}
                                 />
                               </div>
                               <label
@@ -466,6 +507,7 @@ export const CreateNewForm = () => {
                                   onChange={(e) =>
                                     field.handleChange(e.target.value)
                                   }
+                                  checked={field.state.value === "now"}
                                 />
                               </div>
                               <label
@@ -490,6 +532,7 @@ export const CreateNewForm = () => {
                                   onChange={(e) =>
                                     field.handleChange(e.target.value)
                                   }
+                                  checked={field.state.value === "scheduled"}
                                 />
                               </div>
                               <label
@@ -541,7 +584,7 @@ export const CreateNewForm = () => {
                                   ])}
                                   id={field.name}
                                   name={field.name}
-                                  value={field.state.value}
+                                  value={field.getValue() ?? ""}
                                   onBlur={field.handleBlur}
                                   onChange={(e) =>
                                     field.handleChange(e.target.value)
@@ -593,7 +636,7 @@ export const CreateNewForm = () => {
           <div className="mt-5 flex justify-between items-center gap-x-2">
             <button
               type="button"
-              disabled={createMutation.isPending}
+              disabled={updateMutation.isPending}
               onClick={handlePrev}
               className={clsx([
                 "py-2 px-3 inline-flex items-center gap-x-1 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none",
@@ -642,7 +685,7 @@ export const CreateNewForm = () => {
             </button>
             <button
               type="button"
-              disabled={createMutation.isPending}
+              disabled={updateMutation.isPending}
               onClick={() => {
                 void form.handleSubmit();
               }}
@@ -651,7 +694,7 @@ export const CreateNewForm = () => {
                 activeIndex === 2 ? "block" : "hidden",
               ])}
             >
-              {createMutation.isPending ? (
+              {updateMutation.isPending ? (
                 <>
                   <span
                     className="animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-white rounded-full"

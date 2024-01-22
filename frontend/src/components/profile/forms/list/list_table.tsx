@@ -12,19 +12,30 @@ import {
   TableCell,
   Table,
 } from "@nextui-org/table";
-import { useQuery } from "@tanstack/react-query";
-import { Eye, Edit2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Eye, Edit2, Play } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { Pagination } from "@nextui-org/pagination";
 import { Tooltip } from "@nextui-org/tooltip";
 import { forms } from "backend/drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
 import dayjs from "dayjs";
+import { toast } from "sonner";
+import clsx from "clsx";
 
 const statuses = {
   new: {
     name: "Новое",
     color: "#FFB800",
+  },
+  sent: {
+    name: "Отправлено",
+    color: "#00B341",
+  },
+  is_sending: {
+    name: "Отправляется",
+    // generate gray color
+    color: "#808080".replace(/0/g, () => (~~(Math.random() * 16)).toString(16)),
   },
 };
 
@@ -36,6 +47,7 @@ const scheduleTypes = {
 
 export const ProfileFormsListTable = () => {
   const accessToken = useStore($accessToken);
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -71,13 +83,43 @@ export const ProfileFormsListTable = () => {
     },
   });
 
+  const sendMutation = useMutation({
+    mutationFn: async (newTodo: { id: string }) => {
+      const { data, error, status } = await apiClient.api.forms[
+        newTodo.id
+      ].send.post({
+        $headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (status === 200) {
+        return data;
+      } else {
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Форма успешно отправлена");
+      queryClient.invalidateQueries({
+        queryKey: ["forms"],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.value && error.value.message
+          ? error.value.message
+          : JSON.stringify(error.value)
+      );
+    },
+  });
+
   const pages = useMemo(() => {
     if (data?.total === undefined) {
       return 0;
     }
     return Math.ceil(data?.total / pageSize);
   }, [data?.total, pageSize]);
-
   const renderCell = useCallback(
     (ticket: InferSelectModel<typeof forms>, columnKey: React.Key) => {
       const cellValue =
@@ -141,13 +183,40 @@ export const ProfileFormsListTable = () => {
                   </span>
                 </Tooltip>
               </a>
-              <a href={`/profile/forms/edit/${ticket.id}`}>
-                <Tooltip content="Редактировать">
+              {ticket.status == "new" && (
+                <a href={`/profile/forms/edit/${ticket.id}`}>
+                  <Tooltip content="Редактировать">
+                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                      <Edit2 className="w-5 h-5" />
+                    </span>
+                  </Tooltip>
+                </a>
+              )}
+
+              <button
+                disabled={
+                  ticket.status != "new" && ticket.schedule_type != "later"
+                }
+                onClick={() =>
+                  ticket.status == "new" &&
+                  ticket.schedule_type != "now" &&
+                  sendMutation.mutate({ id: ticket.id })
+                }
+              >
+                <Tooltip content="Отправить">
                   <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    <Edit2 className="w-5 h-5" />
+                    <Play
+                      className={clsx([
+                        "w-5 h-5",
+                        ticket.status != "new" && "text-gray-400 opacity-50",
+                        ticket.status == "new" &&
+                          ticket.schedule_type != "now" &&
+                          "animate-pulse text-green-400",
+                      ])}
+                    />
                   </span>
                 </Tooltip>
-              </a>
+              </button>
             </div>
           );
         default:
@@ -215,7 +284,7 @@ export const ProfileFormsListTable = () => {
           emptyContent={"Нет данных"}
         >
           {(item) => (
-            <TableRow key={item.name}>
+            <TableRow key={item.id}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
