@@ -16,11 +16,22 @@ if (!accessToken) {
 }
 const { id } = Astro.params;
 
-const { data: spTicketById } = await apiClient.api.sp_tickets[":id"].get({
+const { data: spTicketById } = await apiClient.api.sp_tickets[id!].get({
   $headers: {
     Authorization: `Bearer ${accessToken}`,
   },
 });
+console.log("spTicketById:", spTicketById);
+
+const { data: spTicketTimescale } = await apiClient.api.sp_ticket_timescale[
+  id!
+].get({
+  $headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
+
+console.log("spTicketTimescale:", spTicketTimescale);
 ---
 
 <BaseLayout>
