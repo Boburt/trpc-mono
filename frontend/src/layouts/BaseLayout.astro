@@ -32,21 +32,16 @@ let userData;
 const accessToken = Astro.cookies.get("x-token")?.value;
 
 $userData.set(null);
-console.log("accessToken", accessToken);
 if (accessToken) {
   const { data, error } = await apiClient.api.users.me.get({
     $headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  console.log("error", error);
-  console.log("data", data);
   if (data && "user" in data && data.user) {
     $userData.set(data.user);
   }
 }
-
-console.log("showHeaderFilter", showHeaderFilter);
 ---
 
 <html lang="en" class="h-full">
@@ -57,7 +52,7 @@ console.log("showHeaderFilter", showHeaderFilter);
     <ViewTransitions />
     <title>{title ?? "Лёгкая промышленность"}</title>
   </head>
-  <body class="bg-white dark:bg-slate-900 flex flex-col h-full">
+  <body class="bg-white dark:bg-slate-900 flex flex-col">
     <Header />
     <main class="container mx-auto py-4 shrink-0">
       {

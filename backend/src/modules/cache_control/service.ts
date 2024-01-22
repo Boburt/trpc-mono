@@ -321,7 +321,6 @@ export class CacheControlService {
   }
 
   async getCachedSEOLinks(link: string) {
-    console.log("link", link);
     const linkHash = Bun.hash(link);
     const seoLinks = await this.redis.get(
       `${process.env.PROJECT_PREFIX}seo_links:${linkHash}`
@@ -427,7 +426,7 @@ export class CacheControlService {
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
       );
-    } catch (e) {}
+    } catch (e) { }
   }
 
   async getCachedUserDataByToken(accessToken: string): Promise<{

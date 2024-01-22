@@ -26,6 +26,7 @@
     "@elysiajs/static": "^0.8.1",
     "@fastify/middie": "^8.3.0",
     "@fastify/static": "^6.10.2",
+    "@fluentui/react-icons-mdl2": "^1.3.56",
     "@nanostores/persistent": "^0.9.1",
     "@nanostores/react": "^0.7.1",
     "@nextui-org/chip": "^2.0.25",
@@ -40,6 +41,7 @@
     "@react-form-builder/components-rsuite": "^1.0.3",
     "@react-form-builder/core": "^1.0.3",
     "@react-form-builder/designer": "^1.0.3",
+    "@react-querybuilder/fluent": "^6.5.5",
     "@tailwindcss/typography": "^0.5.10",
     "@tanstack/react-form": "^0.13.3",
     "@tanstack/react-query": "^5.17.0",
@@ -61,6 +63,7 @@
     "flowbite": "^2.2.1",
     "flowbite-react": "^0.7.2",
     "framer-motion": "^10.18.0",
+    "idb-keyval": "^6.2.1",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.312.0",
     "nanostores": "^0.9.5",
@@ -70,6 +73,7 @@
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.47.0",
     "react-icons": "^4.11.0",
+    "react-querybuilder": "^6.5.5",
     "react-responsive-carousel": "^3.2.23",
     "rsuite": "^5.51.0",
     "sharp": "^0.33.1",
@@ -80,6 +84,8 @@
     "zod": "3.21.1"
   },
   "devDependencies": {
-    "daisyui": "latest"
+    "daisyui": "latest",
+    "sass": "^1.70.0",
+    "sass-loader": "^14.0.0"
   }
 }

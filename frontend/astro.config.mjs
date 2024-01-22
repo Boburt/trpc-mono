@@ -5,6 +5,7 @@ import nodejs from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import partytown from "@astrojs/partytown";
 import auth from "auth-astro";
+import * as sass from "sass";
 
 import tunnel from "astro-tunnel";
 
@@ -25,6 +26,13 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ["react-icons"],
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          implementation: sass,
+        },
+      },
     },
   },
   integrations: [react(), sitemap(), partytown(), auth()],
