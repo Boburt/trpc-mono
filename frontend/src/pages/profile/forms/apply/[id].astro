@@ -2,6 +2,7 @@
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
 import { apiClient } from "@frontend/src/utils/eden";
 import { statusRender } from "@frontend/src/utils/status";
+import { ProfileFormsApplyProvider } from "@frontend/src/components/profile/forms/apply/index";
 
 const { id } = Astro.params;
 export const prerender = false;
@@ -16,7 +17,7 @@ const { data, status } = await apiClient.api.forms_sent_items[id!].get({
     Authorization: `Bearer ${accessToken}`,
   },
 });
-
+console.log("form_sent_items", status);
 if (status == 404 || status == 500) {
   return statusRender(404, `${Astro.site}404`);
 }
@@ -32,12 +33,7 @@ if (!("id" in data)) {
 console.log(data);
 
 if (data.model == "manufacturers") {
-  const { data: userData, error } = await apiClient.api.users.me.get({
-    $headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  if (userData && "user" in userData && userData.user) {
+  if (Astro.locals.user) {
     const { data: manufacturer_user, status } =
       await apiClient.api.manufacturers_users.get({
         $query: {
@@ -48,7 +44,7 @@ if (data.model == "manufacturers") {
             {
               field: "user_id",
               operator: "eq",
-              value: userData.user.id,
+              value: Astro.locals.user.id,
             },
             {
               field: "manufacturer_id",
@@ -72,9 +68,11 @@ if (data.model == "manufacturers") {
       return statusRender(404, `${Astro.site}404`);
     }
   } else {
-    return statusRender(404, `${Astro.site}404`);
+    return statusRender(403, `${Astro.site}403`);
   }
 }
 ---
 
-<BaseLayout disableBreadcrumbs={true} />
+<BaseLayout disableBreadcrumbs={true}>
+  <ProfileFormsApplyProvider formItem={data.form!} client:only />
+</BaseLayout>
