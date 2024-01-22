@@ -11,20 +11,21 @@ import { CacheControlService } from "@backend/modules/cache_control/service";
 import { AssetsService } from "@backend/modules/assets/service";
 import { Queue } from "bullmq";
 
-export const client = new Redis({
+const client = new Redis({
   port: 6379, // Redis port
   host: "127.0.0.1", // Redis host
   //   maxRetriesPerRequest: null,
 });
-export const newAssetsAddedQueue = new Queue(
+const formSendTgQueueName = `${process.env.PROJECT_PREFIX}form_send_tg`;
+const newAssetsAddedQueue = new Queue(
   `${process.env.PROJECT_PREFIX}new_assets_added`,
   {
     connection: client,
   }
 );
 
-export const cacheControlService = new CacheControlService(drizzleDb, client);
-export const assetsService = new AssetsService(newAssetsAddedQueue, drizzleDb);
+const cacheControlService = new CacheControlService(drizzleDb, client);
+const assetsService = new AssetsService(newAssetsAddedQueue, drizzleDb);
 
 // const permissionExtension = new Elysia({
 //   name: "permission_extension",
@@ -59,26 +60,31 @@ export const assetsService = new AssetsService(newAssetsAddedQueue, drizzleDb);
 //   };
 // });
 
-export const newIndexManufacturersQueue = new Queue(
+const newIndexManufacturersQueue = new Queue(
   `${process.env.PROJECT_PREFIX}index_manufacturers`,
   {
     connection: client,
   }
 );
 
-export const newDeleteManufacturersQueue = new Queue(
+const newDeleteManufacturersQueue = new Queue(
   `${process.env.PROJECT_PREFIX}delete_manufacturers`,
   {
     connection: client,
   }
 );
 
-export const newIndexManufacturerReviewQueue = new Queue(
+const newIndexManufacturerReviewQueue = new Queue(
   `${process.env.PROJECT_PREFIX}index_manufacturer_review`,
   {
     connection: client,
   }
 );
+
+const formSendTgQueueNameQueue = new Queue(formSendTgQueueName, {
+  connection: client,
+});
+
 
 export const ctx = new Elysia({
   name: "@app/ctx",
@@ -91,6 +97,7 @@ export const ctx = new Elysia({
   .decorate("newIndexManufacturersQueue", newIndexManufacturersQueue)
   .decorate("newDeleteManufacturersQueue", newDeleteManufacturersQueue)
   .decorate("newIndexManufacturerReviewQueue", newIndexManufacturerReviewQueue)
+  .decorate("formSendTgQueueNameQueue", formSendTgQueueNameQueue)
   .use(
     cors({
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

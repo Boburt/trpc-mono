@@ -278,7 +278,7 @@ export const usersController = new Elysia({
           status: "active",
           password: passwordHash,
           salt,
-          login: data.username,
+          login: data.username ?? data.id,
         }).returning({
           id: users.id,
           login: users.login,
@@ -330,9 +330,9 @@ export const usersController = new Elysia({
       body: t.Object({
         id: t.String(),
         first_name: t.String(),
-        last_name: t.String(),
-        username: t.String(),
-        photo_url: t.String(),
+        last_name: t.Optional(t.String()),
+        username: t.Optional(t.String()),
+        photo_url: t.Optional(t.String()),
         auth_date: t.String(),
         hash: t.String(),
       }),

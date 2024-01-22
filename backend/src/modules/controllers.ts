@@ -18,6 +18,9 @@ import { spTicketCategoriesController } from "./sp_ticket_categories/controller"
 import { spTicketStatusesController } from "./sp_ticket_statuses/controller";
 import { spTicketsController } from "./sp_tickets/controller";
 import { spTicketTimelineController } from "@backend/modules/sp_ticket_timeline/controller";
+import { formsController } from "./forms/controller";
+import { formsSentItemsController } from "./form_sent_items/controller";
+import { ManufacturersUsersController } from "./manufacturers_users/controller";
 
 export const apiController = new Elysia({
   prefix: "/api",
@@ -40,4 +43,7 @@ export const apiController = new Elysia({
   .use(spTicketCategoriesController)
   .use(spTicketStatusesController)
   .use(spTicketsController)
-  .use(spTicketTimelineController);
+  .use(spTicketTimelineController)
+  .use(formsController)
+  .use(formsSentItemsController)
+  .use(ManufacturersUsersController);

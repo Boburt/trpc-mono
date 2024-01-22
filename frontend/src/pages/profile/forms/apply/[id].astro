@@ -1,0 +1,80 @@
+---
+import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
+import { apiClient } from "@frontend/src/utils/eden";
+import { statusRender } from "@frontend/src/utils/status";
+
+const { id } = Astro.params;
+export const prerender = false;
+
+if (!id) {
+  Astro.redirect("/");
+}
+const accessToken = Astro.cookies.get("x-token")?.value;
+
+const { data, status } = await apiClient.api.forms_sent_items[id!].get({
+  $headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
+
+if (status == 404 || status == 500) {
+  return statusRender(404, `${Astro.site}404`);
+}
+
+if (!data) {
+  return statusRender(404, `${Astro.site}404`);
+}
+
+if (!("id" in data)) {
+  return statusRender(404, `${Astro.site}404`);
+}
+
+console.log(data);
+
+if (data.model == "manufacturers") {
+  const { data: userData, error } = await apiClient.api.users.me.get({
+    $headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (userData && "user" in userData && userData.user) {
+    const { data: manufacturer_user, status } =
+      await apiClient.api.manufacturers_users.get({
+        $query: {
+          limit: "1",
+          offset: "0",
+          fields: "id,manufacturer_id,user_id",
+          filters: JSON.stringify([
+            {
+              field: "user_id",
+              operator: "eq",
+              value: userData.user.id,
+            },
+            {
+              field: "manufacturer_id",
+              operator: "eq",
+              value: data.model_id,
+            },
+          ]),
+        },
+        $headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    if (manufacturer_user && "data" in manufacturer_user) {
+      if (
+        Array.isArray(manufacturer_user.data) &&
+        manufacturer_user.data.length == 0
+      ) {
+        return statusRender(403, `${Astro.site}403`);
+      }
+    } else {
+      return statusRender(404, `${Astro.site}404`);
+    }
+  } else {
+    return statusRender(404, `${Astro.site}404`);
+  }
+}
+---
+
+<BaseLayout disableBreadcrumbs={true} />
