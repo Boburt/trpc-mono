@@ -32,7 +32,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
             context.cookies.set("x-token", data.accessToken);
             context.locals.user = data.user;
             context.locals.permissions = data.permissions;
-            return next();
+
+            const url = new URL(context.request.url);
+
+            // remove query following query params from url: id, auth_date, hash, first_name, last_name, username, photo_url. Others are kept.
+            url.searchParams.delete("id");
+            url.searchParams.delete("auth_date");
+            url.searchParams.delete("hash");
+            url.searchParams.delete("first_name");
+            url.searchParams.delete("last_name");
+            url.searchParams.delete("username");
+            url.searchParams.delete("photo_url");
+
+            // return Response.redirect to the url without query params
+
+            return Response.redirect(url);
         } else if (status != 200 || error) {
             return Response.redirect(new URL("/403", context.url));
         } else {
