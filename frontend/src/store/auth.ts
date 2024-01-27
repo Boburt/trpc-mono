@@ -137,6 +137,7 @@ export const logout = () =>
       $refreshToken.set(null);
       $userData.set(null);
       $isLoggedIn.set(false);
+      location.reload();
     } catch (e: any) {
       return {
         error: e.message,

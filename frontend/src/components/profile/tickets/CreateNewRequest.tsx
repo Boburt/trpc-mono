@@ -6,9 +6,10 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { toast } from "sonner";
+import { useCookieState } from "use-cookie-state";
 
 export function CreateNewRequest() {
-  const accessToken = useStore($accessToken);
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const queryClient = useQueryClient();
   const form = useForm<{
     name: string;

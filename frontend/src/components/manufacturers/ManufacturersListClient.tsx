@@ -66,7 +66,6 @@ export default function ManufacturersListClient({
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
   });
-  console.log("manufacturers?.items", manufacturers?.items);
   return (
     <div className="relative mt-8 flex flex-col">
       {manufacturers?.items.map((item) => (

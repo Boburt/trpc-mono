@@ -5,6 +5,7 @@ import { MdOutlineSettingsApplications } from "react-icons/md";
 import BaseLayout from "./BaseLayout.astro";
 const pathname = new URL(Astro.request.url).pathname;
 let { title } = Astro.props;
+const { permissions } = Astro.locals;
 ---
 
 <BaseLayout>
@@ -14,7 +15,7 @@ let { title } = Astro.props;
         <li>
           <a href="/profile" class={pathname == "/profile" ? "active" : ""}>
             <FaRegUserCircle />
-            Profile
+            Профиль
           </a>
         </li>
         <li>
@@ -26,33 +27,19 @@ let { title } = Astro.props;
             Обращения
           </a>
         </li>
-        <li>
-          <a
-            href="/profile/company"
-            class={pathname == "/profile/company" ? "active" : ""}
-          >
-            <BsBuildings />
-            My Company
-          </a>
-        </li>
-        <li>
-          <a
-            href="/profile/collegs"
-            class={pathname == "/profile/collegs" ? "active" : ""}
-          >
-            <FaUsers />
-            My Collegs
-          </a>
-        </li>
-        <li>
-          <a
-            href="/profile/forms"
-            class={pathname == "/profile/forms" ? "active" : ""}
-          >
-            <FaWpforms />
-            Forms
-          </a>
-        </li>
+        {
+          permissions && permissions.includes("forms.list") && (
+            <li>
+              <a
+                href="/profile/forms"
+                class={pathname.startsWith("/profile/forms") ? "active" : ""}
+              >
+                <FaWpforms />
+                Формы
+              </a>
+            </li>
+          )
+        }
       </ul>
     </nav>
 

@@ -26,22 +26,7 @@ const seoLink = await apiClient.api.seo_links.by_link.get({
 if (seoLink && seoLink.data && "id" in seoLink.data) {
   title = seoLink.data.title;
 }
-
-let userData;
-
-const accessToken = Astro.cookies.get("x-token")?.value;
-
-$userData.set(null);
-if (accessToken) {
-  const { data, error } = await apiClient.api.users.me.get({
-    $headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  if (data && "user" in data && data.user) {
-    $userData.set(data.user);
-  }
-}
+$userData.set(Astro.locals.user);
 ---
 
 <html lang="en" class="h-full">
@@ -67,12 +52,18 @@ if (accessToken) {
     <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>
     <script is:inline src="/node_modules/preline/preline.js"></script>
-    <script async>
+    <script is:inline>
       window.onload = function () {
-        if (window.HSStaticMethods) {
-          console.log("HSStaticMethods", window.HSStaticMethods);
-          window.HSStaticMethods.autoInit();
-        }
+        setTimeout(function () {
+          if (window.HSStaticMethods) {
+            console.log("HSStaticMethods", window.HSStaticMethods);
+            window.HSStaticMethods.autoInit();
+          }
+        }, 100);
+        // if (window.HSStaticMethods) {
+        //   console.log("HSStaticMethods", window.HSStaticMethods);
+        //   window.HSStaticMethods.autoInit();
+        // }
       };
     </script>
   </body>

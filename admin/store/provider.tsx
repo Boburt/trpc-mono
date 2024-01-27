@@ -38,7 +38,6 @@ function useContextualQueryClient() {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = useContextualQueryClient();
-  console.log("queryClient", queryClient.client);
   return (
     <QueryClientProvider client={queryClient.client}>
       {children}

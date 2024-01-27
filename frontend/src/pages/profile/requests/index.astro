@@ -1,8 +1,9 @@
 ---
 import ProfileLayout from "@frontend/src/layouts/ProfileLayout.astro";
 import { TicketsPage } from "@frontend/src/components/profile/tickets/TicketsPage";
+const { permissions } = Astro.locals;
 ---
 
 <ProfileLayout title="Мои обращения">
-  <TicketsPage client:only />
+  <TicketsPage client:only permissions={permissions} />
 </ProfileLayout>

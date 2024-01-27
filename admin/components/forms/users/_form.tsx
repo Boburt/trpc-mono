@@ -11,7 +11,7 @@ import {
 import { useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
-import { createFormFactory } from "@tanstack/react-form";
+import { createFormFactory, useForm } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { useCallback, useState } from "react";
@@ -28,16 +28,6 @@ import { users } from "backend/drizzle/schema";
 import useToken from "@admin/store/get-token";
 import { apiClient } from "@admin/utils/eden";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
-
-const formFactory = createFormFactory<InferInsertModel<typeof users>>({
-  defaultValues: {
-    status: "active",
-    login: "",
-    password: "",
-    first_name: "",
-    last_name: "",
-  },
-});
 
 export default function UsersForm({
   setOpen,
@@ -121,12 +111,19 @@ export default function UsersForm({
     onError,
   });
 
-  const form = formFactory.useForm({
-    onSubmit: async (values, formApi) => {
+  const form = useForm<InferInsertModel<typeof users>>({
+    defaultValues: {
+      status: "active",
+      login: "",
+      password: "",
+      first_name: "",
+      last_name: "",
+    },
+    onSubmit: async ({ value }) => {
       if (recordId) {
-        updateMutation.mutate({ data: values, id: recordId });
+        updateMutation.mutate({ data: value, id: recordId });
       } else {
-        createMutation.mutate(values);
+        createMutation.mutate(value);
       }
     },
   });
@@ -197,7 +194,7 @@ export default function UsersForm({
   });
 
   const userRoleId = useMemo(() => {
-    if (userRolesData && userRolesData.data) {
+    if (userRolesData && userRolesData.data && userRolesData.data.length > 0) {
       return userRolesData.data[0].role_id;
     } else {
       return null;
@@ -228,10 +225,8 @@ export default function UsersForm({
   }, [createMutation.isPending, updateMutation.isPending, isRolesLoading]);
 
   useEffect(() => {
-    // console.log("record", record);
     if (record?.data && "id" in record.data) {
       Object.keys(record.data).forEach((key) => {
-        console.log(key, record.data[key as keyof typeof record.data]);
         form.setFieldValue(
           key as keyof typeof record.data,
           record.data[key as keyof typeof record.data]
@@ -242,7 +237,14 @@ export default function UsersForm({
 
   return (
     <form.Provider>
-      <form {...form.getFormProps()} className="space-y-8">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+        className="space-y-8"
+      >
         <div className="space-y-2">
           <div>
             <Label>Статус</Label>
@@ -252,7 +254,7 @@ export default function UsersForm({
               return (
                 <>
                   <Select
-                    onValueChange={(value) => field.setValue(value)}
+                    onValueChange={(value) => field.setValue(value as any)}
                     defaultValue={field.getValue() ?? ""}
                   >
                     <SelectTrigger>
@@ -284,8 +286,11 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
+                    id={field.name}
+                    name={field.name}
                     value={field.getValue() ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -301,8 +306,11 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
+                    id={field.name}
+                    name={field.name}
                     value={field.getValue() ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -321,11 +329,12 @@ export default function UsersForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {rolesData?.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.name}
-                </SelectItem>
-              ))}
+              {Array.isArray(rolesData) &&
+                rolesData?.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -338,8 +347,11 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
+                    id={field.name}
+                    name={field.name}
                     value={field.getValue() ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -355,8 +367,11 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
+                    id={field.name}
+                    name={field.name}
                     value={field.getValue() ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );

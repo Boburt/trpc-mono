@@ -1,5 +1,7 @@
 ---
 import SignInButton from "./SignInButton";
+
+const { user, permissions } = Astro.locals;
 ---
 
 <header
@@ -12,7 +14,7 @@ import SignInButton from "./SignInButton";
     <div class="flex items-center justify-between">
       <a
         class="flex-none text-xl font-semibold dark:text-white"
-        href="#"
+        href="/"
         aria-label="Brand"
       >
         Brand
@@ -188,7 +190,7 @@ import SignInButton from "./SignInButton";
           </div>
         </div>
 
-        <SignInButton client:only />
+        <SignInButton userData={user} permissions={permissions!} client:only />
       </div>
     </div>
   </nav>
