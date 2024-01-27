@@ -81,6 +81,20 @@ const newIndexManufacturerReviewQueue = new Queue(
   }
 );
 
+const newTicketQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}new_ticket`,
+  {
+    connection: client,
+  }
+);
+
+const ticketStatusChangedQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}ticket_status_change`,
+  {
+    connection: client,
+  }
+);
+
 const formSendTgQueueNameQueue = new Queue(formSendTgQueueName, {
   connection: client,
 });
@@ -98,6 +112,8 @@ export const ctx = new Elysia({
   .decorate("newDeleteManufacturersQueue", newDeleteManufacturersQueue)
   .decorate("newIndexManufacturerReviewQueue", newIndexManufacturerReviewQueue)
   .decorate("formSendTgQueueNameQueue", formSendTgQueueNameQueue)
+  .decorate("newTicketQueue", newTicketQueue)
+  .decorate("ticketStatusChangedQueue", ticketStatusChangedQueue)
   .use(
     cors({
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
