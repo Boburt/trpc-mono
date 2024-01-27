@@ -144,16 +144,30 @@ export default async function processFormSendTg(id: string) {
                                         body: JSON.stringify({
                                             chat_id: user.tgId,
                                             parse_mode: 'HTML',
-                                            text: `<b>Пожалуйста заполните форму "${form.name}"</b>.\nСсылка на форму: <a href='${process.env.FRONTEND_URL}/profile/forms/apply/${sentItem.id}'>${process.env.FRONTEND_URL}/profile/forms/apply/${sentItem.id}</a>`
+                                            text: `<b>Пожалуйста заполните форму "${form.name}"</b>.`,
+                                            "reply_markup": {
+                                                "inline_keyboard": [
+                                                    [
+                                                        {
+                                                            "text": "Открыть форму",
+                                                            "login_url": { "url": `${process.env.FRONTEND_URL}/profile/forms/apply/${sentItem.id}` }
+                                                        }
+                                                    ]
+                                                ]
+                                            }
                                         }),
                                         headers: { "Content-Type": "application/json" },
                                     });
-
+                                    console.log('tg message', await response.text())
                                 }
                             }
                         }
                     }
                 }
+
+                await drizzleDb.update(forms).set({
+                    status: 'sent'
+                }).where(eq(forms.id, id)).execute();
             }
 
 

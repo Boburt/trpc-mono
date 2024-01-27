@@ -205,12 +205,11 @@ export const ProfileFormsEditForm = ({
     },
     onSubmit: async ({ value }) => {
       const formJson = await formStorage?.getForm(formName);
-      const form_json = formJson;
       const form_recipients = formatQuery(query);
       console.log("value", value);
       updateMutation.mutate({
         name: value.name,
-        form_json,
+        form_json: formJson,
         form_recipients,
         schedule_type: value.schedule_type,
         schedule_time: value.schedule_time,
@@ -323,7 +322,10 @@ export const ProfileFormsEditForm = ({
               viewerRef={ref}
               formName="form_builder"
               initialData={{}}
-              getForm={(_) => JSON.stringify(formItem.form_json)}
+              getForm={(_) => {
+                console.log("form json", JSON.stringify(formItem.form_json));
+                return JSON.stringify(formItem.form_json);
+              }}
               i18n={{
                 languages: [ruLanguage, uzLanguage],
                 getData: (locale) => {

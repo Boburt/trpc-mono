@@ -174,7 +174,11 @@ export const formsController = new Elysia({
             }
             const role = await drizzle
                 .update(forms)
-                .set(data)
+                .set({
+                    ...data,
+                    form_json: JSON.parse(data.form_json),
+                    form_recipients: JSON.parse(data.form_recipients),
+                })
                 .where(eq(forms.id, id))
                 .execute();
 
