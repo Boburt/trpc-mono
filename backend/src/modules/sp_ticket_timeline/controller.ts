@@ -3,14 +3,14 @@ import Elysia, { t } from "elysia";
 import { ctx } from "@backend/context";
 
 import { sp_tickets_timeline } from "backend/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export const spTicketTimelineController = new Elysia({
-  name: "@api/sp_ticket_timescale",
+  name: "@api/sp_ticket_timeline",
 })
   .use(ctx)
   .get(
-    "/sp_ticket_timescale/:id",
+    "/sp_ticket_timeline/:id",
     async ({ params: { id }, user, set, drizzle }) => {
       if (!user) {
         set.status = 401;
@@ -19,20 +19,21 @@ export const spTicketTimelineController = new Elysia({
         };
       }
 
-      const spTicketTimescale = await drizzle
+      const spTicketTimeline = await drizzle
         .select()
         .from(sp_tickets_timeline)
         .where(eq(sp_tickets_timeline.ticket_id, id))
+        .orderBy(desc(sp_tickets_timeline.created_at))
         .execute();
 
-      if (!spTicketTimescale.length) {
+      if (!spTicketTimeline.length) {
         set.status = 404;
         return {
-          message: "spTicketTimescale not found",
+          message: "spTicketTimeline not found",
         };
       }
 
-      return spTicketTimescale[0];
+      return spTicketTimeline;
     },
     {
       params: t.Object({
