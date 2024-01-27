@@ -68,6 +68,62 @@ export const formsController = new Elysia({
             }),
         }
     )
+    .get("/forms/:id/counts", async ({
+        params: { id },
+        user,
+        set,
+        drizzle
+    }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                message: "User not found",
+            };
+        }
+
+        if (!user.permissions.includes("forms.edit")) {
+            set.status = 401;
+            return {
+                message: "You don't have permissions",
+            };
+        }
+
+        const role = (await drizzle
+            .select({ count: sql<number>`count(*)` })
+            .from(forms)
+            .where(eq(forms.id, id))
+            .execute());
+
+        if (!role.length) {
+            set.status = 404;
+            return {
+                message: "Role not found",
+            };
+        }
+
+        const countStatistics = await drizzle.execute<{
+            cnt: number;
+            filled: number;
+            opened: number;
+            form_id: string;
+        }>(
+            sql.raw(`
+                select count(*)                                           as cnt,
+                    sum(case (status) when 'filled' then 1 else 0 end) as filled,
+                    sum(case (status) when 'opened' then 1 else 0 end) as opened,
+                    form_id
+                from forms_sent_items
+                where form_id = '${id}'
+                group by form_id
+            `)
+        )
+
+        return countStatistics[0];
+    }, {
+        params: t.Object({
+            id: t.String(),
+        })
+    })
     .get(
         "/forms/:id",
         async ({
@@ -83,7 +139,7 @@ export const formsController = new Elysia({
                 };
             }
 
-            if (!user.permissions.includes("forms.one")) {
+            if (!user.permissions.includes("forms.edit")) {
                 set.status = 403;
                 return {
                     message: "You don't have permissions",

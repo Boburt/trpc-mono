@@ -159,9 +159,9 @@ export default function RolePermissionsForm({
     return (
       isLoading ||
       createMutation.isPending ||
-      Object.keys(rowSelection).length === 0
+      Object.keys(roleSelection).length === 0
     );
-  }, [createMutation.isPending, isLoading, rowSelection]);
+  }, [createMutation.isPending, isLoading, roleSelection]);
 
   const selectedRowsIds = useMemo(() => {
     return Object.keys(rowSelection);

@@ -2,17 +2,20 @@ import { $isLoggedIn, $userData, setAuthData } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
 import { useStore } from "@nanostores/react";
 import { useForm } from "@tanstack/react-form";
+import { users } from "backend/drizzle/schema";
 import { useEffect, useState } from "react";
 import TelegramLoginButton from "telegram-login-button";
+import { InferSelectModel } from "drizzle-orm";
 
 export default function AuthForm({
   error,
   token,
+  userData,
 }: {
+  userData: InferSelectModel<typeof users>;
   error?: string | null;
   token?: string | null;
 }) {
-  const userData = useStore($userData);
   const [errorMessage, setErrorMessage] = useState(error);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,6 +57,7 @@ export default function AuthForm({
       } else if (data && "accessToken" in data) {
         setIsLoading(false);
         setAuthData(data.accessToken, data.refreshToken, data.user);
+        location.reload();
       }
     },
   });

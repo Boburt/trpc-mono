@@ -2,7 +2,6 @@
 import { defineMiddleware } from "astro/middleware";
 import { apiClient } from "./utils/eden";
 export const onRequest = defineMiddleware(async (context, next) => {
-    console.log('davr');
     const url = new URL(context.request.url);
     const params = url.searchParams;
     const id = params.get("id");
@@ -29,7 +28,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
             hash: query["hash"],
         });
         if (status == 200 && data && "accessToken" in data) {
-            context.cookies.set("x-token", data.accessToken);
+            context.cookies.set("x-token", data.accessToken, {
+                path: "/",
+            });
+            context.cookies.set("x-refresh-token", data.refreshToken, {
+                path: "/",
+            });
             context.locals.user = data.user;
             context.locals.permissions = data.permissions;
 
@@ -55,25 +59,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     }
 
-    if (context.url.pathname.startsWith("/profile/")) {
 
-        const accessToken = context.cookies.get("x-token")?.value;
-        if (accessToken) {
-            const { data, error } = await apiClient.api.users.me.get({
-                $headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            if (data && "user" in data && data.user) {
-                context.locals.user = data.user;
-                context.locals.permissions = data.permissions;
-                return next();
-            } else {
-                return Response.redirect(new URL("/403", context.url));
-            }
-        } else {
+    const accessToken = context.cookies.get("x-token")?.value;
+    if (accessToken) {
+        const { data, error } = await apiClient.api.users.me.get({
+            $headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+        if (data && "user" in data && data.user) {
+            context.locals.user = data.user;
+            context.locals.permissions = data.permissions;
+            return next();
+        } else if (context.url.pathname.startsWith("/profile")) {
             return Response.redirect(new URL("/403", context.url));
+        } else {
+            return next();
         }
+    } else if (context.url.pathname.startsWith("/profile")) {
+        return Response.redirect(new URL("/403", context.url));
     } else {
         return next();
     }

@@ -8,6 +8,7 @@ export default function CanAccess({
   permission: string;
 }) {
   const { data: session, status } = useSession();
+
   if (!session) {
     return <></>;
   }

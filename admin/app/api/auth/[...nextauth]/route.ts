@@ -23,12 +23,12 @@ const authOptions: AuthOptions = {
               login,
               password,
             });
-            if (status == 200 && res) {
+            if (status == 200 && res && "accessToken" in res) {
               return {
-                ...res.data,
+                ...res.user,
                 accessToken: res.accessToken,
                 refreshToken: res.refreshToken,
-                rights: res.rights,
+                rights: res.permissions,
               };
             } else if (status == 401) {
               throw new Error(res?.message);

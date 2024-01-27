@@ -7,7 +7,7 @@ import { RolesCreateInputSchema } from "@backend/lib/zod";
 import { useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
-import { createFormFactory } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toast } from "sonner";
@@ -16,14 +16,6 @@ import { apiClient } from "@admin/utils/eden";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { InferInsertModel } from "drizzle-orm";
 import useToken from "@admin/store/get-token";
-
-const formFactory = createFormFactory<InferInsertModel<typeof roles>>({
-  defaultValues: {
-    active: true,
-    name: "",
-    code: "",
-  },
-});
 
 export default function RolesForm({
   setOpen,
@@ -76,12 +68,22 @@ export default function RolesForm({
     onError,
   });
 
-  const form = formFactory.useForm({
-    onSubmit: async (values, formApi) => {
+  const form = useForm<{
+    active: boolean;
+    name: string;
+    code: string;
+  }>({
+    defaultValues: {
+      active: true,
+      name: "",
+      code: "",
+    },
+    onSubmit: async ({ value, formApi }) => {
+      console.log(value);
       if (recordId) {
-        updateMutation.mutate({ data: values, id: recordId });
+        updateMutation.mutate({ data: value, id: recordId });
       } else {
-        createMutation.mutate(values);
+        createMutation.mutate(value);
       }
     },
   });
@@ -110,13 +112,20 @@ export default function RolesForm({
     if (record?.data && "id" in record.data) {
       form.setFieldValue("active", record.data.active);
       form.setFieldValue("name", record.data.name);
-      form.setFieldValue("code", record.data.code);
+      form.setFieldValue("code", record.data?.code ?? "");
     }
   }, [record]);
 
   return (
     <form.Provider>
-      <form {...form.getFormProps()} className="space-y-8">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+        className="space-y-8"
+      >
         <div className="space-y-2">
           <div>
             <Label>Активность</Label>
@@ -138,13 +147,25 @@ export default function RolesForm({
           <div>
             <Label>Название</Label>
           </div>
-          <form.Field name="name">
+          <form.Field
+            name="name"
+            validators={{
+              onChange({ value }) {
+                if (!value) {
+                  return "Required";
+                }
+              },
+            }}
+          >
             {(field) => {
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
-                    value={field.getValue() ?? ""}
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -155,13 +176,25 @@ export default function RolesForm({
           <div>
             <Label>Код</Label>
           </div>
-          <form.Field name="code">
+          <form.Field
+            name="code"
+            validators={{
+              onChange({ value }) {
+                if (!value) {
+                  return "Required";
+                }
+              },
+            }}
+          >
             {(field) => {
               return (
                 <>
                   <Input
-                    {...field.getInputProps()}
-                    value={field.getValue() ?? ""}
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value!}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );

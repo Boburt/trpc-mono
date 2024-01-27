@@ -25,7 +25,6 @@ export const FilterFacetedDropdown = ({
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
-    console.log("text", text);
     setSearchText(text);
     setFilteredItems(
       items.filter((item) =>

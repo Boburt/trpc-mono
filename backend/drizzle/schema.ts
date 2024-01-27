@@ -771,18 +771,40 @@ export const manufacturers_users = pgTable("manufacturers_users", {
 
 export const forms_sent_items = pgTable("forms_sent_items", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  form_id: uuid("form_id")
-    .notNull()
-    .references(() => forms.id, { onUpdate: "cascade" }),
+  form_id: uuid("form_id").notNull(),
   model: text("model").notNull(),
   model_id: text("model_id").notNull(),
   status: text("status").notNull(),
+  opened_at: timestamp("opened_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
   opened_by: uuid("opened_by").references(() => users.id, {
     onUpdate: "cascade",
   }),
   applied_by: uuid("applied_by").references(() => users.id, {
     onUpdate: "cascade",
   }),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});
+
+export const form_filled_values = pgTable("form_filled_values", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  form_id: uuid("form_id").notNull(),
+  form_sent_item_id: uuid("form_sent_item_id").notNull(),
+  field_id: text("field_id").notNull(),
+  field_label: text("field_label").notNull(),
+  value: text("value").notNull(),
   created_at: timestamp("created_at", {
     precision: 5,
     withTimezone: true,

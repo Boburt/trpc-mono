@@ -18,9 +18,10 @@ import { SpTicketsRelatedList } from "@backend/modules/sp_tickets/sp_tickets.dto
 import { Chip } from "@nextui-org/chip";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Eye } from "lucide-react";
+import { useCookieState } from "use-cookie-state";
 
 export const RequestsListTable = () => {
-  const accessToken = useStore($accessToken);
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
