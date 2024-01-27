@@ -1,22 +1,18 @@
 ---
 import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
 import { apiClient } from "@frontend/src/utils/eden";
+import { statusRender } from "@frontend/src/utils/status";
 import Timeline from "@frontend/src/components/sp-ticket-timeline/timeline.astro";
 import CommentCard from "@frontend/src/components/sp-ticket-timeline/CommentCard.astro";
+import TextSenderCard from "@frontend/src/components/sp-ticket-timeline/TextSenderCard.astro";
 export const prerender = false;
 
 const accessToken = Astro.cookies.get("x-token")?.value;
-
 if (!accessToken) {
-  return {
-    status: 302,
-    headers: {
-      location: "/login",
-    },
-  };
+  return Astro.redirect("/login");
 }
 const { id } = Astro.params;
-
+console.log("id from page", id);
 if (!id) {
   return statusRender(404, `${Astro.site}404`);
 }
@@ -39,7 +35,11 @@ const { data: spTicketTimeline } = await apiClient.api.sp_ticket_timeline[
 <BaseLayout>
   <div class="flex justify-around">
     <!-- Comment card -->
-    <CommentCard spTicket={spTicketById} />
+    <div class="grid-cols-1 space-y-3 w-7/12">
+      <CommentCard spTicket={spTicketById} />
+      <TextSenderCard ticketId={id} />
+    </div>
+
     <!-- Timeline -->
     <Timeline timeline={spTicketTimeline} />
   </div>
