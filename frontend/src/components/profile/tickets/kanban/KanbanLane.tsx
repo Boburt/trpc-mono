@@ -1,20 +1,18 @@
-import { SpTicketsRelatedList } from "@backend/modules/sp_tickets/sp_tickets.dto";
 import { useDroppable } from "@dnd-kit/core";
 import { KanbanCard } from "./KanbanCard";
 import { sp_ticket_statuses } from "backend/drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { useQuery } from "@tanstack/react-query";
-import { useStore } from "@nanostores/react";
-import { $accessToken } from "@frontend/src/store/auth";
 import { apiClient } from "@frontend/src/utils/eden";
 import { Spinner } from "@nextui-org/spinner";
+import { useCookieState } from "use-cookie-state";
 
 interface KanbanLaneProps {
   status: InferSelectModel<typeof sp_ticket_statuses>;
 }
 
 export default function KanbanLane({ status }: KanbanLaneProps) {
-  const accessToken = useStore($accessToken);
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const { setNodeRef } = useDroppable({
     id: status.id,
   });
