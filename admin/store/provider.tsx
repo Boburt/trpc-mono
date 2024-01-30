@@ -1,11 +1,8 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { httpBatchLink } from "@trpc/client";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { getCookie } from "cookies-next";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 function useToken() {
   const { data: sessionData } = useSession();

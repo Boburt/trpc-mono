@@ -8,9 +8,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@frontend/src/utils/eden";
 import { Spinner } from "@nextui-org/spinner";
 import { toast } from "sonner";
+import { useCookieState } from "use-cookie-state";
 
 export default function KanbanBoard() {
-  const accessToken = useStore($accessToken);
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const queryClient = useQueryClient();
 
   const { data: spTicketsStatuses, isLoading } = useQuery({

@@ -1,6 +1,8 @@
 import { Worker } from "bullmq";
 import Redis from "ioredis";
 import processFormSendTg from "./processors/form_send_tg";
+import processNewTicket from "./processors/new_ticket";
+import processTicketStatusChange from "./processors/ticket_status_change";
 // import processNewImages from "./processors/new_assets_added";
 // import processIndexManufacturer from "./processors/index_manufacturers";
 // import processDeleteManufacturer from "./processors/delete_manufacturers";
@@ -72,6 +74,30 @@ const formSendTgQueueNameWorker = new Worker(
     const { data } = job;
     console.log("job data", data);
     await processFormSendTg(data.id);
+  },
+  {
+    connection: redisClient,
+  }
+);
+
+const newTicketQueueWorker = new Worker(
+  `${process.env.PROJECT_PREFIX}new_ticket`,
+  async (job) => {
+    const { data } = job;
+    console.log("job data", data);
+    await processNewTicket(data.id);
+  },
+  {
+    connection: redisClient,
+  }
+);
+
+const ticketStatusChangeWorker = new Worker(
+  `${process.env.PROJECT_PREFIX}ticket_status_change`,
+  async (job) => {
+    const { data } = job;
+    console.log("job data", data);
+    await processTicketStatusChange(data.id, data.newStatus);
   },
   {
     connection: redisClient,

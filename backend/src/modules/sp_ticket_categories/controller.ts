@@ -61,23 +61,26 @@ export const spTicketCategoriesController = new Elysia({
             email: t.String(),
             address: t.String(),
             phone: t.String(),
-          })
+          }),
         ),
         fields: t.Optional(t.String()),
       }),
-    }
+    },
   )
-  .get("/sp_ticket_categories/cached", async ({ redis, user, set, cacheController }) => {
-    if (!user) {
-      set.status = 401;
-      return {
-        message: "User not found",
-      };
-    }
+  .get(
+    "/sp_ticket_categories/cached",
+    async ({ redis, user, set, cacheController }) => {
+      if (!user) {
+        set.status = 401;
+        return {
+          message: "User not found",
+        };
+      }
 
-    const res = await cacheController.getCachedSpTicketCategories({});
-    return res;
-  })
+      const res = await cacheController.getCachedSpTicketCategories({});
+      return res;
+    },
+  )
   .get(
     "/sp_ticket_categories/:id",
     async ({ params: { id }, user, set, drizzle }) => {
@@ -105,12 +108,11 @@ export const spTicketCategoriesController = new Elysia({
       params: t.Object({
         id: t.String(),
       }),
-    }
+    },
   )
   .delete(
     "/sp_ticket_categories/:id",
-    async ({ params: { id }, user, set, drizzle,
-      cacheController }) => {
+    async ({ params: { id }, user, set, drizzle, cacheController }) => {
       if (!user) {
         set.status = 401;
         return {
@@ -133,14 +135,17 @@ export const spTicketCategoriesController = new Elysia({
         .where(eq(sp_ticket_categories.id, id))
         .execute();
 
-      await drizzle.delete(sp_ticket_categories).where(eq(sp_ticket_categories.id, id)).execute();
+      await drizzle
+        .delete(sp_ticket_categories)
+        .where(eq(sp_ticket_categories.id, id))
+        .execute();
       return permissionsRecord[0];
     },
     {
       params: t.Object({
         id: t.String(),
       }),
-    }
+    },
   )
   .post(
     "/sp_ticket_categories",
@@ -180,7 +185,7 @@ export const spTicketCategoriesController = new Elysia({
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
-    }
+    },
   )
   .put(
     "/sp_ticket_categories/:id",
@@ -224,5 +229,5 @@ export const spTicketCategoriesController = new Elysia({
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
-    }
+    },
   );

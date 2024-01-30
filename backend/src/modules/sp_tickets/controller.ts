@@ -174,7 +174,7 @@ export const spTicketsController = new Elysia({
   )
   .post(
     "/sp_tickets",
-    async ({ body: { data, fields }, user, set, drizzle, cacheController }) => {
+    async ({ body: { data, fields }, user, set, drizzle, cacheController, newTicketQueue }) => {
       if (!user) {
         set.status = 401;
         return {
@@ -195,7 +195,6 @@ export const spTicketsController = new Elysia({
       const firstTicketStatus = spTicketStatuses.find(
         (status) => status.sort == 1
       );
-      console.log("firstTicketStatus", firstTicketStatus);
       const result = await drizzle
         .insert(sp_tickets)
         .values({
@@ -204,7 +203,16 @@ export const spTicketsController = new Elysia({
           created_at: new Date().toISOString(),
           status_id: firstTicketStatus!.id,
         })
-        .returning(selectFields);
+        .returning({
+          id: sp_tickets.id,
+        });
+
+      await newTicketQueue.add(result[0].id, {
+        id: result[0].id,
+      }, {
+        removeOnComplete: true,
+        removeOnFail: true,
+      })
 
       return {
         data: result[0],
@@ -232,6 +240,7 @@ export const spTicketsController = new Elysia({
       set,
       drizzle,
       cacheController,
+      ticketStatusChangedQueue
     }) => {
       if (!user) {
         set.status = 401;
@@ -239,7 +248,7 @@ export const spTicketsController = new Elysia({
           message: "User not found",
         };
       }
-      console.log("user.permissions", user.permissions);
+
       if (!user.permissions.includes("sp_tickets.edit")) {
         set.status = 401;
         return {
@@ -279,15 +288,6 @@ export const spTicketsController = new Elysia({
           (status) => status.id === data.status_id
         );
         if (prevStatus && nextStatus) {
-          console.log("inserting timeline", {
-            ticket_id: id,
-            user_id: user.user.id,
-            timeline_type: "status",
-            before_value: prevStatus.name,
-            after_value: nextStatus.name,
-            created_at: new Date().toISOString(),
-            comment: "",
-          });
           try {
             await drizzle
               .insert(sp_tickets_timeline)
@@ -301,6 +301,13 @@ export const spTicketsController = new Elysia({
                 comment: "",
               })
               .execute();
+            await ticketStatusChangedQueue.add(id, {
+              id,
+              newStatus: nextStatus.name,
+            }, {
+              removeOnComplete: true,
+              removeOnFail: true,
+            })
           } catch (e) {
             console.log("e", e);
           }
