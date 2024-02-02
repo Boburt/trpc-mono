@@ -745,7 +745,6 @@ export const forms = pgTable("forms", {
   }),
 });
 
-
 export const manufacturers_users = pgTable("manufacturers_users", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   manufacturer_id: uuid("manufacturer_id")
@@ -767,7 +766,6 @@ export const manufacturers_users = pgTable("manufacturers_users", {
     mode: "string",
   }),
 });
-
 
 export const forms_sent_items = pgTable("forms_sent_items", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
@@ -816,3 +814,73 @@ export const form_filled_values = pgTable("form_filled_values", {
     mode: "string",
   }),
 });
+
+export const conversations = pgTable("conversations", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  is_group: boolean("is_group").default(false).notNull(),
+  created_by: uuid("created_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  updated_by: uuid("updated_by").references(() => users.id, {
+    onUpdate: "cascade",
+  }),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});
+
+export const participants = pgTable("participants", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  conversation_id: uuid("conversation_id").notNull(),
+  user_id: uuid("user_id").notNull(),
+  is_admin: boolean("is_admin").default(false).notNull(),
+  is_deleted: boolean("is_deleted").default(false).notNull(),
+  joined_at: timestamp("joined_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+  left_at: timestamp("left_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  }),
+});
+
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").defaultRandom().notNull(),
+    conversation_id: uuid("conversation_id").notNull(),
+    sender_id: uuid("sender_id").notNull(),
+    message: text("message").notNull(),
+    is_deleted: boolean("is_deleted").default(false).notNull(),
+    sent_at: timestamp("sent_at", {
+      precision: 5,
+      withTimezone: true,
+      mode: "string",
+    })
+      .defaultNow()
+      .notNull(),
+    edited_at: timestamp("edited_at", {
+      precision: 5,
+      withTimezone: true,
+      mode: "string",
+    }),
+  },
+  (table) => {
+    return {
+      PK_3a1f1f251e5d6d2b9c1a7c5c9d1: primaryKey({
+        columns: [table.id, table.sent_at],
+      }),
+    };
+  }
+);
