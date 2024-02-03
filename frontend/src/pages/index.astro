@@ -1,10 +1,22 @@
 ---
 import Proez from "../components/Proezvoditel";
+import IconSection from "../components/home/IconSection.astro";
+import LeadersSection from "../components/home/LeadersSection.astro";
+import ManufacturersCardList from "../components/home/ManufacturersCardList.astro";
 import ManufacturersListServer from "../components/manufacturers/ManufacturersListServer.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSection from "@frontend/src/components/home/HeroSection.astro";
 export const prerender = false;
 ---
 
 <BaseLayout title="Лёгкая промышленность" showHeaderFilter={true}>
-  <ManufacturersListServer />
+  <HeroSection />
+
+  <ManufacturersCardList />
+
+  <IconSection />
+
+  <LeadersSection />
+
+  <!-- <ManufacturersListServer /> -->
 </BaseLayout>
