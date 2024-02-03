@@ -15,6 +15,7 @@ let {
   title,
   showHeaderFilter = false,
   disableBreadcrumbs = false,
+  customCrumbs = [],
 } = Astro.props;
 const pathname = new URL(Astro.request.url).pathname;
 const url = Astro.url.pathname + Astro.url.search;
@@ -41,13 +42,31 @@ $userData.set(Astro.locals.user);
     <Header />
     <main class="container mx-auto py-4 shrink-0">
       {
+        title && (
+          <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+            {title}
+          </h1>
+        )
+      }
+      {
         pathname !== "/" && disableBreadcrumbs == false && (
-          <Breadcrumbs indexText="Home" mainBemClass="breadcrumbs" />
+          <Breadcrumbs
+            indexText="Главная"
+            mainBemClass="breadcrumbs"
+            crumbs={customCrumbs}
+          />
         )
       }
 
-      <!-- {showHeaderFilter && <CategoriesFilterServer />} -->
-      <slot />
+      {
+        pathname !== "/" ? (
+          <div class="container">
+            <slot />
+          </div>
+        ) : (
+          <slot />
+        )
+      }
     </main>
     <Footer />
     <Toaster richColors client:load />

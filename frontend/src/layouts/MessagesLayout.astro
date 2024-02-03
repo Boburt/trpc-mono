@@ -13,9 +13,10 @@ const { data } = await apiClient.api.conversations.get({
   },
 });
 const pathname = new URL(Astro.request.url).pathname;
+let { title, customCrumbs = [] } = Astro.props;
 ---
 
-<BaseLayout>
+<BaseLayout title={title} customCrumbs={customCrumbs}>
   {
     data && data.length == 0 && (
       <main id="content" role="main">
