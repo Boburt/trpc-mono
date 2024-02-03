@@ -67,7 +67,7 @@ export default function ManufacturersListClient({
     refetchOnWindowFocus: false,
   });
   return (
-    <div className="relative mt-8 flex flex-col">
+    <div className="relative mt-8 flex flex-col col-span-2">
       {manufacturers?.items.map((item) => (
         <ManufactureCard item={item} key={item.id} />
       ))}

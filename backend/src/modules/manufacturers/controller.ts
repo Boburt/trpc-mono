@@ -398,7 +398,7 @@ export const manufacturersController = new Elysia({
         if (ids.length > 0) {
           whereClause.push(inArray(manufacturers.id, ids));
         }
-        console.log('whereClause', ids)
+        console.log("whereClause", ids);
       }
 
       // const manufacturersDbSelect = drizzle
@@ -477,63 +477,62 @@ export const manufacturersController = new Elysia({
       }),
     }
   )
-  .get("/manufacturers/:id/reviews", async ({
-    params: { id },
-    query: {
-      from
-    }
-  }) => {
-    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturer_reviews`;
-    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
-    const response = await fetch(elasticUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-      },
-      body: JSON.stringify({
-        size: 10,
-        from: from ?? 0,
-        query: {
-          bool: {
-            must: [
-              {
-                term: {
-                  active: true,
-                },
-              },
-              {
-                term: {
-                  manufacturer_id: id,
-                },
-              },
-            ],
-          },
+  .get(
+    "/manufacturers/:id/reviews",
+    async ({ params: { id }, query: { from } }) => {
+      const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturer_reviews`;
+      const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_search`;
+      const response = await fetch(elasticUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
         },
-        sort: [
-          {
-            created_at: {
-              order: "desc",
+        body: JSON.stringify({
+          size: 10,
+          from: from ?? 0,
+          query: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    active: true,
+                  },
+                },
+                {
+                  term: {
+                    manufacturer_id: id,
+                  },
+                },
+              ],
             },
           },
-        ],
+          sort: [
+            {
+              created_at: {
+                order: "desc",
+              },
+            },
+          ],
+        }),
+      });
+
+      const responseJson = await response.json();
+
+      return {
+        total: responseJson.hits.total.value,
+        items: responseJson.hits.hits.map((h: any) => h._source),
+      };
+    },
+    {
+      params: t.Object({
+        id: t.String(),
       }),
-    });
-
-    const responseJson = await response.json();
-
-    return {
-      total: responseJson.hits.total.value,
-      items: responseJson.hits.hits.map((h: any) => h._source),
-    };
-  }, {
-    params: t.Object({
-      id: t.String(),
-    }),
-    query: t.Object({
-      from: t.Optional(t.Number()),
-    }),
-  })
+      query: t.Object({
+        from: t.Optional(t.Number()),
+      }),
+    }
+  )
   .get(
     "/manufacturers/:id",
     async ({ params: { id }, user, set, drizzle }) => {
@@ -643,55 +642,57 @@ export const manufacturersController = new Elysia({
       }),
     }
   )
-  .post("/manufacturers/review", async ({
-    body: {
-      manufacturer_id,
-      rating,
-      review
-    },
-    user,
-    set,
-    drizzle,
-    newIndexManufacturerReviewQueue
-  }) => {
-
-    if (!user) {
-      set.status = 401;
-      return {
-        message: "User not found",
-      };
-    }
-
-    const res = await drizzle.insert(manufacturers_reviews).values({
-      manufacturer_id,
-      rating,
-      comment: review,
-      user_id: user.id,
-    }).returning({
-      id: manufacturers_reviews.id,
-      rating: manufacturers_reviews.rating,
-      comment: manufacturers_reviews.comment,
-      user_id: manufacturers_reviews.user_id,
-      manufacturer_id: manufacturers_reviews.manufacturer_id,
-    });
-
-    await newIndexManufacturerReviewQueue.add(
-      res[0].id,
-      {
-        id: res[0].id,
-      },
-      {
-        removeOnComplete: true,
+  .post(
+    "/manufacturers/review",
+    async ({
+      body: { manufacturer_id, rating, review },
+      user,
+      set,
+      drizzle,
+      newIndexManufacturerReviewQueue,
+    }) => {
+      if (!user) {
+        set.status = 401;
+        return {
+          message: "User not found",
+        };
       }
-    );
-    return res;
-  }, {
-    body: t.Object({
-      manufacturer_id: t.String(),
-      rating: t.Number(),
-      review: t.String(),
-    }),
-  })
+
+      const res = await drizzle
+        .insert(manufacturers_reviews)
+        .values({
+          manufacturer_id,
+          rating,
+          comment: review,
+          user_id: user.id,
+        })
+        .returning({
+          id: manufacturers_reviews.id,
+          rating: manufacturers_reviews.rating,
+          comment: manufacturers_reviews.comment,
+          user_id: manufacturers_reviews.user_id,
+          manufacturer_id: manufacturers_reviews.manufacturer_id,
+        });
+
+      await newIndexManufacturerReviewQueue.add(
+        res[0].id,
+        {
+          id: res[0].id,
+        },
+        {
+          removeOnComplete: true,
+        }
+      );
+      return res;
+    },
+    {
+      body: t.Object({
+        manufacturer_id: t.String(),
+        rating: t.Number(),
+        review: t.String(),
+      }),
+    }
+  )
   .put(
     "/manufacturers/:id",
     async ({ params: { id }, body: { data, fields }, user, set, drizzle }) => {

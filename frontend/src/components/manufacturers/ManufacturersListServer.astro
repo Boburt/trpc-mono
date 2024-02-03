@@ -31,12 +31,14 @@ const { data: manufacturers } =
   });
 ---
 
-<ManufacturersListClientProvider
-  initialData={manufacturers ?? {
-    items: [],
-  }}
-  categorySlug={categorySlug}
-  searchParams={searchParams}
-  pathname={pathname}
-  client:load
-/>
+<div>
+  <ManufacturersListClientProvider
+    initialData={manufacturers ?? {
+      items: [],
+    }}
+    categorySlug={categorySlug}
+    searchParams={searchParams}
+    pathname={pathname}
+    client:load
+  />
+</div>
