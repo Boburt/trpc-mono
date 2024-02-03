@@ -3,6 +3,12 @@ import { FaRegUserCircle, FaUsers, FaWpforms } from "react-icons/fa";
 import { BsBuildings } from "react-icons/bs";
 import { MdOutlineSettingsApplications } from "react-icons/md";
 import BaseLayout from "./BaseLayout.astro";
+import {
+  CircleUser,
+  ClipboardList,
+  MessageCircleQuestion,
+  MessageSquareText,
+} from "lucide-react";
 const pathname = new URL(Astro.request.url).pathname;
 let { title } = Astro.props;
 const { permissions } = Astro.locals;
@@ -14,8 +20,17 @@ const { permissions } = Astro.locals;
       <ul class="menu bg-base-300 w-56 rounded-box">
         <li>
           <a href="/profile" class={pathname == "/profile" ? "active" : ""}>
-            <FaRegUserCircle />
+            <CircleUser />
             Профиль
+          </a>
+        </li>
+        <li>
+          <a
+            href="/profile/messages"
+            class={pathname == "/profile/messages" ? "active" : ""}
+          >
+            <MessageSquareText />
+            Сообщения
           </a>
         </li>
         <li>
@@ -23,7 +38,7 @@ const { permissions } = Astro.locals;
             href="/profile/requests"
             class={pathname == "/profile/requests" ? "active" : ""}
           >
-            <MdOutlineSettingsApplications />
+            <MessageCircleQuestion />
             Обращения
           </a>
         </li>
@@ -34,7 +49,7 @@ const { permissions } = Astro.locals;
                 href="/profile/forms"
                 class={pathname.startsWith("/profile/forms") ? "active" : ""}
               >
-                <FaWpforms />
+                <ClipboardList />
                 Формы
               </a>
             </li>
