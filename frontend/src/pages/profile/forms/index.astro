@@ -1,9 +1,23 @@
 ---
 import ProfileLayout from "@frontend/src/layouts/ProfileLayout.astro";
 import { ProfileFormsListPage } from "@frontend/src/components/profile/forms/list/page";
+const customCrumbs = [
+  {
+    text: "Главная",
+    href: "/",
+  },
+  {
+    text: "Профиль",
+    href: "/profile",
+  },
+  {
+    text: "Сообщения",
+    href: "/profile/tickets",
+  },
+];
 ---
 
-<ProfileLayout>
+<ProfileLayout title="Формы" customCrumbs={customCrumbs}>
   <div>
     <a href="/profile/forms/new" class="btn btn-primary mb-6">
       Добавить форму</a

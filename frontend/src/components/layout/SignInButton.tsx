@@ -12,7 +12,13 @@ import {
   DropdownItem,
 } from "@nextui-org/dropdown";
 import { User } from "@nextui-org/user";
-import { LogOut } from "lucide-react";
+import {
+  CircleUser,
+  ClipboardList,
+  LogOut,
+  MessageCircleQuestion,
+  MessageSquareText,
+} from "lucide-react";
 
 export default function SignInButton({
   userData,
@@ -55,15 +61,23 @@ export default function SignInButton({
           <DropdownSection showDivider>
             <DropdownItem
               key="profile"
-              startContent={<FaRegUserCircle />}
+              startContent={<CircleUser />}
               href="/profile"
             >
               Профиль
             </DropdownItem>
 
             <DropdownItem
+              key="messages"
+              startContent={<MessageSquareText />}
+              href="/profile/messages"
+            >
+              Сообщения
+            </DropdownItem>
+
+            <DropdownItem
               key="requests"
-              startContent={<MdOutlineSettingsApplications />}
+              startContent={<MessageCircleQuestion />}
               href="/profile/requests"
             >
               Обращения
@@ -71,7 +85,7 @@ export default function SignInButton({
             {permissions && permissions.includes("forms.list") ? (
               <DropdownItem
                 key="forms"
-                startContent={<MdOutlineSettingsApplications />}
+                startContent={<ClipboardList />}
                 href="/profile/forms"
               >
                 Формы
