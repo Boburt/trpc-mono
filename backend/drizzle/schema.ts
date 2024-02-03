@@ -819,6 +819,7 @@ export const conversations = pgTable("conversations", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: text("name").notNull(),
   is_group: boolean("is_group").default(false).notNull(),
+  manufacturer_id: uuid("manufacturer_id"),
   created_by: uuid("created_by").references(() => users.id, {
     onUpdate: "cascade",
   }),

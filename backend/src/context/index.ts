@@ -121,8 +121,13 @@ export const ctx = new Elysia({
   )
   .use(bearer())
   .use(jwt)
-  .derive(async ({ bearer, cacheController }) => {
-    const token = bearer;
+  .derive(async ({ bearer, cacheController, query }) => {
+    let token = bearer;
+
+    if (query && query.token) {
+      token = query.token;
+    }
+
     if (!token) {
       return {
         user: null,

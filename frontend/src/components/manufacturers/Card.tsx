@@ -2,6 +2,7 @@ import { Key, useMemo } from "react";
 import Like from "./Like";
 import { RouterOutputs } from "@frontend/src/utils/trpc";
 import clsx from "clsx";
+import { ChatNow, ChatNowProvider } from "../chat/ChatNow";
 
 export function ManufactureCard({
   item,
@@ -87,6 +88,7 @@ export function ManufactureCard({
               </div>
             </div>
           </div>
+          <ChatNowProvider manufacturerId={item.id} />
           <Like />
         </div>
         <div className="card card-side flex justify-between">
