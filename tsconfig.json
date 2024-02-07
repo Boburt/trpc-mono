@@ -15,6 +15,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@backend/*": ["./backend/src/*"],
+      "@drizzle/*": ["./drizzle/*"],
       "@frontend/*": ["./frontend/*"],
       "@admin/*": ["./admin/*"],
       "@lib/*": ["./lib/*"],

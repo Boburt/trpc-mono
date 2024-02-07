@@ -40,6 +40,7 @@
     "@nextui-org/navbar": "^2.0.27",
     "@nextui-org/pagination": "^2.0.26",
     "@nextui-org/spinner": "^2.0.24",
+    "@nextui-org/switch": "^2.0.25",
     "@nextui-org/system": "^2.0.15",
     "@nextui-org/table": "^2.0.28",
     "@nextui-org/theme": "^2.1.17",

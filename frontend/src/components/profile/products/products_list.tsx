@@ -32,6 +32,7 @@ import { SearchIcon } from "./icons/SearchIcon";
 import { users, statusOptions } from "./icons/data";
 import { capitalize } from "./icons/utils";
 import { Offcanvas } from "./offcanvas";
+import { ProductDrawer } from "./drawer";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -296,18 +297,8 @@ export default function ProductsList() {
                 ))}
               </DropdownMenu>
             </Dropdown> */}
-            <Button
-              color="primary"
-              //add onClick to open offcanvas
 
-              onClick={() => {
-                console.log("clicked");
-                <Offcanvas />;
-              }}
-              endContent={<PlusIcon />}
-            >
-              Add New
-            </Button>
+            <ProductDrawer />
           </div>
         </div>
         <div className="flex justify-between items-center">
