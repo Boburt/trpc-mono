@@ -17,7 +17,7 @@ const searchParams = new URL(Astro.request.url).search;
 const pathname = new URL(Astro.request.url).pathname;
 
 const manufacturersFilterValues = parseQueryParams(searchParams);
-const filters = [];
+const filters: any[] = [];
 
 const { data: manufacturers } =
   await apiClient.api.manufacturers.with_facet.post({
@@ -31,6 +31,10 @@ const { data: manufacturers } =
       },
     ],
   });
+
+const { data: facets } = await apiClient.api.manufacturers.facet_filter.get({
+  $query: {},
+});
 ---
 
 <BaseLayout title="Производители" customCrumbs={customCrumbs}>
@@ -40,6 +44,8 @@ const { data: manufacturers } =
     }}
     searchParams={searchParams}
     pathname={pathname}
+    facets={facets}
+    filterValues={manufacturersFilterValues?.manufacturers_filter ?? {}}
     client:load
   />
 </BaseLayout>
