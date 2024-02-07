@@ -885,3 +885,98 @@ export const messages = pgTable(
     };
   }
 );
+
+export const products = pgTable("products", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  manufacturer_id: uuid("manufacturer_id")
+    .notNull()
+    .references(() => manufacturers.id, { onUpdate: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  active: boolean("active").default(true).notNull(),
+  price: integer("price"),
+  stock_quantity: integer("stock_quantity"),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});
+
+export const products_categories = pgTable("products_categories", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  product_id: uuid("product_id")
+    .notNull()
+    .references(() => products.id, { onUpdate: "cascade" }),
+  category_id: uuid("category_id")
+    .notNull()
+    .references(() => categories.id, { onUpdate: "cascade" }),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});
+
+export const properties = pgTable("properties", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  property_type: text("property_type").notNull(),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});
+
+export const products_properties = pgTable("products_properties", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  product_id: uuid("product_id")
+    .notNull()
+    .references(() => products.id, { onUpdate: "cascade" }),
+  property_id: uuid("property_id")
+    .notNull()
+    .references(() => properties.id, { onUpdate: "cascade" }),
+  value: text("value").notNull(),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});

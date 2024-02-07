@@ -18,6 +18,7 @@ import {
   LogOut,
   MessageCircleQuestion,
   MessageSquareText,
+  Barcode,
 } from "lucide-react";
 
 export default function SignInButton({
@@ -68,6 +69,14 @@ export default function SignInButton({
             </DropdownItem>
 
             <DropdownItem
+              key="my_products"
+              startContent={<Barcode />}
+              href="/profile/products"
+            >
+              Мои продукты
+            </DropdownItem>
+
+            <DropdownItem
               key="messages"
               startContent={<MessageSquareText />}
               href="/profile/messages"
@@ -82,7 +91,7 @@ export default function SignInButton({
             >
               Обращения
             </DropdownItem>
-            {permissions && permissions.includes("forms.list") ? (
+            {permissions && permissions.includes("forms.list") && (
               <DropdownItem
                 key="forms"
                 startContent={<ClipboardList />}
@@ -90,8 +99,6 @@ export default function SignInButton({
               >
                 Формы
               </DropdownItem>
-            ) : (
-              <></>
             )}
           </DropdownSection>
           <DropdownSection>
