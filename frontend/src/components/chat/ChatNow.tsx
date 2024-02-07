@@ -4,6 +4,7 @@ import { useCookieState } from "use-cookie-state";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "../../utils/eden";
 import { toast } from "sonner";
+import { MessageSquareText } from "lucide-react";
 
 export const ChatNow = ({
   manufacturerId,
@@ -44,8 +45,9 @@ export const ChatNow = ({
   return (
     <Button
       color="primary"
-      variant="shadow"
+      variant="solid"
       isLoading={createConversations.isPending}
+      startContent={<MessageSquareText />}
       onClick={() => {
         createConversations.mutate({});
       }}

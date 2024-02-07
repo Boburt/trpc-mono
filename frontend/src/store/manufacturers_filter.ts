@@ -61,6 +61,20 @@ export function setValue(key: string, value: string) {
   replaceQueryParams(searchParams);
 }
 
+export function setMultipleValues(key: string, value: string[]) {
+  let facets = $facets.get(); // Create a shallow copy
+  let values = $values.get();
+  let filter = facets.find((f) => f.code === key);
+  if (filter) {
+    $values.setKey(key, value);
+  }
+  const searchParams = createQueryParams(
+    { ...$values.get() },
+    "manufacturers_filter"
+  );
+  replaceQueryParams(searchParams);
+}
+
 export function removeValue(key: string, value: string) {
   let facets = $facets.get(); // Create a shallow copy
   let values = $values.get();
