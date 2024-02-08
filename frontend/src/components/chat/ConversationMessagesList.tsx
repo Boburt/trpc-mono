@@ -71,6 +71,7 @@ export const ConversationMessagesList = ({
         message: value.text,
         type: "publish",
       });
+      form.reset();
     },
   });
 
