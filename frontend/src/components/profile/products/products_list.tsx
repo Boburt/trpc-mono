@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -10,43 +10,37 @@ import {
   SortDescriptor,
 } from "@nextui-org/table";
 import { Input } from "@nextui-org/input";
-import { Button, ButtonGroup } from "@nextui-org/button";
+import { Button } from "@nextui-org/button";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownSection,
   DropdownItem,
 } from "@nextui-org/dropdown";
 import { Chip, ChipProps } from "@nextui-org/chip";
 import { User } from "@nextui-org/user";
-import {
-  Pagination,
-  PaginationItem,
-  PaginationCursor,
-} from "@nextui-org/pagination";
-import { PlusIcon } from "./icons/PlusIcon";
+import { Pagination } from "@nextui-org/pagination";
 import { VerticalDotsIcon } from "./icons/VerticalDotsIcon";
-import { ChevronDownIcon } from "./icons/ChevronDownIcon";
 import { SearchIcon } from "./icons/SearchIcon";
-import { users, statusOptions } from "./icons/data";
-import { capitalize } from "./icons/utils";
-import { Offcanvas } from "./offcanvas";
 import { ProductDrawer } from "./drawer";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@frontend/src/utils/eden";
+import { useCookieState } from "use-cookie-state";
+import { products } from "backend/drizzle/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
+//@ts-ignore
+const statusColorMap: Record<boolean, ChipProps["color"]> = {
+  true: "success",
+  false: "danger",
 };
 
 const columns = [
-  { name: "ID", uid: "id", sortable: true },
-  { name: "PRODUCT NAME", uid: "product name", sortable: true },
+  { name: "PRODUCT NAME", uid: "name", sortable: true },
   { name: "DESCRIPTION", uid: "description", sortable: true },
   { name: "PRICE", uid: "price", sortable: true },
-  { name: "QUANTITY", uid: "quantity" },
-  { name: "STATUS", uid: "status", sortable: true },
+  { name: "QUANTITY", uid: "stock_quantity" },
+  { name: "ACTIVE", uid: "active", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
 
@@ -55,163 +49,155 @@ const INITIAL_VISIBLE_COLUMNS = [
   "description",
   "price",
   "quantity",
-  "status",
+  "active",
   "actions",
 ];
 
-type User = (typeof users)[0];
-
 export default function ProductsList() {
   const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
-    new Set([])
-  );
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "age",
     direction: "ascending",
   });
-
   const [page, setPage] = React.useState(1);
+
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
+
+  const { data: productsList, isLoading } = useQuery({
+    queryKey: [
+      "products",
+      {
+        limit: rowsPerPage,
+        offset: (page - 1) * rowsPerPage,
+      },
+    ],
+    queryFn: async () => {
+      const { data } = await apiClient.api.products.get({
+        $query: {
+          limit: rowsPerPage,
+          offset: (page - 1) * rowsPerPage,
+        },
+        $headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return data;
+    },
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) =>
-      Array.from(visibleColumns).includes(column.uid)
-    );
-  }, [visibleColumns]);
-
-  const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
-
-    if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase())
-      );
+  const pages = useMemo(() => {
+    if (productsList?.total === undefined) {
+      return 0;
     }
-    if (
-      statusFilter !== "all" &&
-      Array.from(statusFilter).length !== statusOptions.length
-    ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
-      );
+    return Math.ceil(productsList?.total / rowsPerPage);
+  }, [productsList?.total, rowsPerPage]);
+
+  const totalCount = useMemo(() => {
+    if (productsList?.total === undefined) {
+      return 0;
     }
-
-    return filteredUsers;
-  }, [users, filterValue, statusFilter]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+    return productsList?.total;
+  }, [productsList?.total]);
 
   const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: User, b: User) => {
-      const first = a[sortDescriptor.column as keyof User] as number;
-      const second = b[sortDescriptor.column as keyof User] as number;
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
-
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof User];
-
-    switch (columnKey) {
-      case "product name":
-        return (
-          <User
-            avatarProps={{ radius: "lg", src: user.avatar }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "description":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
-        );
-      case "price":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
-        );
-      case "quantity":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
-      default:
-        return cellValue;
+    let res: InferSelectModel<typeof products>[] = [];
+    if (
+      productsList?.data &&
+      Array.isArray(productsList.data) &&
+      productsList.data.length > 0
+    ) {
+      res = productsList.data;
     }
-  }, []);
+    return res;
+  }, [productsList]);
 
-  const onNextPage = React.useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
+  const renderCell = React.useCallback(
+    (product: InferSelectModel<typeof products>, columnKey: React.Key) => {
+      const cellValue =
+        product[columnKey as keyof InferSelectModel<typeof products>];
 
-  const onPreviousPage = React.useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
+      switch (columnKey) {
+        case "product name":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+              {/* <p className="text-bold text-tiny capitalize text-default-400">
+                {user.name}
+              </p> */}
+            </div>
+          );
+        case "description":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+              {/* <p className="text-bold text-tiny capitalize text-default-400">
+                {user.description}
+              </p> */}
+            </div>
+          );
+        case "price":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+              {/* <p className="text-bold text-tiny capitalize text-default-400">
+                {user.price}
+              </p> */}
+            </div>
+          );
+        case "quantity":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+              {/* <p className="text-bold text-tiny capitalize text-default-400">
+                {user.stock_quantity}
+              </p> */}
+            </div>
+          );
+        case "active":
+          return (
+            <Chip
+              className="capitalize"
+              //@ts-ignore
+              color={statusColorMap[product.active]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue ? "active" : "paused"}
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex justify-end items-center gap-2">
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>View</DropdownItem>
+                  <DropdownItem>Edit</DropdownItem>
+                  <DropdownItem>Delete</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    []
+  );
 
   const onRowsPerPageChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -222,6 +208,7 @@ export default function ProductsList() {
   );
 
   const onSearchChange = React.useCallback((value?: string) => {
+    console.log("value", value);
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -303,7 +290,7 @@ export default function ProductsList() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {users.length} users
+            Total {totalCount} products
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -311,9 +298,15 @@ export default function ProductsList() {
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              <option value="5" selected={rowsPerPage == 5}>
+                5
+              </option>
+              <option value="10" selected={rowsPerPage == 10}>
+                10
+              </option>
+              <option value="15" selected={rowsPerPage == 15}>
+                15
+              </option>
             </select>
           </label>
         </div>
@@ -325,18 +318,13 @@ export default function ProductsList() {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    users.length,
     hasSearchFilter,
+    totalCount,
   ]);
 
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
-        <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span>
         <Pagination
           isCompact
           showControls
@@ -346,27 +334,9 @@ export default function ProductsList() {
           total={pages}
           onChange={setPage}
         />
-        <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onNextPage}
-          >
-            Next
-          </Button>
-        </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [page, pages]);
 
   return (
     <Table
@@ -377,15 +347,12 @@ export default function ProductsList() {
       classNames={{
         wrapper: "max-h-[670px]",
       }}
-      selectedKeys={selectedKeys}
-      selectionMode="multiple"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
     >
-      <TableHeader columns={headerColumns}>
+      <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
             key={column.uid}
@@ -396,7 +363,7 @@ export default function ProductsList() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
+      <TableBody emptyContent={"No product found"} items={items}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (
