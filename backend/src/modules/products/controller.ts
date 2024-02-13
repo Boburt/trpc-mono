@@ -1,7 +1,11 @@
 import Elysia, { t } from "elysia";
 import { ctx } from "@backend/context";
-import { manufacturers_users, products } from "../../../drizzle/schema";
-import { InferSelectModel, eq, sql } from "drizzle-orm";
+import {
+  manufacturers_users,
+  products,
+  permissions,
+} from "../../../drizzle/schema";
+import { InferSelectModel, eq, sql, SQLWrapper, and } from "drizzle-orm";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
@@ -62,13 +66,7 @@ export const productsController = new Elysia({
       user,
       set,
       drizzle,
-      query: {
-        limit,
-        offset,
-        sort,
-        //filter,
-        // fields
-      },
+      query: { limit, offset, sort, filters, fields },
     }) => {
       if (!user) {
         return {
@@ -82,11 +80,6 @@ export const productsController = new Elysia({
           message: "You don't have permissions",
         };
       }
-      // let selectFields: SelectedFields = {};
-      // if (fields) {
-      //   selectFields = parseSelectFields(fields, products, {});
-      // }
-
       const manufacturer_id = await drizzle
         .select({
           manufacturer_id: manufacturers_users.manufacturer_id,
@@ -94,21 +87,36 @@ export const productsController = new Elysia({
         .from(manufacturers_users)
         .where(eq(manufacturers_users.user_id, user.user.id))
         .execute();
+      let selectFields: SelectedFields = {};
+      if (fields) {
+        selectFields = parseSelectFields(fields, products, {});
+      }
+
+      let whereClause: (SQLWrapper | undefined)[] = [];
+
+      if (filters) {
+        whereClause = parseFilterFields(filters, products, {
+          permissions,
+        });
+      }
 
       const productsCount = await drizzle
         .select({ count: sql<number>`count(*)` })
         .from(products)
-        .where(eq(products.manufacturer_id, manufacturer_id[0].manufacturer_id))
+        .where(
+          and(
+            eq(products.manufacturer_id, manufacturer_id[0].manufacturer_id),
+            ...whereClause
+          )
+        )
         .execute();
 
       const productsList = (await drizzle
-        .select()
+        .select(selectFields)
         .from(products)
-        .where(eq(products.manufacturer_id, manufacturer_id[0].manufacturer_id))
+        .where(and(...whereClause))
         .limit(+limit)
         .offset(+offset)
-        //.sort(sort)
-        //.filter(parseFilterFields(filter, products))
         .execute()) as InferSelectModel<typeof products>[];
 
       return {
@@ -121,7 +129,7 @@ export const productsController = new Elysia({
         limit: t.Numeric(),
         offset: t.Numeric(),
         sort: t.Optional(t.String()),
-        filter: t.Optional(t.String()),
+        filters: t.Optional(t.String()),
         fields: t.Optional(t.String()),
       }),
     }

@@ -11,6 +11,7 @@ import { apiClient } from "@frontend/src/utils/eden";
 import { toast } from "sonner";
 import { useCookieState } from "use-cookie-state";
 import { useState } from "react";
+import FileUploadField from "../../elements/file-upload";
 
 function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
   return (
@@ -178,6 +179,15 @@ export const ProductAddingForm = ({
               )}
             />
           </div>
+          <div>
+            {/* <FileUploadField
+              model="products"
+              model_id={recordId}
+              onValueChange={(item) => setImageId(item)}
+              code="main"
+            /> */}
+          </div>
+
           {/* <div>
                     <form.Field
                       name="quantity"

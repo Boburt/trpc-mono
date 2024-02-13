@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   Table,
   TableHeader,
@@ -18,7 +18,6 @@ import {
   DropdownItem,
 } from "@nextui-org/dropdown";
 import { Chip, ChipProps } from "@nextui-org/chip";
-import { User } from "@nextui-org/user";
 import { Pagination } from "@nextui-org/pagination";
 import { VerticalDotsIcon } from "./icons/VerticalDotsIcon";
 import { SearchIcon } from "./icons/SearchIcon";
@@ -28,6 +27,8 @@ import { apiClient } from "@frontend/src/utils/eden";
 import { useCookieState } from "use-cookie-state";
 import { products } from "backend/drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { ProductAddingForm } from "./product_adding_form";
+import { useState } from "react";
 
 //@ts-ignore
 const statusColorMap: Record<boolean, ChipProps["color"]> = {
@@ -67,13 +68,14 @@ export default function ProductsList() {
   const [page, setPage] = React.useState(1);
 
   const [accessToken, setAccessToken] = useCookieState("x-token", "");
-
+  const [open, setOpen] = useState(false);
   const { data: productsList, isLoading } = useQuery({
     queryKey: [
       "products",
       {
         limit: rowsPerPage,
         offset: (page - 1) * rowsPerPage,
+        filter: filterValue,
       },
     ],
     queryFn: async () => {
@@ -81,6 +83,14 @@ export default function ProductsList() {
         $query: {
           limit: rowsPerPage,
           offset: (page - 1) * rowsPerPage,
+          fields: "id,name,description,active,price,stock_quantity",
+          filters: JSON.stringify([
+            {
+              operator: "contains",
+              field: "name",
+              value: filterValue,
+            },
+          ]),
         },
         $headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -120,6 +130,10 @@ export default function ProductsList() {
     }
     return res;
   }, [productsList]);
+
+  function editProduct() {
+    return <ProductAddingForm setOpen={setOpen} />;
+  }
 
   const renderCell = React.useCallback(
     (product: InferSelectModel<typeof products>, columnKey: React.Key) => {
@@ -186,7 +200,13 @@ export default function ProductsList() {
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem>View</DropdownItem>
-                  <DropdownItem>Edit</DropdownItem>
+                  <DropdownItem
+                    onClick={() => {
+                      editProduct();
+                    }}
+                  >
+                    Edit
+                  </DropdownItem>
                   <DropdownItem>Delete</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -208,7 +228,6 @@ export default function ProductsList() {
   );
 
   const onSearchChange = React.useCallback((value?: string) => {
-    console.log("value", value);
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -236,7 +255,7 @@ export default function ProductsList() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            {/* <Dropdown>
+            {/* <Dropdown>1
               <DropdownTrigger className="hidden sm:flex">
                 <Button
                   endContent={<ChevronDownIcon className="text-small" />}
