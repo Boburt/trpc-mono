@@ -1,4 +1,4 @@
-import Elysia, { t } from "elysia";
+import Elysia, { error, t } from "elysia";
 import { ctx } from "@backend/context";
 import {
   manufacturers_users,
@@ -55,8 +55,9 @@ export const productsController = new Elysia({
           active: t.Boolean(),
           name: t.String(),
           description: t.Optional(t.String()),
-          price: t.Optional(t.Number()),
+          price: t.Optional(t.Nullable(t.Number())),
         }),
+        fields: t.Optional(t.Array(t.String())),
       }),
     }
   )
@@ -131,6 +132,79 @@ export const productsController = new Elysia({
         sort: t.Optional(t.String()),
         filters: t.Optional(t.String()),
         fields: t.Optional(t.String()),
+      }),
+    }
+  )
+  .get(
+    "/products/:id",
+    async ({ user, set, drizzle, params: { id } }) => {
+      if (!user) {
+        return {
+          message: "User not found",
+        };
+      }
+
+      if (!user.permissions.includes("products.one")) {
+        set.status = 401;
+        return {
+          message: "You don't have permissions",
+        };
+      }
+
+      const product = await drizzle
+        .select()
+        .from(products)
+        .where(eq(products.id, id))
+        .execute();
+
+      return product[0];
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    }
+  )
+  .put(
+    "/products/:id",
+    async ({ user, set, drizzle, body, params: { id } }) => {
+      if (!user) {
+        return {
+          message: "User not found",
+        };
+      }
+
+      if (!user.permissions.includes("products.edit")) {
+        set.status = 401;
+        
+        return {
+          message: "You don't have permissions",
+        };
+      }
+
+      const updatedProduct = await drizzle
+        .update(products)
+        .set({
+          ...body.data,
+        })
+        .where(eq(products.id, id))
+        .returning()
+        .execute();
+
+      return updatedProduct[0];
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: t.Object({
+        data: t.Object({
+          active: t.Optional(t.Boolean()),
+          name: t.Optional(t.String()),
+          description: t.Optional(t.String()),
+          price: t.Optional(t.Nullable(t.Number())),
+        }),
+        fields: t.Optional(t.Array(t.String())),
       }),
     }
   );

@@ -1,17 +1,15 @@
 import * as React from "react";
-import { createRoot } from "react-dom/client";
 import { useForm } from "@tanstack/react-form";
 import type { FieldApi } from "@tanstack/react-form";
 import { Switch } from "@nextui-org/switch";
-import { Drawer } from "vaul";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@nextui-org/button";
-import { MinusIcon, PlusIcon } from "lucide-react";
 import { apiClient } from "@frontend/src/utils/eden";
 import { toast } from "sonner";
 import { useCookieState } from "use-cookie-state";
-import { useState } from "react";
-import FileUploadField from "../../elements/file-upload";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import FileUploadField from "@frontend/src/components/elements/file-upload";
 
 function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
   return (
@@ -26,57 +24,156 @@ function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
 
 export const ProductAddingForm = ({
   setOpen,
+  recordId,
 }: {
   setOpen: (open: boolean) => void;
+  recordId?: string;
 }) => {
   const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const queryClient = useQueryClient();
   const form = useForm<{
-    isChecked: boolean;
+    active: boolean;
     productName: string;
     description: string;
-    price: number;
+    price?: number | null;
   }>({
     defaultValues: {
-      isChecked: false,
+      active: false,
       productName: "",
       description: "",
-      price: 0,
+      price: undefined,
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
       console.log(value);
-      createMutation.mutate({
-        active: value.isChecked,
-        name: value.productName,
-        description: value.description,
-        price: value.price,
-      });
+      if (recordId) {
+        updateMutation.mutate({
+          data: {
+            active: value.active,
+            name: value.productName,
+            description: value.description,
+            price: value.price,
+          },
+          id: recordId,
+        });
+      } else
+        createMutation.mutate({
+          active: value.active,
+          name: value.productName,
+          description: value.description,
+          price: value.price,
+        });
     },
   });
+
+  const onAddSuccess = (actionText: string) => {
+    toast.success(`${actionText}`);
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    // form.reset();
+    setOpen(false);
+  };
+
+  const onError = (error: any) => {
+    toast.error(
+      error.value && error.value.message
+        ? error.value.message
+        : JSON.stringify(error.value)
+    );
+  };
+
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_product", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.products[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      } else {
+        return null;
+      }
+    },
+    enabled: !!recordId && !!accessToken,
+  });
+
+  useEffect(() => {
+    if (record?.data && "id" in record.data) {
+      form.setFieldValue("active", record.data.active);
+      form.setFieldValue("productName", record.data.name);
+      form.setFieldValue(
+        "description",
+        record.data.description ? record.data.description : ""
+      );
+      form.setFieldValue("price", record.data.price);
+    }
+  }, [record]);
+
   const createMutation = useMutation({
     mutationFn: (newTodo: {
       active: boolean;
       name: string;
       description?: string;
-      price?: number;
+      price?: number | null;
     }) => {
       return apiClient.api.products.post({
         data: newTodo,
+        fields: ["id", "name", "active", "description", "price"],
         $headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
     },
-    onSuccess: () => {
-      form.reset();
-      //HSOverlay.close("#hs-overlay-ticket-add");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+    onSuccess: () => onAddSuccess("Новый продукт успешно создано"),
+    onError,
 
-      toast.success("Новый продукт успешно создано");
-      setOpen(false);
-    },
+    // {
+    //   form.reset();
+    //   //HSOverlay.close("#hs-overlay-ticket-add");
+    //   queryClient.invalidateQueries({ queryKey: ["products"] });
+
+    //   setOpen(false);
+    // },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async (newTodo: {
+      data: {
+        active: boolean;
+        name: string;
+        description?: string;
+        price?: number | null;
+      };
+      id: string;
+    }) => {
+      const { data, error, status } = await apiClient.api.products[
+        newTodo.id
+      ].put({
+        data: newTodo.data,
+        fields: ["id", "name", "active", "description", "price"],
+        $headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (status === 200) {
+        return data;
+      } else {
+        throw error;
+      }
+    },
+    onSuccess: () => onAddSuccess("Продукт успешно обновлен"),
+    onError,
+
+    // {
+    //   form.reset();
+    //   //HSOverlay.close("#hs-overlay-ticket-add");
+    //   queryClient.invalidateQueries({ queryKey: ["products"] });
+
+    //   toast.success("Продукт успешно обновлен");
+    //   setOpen(false);
+    // },
+  });
+
   return (
     <div>
       <form.Provider>
@@ -89,15 +186,16 @@ export const ProductAddingForm = ({
         >
           <div className="py-4">
             <form.Field
-              name="isChecked"
-              children={({ state, handleChange, handleBlur }) => (
-                <Switch
-                  onChange={(e) => handleChange(e.target.checked)}
-                  onBlur={handleBlur}
-                  checked={state.value}
-                  defaultSelected={state.value}
-                  className="relative w-[3.25rem] h-7 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-blue-600 checked:border-blue-600 focus:checked:border-blue-600 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-600 before:inline-block before:w-6 before:h-6 before:bg-white checked:before:bg-blue-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-gray-400 dark:checked:before:bg-blue-200"
-                />
+              name="active"
+              children={(field) => (
+                <>
+                  <Switch
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    isSelected={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                  />
+                </>
               )}
             />
           </div>
@@ -168,10 +266,14 @@ export const ProductAddingForm = ({
                   <input
                     id={field.name}
                     name={field.name}
-                    value={field.state.value}
+                    value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
                     type="number"
-                    onChange={(e) => field.handleChange(+e.target.value)}
+                    onChange={(e) =>
+                      field.handleChange(
+                        e.target.value ? +e.target.value : undefined
+                      )
+                    }
                     className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
                   />
                   <FieldInfo field={field} />
@@ -179,14 +281,14 @@ export const ProductAddingForm = ({
               )}
             />
           </div>
-          <div>
-            {/* <FileUploadField
+          {/* <div>
+            <FileUploadField
               model="products"
               model_id={recordId}
               onValueChange={(item) => setImageId(item)}
               code="main"
-            /> */}
-          </div>
+            />
+          </div> */}
 
           {/* <div>
                     <form.Field

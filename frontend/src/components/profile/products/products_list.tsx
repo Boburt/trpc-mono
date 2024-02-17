@@ -29,6 +29,9 @@ import { products } from "backend/drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { ProductAddingForm } from "./product_adding_form";
 import { useState } from "react";
+import { Edit2Icon, PlusIcon, Edit3Icon } from "lucide-react";
+import { Drawer } from "vaul";
+import { dataFocusVisibleClasses } from "@nextui-org/theme";
 
 //@ts-ignore
 const statusColorMap: Record<boolean, ChipProps["color"]> = {
@@ -68,7 +71,7 @@ export default function ProductsList() {
   const [page, setPage] = React.useState(1);
 
   const [accessToken, setAccessToken] = useCookieState("x-token", "");
-  const [open, setOpen] = useState(false);
+
   const { data: productsList, isLoading } = useQuery({
     queryKey: [
       "products",
@@ -131,10 +134,6 @@ export default function ProductsList() {
     return res;
   }, [productsList]);
 
-  function editProduct() {
-    return <ProductAddingForm setOpen={setOpen} />;
-  }
-
   const renderCell = React.useCallback(
     (product: InferSelectModel<typeof products>, columnKey: React.Key) => {
       const cellValue =
@@ -192,7 +191,7 @@ export default function ProductsList() {
         case "actions":
           return (
             <div className="relative flex justify-end items-center gap-2">
-              <Dropdown>
+              {/* <Dropdown>
                 <DropdownTrigger>
                   <Button isIconOnly size="sm" variant="light">
                     <VerticalDotsIcon className="text-default-300" />
@@ -200,16 +199,17 @@ export default function ProductsList() {
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem>View</DropdownItem>
-                  <DropdownItem
-                    onClick={() => {
-                      editProduct();
-                    }}
-                  >
-                    Edit
-                  </DropdownItem>
+
+                  <DropdownItem>Edit</DropdownItem>
+
                   <DropdownItem>Delete</DropdownItem>
                 </DropdownMenu>
-              </Dropdown>
+              </Dropdown> */}
+              <ProductDrawer record_id={product.id}>
+                <Button isIconOnly size="sm" variant="light">
+                  <Edit2Icon className="text-default-500" />
+                </Button>
+              </ProductDrawer>
             </div>
           );
         default:
@@ -255,56 +255,21 @@ export default function ProductsList() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            {/* <Dropdown>1
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
-                  Status
+            {/* <Drawer open={open} onOpenChange={setOpen}>
+              <DrawerTrigger asChild>
+                <Button color="primary" endContent={<PlusIcon />}>
+                  Добавить новый продукт
                 </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-            {/* <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
-                  Columns
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {columns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-
-            <ProductDrawer />
+              </DrawerTrigger>
+              <DrawerContent>
+                <ProductAddingForm setOpen={setOpen} />
+              </DrawerContent>
+            </Drawer> */}
+            <ProductDrawer>
+              <Button color="primary" endContent={<PlusIcon />}>
+                Добавить новый продукт
+              </Button>
+            </ProductDrawer>
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -339,6 +304,7 @@ export default function ProductsList() {
     onRowsPerPageChange,
     hasSearchFilter,
     totalCount,
+    open,
   ]);
 
   const bottomContent = React.useMemo(() => {
