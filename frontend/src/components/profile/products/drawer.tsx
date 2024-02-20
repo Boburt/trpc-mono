@@ -5,6 +5,8 @@ import { Button } from "@nextui-org/button";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { ProductAddingForm } from "./product_adding_form";
+import {Tabs, Tab} from "@nextui-org/tabs";
+
 
 export function ProductDrawer({
   children,

@@ -10,6 +10,9 @@ import { useCookieState } from "use-cookie-state";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import FileUploadField from "@frontend/src/components/elements/file-upload";
+import { Tabs, Tab } from "@nextui-org/tabs";
+import { Card, CardBody } from "@nextui-org/card";
+import { ProductsProfile } from "./products_profile";
 
 function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
   return (
@@ -174,114 +177,127 @@ export const ProductAddingForm = ({
     // },
   });
 
+  const variants = [
+    "solid",
+    "underlined",
+    "bordered",
+    "light",
+  ];
+
   return (
     <div>
-      <form.Provider>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          <div className="py-4">
-            <form.Field
-              name="active"
-              children={(field) => (
-                <>
-                  <Switch
-                    checked={field.state.value}
-                    onBlur={field.handleBlur}
-                    isSelected={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.checked)}
-                  />
-                </>
-              )}
-            />
-          </div>
-          <div>
-            {/* A type-safe field component*/}
-            <form.Field
-              name="productName"
-              validators={{
-                onChange: ({ value }) =>
-                  !value
-                    ? "A product name is required"
-                    : value.length < 2
-                    ? "Product name must be at least 2 characters"
-                    : undefined,
-                onChangeAsyncDebounceMs: 500,
-                onChangeAsync: async ({ value }) => {
-                  await new Promise((resolve) => setTimeout(resolve, 1000));
-                  return (
-                    value.includes("error") &&
-                    'No "error" allowed in product name'
-                  );
-                },
-              }}
-              children={(field) => {
-                // Avoid hasty abstractions. Render props are great!
-                return (
-                  <>
-                    <label htmlFor={field.name}>Название продукта</label>
-                    <input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="py-3 px-4 block w-full border-gray-200  rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-70 bg-gray-100 dark:text-gray-400 dark:focus:ring-gray-600"
-                    />
-                    <FieldInfo field={field} />
-                  </>
-                );
-              }}
-            />
-          </div>
-          <div className="py-6">
-            <form.Field
-              name="description"
-              children={(field) => (
-                <>
-                  <label htmlFor={field.name}>Описание продукта</label>
-                  <textarea
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                  />
-                  <FieldInfo field={field} />
-                </>
-              )}
-            />
-          </div>
-          <div>
-            <form.Field
-              name="price"
-              children={(field) => (
-                <>
-                  <label htmlFor={field.name}>Цена:</label>
-                  <input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value ?? ""}
-                    onBlur={field.handleBlur}
-                    type="number"
-                    onChange={(e) =>
-                      field.handleChange(
-                        e.target.value ? +e.target.value : undefined
-                      )
-                    }
-                    className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                  />
-                  <FieldInfo field={field} />
-                </>
-              )}
-            />
-          </div>
-          {/* <div>
+      <div className="flex w-full flex-col">
+        <Tabs aria-label="Options" >
+          <Tab key="photos" title="Общие">
+            <Card>
+              <CardBody>
+
+                <form.Provider>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void form.handleSubmit();
+                    }}
+                  >
+                    <div className="py-4">
+                      <form.Field
+                        name="active"
+                        children={(field) => (
+                          <>
+                            <Switch
+                              checked={field.state.value}
+                              onBlur={field.handleBlur}
+                              isSelected={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.checked)}
+                            />
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      {/* A type-safe field component*/}
+                      <form.Field
+                        name="productName"
+                        validators={{
+                          onChange: ({ value }) =>
+                            !value
+                              ? "A product name is required"
+                              : value.length < 2
+                                ? "Product name must be at least 2 characters"
+                                : undefined,
+                          onChangeAsyncDebounceMs: 500,
+                          onChangeAsync: async ({ value }) => {
+                            await new Promise((resolve) => setTimeout(resolve, 1000));
+                            return (
+                              value.includes("error") &&
+                              'No "error" allowed in product name'
+                            );
+                          },
+                        }}
+                        children={(field) => {
+                          // Avoid hasty abstractions. Render props are great!
+                          return (
+                            <>
+                              <label htmlFor={field.name}>Название продукта</label>
+                              <input
+                                id={field.name}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                className="py-3 px-4 block w-full border-gray-200  rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-70 bg-gray-100 dark:text-gray-400 dark:focus:ring-gray-600"
+                              />
+                              <FieldInfo field={field} />
+                            </>
+                          );
+                        }}
+                      />
+                    </div>
+                    <div className="py-6">
+                      <form.Field
+                        name="description"
+                        children={(field) => (
+                          <>
+                            <label htmlFor={field.name}>Описание продукта</label>
+                            <textarea
+                              id={field.name}
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                            />
+                            <FieldInfo field={field} />
+                          </>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <form.Field
+                        name="price"
+                        children={(field) => (
+                          <>
+                            <label htmlFor={field.name}>Цена:</label>
+                            <input
+                              id={field.name}
+                              name={field.name}
+                              value={field.state.value ?? ""}
+                              onBlur={field.handleBlur}
+                              type="number"
+                              onChange={(e) =>
+                                field.handleChange(
+                                  e.target.value ? +e.target.value : undefined
+                                )
+                              }
+                              className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                            />
+                            <FieldInfo field={field} />
+                          </>
+                        )}
+                      />
+                    </div>
+                    {/* <div>
             <FileUploadField
               model="products"
               model_id={recordId}
@@ -290,7 +306,7 @@ export const ProductAddingForm = ({
             />
           </div> */}
 
-          {/* <div>
+                    {/* <div>
                     <form.Field
                       name="quantity"
                       children={(field) => (
@@ -312,22 +328,35 @@ export const ProductAddingForm = ({
                       )}
                     />
                   </div> */}
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-            children={([canSubmit, isSubmitting]) => (
-              <Button
-                color="primary"
-                isDisabled={!canSubmit}
-                className="mt-10 w-full"
-                type="submit"
-                disabled={!canSubmit}
-              >
-                {isSubmitting ? "..." : "Сохранить"}
-              </Button>
-            )}
-          />
-        </form>
-      </form.Provider>
+                    <form.Subscribe
+                      selector={(state) => [state.canSubmit, state.isSubmitting]}
+                      children={([canSubmit, isSubmitting]) => (
+                        <Button
+                          color="primary"
+                          isDisabled={!canSubmit}
+                          className="mt-10 w-full"
+                          type="submit"
+                          disabled={!canSubmit}
+                        >
+                          {isSubmitting ? "..." : "Сохранить"}
+                        </Button>
+                      )}
+                    />
+                  </form>
+                </form.Provider>
+              </CardBody>
+            </Card>
+          </Tab>
+          <Tab key="properties" title="Характеристики">
+            <Card>
+              <CardBody>
+                <ProductsProfile />
+              </CardBody>
+            </Card>
+          </Tab>
+
+        </Tabs>
+      </div>
     </div>
   );
 };
