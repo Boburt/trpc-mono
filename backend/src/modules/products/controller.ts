@@ -56,6 +56,7 @@ export const productsController = new Elysia({
           name: t.String(),
           description: t.Optional(t.String()),
           price: t.Optional(t.Nullable(t.Number())),
+          properties: t.Optional(t.Record(t.String(), t.Any())),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
@@ -176,7 +177,7 @@ export const productsController = new Elysia({
 
       if (!user.permissions.includes("products.edit")) {
         set.status = 401;
-        
+
         return {
           message: "You don't have permissions",
         };

@@ -896,6 +896,7 @@ export const products = pgTable("products", {
   active: boolean("active").default(true).notNull(),
   price: integer("price"),
   stock_quantity: integer("stock_quantity"),
+  properties: jsonb("properties"),
   created_at: timestamp("created_at", {
     precision: 5,
     withTimezone: true,

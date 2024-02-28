@@ -174,6 +174,8 @@ export const ProductAddingForm = ({
     // },
   });
 
+  const [imageId, setImageId] = useState<string | null>(null);
+
   return (
     <div>
       <form.Provider>
@@ -281,37 +283,37 @@ export const ProductAddingForm = ({
               )}
             />
           </div>
-          {/* <div>
-            <FileUploadField
-              model="products"
-              model_id={recordId}
-              onValueChange={(item) => setImageId(item)}
-              code="main"
-            />
-          </div> */}
+          {recordId && (
+            <div>
+              <FileUploadField
+                model="products"
+                model_id={recordId}
+                onValueChange={(item) => setImageId(item)}
+                code="main"
+              />
+            </div>
+          )}
 
           {/* <div>
-                    <form.Field
-                      name="quantity"
-                      children={(field) => (
-                        <>
-                          <label htmlFor={field.name}>Количество:</label>
-                          <input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) =>
-                              field.handleChange(+e.target.value)
-                            }
-                            type="number"
-                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                          />
-                          <FieldInfo field={field} />
-                        </>
-                      )}
-                    />
-                  </div> */}
+            <form.Field
+              name="quantity"
+              children={(field) => (
+                <>
+                  <label htmlFor={field.name}>Количество:</label>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(+e.target.value)}
+                    type="number"
+                    className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                  />
+                  <FieldInfo field={field} />
+                </>
+              )}
+            />
+          </div> */}
           <form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
             children={([canSubmit, isSubmitting]) => (
