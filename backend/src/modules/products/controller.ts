@@ -70,6 +70,7 @@ export const productsController = new Elysia({
       drizzle,
       query: { limit, offset, sort, filters, fields },
     }) => {
+      console.log(user)
       if (!user) {
         return {
           message: "User not found",
