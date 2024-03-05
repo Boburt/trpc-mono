@@ -5,7 +5,7 @@ import { Button } from "@nextui-org/button";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { ProductAddingForm } from "./product_adding_form";
-import {Tabs, Tab} from "@nextui-org/tabs";
+import { Tabs, Tab } from "@nextui-org/tabs";
 
 
 export function ProductDrawer({
@@ -22,9 +22,9 @@ export function ProductDrawer({
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40 " />
         <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[400px] mt-24 fixed bottom-0 right-0">
-          <div className="p-4 bg-white flex-1 h-full">
+          <div className="p-4 bg-white flex-1 h-full dark:bg-slate-800">
             <div className="max-w-md mx-auto">
-              <Drawer.Title className="font-medium mb-4 mt-16">
+              <Drawer.Title className="font-medium mb-4 mt-16 dark:text-white">
                 {record_id ? "Редактировать продукт" : "Добавить новый продукт"}
               </Drawer.Title>
             </div>

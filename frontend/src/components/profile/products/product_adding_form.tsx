@@ -39,12 +39,14 @@ export const ProductAddingForm = ({
     productName: string;
     description: string;
     price?: number | null;
+    properties: string;
   }>({
     defaultValues: {
       active: false,
       productName: "",
       description: "",
       price: undefined,
+      properties: ""
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
@@ -56,6 +58,7 @@ export const ProductAddingForm = ({
             name: value.productName,
             description: value.description,
             price: value.price,
+            properties: value.properties,
           },
           id: recordId,
         });
@@ -65,6 +68,7 @@ export const ProductAddingForm = ({
           name: value.productName,
           description: value.description,
           price: value.price,
+          properties: value.properties
         });
     },
   });
@@ -109,6 +113,7 @@ export const ProductAddingForm = ({
         record.data.description ? record.data.description : ""
       );
       form.setFieldValue("price", record.data.price);
+      form.setFieldValue("properties", record.data.properties);
     }
   }, [record]);
 
@@ -118,10 +123,11 @@ export const ProductAddingForm = ({
       name: string;
       description?: string;
       price?: number | null;
+      properties: string;
     }) => {
       return apiClient.api.products.post({
         data: newTodo,
-        fields: ["id", "name", "active", "description", "price"],
+        fields: ["id", "name", "active", "description", "price", "properties"],
         $headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -146,6 +152,7 @@ export const ProductAddingForm = ({
         name: string;
         description?: string;
         price?: number | null;
+        properties: string;
       };
       id: string;
     }) => {
@@ -153,7 +160,7 @@ export const ProductAddingForm = ({
         newTodo.id
       ].put({
         data: newTodo.data,
-        fields: ["id", "name", "active", "description", "price"],
+        fields: ["id", "name", "active", "description", "price", "properties"],
         $headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -182,9 +189,9 @@ export const ProductAddingForm = ({
   return (
     <div>
       <div className="flex w-full flex-col">
-        <Tabs aria-label="Options">
-          <Tab key="photos" title="Общие">
-            <Card>
+        <Tabs aria-label="Options" className="">
+          <Tab key="photos" title="Общие" className="">
+            <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
                 <form.Provider>
                   <form
@@ -220,8 +227,8 @@ export const ProductAddingForm = ({
                             !value
                               ? "A product name is required"
                               : value.length < 2
-                              ? "Product name must be at least 2 characters"
-                              : undefined,
+                                ? "Product name must be at least 2 characters"
+                                : undefined,
                           onChangeAsyncDebounceMs: 500,
                           onChangeAsync: async ({ value }) => {
                             await new Promise((resolve) =>
@@ -248,7 +255,7 @@ export const ProductAddingForm = ({
                                 onChange={(e) =>
                                   field.handleChange(e.target.value)
                                 }
-                                className="py-3 px-4 block w-full border-gray-200  rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-70 bg-gray-100 dark:text-gray-400 dark:focus:ring-gray-600"
+                                className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
                               />
                               <FieldInfo field={field} />
                             </>
@@ -356,10 +363,132 @@ export const ProductAddingForm = ({
               </CardBody>
             </Card>
           </Tab>
-          <Tab key="properties" title="Характеристики">
-            <Card>
+          <Tab key="properties" title="Характеристики" className="">
+            <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
-                <ProductsProfile />
+
+                <form.Provider>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void form.handleSubmit();
+                    }}
+                  >
+                    <form.Field
+                      name="properties"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Тип ткани:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+                    <form.Field
+                      name="row"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Сырьё:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+
+                    <form.Field
+                      name="farbic_density"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Плотность ткани:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+                    <form.Field
+                      name="color&design"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Цвет и дизайн:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+                    <form.Field
+                      name="resistance"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Прочность и износостойкость:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+                    <form.Field
+                      name="product_tech"
+                      children={(field) => (
+                        <>
+                          <label htmlFor={field.name}>Технологии производства:</label>
+                          <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                          />
+                          <FieldInfo field={field} />
+                        </>
+                      )}
+                    />
+                    <Button
+                      color="primary"
+                      type="submit"
+                      className="mt-10 w-full">
+                      Сохранить
+                    </Button>
+                  </form>
+                </form.Provider>
+
+                {/* <ProductsProfile /> */}
+
               </CardBody>
             </Card>
           </Tab>
