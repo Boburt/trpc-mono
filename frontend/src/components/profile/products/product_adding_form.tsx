@@ -34,19 +34,34 @@ export const ProductAddingForm = ({
 }) => {
   const [accessToken, setAccessToken] = useCookieState("x-token", "");
   const queryClient = useQueryClient();
+  interface Properties {
+    fabric_type: string;
+    raw_material: string;
+    fabric_density: string;
+    color_and_design: string;
+    strength_resistance: string;
+    product_tech: string;
+  }
   const form = useForm<{
     active: boolean;
     productName: string;
     description: string;
     price?: number | null;
-    properties: string;
+    properties?: Properties;
   }>({
     defaultValues: {
       active: false,
       productName: "",
       description: "",
       price: undefined,
-      properties: ""
+      properties: {
+        fabric_type: "",
+        raw_material: "",
+        fabric_density: "",
+        color_and_design: "",
+        strength_resistance: "",
+        product_tech: "",
+      }
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
@@ -113,7 +128,12 @@ export const ProductAddingForm = ({
         record.data.description ? record.data.description : ""
       );
       form.setFieldValue("price", record.data.price);
-      form.setFieldValue("properties", record.data.properties);
+      form.setFieldValue("properties.fabric_type", record.data.properties.fabric_type);
+      form.setFieldValue("properties.raw_material", record.data.properties.raw_material);
+      form.setFieldValue("properties.fabric_density", record.data.properties.fabric_density);
+      form.setFieldValue("properties.color_and_design", record.data.properties.color_and_design);
+      form.setFieldValue("properties.strength_resistance", record.data.properties.strength_resistance);
+      form.setFieldValue("properties.product_tech", record.data.properties.product_tech);
     }
   }, [record]);
 
@@ -123,7 +143,7 @@ export const ProductAddingForm = ({
       name: string;
       description?: string;
       price?: number | null;
-      properties: string;
+      properties: Properties;
     }) => {
       return apiClient.api.products.post({
         data: newTodo,
@@ -152,7 +172,7 @@ export const ProductAddingForm = ({
         name: string;
         description?: string;
         price?: number | null;
-        properties: string;
+        properties: Properties
       };
       id: string;
     }) => {
@@ -190,7 +210,7 @@ export const ProductAddingForm = ({
     <div>
       <div className="flex w-full flex-col">
         <Tabs aria-label="Options" className="">
-          <Tab key="photos" title="Общие" className="">
+          <Tab key="photos" title="Общие" className="dark:bg-slate-800 dark:active:bg-slate-900">
             <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
                 <form.Provider>
@@ -363,7 +383,8 @@ export const ProductAddingForm = ({
               </CardBody>
             </Card>
           </Tab>
-          <Tab key="properties" title="Характеристики" className="">
+          <Tab key="properties" title="Характеристики" className="dark:bg-slate-800 ">
+
             <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
 
@@ -376,7 +397,7 @@ export const ProductAddingForm = ({
                     }}
                   >
                     <form.Field
-                      name="properties"
+                      name="properties.fabric_type"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Тип ткани:</label>
@@ -393,7 +414,7 @@ export const ProductAddingForm = ({
                       )}
                     />
                     <form.Field
-                      name="row"
+                      name="properties.raw_material"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Сырьё:</label>
@@ -409,9 +430,8 @@ export const ProductAddingForm = ({
                         </>
                       )}
                     />
-
                     <form.Field
-                      name="farbic_density"
+                      name="properties.fabric_density"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Плотность ткани:</label>
@@ -428,7 +448,7 @@ export const ProductAddingForm = ({
                       )}
                     />
                     <form.Field
-                      name="color&design"
+                      name="properties.color_and_design"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Цвет и дизайн:</label>
@@ -445,7 +465,7 @@ export const ProductAddingForm = ({
                       )}
                     />
                     <form.Field
-                      name="resistance"
+                      name="properties.strength_resistance"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Прочность и износостойкость:</label>
@@ -462,7 +482,7 @@ export const ProductAddingForm = ({
                       )}
                     />
                     <form.Field
-                      name="product_tech"
+                      name="properties.product_tech"
                       children={(field) => (
                         <>
                           <label htmlFor={field.name}>Технологии производства:</label>
