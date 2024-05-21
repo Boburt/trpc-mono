@@ -47,7 +47,7 @@ export const ProductAddingForm = ({
     productName: string;
     description: string;
     price?: number | null;
-    properties?: Properties;
+    properties: Properties;
   }>({
     defaultValues: {
       active: false,
@@ -61,7 +61,7 @@ export const ProductAddingForm = ({
         color_and_design: "",
         strength_resistance: "",
         product_tech: "",
-      }
+      },
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
@@ -83,7 +83,7 @@ export const ProductAddingForm = ({
           name: value.productName,
           description: value.description,
           price: value.price,
-          properties: value.properties
+          properties: value.properties,
         });
     },
   });
@@ -128,12 +128,30 @@ export const ProductAddingForm = ({
         record.data.description ? record.data.description : ""
       );
       form.setFieldValue("price", record.data.price);
-      form.setFieldValue("properties.fabric_type", record.data.properties.fabric_type);
-      form.setFieldValue("properties.raw_material", record.data.properties.raw_material);
-      form.setFieldValue("properties.fabric_density", record.data.properties.fabric_density);
-      form.setFieldValue("properties.color_and_design", record.data.properties.color_and_design);
-      form.setFieldValue("properties.strength_resistance", record.data.properties.strength_resistance);
-      form.setFieldValue("properties.product_tech", record.data.properties.product_tech);
+      form.setFieldValue(
+        "properties.fabric_type",
+        record.data.properties?.fabric_type
+      );
+      form.setFieldValue(
+        "properties.raw_material",
+        record.data.properties?.raw_material
+      );
+      form.setFieldValue(
+        "properties.fabric_density",
+        record.data.properties?.fabric_density
+      );
+      form.setFieldValue(
+        "properties.color_and_design",
+        record.data.properties?.color_and_design
+      );
+      form.setFieldValue(
+        "properties.strength_resistance",
+        record.data.properties?.strength_resistance
+      );
+      form.setFieldValue(
+        "properties.product_tech",
+        record.data.properties?.product_tech
+      );
     }
   }, [record]);
 
@@ -172,7 +190,7 @@ export const ProductAddingForm = ({
         name: string;
         description?: string;
         price?: number | null;
-        properties: Properties
+        properties: Properties;
       };
       id: string;
     }) => {
@@ -210,7 +228,11 @@ export const ProductAddingForm = ({
     <div>
       <div className="flex w-full flex-col">
         <Tabs aria-label="Options" className="">
-          <Tab key="photos" title="Общие" className="dark:bg-slate-800 dark:active:bg-slate-900">
+          <Tab
+            key="photos"
+            title="Общие"
+            className="dark:bg-slate-800 dark:active:bg-slate-900"
+          >
             <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
                 <form.Provider>
@@ -247,8 +269,8 @@ export const ProductAddingForm = ({
                             !value
                               ? "A product name is required"
                               : value.length < 2
-                                ? "Product name must be at least 2 characters"
-                                : undefined,
+                              ? "Product name must be at least 2 characters"
+                              : undefined,
                           onChangeAsyncDebounceMs: 500,
                           onChangeAsync: async ({ value }) => {
                             await new Promise((resolve) =>
@@ -383,11 +405,13 @@ export const ProductAddingForm = ({
               </CardBody>
             </Card>
           </Tab>
-          <Tab key="properties" title="Характеристики" className="dark:bg-slate-800 ">
-
+          <Tab
+            key="properties"
+            title="Характеристики"
+            className="dark:bg-slate-800 "
+          >
             <Card className="dark:bg-slate-900 dark:text-white">
               <CardBody>
-
                 <form.Provider>
                   <form
                     onSubmit={(e) => {
@@ -468,7 +492,9 @@ export const ProductAddingForm = ({
                       name="properties.strength_resistance"
                       children={(field) => (
                         <>
-                          <label htmlFor={field.name}>Прочность и износостойкость:</label>
+                          <label htmlFor={field.name}>
+                            Прочность и износостойкость:
+                          </label>
                           <input
                             id={field.name}
                             name={field.name}
@@ -485,7 +511,9 @@ export const ProductAddingForm = ({
                       name="properties.product_tech"
                       children={(field) => (
                         <>
-                          <label htmlFor={field.name}>Технологии производства:</label>
+                          <label htmlFor={field.name}>
+                            Технологии производства:
+                          </label>
                           <input
                             id={field.name}
                             name={field.name}
@@ -501,14 +529,14 @@ export const ProductAddingForm = ({
                     <Button
                       color="primary"
                       type="submit"
-                      className="mt-10 w-full">
+                      className="mt-10 w-full"
+                    >
                       Сохранить
                     </Button>
                   </form>
                 </form.Provider>
 
                 {/* <ProductsProfile /> */}
-
               </CardBody>
             </Card>
           </Tab>
