@@ -78,7 +78,7 @@
     "auth-astro": "^4.1.0",
     "clsx": "^2.0.0",
     "dayjs": "^1.11.10",
-    "drizzle-orm": "^0.29.3",
+    "drizzle-orm": "^0.30.10",
     "elysia": "^0.8.8",
     "fastify": "^4.22.0",
     "flowbite": "^2.2.1",
