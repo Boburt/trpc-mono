@@ -47,24 +47,39 @@ export const ProductAddingForm = ({
     productName: string;
     description: string;
     price?: number | null;
+<<<<<<< HEAD
     fabric_type: string;
     raw_material: string;
     fabric_density: string;
     color_and_design: string;
     strength_resistance: string;
     product_tech: string;
+=======
+    properties: Properties;
+>>>>>>> origin/main
   }>({
     defaultValues: {
       active: false,
       productName: "",
       description: "",
       price: undefined,
+<<<<<<< HEAD
       fabric_type: "",
       raw_material: "",
       fabric_density: "",
       color_and_design: "",
       strength_resistance: "",
       product_tech: "",
+=======
+      properties: {
+        fabric_type: "",
+        raw_material: "",
+        fabric_density: "",
+        color_and_design: "",
+        strength_resistance: "",
+        product_tech: "",
+      },
+>>>>>>> origin/main
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
@@ -93,6 +108,7 @@ export const ProductAddingForm = ({
           name: value.productName,
           description: value.description,
           price: value.price,
+<<<<<<< HEAD
           properties: {
             fabric_type: value.fabric_type,
             raw_material: value.raw_material,
@@ -101,6 +117,9 @@ export const ProductAddingForm = ({
             strength_resistance: value.strength_resistance,
             product_tech: value.product_tech,
           },
+=======
+          properties: value.properties,
+>>>>>>> origin/main
         });
     },
   });
@@ -145,21 +164,30 @@ export const ProductAddingForm = ({
         record.data.description ? record.data.description : ""
       );
       form.setFieldValue("price", record.data.price);
-      form.setFieldValue("fabric_type", record.data.properties.fabric_type);
-      form.setFieldValue("raw_material", record.data.properties.raw_material);
       form.setFieldValue(
-        "fabric_density",
-        record.data.properties.fabric_density
+        "properties.fabric_type",
+        record.data.properties?.fabric_type
       );
       form.setFieldValue(
-        "color_and_design",
-        record.data.properties.color_and_design
+        "properties.raw_material",
+        record.data.properties?.raw_material
       );
       form.setFieldValue(
-        "strength_resistance",
-        record.data.properties.strength_resistance
+        "properties.fabric_density",
+        record.data.properties?.fabric_density
       );
-      form.setFieldValue("product_tech", record.data.properties.product_tech);
+      form.setFieldValue(
+        "properties.color_and_design",
+        record.data.properties?.color_and_design
+      );
+      form.setFieldValue(
+        "properties.strength_resistance",
+        record.data.properties?.strength_resistance
+      );
+      form.setFieldValue(
+        "properties.product_tech",
+        record.data.properties?.product_tech
+      );
     }
   }, [record]);
 

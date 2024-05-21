@@ -86,7 +86,7 @@ export default function ProductsList() {
         $query: {
           limit: rowsPerPage,
           offset: (page - 1) * rowsPerPage,
-          fields: "id,name,description,active,price,stock_quantity",
+          fields: "id,name,description,active,price,properties,stock_quantity",
           filters: JSON.stringify([
             {
               operator: "contains",
@@ -135,7 +135,10 @@ export default function ProductsList() {
   }, [productsList]);
 
   const renderCell = React.useCallback(
-    (product: InferSelectModel<typeof products>, columnKey: React.Key) => {
+    (
+      product: InferSelectModel<typeof products>,
+      columnKey: React.Key
+    ): React.ReactNode => {
       const cellValue =
         product[columnKey as keyof InferSelectModel<typeof products>];
 
@@ -213,7 +216,7 @@ export default function ProductsList() {
             </div>
           );
         default:
-          return cellValue;
+          return <>{cellValue}</>;
       }
     },
     []

@@ -18,7 +18,7 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "bullmq": "^5.1.1",
-    "drizzle-orm": "^0.29.2",
+    "drizzle-orm": "^0.30.10",
     "drizzle-typebox": "^0.1.1",
     "elysia": "^0.8.3",
     "eslint-plugin-drizzle": "^0.2.2",
@@ -33,7 +33,7 @@
     "@types/bull": "^4.10.0",
     "@types/bun": "^1.0.0",
     "bun-types": "^0.7.3",
-    "drizzle-kit": "^0.20.8",
+    "drizzle-kit": "^0.21.2",
     "typescript": "^5.3.3"
   },
   "module": "src/index.js"

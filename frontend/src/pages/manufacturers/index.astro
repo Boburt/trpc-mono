@@ -35,6 +35,7 @@ const { data: manufacturers } =
 const { data: facets } = await apiClient.api.manufacturers.facet_filter.get({
   $query: {},
 });
+console.log("facets", facets);
 ---
 
 <BaseLayout title="Производители" customCrumbs={customCrumbs}>
