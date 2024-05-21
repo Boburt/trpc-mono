@@ -12,9 +12,9 @@ import tunnel from "astro-tunnel";
 // https://astro.build/config
 export default defineConfig({
   adapter: nodejs({
-    mode: "middleware",
+    mode: "standalone",
   }),
-  output: "hybrid",
+  output: "server",
   image: {
     service: sharpImageService(),
   },
@@ -23,6 +23,7 @@ export default defineConfig({
     host: true,
   },
   site: process.env.WEB_URL,
+  prefetch: false,
   vite: {
     ssr: {
       noExternal: ["react-icons"],
