@@ -13,7 +13,8 @@ import FileUploadField from "@frontend/src/components/elements/file-upload";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { Card, CardBody } from "@nextui-org/card";
 import { ProductsProfile } from "./products_profile";
-import { Input } from "@nextui-org/input";
+import { Input, Textarea } from "@nextui-org/input";
+import { Skeleton } from "@nextui-org/skeleton";
 
 function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
   return (
@@ -25,7 +26,14 @@ function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
     </>
   );
 }
-
+interface Properties {
+  fabric_type: string;
+  raw_material: string;
+  fabric_density: string;
+  color_and_design: string;
+  strength_resistance: string;
+  product_tech: string;
+}
 export const ProductAddingForm = ({
   setOpen,
   recordId,
@@ -34,25 +42,72 @@ export const ProductAddingForm = ({
   recordId?: string;
 }) => {
   const [accessToken, setAccessToken] = useCookieState("x-token", "");
-  const queryClient = useQueryClient();
-  interface Properties {
-    fabric_type: string;
-    raw_material: string;
-    fabric_density: string;
-    color_and_design: string;
-    strength_resistance: string;
-    product_tech: string;
+
+  const { data: record, isLoading: isRecordLoading } = useQuery({
+    queryKey: ["one_product", recordId],
+    queryFn: () => {
+      if (recordId) {
+        return apiClient.api.products[recordId].get({
+          $headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      } else {
+        return null;
+      }
+    },
+    enabled: !!recordId && !!accessToken,
+  });
+
+  if (!recordId) {
+    return <ProductAddingFormWithData setOpen={setOpen} />;
+  } else if (!isRecordLoading && record?.data && "id" in record.data) {
+    return (
+      <ProductAddingFormWithData
+        setOpen={setOpen}
+        recordId={recordId}
+        defaultValues={record.data}
+      />
+    );
+  } else {
+    return (
+      <>
+        <Skeleton className="rounded-lg flex h-full w-full">
+          <div className="h-24 rounded-lg bg-default-300"></div>
+        </Skeleton>
+      </>
+    );
   }
+};
+
+export const ProductAddingFormWithData = ({
+  setOpen,
+  recordId,
+  defaultValues,
+}: {
+  setOpen: (open: boolean) => void;
+  recordId?: string;
+  defaultValues?: {
+    active: boolean;
+    name: string;
+    description: string;
+    price?: number | null;
+    properties: Properties;
+  };
+}) => {
+  console.log("defaultValues", defaultValues);
+  const [accessToken, setAccessToken] = useCookieState("x-token", "");
+  const queryClient = useQueryClient();
   const form = useForm<{
     active: boolean;
-    productName: string;
+    name: string;
     description: string;
     price?: number | null;
     properties: Properties;
   }>({
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       active: false,
-      productName: "",
+      name: "",
       description: "",
       price: undefined,
       properties: {
@@ -71,7 +126,7 @@ export const ProductAddingForm = ({
         updateMutation.mutate({
           data: {
             active: value.active,
-            name: value.productName,
+            name: value.name,
             description: value.description,
             price: value.price,
             properties: value.properties,
@@ -81,7 +136,7 @@ export const ProductAddingForm = ({
       } else
         createMutation.mutate({
           active: value.active,
-          name: value.productName,
+          name: value.name,
           description: value.description,
           price: value.price,
           properties: value.properties,
@@ -103,58 +158,6 @@ export const ProductAddingForm = ({
         : JSON.stringify(error.value)
     );
   };
-
-  const { data: record, isLoading: isRecordLoading } = useQuery({
-    queryKey: ["one_product", recordId],
-    queryFn: () => {
-      if (recordId) {
-        return apiClient.api.products[recordId].get({
-          $headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      } else {
-        return null;
-      }
-    },
-    enabled: !!recordId && !!accessToken,
-  });
-
-  useEffect(() => {
-    if (record?.data && "id" in record.data) {
-      form.setFieldValue("active", record.data.active);
-      form.setFieldValue("productName", record.data.name);
-      form.setFieldValue(
-        "description",
-        record.data.description ? record.data.description : ""
-      );
-      form.setFieldValue("price", record.data.price);
-      form.setFieldValue(
-        "properties.fabric_type",
-        record.data.properties?.fabric_type
-      );
-      form.setFieldValue(
-        "properties.raw_material",
-        record.data.properties?.raw_material
-      );
-      form.setFieldValue(
-        "properties.fabric_density",
-        record.data.properties?.fabric_density
-      );
-      form.setFieldValue(
-        "properties.color_and_design",
-        record.data.properties?.color_and_design
-      );
-      form.setFieldValue(
-        "properties.strength_resistance",
-        record.data.properties?.strength_resistance
-      );
-      form.setFieldValue(
-        "properties.product_tech",
-        record.data.properties?.product_tech
-      );
-    }
-  }, [record]);
 
   const createMutation = useMutation({
     mutationFn: (newTodo: {
@@ -227,21 +230,17 @@ export const ProductAddingForm = ({
 
   return (
     <div className="flex w-full flex-col flex-grow">
-      <Tabs aria-label="Options" className="">
-        <Tab
-          key="photos"
-          title="Общие"
-          className="dark:bg-slate-800 dark:active:bg-slate-900 flex-grow"
-        >
-          <form
-            className="flex flex-col h-full"
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}
-          >
-            <div className="flex-grow space-y-3">
+      <form
+        className="flex flex-col h-full"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <div className="flex-grow">
+          <Tabs aria-label="Options">
+            <Tab key="photos" title="Общие">
               <form.Field
                 name="active"
                 children={(field) => (
@@ -257,7 +256,7 @@ export const ProductAddingForm = ({
               />
               {/* A type-safe field component*/}
               <form.Field
-                name="productName"
+                name="name"
                 validators={{
                   onChange: ({ value }) =>
                     !value
@@ -281,10 +280,11 @@ export const ProductAddingForm = ({
                       <Input
                         label="Название продукта"
                         labelPlacement="outside"
+                        placeholder="Введите название продукта"
                         value={field.state.value}
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onValueChange={(value) => field.handleChange(value)}
                         variant="bordered"
                       />
                       <FieldInfo field={field} />
@@ -296,16 +296,16 @@ export const ProductAddingForm = ({
                 name="description"
                 children={(field) => (
                   <div>
-                    <label htmlFor={field.name}>Описание продукта</label>
-                    <textarea
-                      id={field.name}
-                      name={field.name}
+                    <Textarea
+                      label="Описание продукта"
+                      labelPlacement="outside"
+                      placeholder="Введите описание продукта"
                       value={field.state.value}
+                      name={field.name}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                      onValueChange={(value) => field.handleChange(value)}
+                      variant="bordered"
                     />
-                    <FieldInfo field={field} />
                   </div>
                 )}
               />
@@ -313,19 +313,20 @@ export const ProductAddingForm = ({
                 name="price"
                 children={(field) => (
                   <div>
-                    <label htmlFor={field.name}>Цена</label>
-                    <input
-                      id={field.name}
-                      name={field.name}
+                    <Input
+                      label="Цена"
+                      labelPlacement="outside"
+                      placeholder="Цена"
                       value={field.state.value ?? ""}
-                      onBlur={field.handleBlur}
                       type="number"
+                      name={field.name}
+                      onBlur={field.handleBlur}
                       onChange={(e) =>
                         field.handleChange(
                           e.target.value ? +e.target.value : undefined
                         )
                       }
-                      className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                      variant="bordered"
                     />
                     <FieldInfo field={field} />
                   </div>
@@ -362,154 +363,130 @@ export const ProductAddingForm = ({
                       )}
                     />
                   </div> */}
-            </div>
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <Button
-                  color="primary"
-                  isDisabled={!canSubmit}
-                  className="mt-10 w-full"
-                  type="submit"
-                  disabled={!canSubmit}
-                >
-                  {isSubmitting ? "..." : "Сохранить"}
-                </Button>
-              )}
-            />
-          </form>
-        </Tab>
-        <Tab
-          key="properties"
-          title="Характеристики"
-          className="dark:bg-slate-800  flex-grow"
-        >
-          <form.Provider>
-            <form
-              className="flex flex-col h-full"
-              onSubmit={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                void form.handleSubmit();
-              }}
-            >
-              <div className="flex-grow space-y-3">
-                <form.Field
-                  name="properties.fabric_type"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>Тип ткани</label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-                <form.Field
-                  name="properties.raw_material"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>Сырьё</label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-                <form.Field
-                  name="properties.fabric_density"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>Плотность ткани</label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-                <form.Field
-                  name="properties.color_and_design"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>Цвет и дизайн</label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-                <form.Field
-                  name="properties.strength_resistance"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>
-                        Прочность и износостойкость
-                      </label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-                <form.Field
-                  name="properties.product_tech"
-                  children={(field) => (
-                    <div>
-                      <label htmlFor={field.name}>
-                        Технологии производства
-                      </label>
-                      <input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      />
-                      <FieldInfo field={field} />
-                    </div>
-                  )}
-                />
-              </div>
-              <Button color="primary" type="submit" className="mt-10 w-full">
-                Сохранить
-              </Button>
-            </form>
-          </form.Provider>
+            </Tab>
+            <Tab key="properties" title="Характеристики">
+              <form.Field
+                name="properties.fabric_type"
+                children={(field) => (
+                  <div>
+                    <Input
+                      label="Тип ткани"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+              <form.Field
+                name="properties.raw_material"
+                children={(field) => (
+                  <div>
+                    <Input
+                      label="Сырьё"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+              <form.Field
+                name="properties.fabric_density"
+                children={(field) => (
+                  <div>
+                    <Input
+                      label="Плотность ткани"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+              <form.Field
+                name="properties.color_and_design"
+                children={(field) => (
+                  <div datatype={field.state.value}>
+                    <Input
+                      label="Цвет и дизайн"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+              <form.Field
+                name="properties.strength_resistance"
+                children={(field) => (
+                  <div>
+                    <Input
+                      label="Прочность и износостойкость"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+              <form.Field
+                name="properties.product_tech"
+                children={(field) => (
+                  <div>
+                    <Input
+                      label="Технологии производства"
+                      labelPlacement="outside"
+                      value={field.state.value}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      variant="bordered"
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
 
-          {/* <ProductsProfile /> */}
-        </Tab>
-      </Tabs>
+              {/* <ProductsProfile /> */}
+            </Tab>
+          </Tabs>
+        </div>
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              color="primary"
+              isDisabled={!canSubmit}
+              className="mt-10 w-full"
+              type="submit"
+              disabled={!canSubmit}
+            >
+              {isSubmitting ? "..." : "Сохранить"}
+            </Button>
+          )}
+        />
+      </form>
     </div>
   );
 };

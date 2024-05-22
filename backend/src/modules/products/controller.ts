@@ -70,7 +70,6 @@ export const productsController = new Elysia({
       drizzle,
       query: { limit, offset, sort, filters, fields },
     }) => {
-      console.log(user)
       if (!user) {
         return {
           message: "User not found",
@@ -159,7 +158,18 @@ export const productsController = new Elysia({
         .where(eq(products.id, id))
         .execute();
 
-      return product[0];
+      let res = product[0];
+
+      res.properties = {
+        fabric_type: res.properties?.fabric_type ?? "",
+        raw_material: res.properties?.raw_material ?? "",
+        fabric_density: res.properties?.fabric_density ?? "",
+        color_and_design: res.properties?.color_and_design ?? "",
+        strength_resistance: res.properties?.strength_resistance ?? "",
+        product_tech: res.properties?.product_tech ?? "",
+      }
+
+      return res;
     },
     {
       params: t.Object({

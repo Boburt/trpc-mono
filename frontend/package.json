@@ -45,6 +45,7 @@
     "@nextui-org/pagination": "^2.0.26",
     "@nextui-org/radio": "^2.0.25",
     "@nextui-org/scroll-shadow": "^2.1.12",
+    "@nextui-org/skeleton": "^2.0.27",
     "@nextui-org/spinner": "^2.0.24",
     "@nextui-org/switch": "^2.0.25",
     "@nextui-org/system": "^2.0.15",
