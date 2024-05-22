@@ -71,20 +71,5 @@ $userData.set(Astro.locals.user);
     <Footer />
     <Toaster richColors client:load />
     <script type="text/partytown" src="/openlines_b24.js"></script>
-    <script is:inline src="/node_modules/preline/preline.js"></script>
-    <script is:inline>
-      window.onload = function () {
-        setTimeout(function () {
-          if (window.HSStaticMethods) {
-            console.log("HSStaticMethods", window.HSStaticMethods);
-            window.HSStaticMethods.autoInit();
-          }
-        }, 100);
-        // if (window.HSStaticMethods) {
-        //   console.log("HSStaticMethods", window.HSStaticMethods);
-        //   window.HSStaticMethods.autoInit();
-        // }
-      };
-    </script>
   </body>
 </html>
