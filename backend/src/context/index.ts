@@ -1,8 +1,8 @@
 import Elysia, { Context, error } from "elysia";
 import { drizzleDb } from "@backend/lib/db";
-import cors from "@elysiajs/cors";
+import { cors } from "@elysiajs/cors";
 import jwt from "@backend/jwt";
-import bearer from "@elysiajs/bearer";
+import { bearer } from "@elysiajs/bearer";
 import { verifyJwt } from "@backend/lib/bcrypt";
 import { users, users_roles } from "backend/drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -121,37 +121,38 @@ export const ctx = new Elysia({
   )
   .use(bearer())
   .use(jwt)
-  .derive(async ({ bearer, cacheController, query }) => {
-    let token = bearer;
+  .derive(
+    { as: "global" }, async ({ bearer, cacheController, query }) => {
+      let token = bearer;
 
-    if (query && query.token) {
-      token = query.token;
-    }
+      if (query && query.token) {
+        token = query.token;
+      }
 
-    if (!token) {
-      return {
-        user: null,
-      };
-    }
-
-    try {
-      if (token == process.env.API_TOKEN) {
+      if (!token) {
         return {
           user: null,
         };
       }
 
-      const res = await cacheController.getCachedUserDataByToken(token);
+      try {
+        if (token == process.env.API_TOKEN) {
+          return {
+            user: null,
+          };
+        }
 
-      return {
-        user: res,
-      };
-    } catch (error) {
-      console.log("error", error);
-      return {
-        user: null,
-      };
-    }
-  });
+        const res = await cacheController.getCachedUserDataByToken(token);
+
+        return {
+          user: res,
+        };
+      } catch (error) {
+        console.log("error", error);
+        return {
+          user: null,
+        };
+      }
+    });
 
 export type ContextType = Context<any, any, any>;
