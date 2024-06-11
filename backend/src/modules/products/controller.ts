@@ -5,7 +5,7 @@ import {
   products,
   permissions,
 } from "../../../drizzle/schema";
-import { InferSelectModel, eq, sql, SQLWrapper, and } from "drizzle-orm";
+import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc } from "drizzle-orm";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
@@ -54,7 +54,7 @@ export const productsController = new Elysia({
         data: t.Object({
           active: t.Boolean(),
           name: t.String(),
-          description: t.Optional(t.String()),
+          description: t.Optional(t.Nullable(t.String())),
           price: t.Optional(t.Nullable(t.Number())),
           properties: t.Optional(t.Record(t.String(), t.Any())),
         }),
@@ -119,6 +119,7 @@ export const productsController = new Elysia({
         .where(and(...whereClause))
         .limit(+limit)
         .offset(+offset)
+        .orderBy(desc(products.created_at))
         .execute()) as InferSelectModel<typeof products>[];
 
       return {
@@ -213,7 +214,7 @@ export const productsController = new Elysia({
         data: t.Object({
           active: t.Optional(t.Boolean()),
           name: t.Optional(t.String()),
-          description: t.Optional(t.String()),
+          description: t.Optional(t.Nullable(t.String())),
           price: t.Optional(t.Nullable(t.Number())),
         }),
         fields: t.Optional(t.Array(t.String())),

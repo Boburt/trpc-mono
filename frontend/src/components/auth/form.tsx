@@ -22,7 +22,7 @@ export default function AuthForm({
   const getMyData = async () => {
     setIsLoading(true);
     const { data, error } = await apiClient.api.users.me.get({
-      $headers: {
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     });

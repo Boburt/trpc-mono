@@ -20,7 +20,7 @@ let {
 const pathname = new URL(Astro.request.url).pathname;
 const url = Astro.url.pathname + Astro.url.search;
 const seoLink = await apiClient.api.seo_links.by_link.get({
-  $query: {
+  query: {
     link: url,
   },
 });
