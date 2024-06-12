@@ -426,7 +426,7 @@ export class CacheControlService {
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
       );
-    } catch (e) { }
+    } catch (e) {}
   }
 
   async getCachedUserDataByToken(accessToken: string): Promise<{

@@ -35,7 +35,6 @@ const authOptions: AuthOptions = {
             } else {
               return null;
             }
-
           } catch (error) {
             return null;
           }
