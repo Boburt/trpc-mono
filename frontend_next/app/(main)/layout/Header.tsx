@@ -46,6 +46,34 @@ const menuItems = [
     label: "Логисты",
     href: "/logistics",
   },
+  {
+    label: "Блог",
+    href: "/blog",
+  },
+  {
+    label: "Каталог",
+    href: "/catalog",
+  },
+  {
+    label: "Контакты",
+    href: "/contact",
+  },
+  {
+    label: "FAQ",
+    href: "/faq",
+  },
+  {
+    label: "Логин",
+    href: "/login",
+  },
+  {
+    label: "Производители",
+    href: "/manufacturers",
+  },
+  {
+    label: "Новости",
+    href: "/news",
+  },
 ];
 
 export default function Header() {
