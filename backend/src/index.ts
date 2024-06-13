@@ -71,39 +71,44 @@ const app = new Elysia()
           ws.unsubscribe(conversation_id);
           ws.send('unsubscribed');
         } else if (type === 'publish') {
-          const newMessage = await ws.data.drizzle.insert(messages).values({
-            conversation_id: conversation_id,
-            sender_id: ws.data.user.user.id,
-            message: message,
-            sent_at: new Date().toISOString()
-          }).returning({
-            id: messages.id,
-          }).execute();
-
-          const messageData = await ws.data.drizzle
-            .select({
+          try {
+            const newMessage = await ws.data.drizzle.insert(messages).values({
+              conversation_id: conversation_id,
+              sender_id: ws.data.user.user.id,
+              message: message,
+              sent_at: new Date().toISOString()
+            }).returning({
               id: messages.id,
-              message: messages.message,
-              sent_at: messages.sent_at,
-              user: {
-                id: users.id,
-                first_name: users.first_name,
-                last_name: users.last_name
-              },
-            })
-            .from(messages)
-            .leftJoin(users, eq(messages.sender_id, users.id))
-            .where(eq(messages.id, newMessage[0].id))
-            .execute();
+            }).execute();
 
-          ws.send({
-            ...messageData[0],
-            type: 'message'
-          })
-          return ws.publish(conversation_id, {
-            ...messageData[0],
-            type: 'message'
-          });
+            const messageData = await ws.data.drizzle
+              .select({
+                id: messages.id,
+                message: messages.message,
+                sent_at: messages.sent_at,
+                user: {
+                  id: users.id,
+                  first_name: users.first_name,
+                  last_name: users.last_name
+                },
+              })
+              .from(messages)
+              .leftJoin(users, eq(messages.sender_id, users.id))
+              .where(eq(messages.id, newMessage[0].id))
+              .execute();
+
+            ws.send({
+              ...messageData[0],
+              type: 'message'
+            })
+            return ws.publish(conversation_id, {
+              ...messageData[0],
+              type: 'message'
+            });
+          } catch (e) {
+            console.log(e);
+          }
+
         }
 
       } catch (error) {

@@ -55,7 +55,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const accessToken = context.cookies.get("x-token")?.value;
   if (accessToken) {
     const { data, error } = await apiClient.api.users.me.get({
-      $headers: {
+      headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });

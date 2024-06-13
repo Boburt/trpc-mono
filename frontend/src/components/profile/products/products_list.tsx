@@ -83,7 +83,7 @@ export default function ProductsList() {
     ],
     queryFn: async () => {
       const { data } = await apiClient.api.products.get({
-        $query: {
+        query: {
           limit: rowsPerPage,
           offset: (page - 1) * rowsPerPage,
           fields: "id,name,description,active,price,properties,stock_quantity",
@@ -95,7 +95,7 @@ export default function ProductsList() {
             },
           ]),
         },
-        $headers: {
+        headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
