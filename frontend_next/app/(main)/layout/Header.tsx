@@ -74,6 +74,15 @@ const menuItems = [
     label: "Новости",
     href: "/news",
   },
+  {
+    label: " Политика конфиденциальности",
+    href: "/privace",
+  },
+
+  {
+    label: "Услуги",
+    href: "/services",
+  },
 ];
 
 export default function Header() {
