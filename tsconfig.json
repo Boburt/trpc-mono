@@ -21,7 +21,8 @@
       "@lib/*": ["./lib/*"],
       "@components/*": ["./admin/components/*"],
       "@/*": ["./b2b/*"],
-      "@uploads/*": ["./uploads/*"]
+      "@uploads/*": ["./uploads/*"],
+      "@frontend_next/*": ["./frontend_next/*"]
     }
   }
 }
