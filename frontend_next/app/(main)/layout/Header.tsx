@@ -50,24 +50,6 @@ const menuItems = [
 
 export default function Header() {
   const pathname = usePathname();
-  // return (
-  //   <NavigationMenu>
-  //     <NavigationMenuList>
-  //       {menuItems.map((item) => (
-  //         <NavigationMenuItem key={item.href}>
-  //           <Link color="foreground" href={item.href} legacyBehavior passHref>
-  //             <NavigationMenuLink
-  //               className={navigationMenuTriggerStyle()}
-  //               active={pathname.startsWith(item.href)}
-  //             >
-  //               {item.label}
-  //             </NavigationMenuLink>
-  //           </Link>
-  //         </NavigationMenuItem>
-  //       ))}
-  //     </NavigationMenuList>
-  //   </NavigationMenu>
-  // );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <Navbar

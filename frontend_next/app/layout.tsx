@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-white dark:bg-slate-900 flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-white dark:bg-slate-900 flex flex-col h-screen`}
       >
         <NextUIProviderClient>
           <Header />
