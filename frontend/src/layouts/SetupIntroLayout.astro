@@ -1,0 +1,27 @@
+---
+import "../styles/global.css";
+
+import { GoogleFontsOptimizer } from "astro-google-fonts-optimizer";
+import { ViewTransitions } from "astro:transitions";
+import { VscOrganization, VscPerson, VscProject } from "react-icons/vsc";
+
+let { title, showHeaderFilter = false } = Astro.props;
+const pathname = new URL(Astro.request.url).pathname;
+const url = Astro.url.pathname + Astro.url.search;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <GoogleFontsOptimizer
+      url="https://fonts.googleapis.com/css2?family=Damion&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&family=Sonsie+One&display=swap"
+    />
+    <ViewTransitions />
+    <title>{title ?? "Лёгкая промышленность"}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

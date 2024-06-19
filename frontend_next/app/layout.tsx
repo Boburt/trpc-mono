@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
 import Container from "./(main)/layout/Container";
 import Header from "./(main)/layout/Header";
+import Footer from "./(main)/layout/Footer";
 import dynamic from "next/dynamic";
+import { BreadCrumbs } from "../components/breadcrumbs/breadcrumbs";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -53,9 +55,11 @@ export default function RootLayout({
               crumbs={customCrumbs}
             />
           )} */}
-            <Container>{children}</Container>
+            <Container>
+              <BreadCrumbs>{children}</BreadCrumbs>
+            </Container>
           </main>
-          {/* <Footer /> */}
+          <Footer />
           <Toaster richColors />
         </NextUIProviderClient>
       </body>

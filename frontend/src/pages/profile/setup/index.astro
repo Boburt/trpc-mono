@@ -1,7 +1,8 @@
 ---
-import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
+import SetupIntroLayout from "@frontend/src/layouts/SetupIntroLayout.astro";
+import { SetupNewUserWizard } from "@frontend/src/components/profile/setup/SetupNewUserWizard";
 ---
 
-<BaseLayout>
-  <h1 class="text-4xl dark:text-white font-bold">Setup</h1>
-</BaseLayout>
+<SetupIntroLayout>
+  <SetupNewUserWizard />
+</SetupIntroLayout>
