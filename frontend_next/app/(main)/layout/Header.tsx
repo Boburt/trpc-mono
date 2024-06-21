@@ -123,7 +123,10 @@ export default function Header() {
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {menuItems.map((item, index) => (
-          <NavbarItem key={item.href} isActive={pathname.startsWith(item.href)}>
+          <NavbarItem
+            key={`${item}-${index}`}
+            isActive={pathname.startsWith(item.href)}
+          >
             <Link color="foreground" href={item.href}>
               {item.label}
             </Link>
