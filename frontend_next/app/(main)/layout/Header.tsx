@@ -1,29 +1,16 @@
 "use client";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-  navigationMenuTriggerStyle,
-} from "@frontend_next/components/ui/navigation-menu";
-import {
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
   NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
 } from "@nextui-org/navbar";
-import { Button } from "@nextui-org/react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { SignInButton } from "@frontend_next/components/auth/SignInButton";
 
 const menuItems = [
   {
@@ -51,24 +38,12 @@ const menuItems = [
     href: "/blog",
   },
   {
-    label: "Каталог",
-    href: "/catalog",
-  },
-  {
     label: "Контакты",
     href: "/contact",
   },
   {
     label: "FAQ",
     href: "/faq",
-  },
-  {
-    label: "Логин",
-    href: "/login",
-  },
-  {
-    label: "Производители",
-    href: "/manufacturers",
   },
   {
     label: "Новости",
@@ -131,19 +106,9 @@ export default function Header() {
         ))}
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem>
-          {/* <SignInButton userData={userData} permissions={permissions!} /> */}
-        </NavbarItem>
+        <SignInButton />
+        {/* <SignInButton userData={userData} permissions={permissions!} /> */}
       </NavbarContent>
-      <NavbarMenu>
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
-            <Link color="foreground" className="w-full" href={item.href}>
-              {item.label}
-            </Link>
-          </NavbarMenuItem>
-        ))}
-      </NavbarMenu>
     </Navbar>
   );
 }

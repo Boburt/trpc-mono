@@ -24,7 +24,7 @@ export default function Catalog() {
         {catalog &&
           catalog?.length > 0 &&
           catalog.map((catal) => (
-            <a href="/manufacturers">
+            <a href="/manufacturers" key={catal.name}>
               <div className="p-4 md:p-7 bg-gray-100 rounded-lg h-24 dark:bg-slate-800 flex space-x-2 items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -33,9 +33,9 @@ export default function Catalog() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="lucide lucide-badge-check dark:text-green-50"
                 >
                   <>
