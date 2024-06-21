@@ -1,7 +1,6 @@
 "use client";
-
-import { cn } from "@frontend_next/lib/utils";
 import * as React from "react";
+import { cn } from "@frontend_next/lib/utils";
 import { StepperProvider } from "./context";
 import { Step } from "./step";
 import type { StepItem, StepProps, StepperProps } from "./types";

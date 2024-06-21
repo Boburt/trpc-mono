@@ -16,34 +16,36 @@ import {
   RadioGroupItem,
 } from "@frontend_next/components/ui/radio-group";
 import { SignupWizardFirstStep } from "./steps/first";
-import { CustomerSecondStep } from "../sign-up/stepper-forms/customer/second-step";
+import { SignupWizardSecondStep } from "./steps/second";
+import { SignupWizardThirdStep } from "./steps/third";
+import { SignupWizardFourthStep } from "./steps/fourth";
 
 const steps = [
-  { label: "Step 1" },
-  { label: "Step 2" },
-  { label: "Step 3" },
-  { label: "Step 4" },
+  { label: "Step 1", id: "step_1" },
+  { label: "Step 2", id: "step_2" },
+  { label: "Step 3", id: "step_3" },
+  { label: "Step 4", id: "step_4" },
 ] satisfies StepItem[];
 
 const stepComponents: Record<string, React.FC> = {
-  "Step 1": SignupWizardFirstStep,
-  "Step 2": CustomerSecondStep,
+  step_1: SignupWizardFirstStep,
+  step_2: SignupWizardSecondStep,
+  step_3: SignupWizardThirdStep,
+  step_4: SignupWizardFourthStep,
 };
 
-export default function StepperOrientation() {
+export const StepperOrientation = () => {
   const [orientation, setOrientation] =
     React.useState<StepperProps["orientation"]>("vertical");
   return (
     <div className="flex w-full flex-col gap-4">
       <Stepper orientation={orientation} initialStep={0} steps={steps}>
         {steps.map((stepProps, index) => {
-          const CurrentStep = stepComponents[stepProps.label];
+          const CurrentStep = stepComponents[stepProps.id];
           return (
             <Step key={stepProps.label} {...stepProps}>
-              <div className="flex items-center justify-center my-4 border bg-secondary text-primary rounded-md">
-                <h1 className="text-xl">
-                  <CurrentStep />
-                </h1>
+              <div className="my-4 border bg-secondary text-primary rounded-md">
+                {CurrentStep && <CurrentStep />}
               </div>
             </Step>
           );
@@ -52,7 +54,7 @@ export default function StepperOrientation() {
       </Stepper>
     </div>
   );
-}
+};
 
 const Footer = () => {
   const {
