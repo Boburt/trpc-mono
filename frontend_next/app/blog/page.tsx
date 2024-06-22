@@ -130,7 +130,7 @@ export default function Blog() {
                 data-te-ripple-color="light"
               >
                 <img src={item.image_url} className="w-full" alt="Louvre" />
-                <a href={item.id}>
+                <a href={`/blog/${item.id}`}>
                   <div className="absolute top-0 right-0 bottom-0 left-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98.4%,0.2)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
                 </a>
               </div>
