@@ -9,6 +9,7 @@ import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc } from "drizzle-o
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
+import { ProductProperties } from "./dtos/one.dto";
 
 export const productsController = new Elysia({
   name: "@api/products",
@@ -168,7 +169,7 @@ export const productsController = new Elysia({
         color_and_design: res.properties?.color_and_design ?? "",
         strength_resistance: res.properties?.strength_resistance ?? "",
         product_tech: res.properties?.product_tech ?? "",
-      }
+      } as ProductProperties;
 
       return res;
     },

@@ -1,48 +1,33 @@
-import * as React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import type { FieldApi } from "@tanstack/react-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { Switch } from "@nextui-org/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@nextui-org/button";
-import { apiClient } from "@frontend/src/utils/eden";
+import { apiClient } from "@frontend_next/lib/eden";
 import { toast } from "sonner";
-import { useCookieState } from "use-cookie-state";
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import FileUploadField from "@frontend/src/components/elements/file-upload";
 import { Tabs, Tab } from "@nextui-org/tabs";
-import { Card, CardBody } from "@nextui-org/card";
-import { ProductsProfile } from "./products_profile";
 import { Input, Textarea } from "@nextui-org/input";
 import { Skeleton } from "@nextui-org/skeleton";
-import { Form, FormControl, FormField, FormItem } from "../../ui/form";
 import {
   FileInput,
   FileUploader,
   FileUploaderContent,
   FileUploaderItem,
-} from "../../ui/file-uploader";
+} from "@frontend_next/components/ui/file-uploader";
 import { DropzoneOptions } from "react-dropzone";
-import { cn } from "@admin/lib/utils";
-import { buttonVariants } from "../../ui/button";
-import { Paperclip, UploadCloud } from "lucide-react";
-import { AspectRatio } from "../../ui/aspect-ratio";
+import { UploadCloud } from "lucide-react";
+import { AspectRatio } from "@frontend_next/components/ui/aspect-ratio";
+import { useSession } from "next-auth/react";
+import { ProductProperties } from "@backend/modules/products/dtos/one.dto";
+import { ModalFooter } from "@nextui-org/react";
 
-interface Properties {
-  fabric_type: string;
-  raw_material: string;
-  fabric_density: string;
-  color_and_design: string;
-  strength_resistance: string;
-  product_tech: string;
-}
 interface ProductFormValues {
   active: boolean;
   name: string;
   description: string | null;
   price?: number | null;
-  files: File[] | null;
-  properties: Properties | null;
+  files?: File[] | null;
+  properties: ProductProperties | null;
 }
 
 export const ProductAddingForm = ({
@@ -52,7 +37,8 @@ export const ProductAddingForm = ({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) => {
-  const [accessToken, setAccessToken] = useCookieState("x-token", "");
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
 
   const { data: record, isLoading: isRecordLoading } = useQuery({
     queryKey: ["one_product", recordId],
@@ -104,7 +90,8 @@ export const ProductAddingFormWithData = ({
   recordId?: string;
   defaultValues?: ProductFormValues;
 }) => {
-  const [accessToken, setAccessToken] = useCookieState("x-token", "");
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const dropzone = {
     multiple: true,
@@ -114,7 +101,12 @@ export const ProductAddingFormWithData = ({
       "image/*": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
     },
   } satisfies DropzoneOptions;
-  const form = useForm<ProductFormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductFormValues>({
     defaultValues: defaultValues ?? {
       active: false,
       name: "",
@@ -132,29 +124,29 @@ export const ProductAddingFormWithData = ({
     },
   });
 
-  const onSubmit: SubmitHandler<ProductFormValues> = async (value) => {
-    console.log(value);
+  const onSubmit: SubmitHandler<ProductFormValues> = (value) => {
     if (recordId) {
       updateMutation.mutate({
         data: {
           active: value.active,
           name: value.name,
           files: value.files,
-          description: value.description,
+          description: value.description ?? "",
           price: value.price,
           properties: value.properties,
         },
         id: recordId,
       });
-    } else
+    } else {
       createMutation.mutate({
         active: value.active,
         name: value.name,
         files: value.files,
-        description: value.description,
+        description: value.description ?? "",
         price: value.price,
         properties: value.properties,
       });
+    }
   };
 
   const onAddSuccess = (actionText: string) => {
@@ -178,7 +170,7 @@ export const ProductAddingFormWithData = ({
       name: string;
       description?: string;
       price?: number | null;
-      properties: Properties;
+      properties: ProductProperties | null;
     }) => {
       return apiClient.api.products.post(
         {
@@ -210,7 +202,7 @@ export const ProductAddingFormWithData = ({
         name: string;
         description?: string;
         price?: number | null;
-        properties: Properties;
+        properties: ProductProperties | null;
       };
       id: string;
     }) => {
@@ -248,301 +240,231 @@ export const ProductAddingFormWithData = ({
 
   return (
     <div className="flex w-full flex-col flex-grow">
-      <Form {...form}>
-        <form
-          className="flex flex-col h-full"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <div className="flex-grow">
-            <Tabs aria-label="Options">
-              <Tab key="photos" title="Общие">
-                <FormField
-                  control={form.control}
+      <form className="flex flex-col h-full" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex-grow">
+          <Tabs aria-label="Options">
+            <Tab key="photos" title="Общие">
+              <div className="space-y-4">
+                <Controller
                   name="active"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                    </div>
+                    <Switch checked={field.value} onChange={field.onChange}>
+                      Активен
+                    </Switch>
                   )}
                 />
-                {/* A type-safe field component*/}
-                <FormField
-                  control={form.control}
+                <Controller
                   name="name"
-                  // validators={{
-                  //   onChange: ({ value }) =>
-                  //     !value
-                  //       ? "A product name is required"
-                  //       : value.length < 2
-                  //       ? "Product name must be at least 2 characters"
-                  //       : undefined,
-                  //   onChangeAsyncDebounceMs: 500,
-                  //   onChangeAsync: async ({ value }) => {
-                  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-                  //     return (
-                  //       value.includes("error") &&
-                  //       'No "error" allowed in product name'
-                  //     );
-                  //   },
-                  // }}
-                  render={({ field }) => {
-                    // Avoid hasty abstractions. Render props are great!
-                    return (
-                      <div>
-                        <FormControl>
-                          <Input
-                            label="Название продукта"
-                            labelPlacement="outside"
-                            placeholder="Введите название продукта"
-                            onValueChange={field.onChange}
-                            variant="bordered"
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                    );
-                  }}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      label="Название продукта"
+                      placeholder="Введите название продукта"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.name}
+                      errorMessage={errors.name?.message}
+                      variant="bordered"
+                    />
+                  )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="description"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Textarea
-                          label="Описание продукта"
-                          labelPlacement="outside"
-                          placeholder="Введите описание продукта"
-                          variant="bordered"
-                          {...field}
-                          value={field.value ? field.value.toString() : ""}
-                        />
-                      </FormControl>
-                    </div>
+                    <Textarea
+                      label="Описание продукта"
+                      placeholder="Введите описание продукта"
+                      onChange={field.onChange}
+                      value={field.value ?? ""}
+                      isInvalid={!!errors.description}
+                      errorMessage={errors.description?.message}
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="price"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Цена"
-                          labelPlacement="outside"
-                          placeholder="Цена"
-                          type="number"
-                          endContent={
-                            <div className="pointer-events-none flex items-center">
-                              <span className="text-default-400 text-small">
-                                сум
-                              </span>
-                            </div>
-                          }
-                          variant="bordered"
-                          {...field}
-                          value={field.value ? field.value.toString() : ""}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Цена"
+                      placeholder="Цена"
+                      type="number"
+                      onChange={field.onChange}
+                      value={field.value ? field.value.toString() : ""}
+                      isInvalid={!!errors.price}
+                      errorMessage={errors.price?.message}
+                      endContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">
+                            сум
+                          </span>
+                        </div>
+                      }
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="files"
+                  control={control}
                   render={({ field }) => (
                     <div className="relative">
-                      <FormItem>
-                        <FileUploader
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          dropzoneOptions={dropzone}
-                        >
-                          <FileInput className="w-full px-4 py-5 flex flex-col my-3 items-center text-sm rounded-lg border border-gray-300 bg-white">
-                            <UploadCloud />
-                            <div>
-                              <span className="font-bold">Кликните здесь</span>{" "}
-                              или перетащите файлы сюда
-                            </div>
-                            <div>JPG, PNG, GIF, WEBP</div>
-                          </FileInput>
-                          {field.value && field.value.length > 0 && (
-                            <FileUploaderContent className="p-2  w-full -ml-3 rounded-b-none rounded-t-md flex-row gap-2 grid grid-cols-4">
-                              {field.value.map((file, i) => (
-                                <FileUploaderItem
-                                  key={i}
-                                  index={i}
-                                  aria-roledescription={`file ${
-                                    i + 1
-                                  } containing ${file.name}`}
-                                  className="p-0 size-20"
-                                >
-                                  <AspectRatio className="size-full">
-                                    <img
-                                      src={URL.createObjectURL(file)}
-                                      alt={file.name}
-                                      className="aspect-square rounded-md"
-                                    />
-                                  </AspectRatio>
-                                </FileUploaderItem>
-                              ))}
-                            </FileUploaderContent>
-                          )}
-                        </FileUploader>
-                      </FormItem>
+                      <FileUploader
+                        value={field.value ?? null}
+                        onValueChange={field.onChange}
+                        dropzoneOptions={dropzone}
+                      >
+                        <FileInput className="w-full px-4 py-5 flex flex-col my-3 items-center text-sm rounded-lg border border-gray-300 bg-white">
+                          <UploadCloud />
+                          <div>
+                            <span className="font-bold">Кликните здесь</span>{" "}
+                            или перетащите файлы сюда
+                          </div>
+                          <div>JPG, PNG, GIF, WEBP</div>
+                        </FileInput>
+                        {field.value && field.value.length > 0 && (
+                          <FileUploaderContent className="p-2  w-full -ml-3 rounded-b-none rounded-t-md flex-row gap-2 grid grid-cols-4">
+                            {field.value.map((file, i) => (
+                              <FileUploaderItem
+                                key={i}
+                                index={i}
+                                aria-roledescription={`file ${
+                                  i + 1
+                                } containing ${file.name}`}
+                                className="p-0 size-20"
+                              >
+                                <AspectRatio className="size-full">
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="aspect-square rounded-md"
+                                  />
+                                </AspectRatio>
+                              </FileUploaderItem>
+                            ))}
+                          </FileUploaderContent>
+                        )}
+                      </FileUploader>
                     </div>
                   )}
                 />
-                {/* <div>
-            <FileUploadField
-              model="products"
-              model_id={recordId}
-              onValueChange={(item) => setImageId(item)}
-              code="main"
-            />
-          </div> */}
-
-                {/* <div>
-                    <form.Field
-                      name="quantity"
-                      children={(field) => (
-                        <>
-                          <label htmlFor={field.name}>Количество:</label>
-                          <input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) =>
-                              field.handleChange(+e.target.value)
-                            }
-                            type="number"
-                            className="py-3 px-4 block w-full bg-gray-100 border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                          />
-                          <FieldInfo field={field} />
-                        </>
-                      )}
-                    />
-                  </div> */}
-              </Tab>
-              <Tab key="properties" title="Характеристики">
-                <FormField
-                  control={form.control}
+              </div>
+            </Tab>
+            <Tab key="properties" title="Характеристики">
+              <div className="space-y-4">
+                <Controller
                   name="properties.fabric_type"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Тип ткани"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Тип ткани"
+                      placeholder="Введите тип ткани"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.fabric_type}
+                      errorMessage={errors.properties?.fabric_type?.message}
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="properties.raw_material"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Сырьё"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Сырьё"
+                      placeholder="Введите сырьё"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.raw_material}
+                      errorMessage={errors.properties?.raw_material?.message}
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="properties.fabric_density"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Плотность ткани"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Плотность ткани"
+                      placeholder="Введите плотность ткани"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.fabric_density}
+                      errorMessage={errors.properties?.fabric_density?.message}
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="properties.color_and_design"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Цвет и дизайн"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Цвет и дизайн"
+                      placeholder="Введите цвет и дизайн"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.color_and_design}
+                      errorMessage={
+                        errors.properties?.color_and_design?.message
+                      }
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="properties.strength_resistance"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Прочность и износостойкость"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Прочность и износостойкость"
+                      placeholder="Введите прочность и износостойкость"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.strength_resistance}
+                      errorMessage={
+                        errors.properties?.strength_resistance?.message
+                      }
+                      variant="bordered"
+                    />
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="properties.product_tech"
+                  control={control}
                   render={({ field }) => (
-                    <div>
-                      <FormControl>
-                        <Input
-                          label="Технологии производства"
-                          labelPlacement="outside"
-                          variant="bordered"
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
+                    <Input
+                      label="Технологии производства"
+                      placeholder="Введите технологии производства"
+                      onChange={field.onChange}
+                      value={field.value}
+                      isInvalid={!!errors.properties?.product_tech}
+                      errorMessage={errors.properties?.product_tech?.message}
+                      variant="bordered"
+                    />
                   )}
                 />
-
-                {/* <ProductsProfile /> */}
-              </Tab>
-            </Tabs>
-          </div>
+              </div>
+            </Tab>
+          </Tabs>
+        </div>
+        <ModalFooter>
           <Button
             color="primary"
-            isDisabled={form.formState.isSubmitting}
-            className="mt-10 w-full"
             type="submit"
-            disabled={form.formState.isSubmitting}
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+            className="grow"
           >
-            {form.formState.isSubmitting ? "..." : "Сохранить"}
+            Сохранить
           </Button>
-        </form>
-      </Form>
+        </ModalFooter>
+      </form>
     </div>
   );
 };

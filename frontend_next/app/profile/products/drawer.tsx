@@ -17,14 +17,14 @@ export function ProductDrawer({ record_id }: { record_id?: string }) {
   return (
     <>
       <Button
-        isIconOnly
-        size="sm"
+        isIconOnly={record_id ? true : false}
+        size={record_id ? "sm" : "md"}
         onPress={() => setOpen(true)}
         color="primary"
         endContent={!record_id && <PlusIcon />}
       >
         {record_id ? (
-          <Edit2Icon className="text-default-500" />
+          <Edit2Icon className="text-default-500 h-4 w-4" />
         ) : (
           "Добавить новый продукт"
         )}
@@ -34,12 +34,13 @@ export function ProductDrawer({ record_id }: { record_id?: string }) {
         onOpenChange={(isOpen) => setOpen(isOpen)}
         placement="auto"
         backdrop="blur"
+        size="lg"
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Добавить обращение
+                {record_id ? "Редактировать продукт" : "Добавить новый продукт"}
               </ModalHeader>
               <ModalBody>
                 {open && (

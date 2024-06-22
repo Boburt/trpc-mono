@@ -17,8 +17,10 @@ import {
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const UserDropDown = ({ session }: { session: Session }) => {
+  const router = useRouter();
   let userData = session!.user!;
   const userName = [userData.first_name, userData.last_name]
     .filter((x) => x)
@@ -67,7 +69,8 @@ export const UserDropDown = ({ session }: { session: Session }) => {
             key="profile"
             textValue="Профиль"
             startContent={<CircleUser />}
-            href="/login"
+            href="/profile"
+            onPress={() => router.push("/profile")}
           >
             Профиль
           </DropdownItem>
@@ -78,6 +81,7 @@ export const UserDropDown = ({ session }: { session: Session }) => {
             closeOnSelect={false}
             href="/profile/products"
             as={Link}
+            onPress={() => router.push("/profile/products")}
           >
             Мои продукты
           </DropdownItem>
@@ -87,6 +91,7 @@ export const UserDropDown = ({ session }: { session: Session }) => {
             textValue="Сообщения"
             startContent={<MessageSquareText />}
             href="/profile/messages"
+            onPress={() => router.push("/profile/messages")}
           >
             Сообщения
           </DropdownItem>
@@ -96,6 +101,7 @@ export const UserDropDown = ({ session }: { session: Session }) => {
             textValue="Запросы"
             startContent={<MessageCircleQuestion />}
             href="/profile/requests"
+            onPress={() => router.push("/profile/requests")}
           >
             Обращения
           </DropdownItem>

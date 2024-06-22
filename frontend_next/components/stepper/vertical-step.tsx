@@ -1,10 +1,10 @@
+import * as React from "react";
 import {
   Collapsible,
   CollapsibleContent,
 } from "@frontend_next/components/ui/collapsible";
 import { cn } from "@frontend_next/lib/utils";
 import { cva } from "class-variance-authority";
-import * as React from "react";
 import { StepButtonContainer } from "./step-button-container";
 import { StepIcon } from "./step-icon";
 import { StepLabel } from "./step-label";
@@ -39,7 +39,7 @@ const verticalStepVariants = cva(
   }
 );
 
-const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
+export const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
   (props, ref) => {
     const {
       children,
@@ -189,5 +189,3 @@ const VerticalStep = React.forwardRef<HTMLDivElement, VerticalStepProps>(
 );
 
 VerticalStep.displayName = "VerticalStep";
-
-export { VerticalStep };

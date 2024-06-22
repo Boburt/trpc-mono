@@ -173,7 +173,7 @@ export default function ProductsList() {
               size="sm"
               variant="flat"
             >
-              {cellValue ? "active" : "paused"}
+              {cellValue ? "Активен" : "Не активен"}
             </Chip>
           );
         case "actions":

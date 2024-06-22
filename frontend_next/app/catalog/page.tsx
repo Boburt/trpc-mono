@@ -23,8 +23,8 @@ export default function Catalog() {
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5">
         {catalog &&
           catalog?.length > 0 &&
-          catalog.map((catal) => (
-            <a href="/manufacturers" key={catal.name}>
+          catalog.map((catal, index) => (
+            <a href="/manufacturers" key={index}>
               <div className="p-4 md:p-7 bg-gray-100 rounded-lg h-24 dark:bg-slate-800 flex space-x-2 items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
