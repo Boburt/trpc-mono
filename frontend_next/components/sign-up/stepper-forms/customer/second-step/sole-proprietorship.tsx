@@ -9,10 +9,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@frontend_next/components/ui/form";
-import { on } from "events";
 import { Separator } from "@frontend_next/components/ui/separator";
+import { roleStore } from "@frontend_next/store/zustand/roleStore";
+import { useStepper } from "@frontend_next/components/stepper/use-stepper";
+import { toast } from "sonner";
+import { Button } from "@frontend_next/components/ui/button";
 
 export const SoleProprietorshipSecondStep = () => {
+  const role = roleStore((state) => state.role);
+  const orgType = roleStore((state) => state.orgType);
+  const { nextStep, prevStep } = useStepper();
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -36,7 +42,12 @@ export const SoleProprietorshipSecondStep = () => {
     phone: string;
     email: string;
   }) => {
-    console.log("data", data);
+    const dataForMutation = {
+      ...data,
+      role: role,
+      org_type: orgType,
+    };
+    console.log("dataForMutation", dataForMutation);
   };
 
   return (
@@ -51,6 +62,10 @@ export const SoleProprietorshipSecondStep = () => {
           <FormField
             control={form.control}
             name="last_name"
+            rules={{
+              required: "Поле обязательно для заполнения",
+              minLength: { value: 3, message: "Минимум 3 символов" },
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Фамилия</FormLabel>
@@ -64,6 +79,10 @@ export const SoleProprietorshipSecondStep = () => {
           <FormField
             control={form.control}
             name="first_name"
+            rules={{
+              required: "Поле обязательно для заполнения",
+              minLength: { value: 3, message: "Минимум 3 символов" },
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Имя</FormLabel>
@@ -90,6 +109,10 @@ export const SoleProprietorshipSecondStep = () => {
           <FormField
             control={form.control}
             name="phone"
+            rules={{
+              required: "Поле обязательно для заполнения",
+              minLength: { value: 12, message: "Минимум 12 символов" },
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Контактный номер телефона</FormLabel>
@@ -107,6 +130,13 @@ export const SoleProprietorshipSecondStep = () => {
           <FormField
             control={form.control}
             name="email"
+            rules={{
+              required: "Поле обязательно для заполнения",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Неверный формат",
+              },
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Электронная почта</FormLabel>
@@ -121,6 +151,14 @@ export const SoleProprietorshipSecondStep = () => {
               </FormItem>
             )}
           />
+        </div>
+        <div className="w-full flex justify-between mt-6 gap-2">
+          <Button onClick={prevStep} size="sm" variant="secondary">
+            Предыдущий шаг
+          </Button>
+          <Button type="submit" size="sm">
+            Следующий шаг
+          </Button>
         </div>
       </form>
     </Form>
