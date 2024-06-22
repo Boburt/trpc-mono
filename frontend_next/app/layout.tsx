@@ -8,6 +8,9 @@ import Header from "./(main)/layout/Header";
 import Footer from "./(main)/layout/Footer";
 import dynamic from "next/dynamic";
 import { BreadCrumbs } from "../components/breadcrumbs/breadcrumbs";
+import { auth } from "@frontend_next/auth";
+import SessionProvider from "@frontend_next/components/providers/SessionProvider";
+import ReactQueryClientProvider from "@frontend_next/components/providers/ReactQueryProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,38 +33,52 @@ const NextUIProviderClient = dynamic(
   }
 );
 
-export default function RootLayout({
+const NextThemesProvider = dynamic(
+  () => import("next-themes").then((mod) => mod.ThemeProvider),
+  {
+    ssr: false,
+  }
+);
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-white dark:bg-slate-900 flex flex-col h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-white dark:bg-slate-900 `}
       >
-        <NextUIProviderClient>
-          <Header />
-          <main className="container mx-auto py-4 shrink-0">
-            {/* {title && pathname != "/" && (
+        <NextThemesProvider attribute="class">
+          <SessionProvider session={session}>
+            <ReactQueryClientProvider>
+              <NextUIProviderClient className="flex flex-col h-screen">
+                <Header />
+                <main className="container mx-auto py-4 shrink-0">
+                  {/* {title && pathname != "/" && (
             <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
               {title}
             </h1>
           )} */}
-            {/* {pathname !== "/" && disableBreadcrumbs == false && (
+                  {/* {pathname !== "/" && disableBreadcrumbs == false && (
             <Breadcrumbs
               indexText="Главная"
               mainBemClass="breadcrumbs"
               crumbs={customCrumbs}
             />
           )} */}
-            <Container>
-              <BreadCrumbs>{children}</BreadCrumbs>
-            </Container>
-          </main>
-          <Footer />
-          <Toaster richColors />
-        </NextUIProviderClient>
+                  <Container>
+                    <BreadCrumbs>{children}</BreadCrumbs>
+                  </Container>
+                </main>
+                <Footer />
+                <Toaster richColors />
+              </NextUIProviderClient>
+            </ReactQueryClientProvider>
+          </SessionProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );
