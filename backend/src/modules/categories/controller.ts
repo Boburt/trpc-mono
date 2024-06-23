@@ -80,21 +80,8 @@ export const categoriesController = new Elysia({
       }),
     }
   )
-  .get("/categories/cached", async ({ redis, user, set, cacheController }) => {
-    if (!user) {
-      set.status = 401;
-      return {
-        message: "User not found",
-      };
-    }
-
-    if (!user.permissions.includes("categories.list")) {
-      set.status = 401;
-      return {
-        message: "You don't have permissions",
-      };
-    }
-    const res = await cacheController.getCachedCategories({});
+  .get("/categories/public/tree", async ({ redis, user, set, cacheController }) => {
+    const res = await cacheController.getCategoryTree();
     return res;
   })
   .get(

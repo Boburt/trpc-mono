@@ -1,3 +1,5 @@
+import { Divider } from "@nextui-org/divider";
+
 export default function Catalog() {
   const catalog = [
     {
@@ -19,6 +21,8 @@ export default function Catalog() {
         <h2 className="text-xl font-semibold md:text-2xl md:leading-tight text-gray-800 dark:text-gray-200">
           Каталог продукции партнеров
         </h2>
+
+        <Divider className="my-2" />
       </div>
       <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5">
         {catalog &&

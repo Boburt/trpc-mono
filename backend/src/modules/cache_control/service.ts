@@ -15,6 +15,7 @@ import {
 import { InferSelectModel, eq } from "drizzle-orm";
 import { Redis } from "ioredis";
 import { RolesWithRelations } from "../roles/dto/roles.dto";
+import { TreeCategoryDto } from "../categories/dtos/tree.dto";
 
 export class CacheControlService {
   constructor(
@@ -25,6 +26,7 @@ export class CacheControlService {
     this.cacheRoles();
     this.cacheLangs();
     this.cacheCategories();
+    this.cacheTreeCategories();
     this.cacheImageSizes();
     this.cacheCities();
     this.cacheManufacturersPropertiesCategories();
@@ -154,6 +156,51 @@ export class CacheControlService {
       `${process.env.PROJECT_PREFIX}categories`,
       JSON.stringify(langs)
     );
+  }
+
+  async cacheTreeCategories() {
+    const categoriesList = await this.drizzle.select().from(categories).where(eq(categories.active, true)).execute();
+    for (const category of categoriesList) {
+      await this.redis.hmset(`category:${category.id}`, {
+        ...category,
+        i18n_name: JSON.stringify(category.i18n_name),
+      });
+
+      // Maintain a list of children for each category
+      if (category.parent_id !== null) {
+        await this.redis.sadd(`category:${category.parent_id}:children`, category.id);
+      } else {
+        // Maintain a list of root categories
+        await this.redis.sadd('root_categories', category.id);
+      }
+    }
+  }
+
+  async getCategoryById(id: string) {
+    // @ts-ignore
+    const category = await this.redis.hgetall(`category:${id}`) as TreeCategoryDto;
+    if (!category.id) return null;
+
+    const childrenIds = await this.redis.smembers(`category:${id}:children`);
+    const children = [];
+    for (const childId of childrenIds) {
+      const childCategory = await this.getCategoryById(childId);
+      if (childCategory) children.push(childCategory);
+    }
+
+    category.children = children;
+    return category;
+  }
+
+  // Retrieve the whole category tree
+  async getCategoryTree() {
+    const rootCategoryIds = await this.redis.smembers('root_categories');
+    const tree = [];
+    for (const rootCategoryId of rootCategoryIds) {
+      const category = await this.getCategoryById(rootCategoryId);
+      if (category) tree.push(category);
+    }
+    return tree;
   }
 
   // async getCachedCategories({
@@ -426,7 +473,7 @@ export class CacheControlService {
       await this.redis.del(
         `${process.env.PROJECT_PREFIX}user_data:${accessToken}`
       );
-    } catch (e) {}
+    } catch (e) { }
   }
 
   async getCachedUserDataByToken(accessToken: string): Promise<{
