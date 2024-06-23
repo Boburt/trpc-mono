@@ -48,6 +48,7 @@ export const SoleProprietorshipSecondStep = () => {
       org_type: orgType,
     };
     console.log("dataForMutation", dataForMutation);
+    nextStep();
   };
 
   return (
@@ -72,7 +73,7 @@ export const SoleProprietorshipSecondStep = () => {
                 <FormControl>
                   <Input placeholder="Введите Вашу фамилию..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -89,7 +90,7 @@ export const SoleProprietorshipSecondStep = () => {
                 <FormControl>
                   <Input placeholder="Введите Ваше имя..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -102,7 +103,7 @@ export const SoleProprietorshipSecondStep = () => {
                 <FormControl>
                   <Input placeholder="Введите Ваше отчество..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -111,7 +112,6 @@ export const SoleProprietorshipSecondStep = () => {
             name="phone"
             rules={{
               required: "Поле обязательно для заполнения",
-              minLength: { value: 12, message: "Минимум 12 символов" },
             }}
             render={({ field }) => (
               <FormItem>
@@ -120,10 +120,10 @@ export const SoleProprietorshipSecondStep = () => {
                   <Input
                     placeholder="Введите контактный номер телефона..."
                     {...field}
-                    type="phone"
+                    type="tel"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -147,7 +147,7 @@ export const SoleProprietorshipSecondStep = () => {
                     type="email"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />

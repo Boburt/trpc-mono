@@ -11,7 +11,11 @@ import {
 } from "@frontend_next/components/ui/form";
 import { Separator } from "@frontend_next/components/ui/separator";
 
+import { useStepper } from "@frontend_next/components/stepper/use-stepper";
+import { Button } from "@frontend_next/components/ui/button";
+
 export const LegalEntitySecondStep = () => {
+  const { nextStep, prevStep } = useStepper();
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -56,6 +60,7 @@ export const LegalEntitySecondStep = () => {
     extra_phone: string;
   }) => {
     console.log("data", data);
+    nextStep();
   };
 
   return (
@@ -70,26 +75,28 @@ export const LegalEntitySecondStep = () => {
           <FormField
             control={form.control}
             name="last_name"
+            rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Фамилия</FormLabel>
                 <FormControl>
                   <Input placeholder="Введите фамилию..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
             name="first_name"
+            rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Имя</FormLabel>
                 <FormControl>
                   <Input placeholder="Введите имя..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -109,19 +116,21 @@ export const LegalEntitySecondStep = () => {
           <FormField
             control={form.control}
             name="job_title"
+            rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Должность</FormLabel>
                 <FormControl>
                   <Input placeholder="Введите должность..." {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
             name="phone"
+            rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Контактный номер</FormLabel>
@@ -132,13 +141,20 @@ export const LegalEntitySecondStep = () => {
                     type="phone"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
             name="email"
+            rules={{
+              required: "Поле обязательно для заполнения",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Неверный формат",
+              },
+            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Электронная почта</FormLabel>
@@ -149,7 +165,7 @@ export const LegalEntitySecondStep = () => {
                     type="email"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-600" />
               </FormItem>
             )}
           />
@@ -248,6 +264,14 @@ export const LegalEntitySecondStep = () => {
               </FormItem>
             )}
           />
+        </div>
+        <div className="w-full flex justify-between mt-6 gap-2">
+          <Button onClick={prevStep} size="sm" variant="secondary">
+            Предыдущий шаг
+          </Button>
+          <Button type="submit" size="sm">
+            Следующий шаг
+          </Button>
         </div>
       </form>
     </Form>
