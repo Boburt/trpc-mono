@@ -11,6 +11,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { SignInButton } from "@frontend_next/components/auth/SignInButton";
+import { useMediaQuery } from "@frontend_next/lib/hooks";
+import { NavbarMenu, NavbarMenuItem } from "@nextui-org/react";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@frontend_next/components/ui/navigation-menu";
+import CatalogMenu from "./CatalogMenu";
+import { cn } from "@frontend_next/lib/utils";
 
 const menuItems = [
   {
@@ -33,39 +46,15 @@ const menuItems = [
     label: "Логисты",
     href: "/logistics",
   },
-  {
-    label: "Блог",
-    href: "/blog",
-  },
-  {
-    label: "Контакты",
-    href: "/contact",
-  },
-  {
-    label: "FAQ",
-    href: "/faq",
-  },
-  {
-    label: "Новости",
-    href: "/news",
-  },
-  {
-    label: " Политика конфиденциальности",
-    href: "/privace",
-  },
-
-  {
-    label: "Услуги",
-    href: "/services",
-  },
 ];
 
 export default function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <Navbar
-      shouldHideOnScroll
+      // isBordered
       onMenuOpenChange={setIsMenuOpen}
       maxWidth="2xl"
       classNames={{
@@ -97,21 +86,59 @@ export default function Header() {
         </NavbarBrand>
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavigationMenu>
+          <NavigationMenuList>
+            {menuItems.map((item, index) => (
+              <NavigationMenuItem key={index}>
+                {item.href === "/catalog" ? (
+                  <>
+                    <NavigationMenuTrigger>
+                      <Link href={item.href} legacyBehavior passHref>
+                        <NavigationMenuLink
+                          className={navigationMenuTriggerStyle()}
+                        >
+                          {item.label}
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="border-0 shadow-lg">
+                      <CatalogMenu />
+                    </NavigationMenuContent>
+                  </>
+                ) : (
+                  <Link href={item.href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        "hover:bg-default-100"
+                      )}
+                    >
+                      {item.label}
+                    </NavigationMenuLink>
+                  </Link>
+                )}
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </NavbarContent>
+
+      <NavbarContent justify="end">
+        <SignInButton />
+        {/* <SignInButton userData={userData} permissions={permissions!} /> */}
+      </NavbarContent>
+      <NavbarMenu>
         {menuItems.map((item, index) => (
-          <NavbarItem
+          <NavbarMenuItem
             key={`${item}-${index}`}
             isActive={pathname.startsWith(item.href)}
           >
             <Link color="foreground" href={item.href}>
               {item.label}
             </Link>
-          </NavbarItem>
+          </NavbarMenuItem>
         ))}
-      </NavbarContent>
-      <NavbarContent justify="end">
-        <SignInButton />
-        {/* <SignInButton userData={userData} permissions={permissions!} /> */}
-      </NavbarContent>
+      </NavbarMenu>
     </Navbar>
   );
 }
