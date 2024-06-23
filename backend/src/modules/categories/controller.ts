@@ -84,6 +84,22 @@ export const categoriesController = new Elysia({
     const res = await cacheController.getCategoryTree();
     return res;
   })
+  .get("/categories/public_code/:code", async ({ cacheController, set, params: { code } }) => {
+    const res = await cacheController.getActiveCachedCategories({
+    });
+    let el = res.find(category => category.code == code && category.active);
+    if (!el) {
+      set.status = 404;
+      return {
+        message: "Category not found",
+      };
+    }
+    return el;
+  }, {
+    params: t.Object({
+      code: t.String(),
+    })
+  })
   .get(
     "/categories/:id",
     async ({ params: { id }, user, set, drizzle }) => {

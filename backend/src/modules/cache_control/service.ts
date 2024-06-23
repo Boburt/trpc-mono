@@ -181,6 +181,8 @@ export class CacheControlService {
     const category = await this.redis.hgetall(`category:${id}`) as TreeCategoryDto;
     if (!category.id) return null;
 
+    if (!category.active) return null;
+
     const childrenIds = await this.redis.smembers(`category:${id}:children`);
     const children = [];
     for (const childId of childrenIds) {

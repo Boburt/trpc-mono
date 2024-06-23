@@ -23,6 +23,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@frontend_next/components/ui/navigation-menu";
 import CatalogMenu from "./CatalogMenu";
+import { cn } from "@frontend_next/lib/utils";
 
 const menuItems = [
   {
@@ -44,31 +45,6 @@ const menuItems = [
   {
     label: "Логисты",
     href: "/logistics",
-  },
-  {
-    label: "Блог",
-    href: "/blog",
-  },
-  {
-    label: "Контакты",
-    href: "/contact",
-  },
-  {
-    label: "FAQ",
-    href: "/faq",
-  },
-  {
-    label: "Новости",
-    href: "/news",
-  },
-  {
-    label: " Политика конфиденциальности",
-    href: "/privace",
-  },
-
-  {
-    label: "Услуги",
-    href: "/services",
   },
 ];
 
@@ -125,14 +101,17 @@ export default function Header() {
                         </NavigationMenuLink>
                       </Link>
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent>
+                    <NavigationMenuContent className="border-0 shadow-lg">
                       <CatalogMenu />
                     </NavigationMenuContent>
                   </>
                 ) : (
                   <Link href={item.href} legacyBehavior passHref>
                     <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        "hover:bg-default-100"
+                      )}
                     >
                       {item.label}
                     </NavigationMenuLink>

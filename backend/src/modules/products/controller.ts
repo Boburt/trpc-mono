@@ -9,18 +9,170 @@ import {
   products_categories,
   assets,
 } from "../../../drizzle/schema";
-import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc } from "drizzle-orm";
+import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc, inArray } from "drizzle-orm";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
 import fs from "fs";
 import path from "path";
 import { ProductProperties } from "./dtos/one.dto";
+import { ProductsWithRelations } from "./dtos/list.dto";
 
 export const productsController = new Elysia({
   name: "@api/products",
 })
   .use(ctx)
+  .get('/products/public/data', async ({ user, set, drizzle, query: {
+    limit,
+    offset,
+    sort,
+    filters,
+    fields,
+    category
+  } }) => {
+
+    let selectFields: SelectedFields = {};
+    if (fields) {
+      selectFields = parseSelectFields(fields, products, {
+        manufacturers,
+      });
+    }
+    let whereClause: (SQLWrapper | undefined)[] = [];
+    if (filters) {
+      whereClause = parseFilterFields(filters, products, {
+        manufacturers,
+      });
+    }
+    whereClause.push(eq(products.active, true));
+    if (category) {
+      const categoryHierarchyQuery = sql.raw(`
+        WITH RECURSIVE category_hierarchy AS (
+          SELECT id, name, parent_id
+          FROM categories
+          WHERE code = '${category}' AND active = true
+          UNION ALL
+          SELECT c.id, c.name, c.parent_id
+          FROM categories c
+          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
+          WHERE c.active = true
+        )
+        SELECT id FROM category_hierarchy;
+      `);
+
+      // Execute the query to get category IDs
+      const categoryHierarchyResult = await drizzle.execute<{
+        id: string;
+        name: string;
+        parent_id: string;
+      }>(categoryHierarchyQuery);
+      const categoryIds = categoryHierarchyResult.map(row => row.id);
+      whereClause.push(inArray(products_categories.category_id, categoryIds));
+    }
+    const rolesList = await drizzle
+      .select(selectFields)
+      .from(products)
+      .leftJoin(
+        manufacturers,
+        eq(products.manufacturer_id, manufacturers.id)
+      )
+      .innerJoin(
+        products_categories,
+        eq(products.id, products_categories.product_id)
+      )
+      .where(and(...whereClause))
+      .limit(limit)
+      .offset(offset)
+      .execute() as ProductsWithRelations[];
+    if (rolesList.length > 0) {
+      const images = await drizzle.query.assets.findMany({
+        where: and(
+          eq(assets.code, 'source'),
+          eq(assets.model, "products"),
+          inArray(
+            assets.model_id,
+            rolesList.map((m) => m.id)
+          )
+        )
+      });
+
+      rolesList.forEach((p) => {
+        p.images = images
+          .filter((i) => i.model_id === p.id)
+          .map((i) => ({
+            path: `/public/${i.path}/${i.id}/${i.name}`,
+            code: i.code ?? "",
+          }));
+      });
+    }
+
+    return rolesList;
+  },
+    {
+      query: t.Object({
+        limit: t.Numeric(),
+        offset: t.Numeric(),
+        sort: t.Optional(t.String()),
+        filters: t.Optional(t.String()),
+        fields: t.Optional(t.String()),
+        category: t.Optional(t.String()),
+      }),
+    })
+  .get('/products/public/count', async ({ user, set, drizzle, query: {
+    sort,
+    filters,
+    category
+  } }) => {
+
+    let whereClause: (SQLWrapper | undefined)[] = [];
+    if (filters) {
+      whereClause = parseFilterFields(filters, products, {
+        manufacturers,
+      });
+    }
+    whereClause.push(eq(products.active, true));
+    if (category) {
+      const categoryHierarchyQuery = sql.raw(`
+        WITH RECURSIVE category_hierarchy AS (
+          SELECT id, name, parent_id
+          FROM categories
+          WHERE code = '${category}' AND active = true
+          UNION ALL
+          SELECT c.id, c.name, c.parent_id
+          FROM categories c
+          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
+          WHERE c.active = true
+        )
+        SELECT id FROM category_hierarchy;
+      `);
+
+      // Execute the query to get category IDs
+      const categoryHierarchyResult = await drizzle.execute<{
+        id: string;
+        name: string;
+        parent_id: string;
+      }>(categoryHierarchyQuery);
+      const categoryIds = categoryHierarchyResult.map(row => row.id);
+      whereClause.push(inArray(products_categories.category_id, categoryIds));
+    }
+    const rolesCount = await drizzle
+      .select({ count: sql<number>`count(*)` })
+      .from(products)
+      .innerJoin(
+        products_categories,
+        eq(products.id, products_categories.product_id)
+      )
+      .where(and(...whereClause))
+      .execute();
+
+    return rolesCount[0].count;
+  },
+    {
+      query: t.Object({
+        sort: t.Optional(t.String()),
+        filters: t.Optional(t.String()),
+        category: t.Optional(t.String()),
+      }),
+    })
   .post(
     "/products",
     async ({ body, user, set, drizzle }) => {

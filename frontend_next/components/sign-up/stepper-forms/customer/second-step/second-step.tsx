@@ -1,44 +1,20 @@
 "use client";
 
-import { Button } from "@frontend_next/components/ui/button";
-import { Input } from "@frontend_next/components/ui/input";
-import { Label } from "@frontend_next/components/ui/label";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@frontend_next/components/ui/radio-group";
 import { roleStore } from "@frontend_next/store/zustand/roleStore";
 import { SoleProprietorshipSecondStep } from "./sole-proprietorship";
 import { LegalEntitySecondStep } from "./legal-entity";
-import { use, useState } from "react";
-import { set } from "react-hook-form";
-import { Checkbox } from "@frontend_next/components/ui/checkbox";
 
 export const CustomerSecondStep = () => {
-  const [orgType, setOrgType] = useState<string>("sole-proprietorship");
+  // const [orgType, setOrgType] = useState<string>("sole-proprietorship");
+  const orgType: string = roleStore((state) => state.orgType);
+  const setOrgType = roleStore((state) => state.setOrgType);
   return (
     <div className="flex flex-col px-4">
       <div className="flex justify-start items-center gap-4 pt-6">
-        {/* <RadioGroup
-          defaultValue="sole-proprietorship"
-          onValueChange={(value) => setOrgType(value)}
-          className="flex space-x-4 py-2"
-        >
-          <div className="flex items-center space-x-2 border border-gray-700 rounded-md p-2">
-            <RadioGroupItem value="sole-proprietorship" id="option-one" />
-            <Label htmlFor="sole-proprietorship">
-              Индивидуальный предприниматель
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2 border border-gray-700 rounded-md p-2">
-            <RadioGroupItem value="legal-entity" id="option-two" />
-            <Label htmlFor="legal-entity">Юридическое лицо</Label>
-          </div>
-        </RadioGroup> */}
         <div
           onClick={() => setOrgType("sole-proprietorship")}
           className={`flex items-center space-x-2 border border-gray-700 rounded-md p-2 w-80 h-12 cursor-pointer ${
-            orgType === "sole-proprietorship" ? "bg-blue-100" : ""
+            orgType === "sole-proprietorship" ? "bg-primary-200" : ""
           }`}
         >
           <label
@@ -51,7 +27,7 @@ export const CustomerSecondStep = () => {
         <div
           onClick={() => setOrgType("legal-entity")}
           className={`flex items-center space-x-2 border border-gray-700 rounded-md p-2 w-80 h-12 ${
-            orgType === "legal-entity" ? "bg-blue-100" : ""
+            orgType === "legal-entity" ? "bg-primary-200" : ""
           }`}
         >
           <label
