@@ -92,6 +92,7 @@ export const manufacturersController = new Elysia({
         {}
       );
 
+      // @ts-ignore
       const filterProperties = properties.filter((p) => p.show_in_filter);
 
       if (filterProperties.length === 0) {
@@ -142,6 +143,7 @@ export const manufacturersController = new Elysia({
         };
       }
 
+      // @ts-ignore
       filterProperties.forEach((p) => {
         if (["production-volume", "power"].includes(p.code)) {
           elasticQuery.aggs[p.code] = {
@@ -212,6 +214,7 @@ export const manufacturersController = new Elysia({
           }[];
         };
       } = {};
+      // @ts-ignore
       filterProperties.forEach((p) => {
         if (["production-volume", "power"].includes(p.code)) {
           facets[p.code] = {
@@ -220,6 +223,7 @@ export const manufacturersController = new Elysia({
             multiple: false,
             value: [],
           };
+          // @ts-ignore
           elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
             facets[p.code]["value"].push({
               value: b.key,
@@ -233,6 +237,7 @@ export const manufacturersController = new Elysia({
             multiple: true,
             value: [],
           };
+          // @ts-ignore
           elasticResponseJson.aggregations[p.code].buckets.forEach((b: any) => {
             facets[p.code]["value"].push({
               value: b.key,
@@ -256,7 +261,7 @@ export const manufacturersController = new Elysia({
         multiple: true,
         value: [],
       };
-
+      // @ts-ignore
       elasticResponseJson.aggregations.city.city.buckets.forEach((b: any) => {
         cityFacet["value"].push({
           value: b.key,
@@ -302,7 +307,9 @@ export const manufacturersController = new Elysia({
       if (facets && Object.keys(facets).length > 0) {
         const cachedProperties = (
           await cacheController.getCachedManufacturersProperties({})
-        ).filter((property) => property.show_in_filter);
+        )
+          // @ts-ignore
+          .filter((property) => property.show_in_filter);
 
         let elasticQuery: {
           size: number;
@@ -356,7 +363,7 @@ export const manufacturersController = new Elysia({
             },
           });
         }
-
+        // @ts-ignore
         cachedProperties.forEach((property) => {
           if (facets![property.code] && facets![property.code].length > 0) {
             if (property.type === "number") {
@@ -393,7 +400,7 @@ export const manufacturersController = new Elysia({
         });
 
         const elasticResponseJson = await elasticResponse.json();
-
+        // @ts-ignore
         const ids = elasticResponseJson.hits.hits.map((h: any) => h._id);
         if (ids.length > 0) {
           whereClause.push(inArray(manufacturers.id, ids));
@@ -421,7 +428,7 @@ export const manufacturersController = new Elysia({
         .from(manufacturers)
         .where(and(...whereClause))
         .limit(+limit)
-        .offset(+offset)
+        .offset(offset ? +offset : 0)
         .execute()) as PublicManufacturer[];
 
       if (imageSizes && imageSizes.length > 0) {
@@ -520,7 +527,9 @@ export const manufacturersController = new Elysia({
       const responseJson = await response.json();
 
       return {
+        // @ts-ignore
         total: responseJson.hits.total.value,
+        // @ts-ignore
         items: responseJson.hits.hits.map((h: any) => h._source),
       };
     },
@@ -664,6 +673,7 @@ export const manufacturersController = new Elysia({
           manufacturer_id,
           rating,
           comment: review,
+          // @ts-ignore
           user_id: user.id,
         })
         .returning({
