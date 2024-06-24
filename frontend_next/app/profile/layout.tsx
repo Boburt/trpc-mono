@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface ProfileLayoutProps {
   children: ReactNode;
-  sidebar?: ReactNode;
+  sidebar: ReactNode;
 }
 export default function ProfileLayout({
   children,
@@ -10,7 +10,7 @@ export default function ProfileLayout({
 }: ProfileLayoutProps) {
   return (
     <div className="flex space-x-6">
-      {sidebar && <div>{sidebar}</div>}
+      {sidebar}
       <div className="w-full">{children}</div>
     </div>
   );
