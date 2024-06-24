@@ -8,8 +8,9 @@ import {
   products_properties,
   products_categories,
   assets,
+  properties,
 } from "../../../drizzle/schema";
-import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc, inArray } from "drizzle-orm";
+import { InferSelectModel, eq, sql, SQLWrapper, and, asc, desc, inArray, getTableColumns, not, ne } from "drizzle-orm";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
 import { SelectedFields } from "drizzle-orm/pg-core";
@@ -44,7 +45,16 @@ export const productsController = new Elysia({
       });
     }
     whereClause.push(eq(products.active, true));
+    let categoryCode = category;
     if (category) {
+      try {
+        categoryCode = JSON.parse(category);
+      } catch (e) {
+
+      }
+
+    }
+    if (categoryCode && categoryCode != null) {
       const categoryHierarchyQuery = sql.raw(`
         WITH RECURSIVE category_hierarchy AS (
           SELECT id, name, parent_id
@@ -130,7 +140,16 @@ export const productsController = new Elysia({
       });
     }
     whereClause.push(eq(products.active, true));
+    let categoryCode = category;
     if (category) {
+      try {
+        categoryCode = JSON.parse(category);
+      } catch (e) {
+
+      }
+
+    }
+    if (categoryCode && categoryCode != null) {
       const categoryHierarchyQuery = sql.raw(`
         WITH RECURSIVE category_hierarchy AS (
           SELECT id, name, parent_id
@@ -173,6 +192,171 @@ export const productsController = new Elysia({
         category: t.Optional(t.String()),
       }),
     })
+  .get("/products/public/:id", async ({ cacheController, set, params: { id }, drizzle }) => {
+    const oneProductPrepared = drizzle.query.products.findFirst({
+      where: and(eq(products.id, sql.placeholder('id')), eq(products.active, true)),
+      columns: {
+        id: true,
+      }
+    }).prepare('one_product_prepared');
+    const product = await oneProductPrepared.execute({ id });
+
+    if (!product) {
+      set.status = 404;
+      return {
+        message: "Product not found",
+      };
+    }
+
+
+    const existingProduct = await drizzle.select({
+      ...getTableColumns(products),
+      manufacturers: getTableColumns(manufacturers),
+    })
+      .from(products)
+      .leftJoin(
+        manufacturers,
+        eq(products.manufacturer_id, manufacturers.id)
+      )
+      .where(eq(products.id, id))
+      .execute();
+
+    const productWithManufacturer: ProductsWithRelations = {
+      ...existingProduct[0],
+      images: [],
+      properties: []
+    }
+
+    const images = await drizzle.query.assets.findMany({
+      where: and(
+        eq(assets.code, 'source'),
+        eq(assets.model, "products"),
+        eq(
+          assets.model_id,
+          productWithManufacturer.id
+        )
+      )
+    });
+
+    if (images.length > 0) {
+      productWithManufacturer.images = images
+        .map((i) => ({
+          path: `/public/${i.path}/${i.id}/${i.name}`,
+          code: i.code ?? "",
+        }));
+    }
+
+    const propertiesList = await drizzle
+      .select({
+        name: properties.name,
+        value: products_properties.value,
+        id: products_properties.id,
+      })
+      .from(products_properties)
+      .leftJoin(properties, eq(products_properties.property_id, properties.id))
+      .where(eq(products_properties.product_id, id));
+
+    productWithManufacturer.properties = propertiesList;
+
+    return productWithManufacturer;
+
+  }, {
+    params: t.Object({
+      id: t.String()
+    })
+  })
+  .get("/products/public/:id/related", async ({ cacheController, set, params: { id }, drizzle, query: {
+    limit,
+    fields
+  } }) => {
+    const oneProductPrepared = drizzle.query.products.findFirst({
+      where: and(eq(products.id, sql.placeholder('id')), eq(products.active, true)),
+      columns: {
+        id: true,
+      }
+    }).prepare('one_product_prepared');
+    const product = await oneProductPrepared.execute({ id });
+
+    if (!product) {
+      set.status = 404;
+      return {
+        message: "Product not found",
+      };
+    }
+
+    let selectFields: SelectedFields = {};
+    if (fields) {
+      selectFields = parseSelectFields(fields, products, {
+        manufacturers,
+      });
+    }
+    const existingProduct = await drizzle.select({
+      id: products.id,
+      category_id: products_categories.category_id,
+    })
+      .from(products)
+      .leftJoin(
+        manufacturers,
+        eq(products.manufacturer_id, manufacturers.id)
+      )
+      .innerJoin(
+        products_categories,
+        eq(products.id, products_categories.product_id)
+      )
+      .where(eq(products.id, id))
+      .execute();
+    const rolesList = await drizzle
+      .select(selectFields)
+      .from(products)
+      .leftJoin(
+        manufacturers,
+        eq(products.manufacturer_id, manufacturers.id)
+      )
+      .innerJoin(
+        products_categories,
+        eq(products.id, products_categories.product_id)
+      )
+      .where(and(
+        ne(products.id, id),
+        ne(products_categories.category_id, existingProduct[0].category_id)
+      ))
+      .orderBy(sql`RANDOM()`)
+      .limit(+limit)
+      .offset(0)
+      .execute() as ProductsWithRelations[];
+    if (rolesList.length > 0) {
+      const images = await drizzle.query.assets.findMany({
+        where: and(
+          eq(assets.code, 'source'),
+          eq(assets.model, "products"),
+          inArray(
+            assets.model_id,
+            rolesList.map((m) => m.id)
+          )
+        )
+      });
+
+      rolesList.forEach((p) => {
+        p.images = images
+          .filter((i) => i.model_id === p.id)
+          .map((i) => ({
+            path: `/public/${i.path}/${i.id}/${i.name}`,
+            code: i.code ?? "",
+          }));
+      });
+    }
+
+    return rolesList;
+
+  }, {
+    params: t.Object({
+      id: t.String()
+    }),
+    query: t.Object({
+      limit: t.String(),
+      fields: t.Optional(t.String()),
+    })
+  })
   .post(
     "/products",
     async ({ body, user, set, drizzle }) => {
@@ -396,13 +580,13 @@ export const productsController = new Elysia({
     // }
 
     for (const product of data) {
-      const randormManufacturer = await drizzle.select().from(manufacturers).orderBy(sql`RANDOM()`).limit(1);
+      const randomManufacturer = await drizzle.select().from(manufacturers).orderBy(sql`RANDOM()`).limit(1);
       const newProduct = await drizzle.insert(products).values({
         active: true,
         name: product.name,
         description: product.description,
         price: product.price,
-        manufacturer_id: randormManufacturer[0].id
+        manufacturer_id: randomManufacturer[0].id
       }).returning({
         id: products.id,
       });
