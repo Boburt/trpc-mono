@@ -127,6 +127,7 @@ export default function ProductsList() {
 
   const renderCell = React.useCallback(
     (
+      // @ts-ignore
       product: InferSelectModel<typeof products>,
       columnKey: React.Key
     ): React.ReactNode => {
