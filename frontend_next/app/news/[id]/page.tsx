@@ -41,12 +41,12 @@ export default function NewsDetailPage({
           <div>{dayjs(newsItem.created_at).format("DD MMM YYYY")}</div>
         </small>
       </div>
-      <h1>{newsItem.title}</h1>
+      <div className="text-lg font-bold">{newsItem.title}</div>
       <Image
         removeWrapper
         alt="Card background"
         width="100%"
-        className="z-0 w-full h-full object-cover"
+        className="z-0 w-full h-full object-cover my-4"
         src={newsItem.image}
       />
       <div>{newsItem.description}</div>
