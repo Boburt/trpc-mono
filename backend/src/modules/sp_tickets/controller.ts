@@ -275,6 +275,7 @@ export const spTicketsController = new Elysia({
 
       const result = await drizzle
         .update(sp_tickets)
+        // @ts-ignore
         .set(data)
         .where(eq(sp_tickets.id, id))
         .returning(selectFields);
