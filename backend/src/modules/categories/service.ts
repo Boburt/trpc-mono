@@ -23,6 +23,7 @@ export class CategoriesService {
   async create(input: Prisma.CategoriesCreateArgs): Promise<Categories> {
     const res = await this.prisma.categories.create(input);
     await this.cacheControl.cacheCategories();
+    await this.cacheControl.cacheTreeCategories();
     return res;
   }
 
@@ -85,12 +86,14 @@ export class CategoriesService {
   async update(input: Prisma.CategoriesUpdateArgs): Promise<Categories> {
     const res = await this.prisma.categories.update(input);
     await this.cacheControl.cacheCategories();
+    await this.cacheControl.cacheTreeCategories();
     return res;
   }
 
   async delete(input: Prisma.CategoriesDeleteArgs) {
     const res = await this.prisma.categories.delete(input);
     await this.cacheControl.cacheCategories();
+    await this.cacheControl.cacheTreeCategories();
     return res;
   }
 

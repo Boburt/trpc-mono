@@ -14,7 +14,7 @@ export default async function ManufacturersPage() {
       href: "/manufacturers",
     },
   ];
-  const searchParams = new URL(Astro.request.url).search;
+  const searchParams = new URL(Astro.request.url4).search;
   const pathname = new URL(Astro.request.url).pathname;
 
   const manufacturersFilterValues = parseQueryParams(searchParams);

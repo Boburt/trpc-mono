@@ -941,6 +941,7 @@ export const properties = pgTable("properties", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: text("name").notNull(),
   property_type: text("property_type").notNull(),
+  code: text("code"),
   created_at: timestamp("created_at", {
     precision: 5,
     withTimezone: true,

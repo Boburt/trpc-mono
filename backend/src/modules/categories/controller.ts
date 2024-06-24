@@ -80,22 +80,25 @@ export const categoriesController = new Elysia({
       }),
     }
   )
-  .get("/categories/cached", async ({ redis, user, set, cacheController }) => {
-    if (!user) {
-      set.status = 401;
-      return {
-        message: "User not found",
-      };
-    }
-
-    if (!user.permissions.includes("categories.list")) {
-      set.status = 401;
-      return {
-        message: "You don't have permissions",
-      };
-    }
-    const res = await cacheController.getCachedCategories({});
+  .get("/categories/public/tree", async ({ redis, user, set, cacheController }) => {
+    const res = await cacheController.getCategoryTree();
     return res;
+  })
+  .get("/categories/public_code/:code", async ({ cacheController, set, params: { code } }) => {
+    const res = await cacheController.getActiveCachedCategories({
+    });
+    let el = res.find(category => category.code == code && category.active);
+    if (!el) {
+      set.status = 404;
+      return {
+        message: "Category not found",
+      };
+    }
+    return el;
+  }, {
+    params: t.Object({
+      code: t.String(),
+    })
   })
   .get(
     "/categories/:id",

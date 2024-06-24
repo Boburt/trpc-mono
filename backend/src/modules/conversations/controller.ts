@@ -1,6 +1,6 @@
 import { ctx } from "@backend/context";
 import { conversations, manufacturers, manufacturers_users, participants } from "backend/drizzle/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { InferSelectModel, and, desc, eq } from "drizzle-orm";
 import Elysia, { t } from "elysia";
 
 export const ConversationsController = new Elysia({
@@ -117,7 +117,7 @@ export const ConversationsController = new Elysia({
             .leftJoin(conversations, eq(participants.conversation_id, conversations.id))
             .where(eq(participants.user_id, user.user.id))
             .orderBy(desc(conversations.created_at))
-            .execute();
+            .execute() as InferSelectModel<typeof conversations>[];
 
         return conversationsList;
 

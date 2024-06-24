@@ -1,73 +1,65 @@
-import { setAuthData } from "@frontend/src/store/auth";
-import { apiClient } from "@frontend/src/utils/eden";
-import { useForm } from "@tanstack/react-form";
-import { users } from "backend/drizzle/schema";
-import { useEffect, useState } from "react";
+"use client";
+import { apiClient } from "@frontend_next/lib/eden";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useState } from "react";
 import TelegramLoginButton from "telegram-login-button";
-import { InferSelectModel } from "drizzle-orm";
+import { useSession, signIn as signInNextAuth } from "next-auth/react";
+import { signInLocal } from "./actions/signin";
+import { signIn } from "@frontend_next/auth";
+interface FormValues {
+  login: string;
+  password: string;
+}
+export default function AuthForm() {
+  const { data: session } = useSession();
+  const [errorMessage, setErrorMessage] = useState("");
 
-export default function AuthForm({
-  error,
-  token,
-  userData,
-}: {
-  userData: InferSelectModel<typeof users>;
-  error?: string | null;
-  token?: string | null;
-}) {
-  const [errorMessage, setErrorMessage] = useState(error);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const getMyData = async () => {
-    setIsLoading(true);
-    const { data, error } = await apiClient.api.users.me.get({
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (error) {
-      setIsLoading(false);
-      setErrorMessage(error.message);
-    } else if (data && "user" in data) {
-      setIsLoading(false);
-      setAuthData(data.accessToken, data.refreshToken, data.user);
-    }
-  };
-
-  const form = useForm<{
-    login: string;
-    password?: string;
-  }>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting: isLoading },
+  } = useForm<FormValues>({
     defaultValues: {
       login: "",
       password: "",
     },
-    onSubmit: async ({ value }) => {
-      setIsLoading(true);
-      const { data, error } = await apiClient.api.users.login.post({
-        login: value.login,
-        password: value.password!,
-      });
-      if (error) {
-        console.log("error", data.message);
-        setIsLoading(false);
-        setErrorMessage(data.message);
-      } else if (data && "accessToken" in data) {
-        setIsLoading(false);
-        setAuthData(data.accessToken, data.refreshToken, data.user);
-        location.reload();
-      }
-    },
   });
 
-  useEffect(() => {
-    if (token) {
-      getMyData();
+  const action: () => void = handleSubmit(async (data) => {
+    try {
+      const signData = await signInLocal({
+        login: data.login,
+        password: data.password,
+      });
+      if (signData?.error) {
+        setErrorMessage(signData.error);
+      } else {
+        setErrorMessage("");
+        await signInNextAuth("credentials", {
+          login: data.login,
+          password: data.password,
+          redirect: false,
+        });
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message);
     }
-  }, []);
+    // const response = await signInLocal(data);
+    // console.log("response", response);
+    // console.log("response", response);
+    // if (response?.error) {
+    //   setErrorMessage(response.error);
+    // } else {
+    //   setErrorMessage("");
+    //   await signInNextAuth("credentials", {
+    //     login: data.login,
+    //     password: data.password,
+    //     redirect: false,
+    //   });
+    // }
+  });
 
-  if (userData) {
+  if (session?.user) {
     return (
       <div className="w-full max-w-md mx-auto p-6">
         <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -125,141 +117,66 @@ export default function AuthForm({
             <div className="py-3 flex items-center text-xs text-gray-400 uppercase before:flex-[1_1_0%] before:border-t before:border-gray-200 before:me-6 after:flex-[1_1_0%] after:border-t after:border-gray-200 after:ms-6 dark:text-gray-500 dark:before:border-gray-600 dark:after:border-gray-600">
               Or
             </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                void form.handleSubmit();
-              }}
-            >
+            <form action={action}>
               <div className="grid gap-y-4">
-                <form.Field
-                  name="login"
-                  validators={{
-                    onChange({ value }) {
-                      if (value.length < 3) {
-                        return "Логин должен быть не менее 3 символов";
-                      }
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <>
-                      <div>
-                        <label
-                          htmlFor={field.name}
-                          className="block text-sm mb-2 dark:text-white"
-                        >
-                          Логин
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            className="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-                            required
-                            aria-describedby="email-error"
-                          />
-                          {field.state.meta.errors &&
-                          field.state.meta.errors.length ? (
-                            <div className="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
-                              <svg
-                                className="flex-shrink-0 h-4 w-4 text-red-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" x2="12" y1="8" y2="12" />
-                                <line x1="12" x2="12.01" y1="16" y2="16" />
-                              </svg>
-                            </div>
-                          ) : null}
-                        </div>
-                        {field.state.meta.errors ? (
-                          <p className="text-sm text-red-600 mt-2">
-                            {field.state.meta.errors.join(", ")}
-                          </p>
-                        ) : null}
-                      </div>
-                    </>
-                  )}
-                </form.Field>
-                <form.Field
-                  name="password"
-                  validators={{
-                    onChange({ value }) {
-                      if (!value || value.length < 3) {
-                        return "Логин должен быть не менее 3 символов";
-                      }
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <>
-                      <div>
-                        <div className="flex justify-between items-center">
-                          <label
-                            htmlFor={field.name}
-                            className="block text-sm mb-2 dark:text-white"
-                          >
-                            Пароль
-                          </label>
-                        </div>
-                        <div className="relative">
-                          <input
-                            type="password"
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            className="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-                            required
-                            aria-describedby="password-error"
-                          />
-                          {field.state.meta.errors &&
-                          field.state.meta.errors.length ? (
-                            <div className="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
-                              <svg
-                                className="flex-shrink-0 h-4 w-4 text-red-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" x2="12" y1="8" y2="12" />
-                                <line x1="12" x2="12.01" y1="16" y2="16" />
-                              </svg>
-                            </div>
-                          ) : null}
-                        </div>
-                        {field.state.meta.errors ? (
-                          <p className="text-sm text-red-600 mt-2">
-                            {field.state.meta.errors.join(", ")}
-                          </p>
-                        ) : null}
-                      </div>
-                    </>
-                  )}
-                </form.Field>
-
+                <div>
+                  <label
+                    htmlFor="login"
+                    className="block text-sm mb-2 dark:text-white"
+                  >
+                    Логин
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="login"
+                      {...register("login", {
+                        required: "Логин обязателен",
+                        minLength: {
+                          value: 3,
+                          message: "Логин должен быть не менее 3 символов",
+                        },
+                      })}
+                      className="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
+                      required
+                    />
+                    {errors.login && (
+                      <p className="text-sm text-red-600 mt-2">
+                        {errors.login.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <label
+                      htmlFor="password"
+                      className="block text-sm mb-2 dark:text-white"
+                    >
+                      Пароль
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      id="password"
+                      {...register("password", {
+                        required: "Пароль обязателен",
+                        minLength: {
+                          value: 3,
+                          message: "Пароль должен быть не менее 3 символов",
+                        },
+                      })}
+                      className="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
+                      required
+                    />
+                    {errors.password && (
+                      <p className="text-sm text-red-600 mt-2">
+                        {errors.password.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <button
                   type="submit"
                   disabled={isLoading}
