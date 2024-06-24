@@ -252,6 +252,7 @@ export const formsSentItemsController = new Elysia({
 
             const result = await drizzle
                 .update(forms_sent_items)
+                // @ts-ignore
                 .set(data)
                 .where(eq(forms_sent_items.id, id))
                 .returning(selectFields);
