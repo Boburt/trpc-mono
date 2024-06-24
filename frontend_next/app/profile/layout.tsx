@@ -10,7 +10,7 @@ export default function ProfileLayout({
 }: ProfileLayoutProps) {
   return (
     <div className="flex space-x-6">
-      {sidebar}
+      {sidebar && <div>{sidebar}</div>}
       <div className="w-full">{children}</div>
     </div>
   );
