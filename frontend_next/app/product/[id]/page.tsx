@@ -6,6 +6,8 @@ import { Button } from "@nextui-org/button";
 import { Heart } from "lucide-react";
 import { Tab, Tabs } from "@nextui-org/tabs";
 import ProductDetailTabs from "./product-tabs";
+import { Suspense } from "react";
+import ProductRelated from "./product-related";
 
 export default async function ProductPage({
   params: { id },
@@ -61,6 +63,9 @@ export default async function ProductPage({
         </div>
       </div>
       <ProductDetailTabs product={data} />
+      <Suspense>
+        <ProductRelated id={data.id} />
+      </Suspense>
     </div>
   );
 }
