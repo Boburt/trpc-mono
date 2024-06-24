@@ -67,6 +67,7 @@ export const ProductAddingForm = ({
       <ProductAddingFormWithData
         setOpen={setOpen}
         recordId={recordId}
+        // @ts-ignore
         defaultValues={record.data}
       />
     );
@@ -130,6 +131,7 @@ export const ProductAddingFormWithData = ({
         data: {
           active: value.active,
           name: value.name,
+          // @ts-ignore
           files: value.files,
           description: value.description ?? "",
           price: value.price,
@@ -141,6 +143,7 @@ export const ProductAddingFormWithData = ({
       createMutation.mutate({
         active: value.active,
         name: value.name,
+        // @ts-ignore
         files: value.files,
         description: value.description ?? "",
         price: value.price,
@@ -174,6 +177,7 @@ export const ProductAddingFormWithData = ({
     }) => {
       return apiClient.api.products.post(
         {
+          // @ts-ignore
           data: newTodo,
           fields: [
             "id",
