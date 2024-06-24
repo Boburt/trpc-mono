@@ -11,8 +11,9 @@ export const assetsController = new Elysia({
     name: "@api/assets",
 })
     .use(ctx)
-    .post("/upload-assets", ({ body, assetsService }) => {
-        return assetsService.addAsset(body);
+    .post("/upload-assets", ({ body }) => {
+        // return assetsService.addAsset(body);
+        return {};
     }, {
         body: t.Object({
             model: t.String(),
