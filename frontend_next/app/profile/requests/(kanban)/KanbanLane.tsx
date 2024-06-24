@@ -8,6 +8,7 @@ import { Spinner } from "@nextui-org/spinner";
 import { useSession } from "next-auth/react";
 
 interface KanbanLaneProps {
+  // @ts-ignore
   status: InferSelectModel<typeof sp_ticket_statuses>;
 }
 
