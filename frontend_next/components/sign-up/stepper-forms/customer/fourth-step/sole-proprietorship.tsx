@@ -165,6 +165,7 @@ export const SoleProprietorshipFourthStep = () => {
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
+                  // @ts-ignore
                   defaultValue={field.value}
                   className="flex space-x-6 space-y-0"
                 >
