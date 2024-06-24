@@ -10,7 +10,8 @@ import {
   sp_ticket_categories,
   sp_ticket_statuses,
   users,
-  langs
+  langs,
+  cities
 } from "backend/drizzle/schema";
 import { InferSelectModel, eq } from "drizzle-orm";
 import { Redis } from "ioredis";
@@ -273,16 +274,16 @@ export class CacheControlService {
     );
   }
 
-  // async getCachedCities({ take }: { take?: number }): Promise<Cities[]> {
-  //   const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
-  //   let res = JSON.parse(langs ?? "[]");
+  async getCachedCities({ take }: { take?: number }): Promise<InferSelectModel<typeof cities>[]> {
+    const citiesList = await this.redis.get(`${process.env.PROJECT_PREFIX}cities`);
+    let res = JSON.parse(citiesList ?? "[]");
 
-  //   if (take && res.length > take) {
-  //     res = res.slice(0, take);
-  //   }
+    if (take && res.length > take) {
+      res = res.slice(0, take);
+    }
 
-  //   return res;
-  // }
+    return res;
+  }
 
   async cacheManufacturersPropertiesCategories() {
     const langs =
