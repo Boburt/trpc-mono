@@ -50,8 +50,8 @@ export default function Privace() {
       </p>
 
       <h6 className="text-lg font-semibold my-8">
-        Section 1.10.33 of "de Finibus Bonorum et Malorum", written by Cicero in
-        45 BC
+        Section 1.10.33 of &quot;de Finibus Bonorum et Malorum&quot;, written by
+        Cicero in 45 BC
       </h6>
       <p className="my-3">
         At vero eos et accusamus et iusto odio dignissimos ducimus qui
