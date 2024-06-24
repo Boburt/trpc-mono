@@ -6,7 +6,7 @@ export default function Container({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return pathname !== "/" ? (
-    <div className="container">{children}</div>
+    <div className="container mx-auto">{children}</div>
   ) : (
     <>{children}</>
   );
