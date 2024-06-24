@@ -1,7 +1,6 @@
 import { verifyJwt } from "@backend/lib/bcrypt";
 import { DrizzleDB } from "@backend/lib/db";
 import { userById, userFirstRole } from "@backend/lib/prepare_statements";
-import { Permissions, Scheduled_reports, Langs } from "@backend/lib/zod";
 import {
   categories,
   permissions,
@@ -11,6 +10,7 @@ import {
   sp_ticket_categories,
   sp_ticket_statuses,
   users,
+  langs
 } from "backend/drizzle/schema";
 import { InferSelectModel, eq } from "drizzle-orm";
 import { Redis } from "ioredis";
@@ -47,11 +47,11 @@ export class CacheControlService {
     take,
   }: {
     take?: number;
-  }): Promise<Permissions[]> {
-    const permissions = await this.redis.get(
+  }): Promise<InferSelectModel<typeof permissions>[]> {
+    const permissionsList = await this.redis.get(
       `${process.env.PROJECT_PREFIX}permissions`
     );
-    let res = JSON.parse(permissions ?? "[]");
+    let res = JSON.parse(permissionsList ?? "[]");
 
     if (take && res.length > take) {
       res = res.slice(0, take);
@@ -137,9 +137,9 @@ export class CacheControlService {
     );
   }
 
-  async getCachedLangs({ take }: { take?: number }): Promise<Langs[]> {
-    const langs = await this.redis.get(`${process.env.PROJECT_PREFIX}langs`);
-    let res = JSON.parse(langs ?? "[]");
+  async getCachedLangs({ take }: { take?: number }): Promise<InferSelectModel<typeof langs>[]> {
+    const langsList = await this.redis.get(`${process.env.PROJECT_PREFIX}langs`);
+    let res = JSON.parse(langsList ?? "[]");
 
     if (take && res.length > take) {
       res = res.slice(0, take);
