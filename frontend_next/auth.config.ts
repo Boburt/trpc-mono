@@ -42,6 +42,7 @@ const providers: Provider[] = [
                             accessToken: res.accessToken,
                             refreshToken: res.refreshToken,
                             permissions: res.permissions,
+                            // @ts-ignore
                             role: res.role,
                         };
                     } else if (status == 401) {
