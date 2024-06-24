@@ -1,10 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@frontend/src/utils/eden";
-import { useStore } from "@nanostores/react";
-import { $accessToken } from "@frontend/src/store/auth";
-import { sp_tickets_comments, users } from "backend/drizzle/schema";
-import { InferSelectModel } from "drizzle-orm";
-
 export const ChatCard = ({
   comments,
 }: {
