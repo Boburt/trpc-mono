@@ -1,8 +1,5 @@
 import { Elysia, t } from "elysia";
-import { cors } from "@elysiajs/cors";
-import { trpc } from "@elysiajs/trpc";
 import { staticPlugin } from "@elysiajs/static";
-import { router } from "./_routes";
 import { apiController } from "./modules/controllers";
 import { serverTiming } from "@elysiajs/server-timing";
 import { conversations, messages, users } from "@backend/../drizzle/schema";
