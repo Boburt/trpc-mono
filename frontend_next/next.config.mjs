@@ -17,6 +17,12 @@ const nextConfig = {
         port: "3000",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.fungeek.net",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
