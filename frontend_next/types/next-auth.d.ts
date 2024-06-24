@@ -2,6 +2,8 @@ import NextAuth, { DefaultSession } from "next-auth";
 import { InferSelectModel } from "drizzle-orm";
 import { users } from "@backend/../drizzle/schema";
 import { DefaultJWT } from "@auth/core/jwt";
+
+// @ts-ignore
 interface ExtendedUser extends InferSelectModel<typeof users> {
   accessToken: string;
   refreshToken: string;
