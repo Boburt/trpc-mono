@@ -8,7 +8,6 @@ import { users, users_roles } from "backend/drizzle/schema";
 import { eq } from "drizzle-orm";
 import Redis from "ioredis";
 import { CacheControlService } from "@backend/modules/cache_control/service";
-import { AssetsService } from "@backend/modules/assets/service";
 import { Queue } from "bullmq";
 
 const client = new Redis({
@@ -25,7 +24,6 @@ const newAssetsAddedQueue = new Queue(
 );
 
 const cacheControlService = new CacheControlService(drizzleDb, client);
-const assetsService = new AssetsService(newAssetsAddedQueue, drizzleDb);
 
 // const permissionExtension = new Elysia({
 //   name: "permission_extension",
@@ -104,7 +102,6 @@ export const ctx = new Elysia({
   name: "@app/ctx",
 })
   .decorate("redis", client)
-  .decorate("assetsService", assetsService)
   .decorate("drizzle", drizzleDb)
   .decorate("cacheController", cacheControlService)
   .decorate("newAssetsAddedQueue", newAssetsAddedQueue)
