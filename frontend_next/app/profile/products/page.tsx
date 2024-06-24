@@ -133,6 +133,7 @@ export default function ProductsList() {
     ): React.ReactNode => {
       // @ts-ignore
       const cellValue =
+        // @ts-ignore
         product[columnKey as keyof InferSelectModel<typeof products>];
 
       switch (columnKey) {
