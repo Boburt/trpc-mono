@@ -22,6 +22,7 @@ export default function ProductPagination({
     queryFn: async () => {
       const { data } = await apiClient.api.products.public.count.get({
         query: {
+          // @ts-ignore
           category: category ?? null,
         },
       });
