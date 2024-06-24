@@ -14,7 +14,7 @@ export default function Catalog({
     page_size?: string;
   };
 }) {
-  const pageSize = searchParams.page_size ?? "25";
+  const pageSize = searchParams.page_size ?? "24";
   return (
     <div className="">
       <h1 className="text-3xl font-bold lg:text-5xl dark:text-white">

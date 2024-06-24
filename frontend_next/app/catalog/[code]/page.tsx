@@ -6,6 +6,7 @@ import ProductListSkeleton from "../product-list-skeleton";
 import ProductList from "../product-list";
 import ProductPaginationSkeleton from "../product-pagination-skeleton";
 import ProductPagination from "../product-pagination";
+import ProductFilter from "../product-filter";
 
 export default async function CatalogCategoryPage({
   params: { code },
@@ -26,7 +27,7 @@ export default async function CatalogCategoryPage({
   }
 
   const data = await itemJson.json();
-  const pageSize = searchParams.page_size ?? "25";
+  const pageSize = searchParams.page_size ?? "24";
   return (
     <>
       <h1 className="text-3xl font-bold lg:text-5xl dark:text-white">
@@ -34,7 +35,9 @@ export default async function CatalogCategoryPage({
       </h1>
       {data.description && <p>{data.description}</p>}
       <div className="flex gap-x-6 mt-10">
-        <div className="hidden h-full overflow-x-hidden overflow-y-scroll sm:flex"></div>
+        <div className="hidden h-full overflow-x-hidden overflow-y-scroll sm:flex">
+          <ProductFilter />
+        </div>
         <div className="w-full flex-1 flex-col">
           <ProductToolbar page_size={pageSize} />
           <Suspense

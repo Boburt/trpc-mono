@@ -20,14 +20,14 @@ export default function ProductToolbar({ page_size }: { page_size: string }) {
           replace(`${pathname}?${newSearchParams.toString()}`);
         }}
       >
-        <SelectItem key={25} value={"25"}>
-          25
+        <SelectItem key={24} value={"24"}>
+          24
         </SelectItem>
-        <SelectItem key={50} value={"50"}>
-          50
+        <SelectItem key={48} value={"48"}>
+          48
         </SelectItem>
-        <SelectItem key={100} value={"100"}>
-          100
+        <SelectItem key={96} value={"96"}>
+          96
         </SelectItem>
       </Select>
     </header>

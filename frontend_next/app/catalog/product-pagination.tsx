@@ -22,7 +22,7 @@ export default function ProductPagination({
     queryFn: async () => {
       const { data } = await apiClient.api.products.public.count.get({
         query: {
-          category,
+          category: category ?? null,
         },
       });
       return data;
@@ -42,7 +42,7 @@ export default function ProductPagination({
     if (!data) {
       return 0;
     }
-    let pageSize = page_size ? +page_size : 25;
+    let pageSize = page_size ? +page_size : 24;
     return Math.ceil(+data / pageSize);
   }, [data, page_size]);
 

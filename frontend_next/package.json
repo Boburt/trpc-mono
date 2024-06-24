@@ -24,6 +24,7 @@
     "@nextui-org/scroll-shadow": "^2.1.17",
     "@nextui-org/select": "^2.2.2",
     "@nextui-org/skeleton": "^2.0.29",
+    "@nextui-org/tabs": "^2.0.32",
     "@nextui-org/user": "^2.0.31",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",

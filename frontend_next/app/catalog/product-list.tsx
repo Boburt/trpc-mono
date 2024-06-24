@@ -17,7 +17,7 @@ export default function ProductList({
   page_size?: string;
   category?: string;
 }) {
-  const pageSize = page_size ? +page_size : 25;
+  const pageSize = page_size ? +page_size : 24;
   const offset = page ? (+page - 1) * pageSize : 0;
   const { data } = useSuspenseQuery({
     queryKey: ["products", offset, pageSize, category],
@@ -28,7 +28,7 @@ export default function ProductList({
           offset,
           fields:
             "id,name,description,price,stock_quantity,manufacturers.name,images",
-          category,
+          category: category ?? null,
         },
       });
       return data;
@@ -37,7 +37,7 @@ export default function ProductList({
 
   if (data && Array.isArray(data) && data.length > 0) {
     return (
-      <div className="my-auto grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="my-auto grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {data.map((product) => (
           <Card key={product.id} className="p-4">
             <Link href={`/product/${product.id}`}>
