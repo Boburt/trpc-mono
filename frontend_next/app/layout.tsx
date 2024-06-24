@@ -56,7 +56,7 @@ export default async function RootLayout({
             <ReactQueryClientProvider>
               <NextUIProviderClient className="flex flex-col h-screen">
                 <Header />
-                <main className="container mx-auto py-4 shrink-0">
+                <main className="py-4 shrink-0">
                   {/* {title && pathname != "/" && (
             <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
               {title}
@@ -69,9 +69,7 @@ export default async function RootLayout({
               crumbs={customCrumbs}
             />
           )} */}
-                  <Container>
-                    <BreadCrumbs>{children}</BreadCrumbs>
-                  </Container>
+                  <Container>{children}</Container>
                 </main>
                 <Footer />
                 <Toaster richColors />
