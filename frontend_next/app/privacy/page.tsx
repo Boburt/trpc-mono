@@ -7,8 +7,8 @@ export default function Privace() {
 
       <h5 className="text-lg font-semibold my-16">
         Lorem Ipsum is simply dummy text of the printing and typesetting
-        industry. Lorem Ipsum has been the industry's standard dummy text ever
-        since the 1500s, when an unknown printer took a galley of type and
+        industry. Lorem Ipsum has been the industry&apos;s standard dummy text
+        ever since the 1500s, when an unknown printer took a galley of type and
         scrambled it to make a type specimen book.
       </h5>
       <h6 className="text-lg font-semibold my-8">
@@ -18,13 +18,13 @@ export default function Privace() {
         1. It is a long established fact that a reader will be distracted by the
         readable content of a page when looking at its layout. The point of
         using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English.
+        letters, as opposed to using &apos;Content here, content here&apos;,
+        making it look like readable English.
       </p>
       <p className="my-3">
         2. Many desktop publishing packages and web page editors now use Lorem
-        Ipsum as their default model text, and a search for 'lorem ipsum' will
-        uncover many web sites still in their infancy
+        Ipsum as their default model text, and a search for &apos;lorem
+        ipsum&apos; will uncover many web sites still in their infancy
       </p>
       <p className="my-3 mb-8">
         3. Various versions have evolved over the years, sometimes by accident,
@@ -36,13 +36,13 @@ export default function Privace() {
         1. It is a long established fact that a reader will be distracted by the
         readable content of a page when looking at its layout. The point of
         using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English.
+        letters, as opposed to using &apos;Content here, content here&apos;,
+        making it look like readable English.
       </p>
       <p className="my-3">
         2. Many desktop publishing packages and web page editors now use Lorem
-        Ipsum as their default model text, and a search for 'lorem ipsum' will
-        uncover many web sites still in their infancy
+        Ipsum as their default model text, and a search for &apos;lorem
+        ipsum&apos; will uncover many web sites still in their infancy
       </p>
       <p className="my-3">
         3. Various versions have evolved over the years, sometimes by accident,
