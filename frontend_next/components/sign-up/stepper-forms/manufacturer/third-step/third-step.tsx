@@ -33,9 +33,9 @@ import {
 } from "@frontend_next/components/ui/command";
 
 import countryList from "@frontend_next/components/country-select/data/countries.json";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@frontend_next/components/ui/separator";
 
-export const CustomerThirdStep = () => {
+export const ManufacturerThirdStep = () => {
   const [open, setOpen] = React.useState(false);
 
   const { nextStep, prevStep } = useStepper();
@@ -56,6 +56,10 @@ export const CustomerThirdStep = () => {
   return (
     <Form {...form}>
       <h1 className="text-2xl font-bold pt-6 px-6 justify-center">
+        Форма производителя
+      </h1>
+      <Separator className="my-4 bg-gray-300 " />
+      <h1 className="text-xl font-bold pt-6 px-6 justify-center">
         Информация о предпринимательстве
       </h1>
       <form

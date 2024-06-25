@@ -9,7 +9,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@frontend_next/components/ui/form";
-import { on } from "events";
 import { Separator } from "@frontend_next/components/ui/separator";
 import {
   RadioGroup,
@@ -17,7 +16,6 @@ import {
 } from "@frontend_next/components/ui/radio-group";
 import { Button } from "@frontend_next/components/ui/button";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
-import { Checkbox } from "@frontend_next/components/ui/checkbox";
 
 export const SoleProprietorshipFourthStep = () => {
   const { nextStep, prevStep } = useStepper();
@@ -29,6 +27,7 @@ export const SoleProprietorshipFourthStep = () => {
     email: string;
     web_site: string;
     vat: boolean;
+    file: File | null;
   }>({
     defaultValues: {
       org_full_name: "",
@@ -38,6 +37,7 @@ export const SoleProprietorshipFourthStep = () => {
       email: "",
       web_site: "",
       vat: undefined,
+      file: null,
     },
   });
 
@@ -49,6 +49,7 @@ export const SoleProprietorshipFourthStep = () => {
     email: string;
     web_site: string;
     vat: boolean;
+    file: File | null;
   }) => {
     console.log("data", data);
     nextStep();
@@ -57,9 +58,8 @@ export const SoleProprietorshipFourthStep = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="">
-        {/* <h1 className="text-2xl font-bold">Данные предприятия</h1>
-        <p className="text-sm text-gray-500">Введите данные предприятия</p>
-        <Separator className="my-4" /> */}
+        <h1 className="text-2xl font-bold">Форма для оказывающих услуг</h1>
+        <Separator className="my-4" />
         <h1 className="text-xl font-bold">Название</h1>
         <Separator className="my-2 bg-gray-300" />
         <div className="grid grid-cols-2 gap-4">
@@ -162,38 +162,39 @@ export const SoleProprietorshipFourthStep = () => {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="vat"
-          rules={{ required: "Поле обязательно для заполнения" }}
-          render={({ field }) => (
-            <FormItem className="flex space-x-4 space-y-0 border rounded-md p-2 mt-6">
-              <FormLabel className="text-lg">
-                Являетес плательщиком НДС?
-              </FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  className="flex space-x-6 space-y-0"
-                >
-                  <FormItem className="flex items-center space-x-1 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="true" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Да</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-1 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="false" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Нет</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage className="text-xs text-red-600" />
-            </FormItem>
-          )}
-        />
+        <Separator className="mt-4 bg-gray-300" />
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <FormField
+            control={form.control}
+            name="vat"
+            rules={{ required: "Поле обязательно для заполнения" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="">Являетесь плательщиком НДС?</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    className="flex space-x-6 space-y-0 border rounded-md py-2.5"
+                  >
+                    <FormItem className="flex items-center ml-4 space-x-1 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="true" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Да</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-1 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="false" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Нет</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage className="text-xs text-red-600" />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="w-full flex justify-between mt-6 gap-2">
           <Button onClick={prevStep} size="sm" variant="secondary">

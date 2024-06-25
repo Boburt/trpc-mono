@@ -23,10 +23,10 @@ import { roleStore } from "@frontend_next/store/zustand/roleStore";
 import { toast } from "sonner";
 
 const steps = [
-  { label: "Step 1", id: "step_1" },
-  { label: "Step 2", id: "step_2" },
-  { label: "Step 3", id: "step_3" },
-  { label: "Step 4", id: "step_4" },
+  { label: "Шаг 1", id: "step_1" },
+  { label: "Шаг 2", id: "step_2" },
+  { label: "Шаг 3", id: "step_3" },
+  { label: "Шаг 4", id: "step_4" },
 ] satisfies StepItem[];
 
 const stepComponents: Record<string, React.FC> = {

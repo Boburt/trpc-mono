@@ -170,6 +170,7 @@ export const LegalEntitySecondStep = () => {
             )}
           />
         </div>
+
         <h1 className="text-xl font-bold pt-10">
           Данные дополнительного контактного лица
         </h1>

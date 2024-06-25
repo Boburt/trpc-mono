@@ -29,8 +29,10 @@ export const SignupWizardFirstStep: React.FC = () => {
           </button>
           <button
             onClick={() => setRole.setRole("manufacturer")}
-            disabled={true}
-            className="btn btn-primary flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56"
+            className={cn(
+              "btn btn-primary select flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56",
+              { "border-primary-300": role == "manufacturer" }
+            )}
           >
             <Factory className="h-12 w-12" /> Производитель
           </button>
@@ -38,8 +40,10 @@ export const SignupWizardFirstStep: React.FC = () => {
             onClick={() => {
               setRole.setRole("service");
             }}
-            disabled={true}
-            className="btn btn-primary flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56"
+            className={cn(
+              "btn btn-primary select flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56",
+              { "border-primary-300": role == "service" }
+            )}
           >
             <FileSliders className="h-12 w-12" /> Оказание услуг
           </button>
