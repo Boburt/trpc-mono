@@ -221,15 +221,19 @@ export const manufacturersPropertiesController = new Elysia({
 
         // remove all properties by propertyId which are not in manufacturerProperties
         const propertiesToSet = properties.filter((property) => {
+
+            // @ts-ignore
             return manufacturerProperties.find((p) => p.id === property.propertyId);
         });
 
+        // @ts-ignore
         const propertiesToDelete = manufacturerProperties.filter((property) => {
             return !properties.find((p) => p.propertyId === property.id);
         });
 
         await drizzle.delete(manufacturers_properties_values).where(and(
             eq(manufacturers_properties_values.manufacturer_id, manufacturerId),
+            // @ts-ignore
             inArray(manufacturers_properties_values.property_id, propertiesToDelete.map(p => p.id))
         )).execute();
 

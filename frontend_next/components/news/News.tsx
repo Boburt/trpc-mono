@@ -26,7 +26,11 @@ export default function News() {
   });
 
   return (
-    <div className=" md:px-6 px-4 py-12">
+    <div
+      className={cn("md:px-6 px-4 py-12", {
+        "container mx-auto": pathname != "/news",
+      })}
+    >
       <div
         className={cn(
           "flex items-end justify-between",

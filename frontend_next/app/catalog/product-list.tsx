@@ -28,6 +28,7 @@ export default function ProductList({
           offset,
           fields:
             "id,name,description,price,stock_quantity,manufacturers.name,images",
+          // @ts-ignore
           category: category ?? null,
         },
       });

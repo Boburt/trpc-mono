@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface ProfileLayoutProps {
   children: ReactNode;
-  sidebar?: ReactNode;
+  sidebar: ReactNode;
 }
 export default function ProfileLayout({
   children,

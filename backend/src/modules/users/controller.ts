@@ -240,7 +240,9 @@ export const usersController = new Elysia({
 
       const checkString = Object.keys(data)
         .sort()
+        // @ts-ignore
         .filter((k) => data[k])
+        // @ts-ignore
         .map((k) => `${k}=${data[k]}`)
         .join("\n");
       console.log('checkString', checkString)

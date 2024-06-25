@@ -113,6 +113,7 @@ export default function ProductsList() {
   }, [productsList?.total]);
 
   const items = React.useMemo(() => {
+    // @ts-ignore
     let res: InferSelectModel<typeof products>[] = [];
     if (
       productsList?.data &&
@@ -126,10 +127,13 @@ export default function ProductsList() {
 
   const renderCell = React.useCallback(
     (
+      // @ts-ignore
       product: InferSelectModel<typeof products>,
       columnKey: React.Key
     ): React.ReactNode => {
+      // @ts-ignore
       const cellValue =
+        // @ts-ignore
         product[columnKey as keyof InferSelectModel<typeof products>];
 
       switch (columnKey) {

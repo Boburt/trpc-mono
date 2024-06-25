@@ -1,21 +1,4 @@
-import { UsersSchema } from "@backend/lib/zod";
-import { z } from "zod";
 
-export const loginInput = z.object({
-  login: z.string(),
-  password: z.string(),
-});
-
-export const refreshTokenInput = z.object({
-  refreshToken: z.string(),
-});
-
-export const typeLoginOutput = z.object({
-  data: UsersSchema.omit({ password: true, salt: true }),
-  refreshToken: z.string(),
-  accessToken: z.string(),
-  rights: z.array(z.string()),
-});
 
 import { PermissionResponseDto } from "@backend/modules/permissions//dto/permissions.dto";
 import { RoleResponseDto } from "@backend/modules/roles/dto/roles.dto";
