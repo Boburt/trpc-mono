@@ -1,13 +1,33 @@
 "use client";
 import { TreeCategoryDto } from "@backend/modules/categories/dtos/tree.dto";
+import { Button } from "@frontend_next/components/ui/button";
+import { ScrollArea } from "@frontend_next/components/ui/scroll-area";
 import { apiClient } from "@frontend_next/lib/eden";
 import { cn } from "@frontend_next/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronRightIcon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronRight, ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export const ProductFilterCategories = () => {
+  const [expandedNodes, setExpandedNodes] = useState<string[]>([]);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+
+  const toggleNode = (nodeId: string) => {
+    setExpandedNodes((prevExpanded) =>
+      prevExpanded.includes(nodeId)
+        ? prevExpanded.filter((id) => id !== nodeId)
+        : [...prevExpanded, nodeId]
+    );
+  };
+
+  const handleSelect = (nodeId: string) => {
+    setSelectedNode(nodeId);
+    // Here you can add logic to navigate to the product list page
+    console.log(`Navigating to product list for category ${nodeId}`);
+  };
   const { data, isLoading } = useQuery({
     queryKey: ["catalog_categories"],
     queryFn: async () => {
@@ -60,11 +80,110 @@ export const ProductFilterCategories = () => {
     return <div></div>;
   } else if (data && Array.isArray(data) && data.length > 0) {
     return (
-      <div className="text-foreground">
-        <nav className="w-full">{renderMenu(data)}</nav>
+      <div className="text-foreground space-y-1">
+        <nav className="w-full">
+          {data.map((category) => (
+            <TreeNode
+              key={category.id}
+              node={category}
+              level={1}
+              expandedNodes={expandedNodes}
+              toggleNode={toggleNode}
+              onSelect={handleSelect}
+            />
+          ))}
+        </nav>
       </div>
     );
   } else {
     return <div></div>;
   }
+};
+
+const TreeNode = ({
+  node,
+  level,
+  expandedNodes,
+  toggleNode,
+  onSelect,
+}: {
+  node: TreeCategoryDto;
+  level: number;
+  expandedNodes: string[];
+  toggleNode: (id: string) => void;
+  onSelect: (id: string) => void;
+}) => {
+  const pathname = usePathname();
+  const isExpanded = expandedNodes.includes(node.id);
+  const hasChildren = node.children && node.children.length > 0;
+  const isActive = pathname === `/catalog/${node.code}`;
+  const isChildActive =
+    hasChildren &&
+    node.children.some((child) =>
+      pathname.startsWith(`/catalog/${child.code}`)
+    );
+
+  const shouldBeExpanded = isExpanded || isChildActive;
+
+  return (
+    <div>
+      <Link href={`/catalog/${node.code}`} passHref>
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start hover:bg-primary hover:text-primary-foreground",
+            level > 0 && `pl-${level * 4}`,
+            isActive && "bg-primary text-primary-foreground",
+            isChildActive && "font-bold"
+          )}
+        >
+          {hasChildren && (
+            <span className="mr-2">
+              <motion.div
+                initial={false}
+                animate={{ rotate: shouldBeExpanded ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (hasChildren) {
+                    toggleNode(node.id);
+                  }
+                }}
+              >
+                <ChevronRight size={16} />
+              </motion.div>
+            </span>
+          )}
+          {node.name}
+        </Button>
+      </Link>
+      <AnimatePresence initial={!shouldBeExpanded}>
+        {hasChildren && (
+          <motion.div
+            key={node.id}
+            initial="collapsed"
+            animate={shouldBeExpanded ? "expanded" : "collapsed"}
+            exit="collapsed"
+            variants={{
+              expanded: { opacity: 1, height: "auto" },
+              collapsed: { opacity: 0, height: 0 },
+            }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: "hidden" }}
+          >
+            {node.children.map((child) => (
+              <TreeNode
+                key={child.id}
+                node={child}
+                level={level + 1}
+                expandedNodes={expandedNodes}
+                toggleNode={toggleNode}
+                onSelect={onSelect}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
