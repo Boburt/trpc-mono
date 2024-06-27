@@ -97,6 +97,13 @@ const formSendTgQueueNameQueue = new Queue(formSendTgQueueName, {
   connection: client,
 });
 
+const indexProductsQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}index_products`,
+  {
+    connection: client,
+  }
+);
+
 
 export const ctx = new Elysia({
   name: "@app/ctx",
@@ -111,6 +118,7 @@ export const ctx = new Elysia({
   .decorate("formSendTgQueueNameQueue", formSendTgQueueNameQueue)
   .decorate("newTicketQueue", newTicketQueue)
   .decorate("ticketStatusChangedQueue", ticketStatusChangedQueue)
+  .decorate("indexProductsQueue", indexProductsQueue)
   .use(
     cors({
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

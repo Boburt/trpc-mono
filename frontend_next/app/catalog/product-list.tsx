@@ -38,7 +38,7 @@ export default function ProductList({
 
   if (data && Array.isArray(data) && data.length > 0) {
     return (
-      <div className="my-auto grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {data.map((product) => (
           <Card key={product.id} className="p-4">
             <Link href={`/product/${product.id}`}>

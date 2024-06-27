@@ -16,7 +16,7 @@ export default function ProductPagination({
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const { push } = useRouter();
   const { data } = useSuspenseQuery({
     queryKey: ["products_pagination", category],
     queryFn: async () => {
@@ -36,7 +36,7 @@ export default function ProductPagination({
   const changePage = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("page", page.toString());
-    replace(`${pathname}?${newSearchParams.toString()}`);
+    push(`${pathname}?${newSearchParams.toString()}`);
   };
 
   const pages = useMemo(() => {

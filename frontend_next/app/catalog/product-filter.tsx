@@ -1,5 +1,7 @@
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import { ProductFilterCategories } from "./product-filter-categories";
+import { Suspense } from "react";
+import ProductFilterFacets from "./product-filter-facets";
 
 export default function ProductFilter() {
   return (
@@ -8,6 +10,9 @@ export default function ProductFilter() {
         Фильтр
       </CardHeader>
       <ProductFilterCategories />
+      <Suspense>
+        <ProductFilterFacets />
+      </Suspense>
     </Card>
   );
 }
