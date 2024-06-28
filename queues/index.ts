@@ -3,6 +3,7 @@ import Redis from "ioredis";
 import processFormSendTg from "./processors/form_send_tg";
 import processNewTicket from "./processors/new_ticket";
 import processTicketStatusChange from "./processors/ticket_status_change";
+import processIndexProducts from "./processors/index_products";
 // import processNewImages from "./processors/new_assets_added";
 // import processIndexManufacturer from "./processors/index_manufacturers";
 // import processDeleteManufacturer from "./processors/delete_manufacturers";
@@ -20,6 +21,7 @@ const indexManufacturersQueueName = `${process.env.PROJECT_PREFIX}index_manufact
 const deleteManufacturersQueueName = `${process.env.PROJECT_PREFIX}delete_manufacturers`;
 const indexManufacturerReview = `${process.env.PROJECT_PREFIX}index_manufacturer_review`;
 const formSendTgQueueName = `${process.env.PROJECT_PREFIX}form_send_tg`;
+const indexProductsQueueName = `${process.env.PROJECT_PREFIX}index_products`;
 
 // const imageProcessQueueWorker = new Worker(
 //   imageProcessQueueName,
@@ -98,6 +100,18 @@ const ticketStatusChangeWorker = new Worker(
     const { data } = job;
     console.log("job data", data);
     await processTicketStatusChange(data.id, data.newStatus);
+  },
+  {
+    connection: redisClient,
+  }
+);
+
+const indexProductsQueueWorker = new Worker(
+  indexProductsQueueName,
+  async (job) => {
+    const { data } = job;
+    console.log("job data", data);
+    await processIndexProducts(data.id);
   },
   {
     connection: redisClient,

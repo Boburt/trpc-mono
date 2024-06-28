@@ -18,11 +18,83 @@ import fs from "fs";
 import path from "path";
 import { ProductProperties } from "./dtos/one.dto";
 import { ProductsWithRelations } from "./dtos/list.dto";
+import { ElasticsearchAggregations } from "./dtos/facets.dto";
 
 export const productsController = new Elysia({
   name: "@api/products",
 })
   .use(ctx)
+  .get('/products/public/facets', async ({
+    user, set, drizzle, query: { }
+  }) => {
+
+    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
+    const indexName = `${process.env.PROJECT_PREFIX}products`;
+
+    const query = {
+      size: 0,
+      aggs: {
+        manufacturers: {
+          terms: { field: 'manufacturer_name.keyword' },
+        },
+        properties: {
+          nested: { path: 'properties' },
+          aggs: {
+            names: {
+              terms: { field: 'properties.name' },
+              aggs: {
+                values: {
+                  terms: { field: 'properties.value.keyword' },
+                },
+              },
+            },
+          },
+        },
+        price_range: {
+          stats: { field: 'price' }
+        }
+      }
+    }
+
+    try {
+      const response = await fetch(`${esUrl}/${indexName}/_search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+        body: JSON.stringify(query)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Elasticsearch request failed: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const aggregations = data.aggregations as ElasticsearchAggregations
+      console.log('aggregations', aggregations)
+      return {
+        manufacturers: aggregations.manufacturers.buckets.map(bucket => ({
+          key: bucket.key,
+          doc_count: bucket.doc_count
+        })),
+        properties: aggregations.properties.names.buckets.map(keyBucket => ({
+          key: keyBucket.key,
+          values: keyBucket.values.buckets.map(valueBucket => ({
+            key: valueBucket.key,
+            doc_count: valueBucket.doc_count
+          }))
+        })),
+        priceRange: {
+          min: aggregations.price_range.min,
+          max: aggregations.price_range.max
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching facets:', error)
+      throw new Error('Failed to fetch facets')
+    }
+  })
   .get('/products/public/data', async ({ user, set, drizzle, query: {
     limit,
     offset,
@@ -564,6 +636,20 @@ export const productsController = new Elysia({
       }),
     }
   )
+  .post('/products/index', async ({ user, set, drizzle, indexProductsQueue }) => {
+    const productsList = await drizzle.select({
+      id: products.id,
+    }).from(products).execute();
+
+    for (const product of productsList) {
+      await indexProductsQueue.add(product.id, {
+        id: product.id,
+      }, {
+        removeOnComplete: true,
+        removeOnFail: true,
+      })
+    }
+  })
   .post('/products/batch', async ({ user, set, drizzle, body: { data } }) => {
     // if (!user) {
     //   return {

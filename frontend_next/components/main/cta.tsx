@@ -22,6 +22,7 @@ export default function Cta() {
     e.preventDefault();
     console.log("submitted");
   };
+
   return (
     <AuroraBackground>
       <motion.div
@@ -34,9 +35,9 @@ export default function Cta() {
         }}
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
-        <div className="text-6xl mx-auto font-normal text-neutral-600 dark:text-neutral-400">
-          Откройте новые возможности с нашими
-          <FlipWords words={words} /> <br />
+        <div className="text-6xl mx-auto font-normal text-center text-neutral-600 dark:text-neutral-400">
+          Откройте новые возможности <br /> с нашими
+          <FlipWords words={words} />
         </div>
         <div className="my-4 max-w-2xl w-full">
           <PlaceholdersAndVanishInput
