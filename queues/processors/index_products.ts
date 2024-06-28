@@ -284,11 +284,38 @@ export default async function processIndexProducts(id: string) {
             .from(products_properties)
             .leftJoin(
                 properties,
-                eq(products_properties.product_id, id)
+                eq(products_properties.property_id, properties.id)
             )
             .where(eq(products_properties.product_id, id))
             .execute();
-
+        console.log('searching properties', drizzleDb
+            .select({
+                id: products_properties.id,
+                // name: properties.name,
+                // property_type: properties.property_type,
+                value: products_properties.value,
+                // code: properties.code,
+            })
+            .from(products_properties)
+            // .leftJoin(
+            //     properties,
+            //     eq(products_properties.property_id, properties.id)
+            // )
+            .where(eq(products_properties.product_id, id)).toSQL().sql)
+        console.log('searching properties params', drizzleDb
+            .select({
+                id: products_properties.id,
+                name: properties.name,
+                property_type: properties.property_type,
+                value: products_properties.value,
+                code: properties.code,
+            })
+            .from(products_properties)
+            .leftJoin(
+                properties,
+                eq(products_properties.product_id, id)
+            )
+            .where(eq(products_properties.product_id, id)).toSQL().params)
         const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexProducts}/_doc/${currentProduct.id}`;
 
         const indexBody = {
@@ -298,7 +325,7 @@ export default async function processIndexProducts(id: string) {
             category: productCategory[0].name ?? "",
             properties: productPropertiesList,
         };
-
+        console.log('indexing', indexBody);
         const indexResponse = await fetch(indexUrl, {
             method: "PUT",
             headers: {
@@ -310,7 +337,7 @@ export default async function processIndexProducts(id: string) {
         });
 
         const indexResponseText = await indexResponse.text();
-        console.log("indexResponseText", indexResponseText);
+        // console.log("indexResponseText", indexResponseText);
     } catch (e) {
         console.log("davr", e);
     }

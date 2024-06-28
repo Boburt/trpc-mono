@@ -34,9 +34,9 @@ export const productsController = new Elysia({
     const query = {
       size: 0,
       aggs: {
-        manufacturers: {
-          terms: { field: 'manufacturer_name.keyword' },
-        },
+        // manufacturers: {
+        //   terms: { field: 'manufacturer_name.keyword' },
+        // },
         properties: {
           nested: { path: 'properties' },
           aggs: {
@@ -74,10 +74,10 @@ export const productsController = new Elysia({
       const aggregations = data.aggregations as ElasticsearchAggregations
       console.log('aggregations', aggregations)
       return {
-        manufacturers: aggregations.manufacturers.buckets.map(bucket => ({
-          key: bucket.key,
-          doc_count: bucket.doc_count
-        })),
+        // manufacturers: aggregations.manufacturers.buckets.map(bucket => ({
+        //   key: bucket.key,
+        //   doc_count: bucket.doc_count
+        // })),
         properties: aggregations.properties.names.buckets.map(keyBucket => ({
           key: keyBucket.key,
           values: keyBucket.values.buckets.map(valueBucket => ({
