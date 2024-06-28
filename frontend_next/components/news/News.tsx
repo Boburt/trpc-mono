@@ -18,7 +18,7 @@ export default function News() {
     queryFn: async () => {
       const { data } = await apiClient.api.news.public.get({
         query: {
-          limit: pathname != "/news" ? "4" : "20",
+          limit: pathname != "/news" ? "5" : "20",
         },
       });
       return data;
@@ -51,7 +51,7 @@ export default function News() {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         {news &&
           news.map((item: any, index: any) => {
             return (
