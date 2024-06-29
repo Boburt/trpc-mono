@@ -1,3 +1,4 @@
+"use client";
 import { Input } from "@frontend_next/components/ui/input";
 import { useForm } from "react-hook-form";
 import {
@@ -13,8 +14,14 @@ import { Separator } from "@frontend_next/components/ui/separator";
 
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { Button } from "@frontend_next/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
+import { createProfileQuery } from "@frontend_next/components/sign-up/stepper-forms/queries";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export const LegalEntitySecondStep = () => {
+  const { data: session } = useSession();
   const { nextStep, prevStep } = useStepper();
   const form = useForm<{
     first_name: string;
@@ -46,6 +53,20 @@ export const LegalEntitySecondStep = () => {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: (newTodo: Record<string, any>) =>
+      createProfileQuery({
+        newProfile: newTodo,
+        token: session?.accessToken!,
+      }),
+    onSuccess: () => {
+      nextStep();
+    },
+    onError: () => {
+      toast.error("Ошибка создания профиля");
+    },
+  });
+
   const onSubmit = (data: {
     first_name: string;
     last_name: string;
@@ -59,8 +80,7 @@ export const LegalEntitySecondStep = () => {
     extra_email: string;
     extra_phone: string;
   }) => {
-    console.log("data", data);
-    nextStep();
+    createMutation.mutate(data);
   };
 
   return (
@@ -70,8 +90,8 @@ export const LegalEntitySecondStep = () => {
         <p className="text-sm text-gray-500">
           Введите данные контактного лица для сотрудничество
         </p>
-        <Separator className="my-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Separator className="my-4 bg-gray-300" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="last_name"
@@ -170,14 +190,15 @@ export const LegalEntitySecondStep = () => {
             )}
           />
         </div>
+
         <h1 className="text-xl font-bold pt-10">
           Данные дополнительного контактного лица
         </h1>
         <p className="text-sm text-gray-500">
           Введите данные дополнительного контактного лица для сотрудничество
         </p>
-        <Separator className="my-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Separator className="my-4 bg-gray-300" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="extra_last_name"

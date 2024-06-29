@@ -1,16 +1,13 @@
-import { CustomerFourthStep } from "@frontend_next/components/sign-up/stepper-forms/customer/fourth-step/fourth-step";
-import { roleStore } from "@frontend_next/store/zustand/roleStore";
+import { FourthStep } from "@frontend_next/components/sign-up/stepper-forms/forms/fourth-step/fourth-step";
+import { IndividualFourthStep } from "@frontend_next/components/sign-up/stepper-forms/forms/fourth-step/individual-fourth-step";
 
-const fourthStepComponents: Record<string, React.FC> = {
-  customer: CustomerFourthStep,
-  manufacturer: CustomerFourthStep,
-  service: CustomerFourthStep,
-};
+import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 
 export const SignupWizardFourthStep = () => {
-  const role = roleStore((state) => state.role);
-
-  const CurrentComponent = fourthStepComponents[role];
-
-  return <CurrentComponent />;
+  const orgType = signUpWizardStore((state) => state.orgType);
+  return orgType.value === "individual" ? (
+    <IndividualFourthStep />
+  ) : (
+    <FourthStep />
+  );
 };
