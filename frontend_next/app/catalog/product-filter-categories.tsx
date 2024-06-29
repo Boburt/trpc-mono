@@ -25,8 +25,6 @@ export const ProductFilterCategories = () => {
 
   const handleSelect = (nodeId: string) => {
     setSelectedNode(nodeId);
-    // Here you can add logic to navigate to the product list page
-    console.log(`Navigating to product list for category ${nodeId}`);
   };
   const { data, isLoading } = useQuery({
     queryKey: ["catalog_categories"],

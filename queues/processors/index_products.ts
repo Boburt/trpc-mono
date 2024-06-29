@@ -190,6 +190,9 @@ export default async function processIndexProducts(id: string) {
                                 }
                             }
                         },
+                        "category_id": {
+                            "type": "keyword"
+                        },
                         "name": {
                             "type": "text",
                             "fields": {
@@ -261,7 +264,7 @@ export default async function processIndexProducts(id: string) {
         // get category name
         const productCategory = await drizzleDb.select({
             category_id: products_categories.category_id,
-            name: categories.name,
+            name: categories.name
         })
             .from(products_categories)
             .leftJoin(
@@ -284,11 +287,38 @@ export default async function processIndexProducts(id: string) {
             .from(products_properties)
             .leftJoin(
                 properties,
-                eq(products_properties.product_id, id)
+                eq(products_properties.property_id, properties.id)
             )
             .where(eq(products_properties.product_id, id))
             .execute();
-
+        console.log('searching properties', drizzleDb
+            .select({
+                id: products_properties.id,
+                // name: properties.name,
+                // property_type: properties.property_type,
+                value: products_properties.value,
+                // code: properties.code,
+            })
+            .from(products_properties)
+            // .leftJoin(
+            //     properties,
+            //     eq(products_properties.property_id, properties.id)
+            // )
+            .where(eq(products_properties.product_id, id)).toSQL().sql)
+        console.log('searching properties params', drizzleDb
+            .select({
+                id: products_properties.id,
+                name: properties.name,
+                property_type: properties.property_type,
+                value: products_properties.value,
+                code: properties.code,
+            })
+            .from(products_properties)
+            .leftJoin(
+                properties,
+                eq(products_properties.product_id, id)
+            )
+            .where(eq(products_properties.product_id, id)).toSQL().params)
         const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexProducts}/_doc/${currentProduct.id}`;
 
         const indexBody = {
@@ -296,9 +326,10 @@ export default async function processIndexProducts(id: string) {
             created_at: dayjs(currentProduct.created_at).toISOString(),
             updated_at: dayjs(currentProduct.updated_at).toISOString(),
             category: productCategory[0].name ?? "",
+            category_id: productCategory[0].category_id ?? "",
             properties: productPropertiesList,
         };
-
+        console.log('indexing', indexBody);
         const indexResponse = await fetch(indexUrl, {
             method: "PUT",
             headers: {
@@ -310,7 +341,7 @@ export default async function processIndexProducts(id: string) {
         });
 
         const indexResponseText = await indexResponse.text();
-        console.log("indexResponseText", indexResponseText);
+        // console.log("indexResponseText", indexResponseText);
     } catch (e) {
         console.log("davr", e);
     }
