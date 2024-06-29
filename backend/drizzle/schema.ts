@@ -982,3 +982,52 @@ export const products_properties = pgTable("products_properties", {
     .defaultNow()
     .notNull(),
 });
+
+export const profiles = pgTable("profiles", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  user_id: uuid("user_id").notNull(),
+  field_name: text("field_name").notNull(),
+  field_value: text("field_value").notNull(),
+  reference_id: uuid("references_id"),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});
+
+export const memberships = pgTable("memberships", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  short_name: text("short_name"),
+  description: text("description"),
+  active: boolean("active").default(true).notNull(),
+  rating: doublePrecision("rating"),
+  country: text("country"),
+  type: text("type").notNull(), // manufacturer, customer, etc.
+  org_type: text("org_type").notNull(), // company, foundation, etc.
+  city: text("city"),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});

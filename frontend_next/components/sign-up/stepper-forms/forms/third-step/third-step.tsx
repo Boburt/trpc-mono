@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { roleStore } from "@frontend_next/store/zustand/roleStore";
+import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { useState } from "react";
 import { CountryDropdown } from "@frontend_next/components/country-select/country-select";
 import { Input } from "@frontend_next/components/ui/input";
@@ -33,9 +33,10 @@ import {
 } from "@frontend_next/components/ui/command";
 
 import countryList from "@frontend_next/components/country-select/data/countries.json";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@frontend_next/components/ui/separator";
 
-export const CustomerThirdStep = () => {
+export const ThirdStep = () => {
+  const orgType = signUpWizardStore((state) => state.orgType);
   const [open, setOpen] = React.useState(false);
 
   const { nextStep, prevStep } = useStepper();
@@ -56,6 +57,10 @@ export const CustomerThirdStep = () => {
   return (
     <Form {...form}>
       <h1 className="text-2xl font-bold pt-6 px-6 justify-center">
+        {orgType.label}
+      </h1>
+      <Separator className="my-4 bg-gray-300 mx-4" />
+      <h1 className="text-xl font-bold pt-6 px-6 justify-center">
         Информация о предпринимательстве
       </h1>
       <form
@@ -156,21 +161,5 @@ export const CustomerThirdStep = () => {
         </div>
       </form>
     </Form>
-
-    // <div className="">
-    //   <h1 className="text-2xl font-bold pt-6 px-6">
-    //     Информация о предпринимательстве
-    //   </h1>
-    //   <div className="w-4/12 space-y-4 p-6 justify-center">
-    //     <div className="flex flex-col">
-    //       <span>Укажите страну регистрации</span>
-    //       <CountryDropdown />
-    //     </div>
-    //     <div>
-    //       <span>Введите ИНН организации</span>
-    //       <Input className="min-w-64" />
-    //     </div>
-    //   </div>
-    // </div>
   );
 };

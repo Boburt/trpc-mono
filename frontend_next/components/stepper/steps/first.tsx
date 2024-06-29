@@ -1,52 +1,77 @@
 "use client";
 
-import { Users, Factory, FileSliders } from "lucide-react";
-import { roleStore } from "@frontend_next/store/zustand/roleStore";
+import {
+  Users,
+  Factory,
+  FileSliders,
+  Truck,
+  Scale,
+  SlidersHorizontal,
+} from "lucide-react";
+import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { cn } from "@frontend_next/lib/utils";
 import { useStepper } from "../use-stepper";
 import { toast } from "sonner";
 import { Button } from "@frontend_next/components/ui/button";
 
-export const SignupWizardFirstStep: React.FC = () => {
-  const role = roleStore((state) => state.role);
-  const setRole = roleStore((state) => ({ setRole: state.setRole }));
+const roles = [
+  {
+    label: "Заказчик",
+    value: "customer",
+    icon: Users,
+  },
+  {
+    label: "Производитель",
+    value: "manufacturer",
+    icon: Factory,
+  },
+  {
+    label: "Логистика",
+    value: "logistics",
+    icon: Truck,
+  },
+  {
+    label: "Юрист",
+    value: "lawyer",
+    icon: Scale,
+  },
+  {
+    label: "Контролер",
+    value: "controller",
+    icon: SlidersHorizontal,
+  },
+];
 
-  console.log("role", role);
+export const SignupWizardFirstStep: React.FC = () => {
+  const role = signUpWizardStore((state) => state.role);
+  const setRole = signUpWizardStore((state) => ({ setRole: state.setRole }));
 
   return (
-    <div className="flex flex-col p-8 items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">Выберите Вашу роль</h1>
-        <div className="space-x-16 pt-10 flex">
-          <button
-            onClick={() => setRole.setRole("customer")}
-            className={cn(
-              "btn btn-primary select flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56",
-              { "border-primary-300": role == "customer" }
-            )}
-          >
-            <Users className=" h-12 w-12" /> Заказчик
-          </button>
-          <button
-            onClick={() => setRole.setRole("manufacturer")}
-            className={cn(
-              "btn btn-primary select flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56",
-              { "border-primary-300": role == "manufacturer" }
-            )}
-          >
-            <Factory className="h-12 w-12" /> Производитель
-          </button>
-          <button
-            onClick={() => {
-              setRole.setRole("service");
-            }}
-            className={cn(
-              "btn btn-primary select flex items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-56",
-              { "border-primary-300": role == "service" }
-            )}
-          >
-            <FileSliders className="h-12 w-12" /> Оказание услуг
-          </button>
+    <div className="p-8">
+      <div className="space-y-4">
+        <h1 className="text-4xl font-bold text-center">Выберите Вашу роль</h1>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          {roles.map((role) => (
+            <button
+              onClick={() =>
+                setRole.setRole({
+                  value: role.value,
+                  label: role.label,
+                })
+              }
+              key={role.value}
+              className={cn(
+                "btn btn-primary select flex mx-auto items-center flex-col rounded-md p-6 shadow-medium hover:shadow-lg  hover:border-gray-300  dark:hover:border-primary-300 border-1 w-full",
+                {
+                  "border-primary-300":
+                    role.value ===
+                    signUpWizardStore((state) => state.role.value),
+                }
+              )}
+            >
+              <role.icon className=" h-12 w-12" /> {role.label}
+            </button>
+          ))}
         </div>
       </div>
       <Footer />
@@ -56,10 +81,10 @@ export const SignupWizardFirstStep: React.FC = () => {
 
 const Footer = () => {
   const { nextStep } = useStepper();
-  const role = roleStore((state) => state.role);
+  const role = signUpWizardStore((state) => state.role);
 
   const gotoNext = () => {
-    if (role.length == 0) {
+    if (role.value.length == 0) {
       return toast.error("Выберите роль");
     } else {
       nextStep();
