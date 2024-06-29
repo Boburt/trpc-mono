@@ -12,6 +12,7 @@ export default function Catalog({
   searchParams: {
     page?: string;
     page_size?: string;
+    properties?: string;
   };
 }) {
   const pageSize = searchParams.page_size ?? "24";
@@ -22,7 +23,7 @@ export default function Catalog({
       </h1>
       <div className="flex gap-x-6 mt-10">
         <div className="hidden h-full overflow-x-hidden overflow-y-scroll sm:flex">
-          <ProductFilter />
+          <ProductFilter properties={searchParams.properties} />
         </div>
         <div className="w-full flex-1 flex-col">
           <ProductToolbar page_size={pageSize} />
@@ -30,13 +31,11 @@ export default function Catalog({
             key={searchParams.page + pageSize}
             fallback={<ProductListSkeleton />}
           >
-            <ProductList page={searchParams.page} page_size={pageSize} />
-          </Suspense>
-          <Suspense
-            key={searchParams.page + pageSize}
-            fallback={<ProductPaginationSkeleton />}
-          >
-            <ProductPagination page={searchParams.page} page_size={pageSize} />
+            <ProductList
+              page={searchParams.page}
+              page_size={pageSize}
+              properties={searchParams.properties}
+            />
           </Suspense>
         </div>
       </div>

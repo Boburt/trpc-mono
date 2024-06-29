@@ -18,17 +18,41 @@ import {
   AccordionTrigger,
 } from "@frontend_next/components/ui/accordion";
 
-export default function ProductFilterFacets() {
+export default function ProductFilterFacets({
+  category,
+  properties,
+}: {
+  category?: string;
+  properties?: string;
+}) {
   const [value, setValue] = useState<SliderValue>([0, 0]);
   const debouncedPriceRange = useDebounce<SliderValue>(value, 300);
   const { push } = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const queryParams = useMemo(() => {
+    let res: {
+      category?: string;
+      properties?: string;
+    } = {};
+
+    if (category) {
+      res.category = category;
+    }
+
+    if (properties) {
+      res.properties = properties;
+    }
+
+    return res;
+  }, [category, properties]);
 
   const { data: facets } = useSuspenseQuery({
-    queryKey: ["products_facets"],
+    queryKey: ["products_facets", category, properties],
     queryFn: async () => {
-      const { data } = await apiClient.api.products.public.facets.get();
+      const { data } = await apiClient.api.products.public.facets.get({
+        query: queryParams,
+      });
       return data;
     },
     refetchOnMount: false,
@@ -64,8 +88,8 @@ export default function ProductFilterFacets() {
         params.set(key, value);
       }
     } else if (Array.isArray(value)) {
-      if (params.get(key)) {
-        params.set(key, params.get(key)!.replace(value.join(","), ""));
+      if (params.get(key) && value.length == 0) {
+        params.delete(key);
       } else {
         params.set(key, value.join(","));
       }
@@ -76,7 +100,9 @@ export default function ProductFilterFacets() {
         params.set(key, value.toString());
       }
     }
-    push(`${pathname}?${params.toString()}`);
+    push(`${pathname}?${params.toString()}`, {
+      scroll: false,
+    });
   };
 
   // useEffect(() => {
@@ -121,7 +147,11 @@ export default function ProductFilterFacets() {
         <CheckboxGroup
           label={property.key}
           key={property.key}
-          value={searchParams.get("properties")?.split(",")}
+          value={
+            searchParams.get("properties")
+              ? searchParams.get("properties")?.split(",")
+              : []
+          }
           // value={selected}
           onValueChange={(val) => updateFilters("properties", val)}
         >
