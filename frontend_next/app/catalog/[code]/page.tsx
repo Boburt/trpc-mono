@@ -16,6 +16,7 @@ export default async function CatalogCategoryPage({
   searchParams: {
     page?: string;
     page_size?: string;
+    properties?: string;
   };
 }) {
   const itemJson = await fetch(
@@ -36,7 +37,7 @@ export default async function CatalogCategoryPage({
       {data.description && <p>{data.description}</p>}
       <div className="flex gap-x-6 mt-10">
         <div className="hidden h-full overflow-x-hidden overflow-y-scroll sm:flex">
-          <ProductFilter />
+          <ProductFilter category={code} properties={searchParams.properties} />
         </div>
         <div className="w-full flex-1 flex-col">
           <ProductToolbar page_size={pageSize} />
@@ -48,16 +49,7 @@ export default async function CatalogCategoryPage({
               page={searchParams.page}
               page_size={pageSize}
               category={code}
-            />
-          </Suspense>
-          <Suspense
-            key={searchParams.page + pageSize}
-            fallback={<ProductPaginationSkeleton />}
-          >
-            <ProductPagination
-              page={searchParams.page}
-              page_size={pageSize}
-              category={code}
+              properties={searchParams.properties}
             />
           </Suspense>
         </div>
