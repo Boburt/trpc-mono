@@ -3,10 +3,20 @@ import { drizzleDb } from "@backend/lib/db";
 import { categories, manufacturers, products, products_categories, products_properties, properties } from "@backend/../drizzle/schema";
 import { SQLWrapper, and, eq, gt, gte, isNotNull, lt, lte } from "drizzle-orm";
 import dayjs from "dayjs";
+import { pipeline, env } from '@xenova/transformers';
+// env.cacheDir = './model_cache';
+
+// const embeddingPipeline = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+
+// async function generateEmbedding(text: string) {
+//     const output = await embeddingPipeline(text, { pooling: 'mean', normalize: true });
+//     return Array.from(output.data);
+// }
+
+const model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
 export default async function processIndexProducts(id: string) {
     try {
-
         const product = await drizzleDb.query.products.findFirst({
             where: eq(products.id, id),
             columns: {
@@ -223,6 +233,18 @@ export default async function processIndexProducts(id: string) {
                                 },
                                 "code": { "type": "keyword" }
                             }
+                        },
+                        text_vector: {
+                            type: 'dense_vector',
+                            dims: 384,
+                            index: true,
+                            similarity: 'cosine'
+                        },
+                        product_vector: {
+                            type: 'dense_vector',
+                            dims: 384,
+                            index: true,
+                            similarity: 'cosine'
                         }
                     }
                 }
@@ -238,7 +260,7 @@ export default async function processIndexProducts(id: string) {
                 verbose: true,
             });
         }
-
+        console.time('productSelect');
         const existingProduct = await drizzleDb.select({
             id: products.id,
             manufacturer_id: products.manufacturer_id,
@@ -260,6 +282,8 @@ export default async function processIndexProducts(id: string) {
             .execute();
 
         const currentProduct = existingProduct[0];
+        const textToEmbed = `${currentProduct.name} ${currentProduct.description}`;
+        const textEmbedding = await model(textToEmbed, { pooling: 'mean', normalize: true });
 
         // get category name
         const productCategory = await drizzleDb.select({
@@ -291,35 +315,14 @@ export default async function processIndexProducts(id: string) {
             )
             .where(eq(products_properties.product_id, id))
             .execute();
-        console.log('searching properties', drizzleDb
-            .select({
-                id: products_properties.id,
-                // name: properties.name,
-                // property_type: properties.property_type,
-                value: products_properties.value,
-                // code: properties.code,
-            })
-            .from(products_properties)
-            // .leftJoin(
-            //     properties,
-            //     eq(products_properties.property_id, properties.id)
-            // )
-            .where(eq(products_properties.product_id, id)).toSQL().sql)
-        console.log('searching properties params', drizzleDb
-            .select({
-                id: products_properties.id,
-                name: properties.name,
-                property_type: properties.property_type,
-                value: products_properties.value,
-                code: properties.code,
-            })
-            .from(products_properties)
-            .leftJoin(
-                properties,
-                eq(products_properties.product_id, id)
-            )
-            .where(eq(products_properties.product_id, id)).toSQL().params)
+
+        console.timeEnd('productSelect');
         const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexProducts}/_doc/${currentProduct.id}`;
+
+        // For product_vector, we might want to include more fields
+        const productToEmbed = `${currentProduct.name} ${currentProduct.description} ${productCategory[0].name} ${currentProduct.manufacturer_name}`;
+        const productEmbedding = await model(productToEmbed, { pooling: 'mean', normalize: true });
+
 
         const indexBody = {
             ...currentProduct,
@@ -328,8 +331,11 @@ export default async function processIndexProducts(id: string) {
             category: productCategory[0].name ?? "",
             category_id: productCategory[0].category_id ?? "",
             properties: productPropertiesList,
+            text_vector: Array.from(textEmbedding.data),
+            product_vector: Array.from(productEmbedding.data)
         };
-        console.log('indexing', indexBody);
+        // console.log('indexing', indexBody);
+        console.time('indexing');
         const indexResponse = await fetch(indexUrl, {
             method: "PUT",
             headers: {
@@ -339,6 +345,7 @@ export default async function processIndexProducts(id: string) {
             body: JSON.stringify(indexBody),
             verbose: true,
         });
+        console.timeEnd('indexing');
 
         const indexResponseText = await indexResponse.text();
         // console.log("indexResponseText", indexResponseText);
