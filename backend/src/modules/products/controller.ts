@@ -843,6 +843,7 @@ export const productsController = new Elysia({
     }).from(products).execute();
 
     for (const product of productsList) {
+      console.log('indexing product', product.id);
       await indexProductsQueue.add(product.id, {
         id: product.id,
       }, {
