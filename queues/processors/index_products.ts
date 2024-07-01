@@ -13,6 +13,15 @@ import { pipeline, env } from '@xenova/transformers';
 //     return Array.from(output.data);
 // }
 
+const HttpsAgent = require('agentkeepalive').HttpsAgent;
+const agent = new HttpsAgent({
+    maxSockets: 100,
+    maxFreeSockets: 10,
+    timeout: 60000,
+    freeSocketTimeout: 30000,
+
+});
+
 const model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
 export default async function processIndexProducts(id: string) {
@@ -47,7 +56,7 @@ export default async function processIndexProducts(id: string) {
                 "Content-Type": "application/json",
                 Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
             },
-            verbose: true,
+            verbose: true
         });
         console.log("response", response);
         if (response.status == 404) {
@@ -343,7 +352,7 @@ export default async function processIndexProducts(id: string) {
                 Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
             },
             body: JSON.stringify(indexBody),
-            verbose: true,
+            verbose: true
         });
         console.timeEnd('indexing');
 
