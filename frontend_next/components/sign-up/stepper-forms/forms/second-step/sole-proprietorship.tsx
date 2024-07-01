@@ -10,15 +10,16 @@ import {
   FormMessage,
 } from "@frontend_next/components/ui/form";
 import { Separator } from "@frontend_next/components/ui/separator";
-import { roleStore } from "@frontend_next/store/zustand/roleStore";
+import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
-import { toast } from "sonner";
 import { Button } from "@frontend_next/components/ui/button";
+import { getProfileById } from "../../queries";
 
 export const SoleProprietorshipSecondStep = () => {
-  const role = roleStore((state) => state.role);
-  const orgType = roleStore((state) => state.orgType);
+  const role = signUpWizardStore((state) => state.role);
+  const orgType = signUpWizardStore((state) => state.orgType);
   const { nextStep, prevStep } = useStepper();
+
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -53,13 +54,13 @@ export const SoleProprietorshipSecondStep = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className=" my-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="my-6">
         <h1 className="text-xl font-bold">Контактные данные</h1>
         <p className="text-sm text-gray-500">
           Введите Контактные данные для сотрудничество
         </p>
-        <Separator className="my-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Separator className="my-4 bg-gray-300" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="last_name"

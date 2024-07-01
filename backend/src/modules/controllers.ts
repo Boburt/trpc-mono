@@ -26,6 +26,8 @@ import { ConversationsController } from "./conversations/controller";
 import { productsController } from "./products/controller";
 import { uploadsController } from "./uploads/controller";
 import { newsController } from "./news/controller";
+import { membershipsController } from "./memberships/controller";
+import { profilesController } from "./profiles/controller";
 
 export const apiController = new Elysia({
   prefix: "/api",
@@ -56,4 +58,7 @@ export const apiController = new Elysia({
   .use(ConversationsController)
   .use(productsController)
   .use(uploadsController)
-  .use(newsController);
+  .use(newsController)
+  .use(membershipsController)
+  .use(rolesController)
+  .use(profilesController);

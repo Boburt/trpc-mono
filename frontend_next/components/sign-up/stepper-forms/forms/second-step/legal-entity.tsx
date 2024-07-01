@@ -1,3 +1,4 @@
+"use client";
 import { Input } from "@frontend_next/components/ui/input";
 import { useForm } from "react-hook-form";
 import {
@@ -13,9 +14,68 @@ import { Separator } from "@frontend_next/components/ui/separator";
 
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { Button } from "@frontend_next/components/ui/button";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import useToken from "@admin/store/get-token";
+import { createProfileQuery } from "@frontend_next/app/sign-up/queries";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useMemo } from "react";
+import { profiles } from "backend/drizzle/schema";
 
 export const LegalEntitySecondStep = () => {
+  const { data: session } = useSession();
   const { nextStep, prevStep } = useStepper();
+
+  // const { data: profile } = useQuery({
+  //   queryKey: ["profile"],
+  //   queryFn: async () => await getProfileById(session?.accessToken!),
+  //   enabled: !!session?.accessToken,
+  // });
+
+  // const values = useMemo(() => {
+  //   let result: {
+  //     first_name: string;
+  //     last_name: string;
+  //     sur_name: string;
+  //     job_title: string;
+  //     phone: string;
+  //     email: string;
+  //     extra_first_name: string;
+  //     extra_last_name: string;
+  //     extra_sur_name: string;
+  //     extra_job_title: string;
+  //     extra_email: string;
+  //     extra_phone: string;
+  //   } = {
+  //     first_name: "",
+  //     last_name: "",
+  //     sur_name: "",
+  //     job_title: "",
+  //     phone: "",
+  //     email: "",
+  //     extra_first_name: "",
+  //     extra_last_name: "",
+  //     extra_sur_name: "",
+  //     extra_job_title: "",
+  //     extra_email: "",
+  //     extra_phone: "",
+  //   };
+  //   if (
+  //     profile &&
+  //     "data" in profile &&
+  //     Array.isArray(profile.data) &&
+  //     profile.data.length > 0
+  //   ) {
+  //     for (let i = 0; i < profile.data.length; i++) {
+  //       let item = profile.data[i];
+  //       result[item.field_name as keyof typeof result] = item.field_value;
+  //     }
+  //   }
+  //   return result;
+  // }, [profile]);
+
+  // console.log("values", values);
+
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -44,6 +104,21 @@ export const LegalEntitySecondStep = () => {
       extra_email: "",
       extra_phone: "",
     },
+    // values,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (newTodo: Record<string, any>) =>
+      createProfileQuery({
+        newProfile: newTodo,
+        token: session?.accessToken!,
+      }),
+    onSuccess: () => {
+      nextStep();
+    },
+    onError: () => {
+      toast.error("Ошибка создания профиля");
+    },
   });
 
   const onSubmit = (data: {
@@ -59,8 +134,7 @@ export const LegalEntitySecondStep = () => {
     extra_email: string;
     extra_phone: string;
   }) => {
-    console.log("data", data);
-    nextStep();
+    createMutation.mutate(data);
   };
 
   return (
@@ -70,8 +144,8 @@ export const LegalEntitySecondStep = () => {
         <p className="text-sm text-gray-500">
           Введите данные контактного лица для сотрудничество
         </p>
-        <Separator className="my-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Separator className="my-4 bg-gray-300" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="last_name"
@@ -170,14 +244,15 @@ export const LegalEntitySecondStep = () => {
             )}
           />
         </div>
+
         <h1 className="text-xl font-bold pt-10">
           Данные дополнительного контактного лица
         </h1>
         <p className="text-sm text-gray-500">
           Введите данные дополнительного контактного лица для сотрудничество
         </p>
-        <Separator className="my-4" />
-        <div className="grid grid-cols-3 gap-4">
+        <Separator className="my-4 bg-gray-300" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="extra_last_name"
