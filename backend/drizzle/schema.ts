@@ -1007,14 +1007,14 @@ export const profiles = pgTable("profiles", {
 
 export const memberships = pgTable("memberships", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name").notNull(),
+  name: text("name"),
   short_name: text("short_name"),
   description: text("description"),
-  active: boolean("active").default(true).notNull(),
+  active: boolean("active").default(false).notNull(),
   rating: doublePrecision("rating"),
   country: text("country"),
   type: text("type").notNull(), // manufacturer, customer, etc.
-  org_type: text("org_type").notNull(), // company, foundation, etc.
+  org_type: text("org_type"), // company, foundation, etc.
   city: text("city"),
   created_at: timestamp("created_at", {
     precision: 5,

@@ -13,11 +13,13 @@ import { Separator } from "@frontend_next/components/ui/separator";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { Button } from "@frontend_next/components/ui/button";
+import { getProfileById } from "../../queries";
 
 export const SoleProprietorshipSecondStep = () => {
   const role = signUpWizardStore((state) => state.role);
   const orgType = signUpWizardStore((state) => state.orgType);
   const { nextStep, prevStep } = useStepper();
+
   const form = useForm<{
     first_name: string;
     last_name: string;
