@@ -13,6 +13,11 @@ import { cn } from "@frontend_next/lib/utils";
 import { useStepper } from "../use-stepper";
 import { toast } from "sonner";
 import { Button } from "@frontend_next/components/ui/button";
+import { useSession } from "next-auth/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InferInsertModel } from "drizzle-orm";
+import { memberships } from "backend/drizzle/schema";
+import { apiClient } from "@frontend_next/lib/eden";
 
 const roles = [
   {
@@ -43,8 +48,51 @@ const roles = [
 ];
 
 export const SignupWizardFirstStep: React.FC = () => {
+  const { data: session } = useSession();
+  const { nextStep } = useStepper();
   const role = signUpWizardStore((state) => state.role);
   const setRole = signUpWizardStore((state) => ({ setRole: state.setRole }));
+  const setMembershipId = signUpWizardStore((state) => ({
+    setMembershipId: state.setMembershipId,
+  }));
+
+  const gotoNext = () => {
+    if (role.value.length == 0) {
+      return toast.error("Выберите роль");
+    } else {
+      createMutation.mutate({
+        type: role.value,
+      });
+    }
+  };
+
+  const createMutation = useMutation({
+    mutationFn: (newMembership: InferInsertModel<typeof memberships>) => {
+      return apiClient.api.memberships.post(
+        {
+          data: {
+            type: newMembership.type,
+          },
+          fields: ["id"],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken!}`,
+          },
+        }
+      );
+    },
+    onSuccess: (data) => {
+      console.log("data", data);
+      if (data.data && "id" in data.data) {
+        setMembershipId.setMembershipId(data.data.id);
+        toast.success("Роль успешно присвоена");
+        nextStep();
+      } else {
+        toast.error("Роль не присвоена");
+      }
+    },
+  });
 
   return (
     <div className="p-8">
@@ -74,28 +122,11 @@ export const SignupWizardFirstStep: React.FC = () => {
           ))}
         </div>
       </div>
-      <Footer />
-    </div>
-  );
-};
-
-const Footer = () => {
-  const { nextStep } = useStepper();
-  const role = signUpWizardStore((state) => state.role);
-
-  const gotoNext = () => {
-    if (role.value.length == 0) {
-      return toast.error("Выберите роль");
-    } else {
-      nextStep();
-    }
-  };
-
-  return (
-    <div className="w-full flex justify-end mt-6">
-      <Button size="sm" onClick={gotoNext}>
-        Следующий шаг
-      </Button>
+      <div className="w-full flex justify-end mt-6">
+        <Button size="sm" onClick={gotoNext}>
+          Следующий шаг
+        </Button>
+      </div>
     </div>
   );
 };

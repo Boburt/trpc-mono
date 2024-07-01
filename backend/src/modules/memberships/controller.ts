@@ -36,24 +36,22 @@ export const membershipsController = new Elysia({
       if (fields) {
         selectFields = parseSelectFields(fields, memberships, {});
       }
-      const result = await drizzle
+      const result = (await drizzle
         .insert(memberships)
         .values(data)
-        .returning(selectFields);
+        .returning(selectFields)) as InferSelectModel<typeof memberships>[];
 
-      return {
-        data: result[0],
-      };
+      return result[0];
     },
     {
       body: t.Object({
         data: t.Object({
-          name: t.String(),
-          short_name: t.String(),
-          description: t.String(),
-          active: t.Boolean(),
+          name: t.Optional(t.String()),
+          short_name: t.Optional(t.String()),
+          description: t.Optional(t.String()),
+          active: t.Optional(t.Boolean()),
           type: t.String(),
-          org_type: t.String(),
+          org_type: t.Optional(t.String()),
           country: t.Optional(t.String()),
           city: t.Optional(t.String()),
           rating: t.Optional(t.Number()),
