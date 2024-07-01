@@ -19,6 +19,9 @@ import path from "path";
 import { ProductProperties } from "./dtos/one.dto";
 import { ProductsWithRelations } from "./dtos/list.dto";
 import { ElasticsearchAggregations } from "./dtos/facets.dto";
+import { pipeline } from '@xenova/transformers';
+
+const model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
 export const productsController = new Elysia({
   name: "@api/products",
@@ -219,7 +222,8 @@ export const productsController = new Elysia({
     sort,
     properties,
     fields,
-    category
+    category,
+    query
   } }) => {
     const propertiesFilter = properties ? properties.split(",") : [];
     const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
@@ -335,6 +339,17 @@ export const productsController = new Elysia({
         });
       }
     }
+
+    if (query && query.length > 0) {
+      const queryEmbedding = await model(query, { pooling: 'mean', normalize: true });
+      elasticQuery.knn = {
+        field: 'text_vector',
+        query_vector: Array.from(queryEmbedding.data),
+        k: 5,
+        num_candidates: 100
+      }
+    }
+
     const response = await fetch(`${esUrl}/${indexName}/_search`, {
       method: 'POST',
       headers: {
@@ -349,7 +364,11 @@ export const productsController = new Elysia({
     }
 
     const result = await response.json()
-    const hits = result.hits.hits.map((hit) => hit._source) as ProductsWithRelations[];
+    const hits = result.hits.hits.map((hit) => ({
+      ...hit._source,
+      text_vector: undefined,
+      product_vector: undefined
+    })) as ProductsWithRelations[];
 
     // const rolesList = await drizzle
     //   .select(selectFields)
@@ -397,6 +416,7 @@ export const productsController = new Elysia({
         sort: t.Optional(t.String()),
         fields: t.Optional(t.String()),
         category: t.Optional(t.String()),
+        query: t.Optional(t.String()),
         properties: t.Optional(t.Nullable(t.String())),
       }),
     })
