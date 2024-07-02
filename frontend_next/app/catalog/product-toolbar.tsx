@@ -17,6 +17,7 @@ import ProductFilter from "./product-filter";
 import { ScrollArea } from "@frontend_next/components/ui/scroll-area";
 import ProductFilterClear from "./product-filter-clear";
 import ProductSearchInput from "./product-search-input";
+import { RequestModeSwitcher } from "./product-request-mode";
 
 export default function ProductToolbar({
   page_size,
@@ -47,6 +48,7 @@ export default function ProductToolbar({
           Фильтры
         </Button>
         <ProductSearchInput />
+        <RequestModeSwitcher />
       </div>
       <Select
         labelPlacement="outside"
