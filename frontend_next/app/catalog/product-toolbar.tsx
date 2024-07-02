@@ -1,14 +1,53 @@
 "use client";
 
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@frontend_next/components/ui/drawer";
+import { Button } from "@nextui-org/button";
 import { Select, SelectItem } from "@nextui-org/select";
+import { Menu } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import ProductFilter from "./product-filter";
+import { ScrollArea } from "@frontend_next/components/ui/scroll-area";
+import ProductFilterClear from "./product-filter-clear";
+import ProductSearchInput from "./product-search-input";
 
-export default function ProductToolbar({ page_size }: { page_size: string }) {
+export default function ProductToolbar({
+  page_size,
+  category,
+  properties,
+}: {
+  page_size: string;
+  category?: string;
+  properties?: string;
+}) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  const openDrawer = () => setIsDrawerOpen(true);
+  const closeDrawer = () => setIsDrawerOpen(false);
+
   return (
-    <header className="relative z-20 flex gap-2 rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 justify-end">
+    <header className="relative z-20 flex flex-wrap gap-2 rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 justify-between items-end">
+      <div className="flex items-center gap-2">
+        <Button
+          className="lg:hidden"
+          variant="bordered"
+          onClick={openDrawer}
+          startContent={<Menu size={24} />}
+        >
+          Фильтры
+        </Button>
+        <ProductSearchInput />
+      </div>
       <Select
         labelPlacement="outside"
         label="На странице: "
@@ -30,6 +69,35 @@ export default function ProductToolbar({ page_size }: { page_size: string }) {
           96
         </SelectItem>
       </Select>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent className="mx-auto w-full bg-content2">
+          <DrawerHeader>
+            <DrawerTitle>Фильтры</DrawerTitle>
+          </DrawerHeader>
+          <div className="p-4">
+            {isDrawerOpen && (
+              <ScrollArea className="h-[calc(100vh-10rem)]">
+                <ProductFilter
+                  category={category}
+                  properties={properties}
+                  hideTitle={true}
+                  className="max-w-md mx-auto"
+                />
+              </ScrollArea>
+            )}
+          </div>
+          <DrawerFooter className="pt-2 flex flex-col space-y-3">
+            <Button color="primary" onPress={closeDrawer} className="w-full">
+              Показать
+            </Button>
+            <ProductFilterClear
+              variant="ghost"
+              color="primary"
+              className="w-full"
+            />
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </header>
   );
 }
