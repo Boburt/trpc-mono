@@ -1,6 +1,6 @@
 "use client";
 import { apiClient } from "@frontend_next/lib/eden";
-import { Card, CardHeader, Pagination } from "@nextui-org/react";
+import { Card, CardFooter, CardHeader, Pagination } from "@nextui-org/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ProductCounter } from "./product-counter";
 
 export default function ProductList({
   page,
@@ -78,7 +79,7 @@ export default function ProductList({
       <div>
         <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {data.products.map((product) => (
-            <Card key={product.id} className="p-4">
+            <Card key={product.id} className="p-4" isFooterBlurred>
               <Link href={`/product/${product.id}`}>
                 <Image
                   as={NextImage}
@@ -91,15 +92,15 @@ export default function ProductList({
                   alt={product.name}
                 />
               </Link>
-              <CardHeader className="pb-0 pt-2 flex-col items-start">
-                <div className="flex flex-col gap-3">
+              <CardHeader className="pb-0 pt-2 flex-col items-start flex-1">
+                <div className="flex flex-col gap-3 flex-1">
                   <Link
                     className="text-medium font-medium text-default-700 leading-tight"
                     href={`/product/${product.id}`}
                   >
                     {product.name}
                   </Link>
-                  <div className="text-small text-default-600">
+                  <div className="text-small text-default-600 flex-1">
                     {product.description}
                   </div>
                   <p className="text-small font-medium text-default-700">
@@ -112,6 +113,9 @@ export default function ProductList({
                   </p>
                 </div>
               </CardHeader>
+              <CardFooter>
+                <ProductCounter productId={product.id} />
+              </CardFooter>
             </Card>
           ))}
         </div>

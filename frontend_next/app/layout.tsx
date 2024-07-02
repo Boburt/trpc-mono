@@ -11,6 +11,7 @@ import { BreadCrumbs } from "../components/breadcrumbs/breadcrumbs";
 import { auth } from "@frontend_next/auth";
 import SessionProvider from "@frontend_next/components/providers/SessionProvider";
 import ReactQueryClientProvider from "@frontend_next/components/providers/ReactQueryProvider";
+import { ProductSelectionSummary } from "./catalog/product-selection-summary";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -73,6 +74,7 @@ export default async function RootLayout({
                 </main>
                 <Footer />
                 <Toaster richColors />
+                <ProductSelectionSummary />
               </NextUIProviderClient>
             </ReactQueryClientProvider>
           </SessionProvider>
