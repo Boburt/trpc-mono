@@ -23,6 +23,9 @@ import { pipeline } from '@xenova/transformers';
 
 const model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
+const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
+const indexName = `${process.env.PROJECT_PREFIX}products`;
+
 export const productsController = new Elysia({
   name: "@api/products",
 })
@@ -36,8 +39,6 @@ export const productsController = new Elysia({
   }) => {
 
     const propertiesFilter = properties ? properties.split(",") : [];
-    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
-    const indexName = `${process.env.PROJECT_PREFIX}products`;
     const filter: any[] = [
       {
         bool: {
@@ -226,8 +227,6 @@ export const productsController = new Elysia({
     query
   } }) => {
     const propertiesFilter = properties ? properties.split(",") : [];
-    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
-    const indexName = `${process.env.PROJECT_PREFIX}products`;
     const filter: any[] = [
       {
         bool: {
@@ -304,6 +303,9 @@ export const productsController = new Elysia({
         price_range: {
           stats: { field: 'price' }
         }
+      },
+      _source: {
+        excludes: ['text_vector', 'product_vector']  // Optionally exclude large vector fields
       }
     } as any;
 
@@ -370,21 +372,6 @@ export const productsController = new Elysia({
       product_vector: undefined
     })) as ProductsWithRelations[];
 
-    // const rolesList = await drizzle
-    //   .select(selectFields)
-    //   .from(products)
-    //   .leftJoin(
-    //     manufacturers,
-    //     eq(products.manufacturer_id, manufacturers.id)
-    //   )
-    //   .innerJoin(
-    //     products_categories,
-    //     eq(products.id, products_categories.product_id)
-    //   )
-    //   .where(and(...whereClause))
-    //   .limit(limit)
-    //   .offset(offset)
-    //   .execute() as ProductsWithRelations[];
     if (hits.length > 0) {
       const images = await drizzle.query.assets.findMany({
         where: and(
@@ -418,71 +405,6 @@ export const productsController = new Elysia({
         category: t.Optional(t.String()),
         query: t.Optional(t.String()),
         properties: t.Optional(t.Nullable(t.String())),
-      }),
-    })
-  .get('/products/public/count', async ({ user, set, drizzle, query: {
-    sort,
-    filters,
-    category
-  } }) => {
-
-    let whereClause: (SQLWrapper | undefined)[] = [];
-    if (filters) {
-      whereClause = parseFilterFields(filters, products, {
-        manufacturers,
-      });
-    }
-    whereClause.push(eq(products.active, true));
-    let categoryCode = category;
-    if (category) {
-      try {
-        categoryCode = JSON.parse(category);
-      } catch (e) {
-
-      }
-
-    }
-    if (categoryCode && categoryCode != null) {
-      const categoryHierarchyQuery = sql.raw(`
-        WITH RECURSIVE category_hierarchy AS (
-          SELECT id, name, parent_id
-          FROM categories
-          WHERE code = '${category}' AND active = true
-          UNION ALL
-          SELECT c.id, c.name, c.parent_id
-          FROM categories c
-          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
-          WHERE c.active = true
-        )
-        SELECT id FROM category_hierarchy;
-      `);
-
-      // Execute the query to get category IDs
-      const categoryHierarchyResult = await drizzle.execute<{
-        id: string;
-        name: string;
-        parent_id: string;
-      }>(categoryHierarchyQuery);
-      const categoryIds = categoryHierarchyResult.map(row => row.id);
-      whereClause.push(inArray(products_categories.category_id, categoryIds));
-    }
-    const rolesCount = await drizzle
-      .select({ count: sql<number>`count(*)` })
-      .from(products)
-      .innerJoin(
-        products_categories,
-        eq(products.id, products_categories.product_id)
-      )
-      .where(and(...whereClause))
-      .execute();
-
-    return rolesCount[0].count;
-  },
-    {
-      query: t.Object({
-        sort: t.Optional(t.String()),
-        filters: t.Optional(t.String()),
-        category: t.Optional(t.String()),
       }),
     })
   .get("/products/public/:id", async ({ cacheController, set, params: { id }, drizzle }) => {
@@ -576,60 +498,74 @@ export const productsController = new Elysia({
         message: "Product not found",
       };
     }
+    const response = await fetch(`${esUrl}/${indexName}/_doc/${product.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+    });
 
-    let selectFields: SelectedFields = {};
-    if (fields) {
-      selectFields = parseSelectFields(fields, products, {
-        manufacturers,
-      });
+    if (!response.ok) {
+      throw new Error(`Elasticsearch request failed: ${response.statusText}`);
     }
-    const existingProduct = await drizzle.select({
-      id: products.id,
-      category_id: products_categories.category_id,
+
+    const elasticProductData = await response.json() as any;
+
+    const productVector = elasticProductData._source.product_vector;
+
+    const body = {
+      size: 5,
+      query: {
+        bool: {
+          must_not: [
+            { term: { _id: product.id } }
+          ],
+          filter: [
+            { term: { active: true } }
+          ]
+        }
+      },
+      knn: {
+        field: 'product_vector',
+        query_vector: productVector,
+        k: 6,
+        num_candidates: 100
+      },
+      _source: {
+        excludes: ['text_vector', 'product_vector']  // Optionally exclude large vector fields
+      }
+    };
+
+    const relatedResponse = await fetch(`${esUrl}/${indexName}/_search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify(body)
     })
-      .from(products)
-      .leftJoin(
-        manufacturers,
-        eq(products.manufacturer_id, manufacturers.id)
-      )
-      .innerJoin(
-        products_categories,
-        eq(products.id, products_categories.product_id)
-      )
-      .where(eq(products.id, id))
-      .execute();
-    const rolesList = await drizzle
-      .select(selectFields)
-      .from(products)
-      .leftJoin(
-        manufacturers,
-        eq(products.manufacturer_id, manufacturers.id)
-      )
-      .innerJoin(
-        products_categories,
-        eq(products.id, products_categories.product_id)
-      )
-      .where(and(
-        ne(products.id, id),
-        ne(products_categories.category_id, existingProduct[0].category_id)
-      ))
-      .orderBy(sql`RANDOM()`)
-      .limit(+limit)
-      .offset(0)
-      .execute() as ProductsWithRelations[];
-    if (rolesList.length > 0) {
+    const result = await relatedResponse.json() as any;
+
+    const hits = result.hits.hits.map((hit: any) => ({
+      ...hit._source,
+      text_vector: undefined,
+      product_vector: undefined
+    })) as ProductsWithRelations[];
+
+    if (hits.length > 0) {
       const images = await drizzle.query.assets.findMany({
         where: and(
           eq(assets.code, 'source'),
           eq(assets.model, "products"),
           inArray(
             assets.model_id,
-            rolesList.map((m) => m.id)
+            hits.map((m) => m.id)
           )
         )
       });
 
-      rolesList.forEach((p) => {
+      hits.forEach((p) => {
         p.images = images
           .filter((i) => i.model_id === p.id)
           .map((i) => ({
@@ -638,8 +574,50 @@ export const productsController = new Elysia({
           }));
       });
     }
+    return hits;
 
-    return rolesList;
+    // const rolesList = await drizzle
+    //   .select(selectFields)
+    //   .from(products)
+    //   .leftJoin(
+    //     manufacturers,
+    //     eq(products.manufacturer_id, manufacturers.id)
+    //   )
+    //   .innerJoin(
+    //     products_categories,
+    //     eq(products.id, products_categories.product_id)
+    //   )
+    //   .where(and(
+    //     ne(products.id, id),
+    //     ne(products_categories.category_id, existingProduct[0].category_id)
+    //   ))
+    //   .orderBy(sql`RANDOM()`)
+    //   .limit(+limit)
+    //   .offset(0)
+    //   .execute() as ProductsWithRelations[];
+    // if (rolesList.length > 0) {
+    //   const images = await drizzle.query.assets.findMany({
+    //     where: and(
+    //       eq(assets.code, 'source'),
+    //       eq(assets.model, "products"),
+    //       inArray(
+    //         assets.model_id,
+    //         rolesList.map((m) => m.id)
+    //       )
+    //     )
+    //   });
+
+    //   rolesList.forEach((p) => {
+    //     p.images = images
+    //       .filter((i) => i.model_id === p.id)
+    //       .map((i) => ({
+    //         path: `/public/${i.path}/${i.id}/${i.name}`,
+    //         code: i.code ?? "",
+    //       }));
+    //   });
+    // }
+
+    // return rolesList;
 
   }, {
     params: t.Object({

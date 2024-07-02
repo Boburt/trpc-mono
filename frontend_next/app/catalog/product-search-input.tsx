@@ -44,30 +44,16 @@ export default function ProductSearchInput() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center">
-      <div className="relative">
-        <Input
-          type="text"
-          placeholder="Поиск..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pr-8"
-        />
-        {searchTerm && (
-          <Button
-            type="button"
-            isIconOnly
-            aria-label="Clear search"
-            className="absolute right-1 top-1/2 -translate-y-1/2"
-            size="sm"
-            variant="light"
-            onPress={handleClear}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Button type="submit" isIconOnly aria-label="Search" className="ml-2">
+    <form onSubmit={handleSubmit} className="flex items-center space-x-1">
+      <Input
+        isClearable
+        type="text"
+        placeholder="Поиск..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onClear={handleClear}
+      />
+      <Button type="submit" isIconOnly aria-label="Search" variant="bordered">
         <Search className="h-4 w-4" />
       </Button>
     </form>
