@@ -14,11 +14,13 @@ export default function ProductList({
   page_size,
   category,
   properties,
+  query,
 }: {
   page?: string;
   page_size?: string;
   category?: string;
   properties?: string;
+  query?: string;
 }) {
   const pageSize = page_size ? +page_size : 24;
   const searchParams = useSearchParams();
@@ -32,6 +34,7 @@ export default function ProductList({
       fields: string;
       category?: string;
       properties?: string;
+      query?: string;
     } = {
       limit: pageSize,
       page: page ? +page : 1,
@@ -47,8 +50,12 @@ export default function ProductList({
       res.properties = properties;
     }
 
+    if (query) {
+      res.query = query;
+    }
+
     return res;
-  }, [page, pageSize, category, properties]);
+  }, [page, pageSize, category, properties, query]);
 
   const changePage = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -57,7 +64,7 @@ export default function ProductList({
   };
 
   const { data } = useSuspenseQuery({
-    queryKey: ["products", page, pageSize, category, properties],
+    queryKey: ["products", page, pageSize, category, properties, query],
     queryFn: async () => {
       const { data } = await apiClient.api.products.public.data.get({
         query: queryParams,
