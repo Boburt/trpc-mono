@@ -8,6 +8,8 @@ import { Tab, Tabs } from "@nextui-org/tabs";
 import ProductDetailTabs from "./product-tabs";
 import { Suspense } from "react";
 import ProductRelated from "./product-related";
+import { ProductMakeRequest } from "@frontend_next/app/catalog/product-make-request";
+import { ProductCounter } from "@frontend_next/app/catalog/product-counter";
 
 export default async function ProductPage({
   params: { id },
@@ -54,10 +56,12 @@ export default async function ProductPage({
               <div className="line-clamp-3 text-medium text-default-700 mt-4">
                 {data.description}
               </div>
-              <div className="flex items-center gap-x-2 my-4">
-                <Button color="primary" className="w-full font-bold">
-                  Оставить заявку
-                </Button>
+              <div className="flex items-end gap-x-2 my-4">
+                <ProductCounter productId={id} />
+                <ProductMakeRequest
+                  productId={id}
+                  className="w-full font-bold"
+                />
                 <Button color="default" isIconOnly>
                   <Heart className="h-4 w-4" />
                 </Button>

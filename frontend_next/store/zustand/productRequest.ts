@@ -1,5 +1,6 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
+import { persistNSync } from "persist-and-sync";
 
 interface ProductRequestState {
   isRequestMode: boolean;
@@ -10,7 +11,7 @@ interface ProductRequestState {
 }
 
 export const useProductRequestStore = create<ProductRequestState>()(
-  persist(
+  persistNSync(
     (set) => ({
       isRequestMode: false,
       selectedProducts: {},
@@ -25,8 +26,7 @@ export const useProductRequestStore = create<ProductRequestState>()(
       clearSelectedProducts: () => set({ selectedProducts: {} }),
     }),
     {
-      name: "product-request-storage",
-      getStorage: () => localStorage,
+      name: "product-request-storage"
     }
   )
 );

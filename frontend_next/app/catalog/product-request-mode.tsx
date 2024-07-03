@@ -7,7 +7,7 @@ export function RequestModeSwitcher() {
 
   return (
     <Switch
-      checked={isRequestMode}
+      isSelected={isRequestMode}
       onChange={() => setRequestMode(!isRequestMode)}
     >
       Оптом
