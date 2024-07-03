@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductCounter } from "./product-counter";
+import { ProductMakeRequest } from "./product-make-request";
 
 export default function ProductList({
   page,
@@ -79,8 +80,8 @@ export default function ProductList({
       <div>
         <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {data.products.map((product) => (
-            <Card key={product.id} className="p-4" isFooterBlurred>
-              <Link href={`/product/${product.id}`}>
+            <Card key={product.id} isFooterBlurred>
+              <Link href={`/product/${product.id}`} className="p-4">
                 <Image
                   as={NextImage}
                   isZoomed
@@ -92,7 +93,7 @@ export default function ProductList({
                   alt={product.name}
                 />
               </Link>
-              <CardHeader className="pb-0 pt-2 flex-col items-start flex-1">
+              <CardHeader className="py-2 px-4 flex-col items-start flex-1">
                 <div className="flex flex-col gap-3 flex-1">
                   <Link
                     className="text-medium font-medium text-default-700 leading-tight"
@@ -113,8 +114,9 @@ export default function ProductList({
                   </p>
                 </div>
               </CardHeader>
-              <CardFooter>
+              <CardFooter className="bg-content4/30 border-t-1 border-zinc-100/50 justify-around flex items-center flex-col">
                 <ProductCounter productId={product.id} />
+                <ProductMakeRequest productId={product.id} />
               </CardFooter>
             </Card>
           ))}
