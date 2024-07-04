@@ -8,6 +8,7 @@ interface ProductRequestState {
   setRequestMode: (isRequestMode: boolean) => void;
   setProductQuantity: (productId: string, quantity: number) => void;
   clearSelectedProducts: () => void;
+  removeProduct: (productId: string) => void;
 }
 
 export const useProductRequestStore = create<ProductRequestState>()(
@@ -24,6 +25,11 @@ export const useProductRequestStore = create<ProductRequestState>()(
           },
         })),
       clearSelectedProducts: () => set({ selectedProducts: {} }),
+      removeProduct: (productId) =>
+        set((state) => {
+          const { [productId]: _, ...selectedProducts } = state.selectedProducts;
+          return { selectedProducts };
+        }),
     }),
     {
       name: "product-request-storage"

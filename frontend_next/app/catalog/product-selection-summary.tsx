@@ -2,7 +2,6 @@
 import React, { useState, useCallback } from "react";
 import { Button } from "@nextui-org/react";
 import { useProductRequestStore } from "@frontend_next/store/zustand/productRequest";
-import ProductRequestModal from "./product-request-modal";
 import { ProductMakeRequest } from "./product-make-request";
 
 export function ProductSelectionSummary() {
@@ -22,7 +21,9 @@ export function ProductSelectionSummary() {
       <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-md z-50">
         <div className="container mx-auto flex justify-between items-center">
           <p>Выбрано: {totalSelectedProducts}</p>
-          <ProductMakeRequest />
+          <div className="w-2/12">
+            <ProductMakeRequest />
+          </div>
         </div>
       </div>
     </>

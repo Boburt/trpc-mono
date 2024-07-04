@@ -10,7 +10,7 @@ import {
 } from "@frontend_next/components/ui/drawer";
 import { Button } from "@nextui-org/button";
 import { Select, SelectItem } from "@nextui-org/select";
-import { Menu } from "lucide-react";
+import { ListFilter, Menu } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import ProductFilter from "./product-filter";
@@ -43,7 +43,7 @@ export default function ProductToolbar({
           className="lg:hidden"
           variant="bordered"
           onClick={openDrawer}
-          startContent={<Menu size={24} />}
+          startContent={<ListFilter size={24} />}
         >
           Фильтры
         </Button>

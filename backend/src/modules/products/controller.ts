@@ -366,7 +366,8 @@ export const productsController = new Elysia({
     }
 
     const result = await response.json()
-    const hits = result.hits.hits.map((hit) => ({
+
+    const hits = result.hits.hits.map((hit: any) => ({
       ...hit._source,
       text_vector: undefined,
       product_vector: undefined
@@ -407,6 +408,77 @@ export const productsController = new Elysia({
         properties: t.Optional(t.Nullable(t.String())),
       }),
     })
+  .get('/products/public/by_ids', async ({ user, set, drizzle, query: {
+    ids
+  } }) => {
+    const idsList = ids.split(",");
+    const body = {
+      size: 5,
+      query: {
+        bool: {
+          must: [
+            {
+              terms: {
+                id: idsList
+              }
+            }
+          ],
+          filter: [
+            { term: { active: true } }
+          ]
+        }
+      },
+      _source: {
+        excludes: ['text_vector', 'product_vector']  // Optionally exclude large vector fields
+      }
+    };
+
+    const response = await fetch(`${esUrl}/${indexName}/_search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+      throw new Error(`Elasticsearch request failed: ${response.statusText}`)
+    }
+
+    const result = await response.json()
+
+    const hits = result.hits.hits.map((hit: any) => ({
+      ...hit._source
+    })) as ProductsWithRelations[];
+
+    if (hits.length > 0) {
+      const images = await drizzle.query.assets.findMany({
+        where: and(
+          eq(assets.code, 'source'),
+          eq(assets.model, "products"),
+          inArray(
+            assets.model_id,
+            hits.map((m) => m.id)
+          )
+        )
+      });
+
+      hits.forEach((p) => {
+        p.images = images
+          .filter((i) => i.model_id === p.id)
+          .map((i) => ({
+            path: `/public/${i.path}/${i.id}/${i.name}`,
+            code: i.code ?? "",
+          }));
+      });
+    }
+    return hits;
+  }, {
+    query: t.Object({
+      ids: t.String(),
+    }),
+  })
   .get("/products/public/:id", async ({ cacheController, set, params: { id }, drizzle }) => {
     const oneProductPrepared = drizzle.query.products.findFirst({
       where: and(eq(products.id, sql.placeholder('id')), eq(products.active, true)),
@@ -575,49 +647,6 @@ export const productsController = new Elysia({
       });
     }
     return hits;
-
-    // const rolesList = await drizzle
-    //   .select(selectFields)
-    //   .from(products)
-    //   .leftJoin(
-    //     manufacturers,
-    //     eq(products.manufacturer_id, manufacturers.id)
-    //   )
-    //   .innerJoin(
-    //     products_categories,
-    //     eq(products.id, products_categories.product_id)
-    //   )
-    //   .where(and(
-    //     ne(products.id, id),
-    //     ne(products_categories.category_id, existingProduct[0].category_id)
-    //   ))
-    //   .orderBy(sql`RANDOM()`)
-    //   .limit(+limit)
-    //   .offset(0)
-    //   .execute() as ProductsWithRelations[];
-    // if (rolesList.length > 0) {
-    //   const images = await drizzle.query.assets.findMany({
-    //     where: and(
-    //       eq(assets.code, 'source'),
-    //       eq(assets.model, "products"),
-    //       inArray(
-    //         assets.model_id,
-    //         rolesList.map((m) => m.id)
-    //       )
-    //     )
-    //   });
-
-    //   rolesList.forEach((p) => {
-    //     p.images = images
-    //       .filter((i) => i.model_id === p.id)
-    //       .map((i) => ({
-    //         path: `/public/${i.path}/${i.id}/${i.name}`,
-    //         code: i.code ?? "",
-    //       }));
-    //   });
-    // }
-
-    // return rolesList;
 
   }, {
     params: t.Object({
