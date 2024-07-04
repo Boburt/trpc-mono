@@ -10,7 +10,7 @@ type ProductCounterProps = {
 };
 
 export function ProductCounter({ productId }: ProductCounterProps) {
-  const { isRequestMode, selectedProducts, setProductQuantity } =
+  const { isRequestMode, selectedProducts, setProductQuantity, removeProduct } =
     useProductRequestStore();
   const quantity = selectedProducts[productId] || 0;
 
@@ -19,8 +19,13 @@ export function ProductCounter({ productId }: ProductCounterProps) {
   }
 
   const handleIncrement = () => setProductQuantity(productId, quantity + 1);
-  const handleDecrement = () =>
+  const handleDecrement = () => {
+    if (quantity === 1) {
+      removeProduct(productId);
+      return;
+    }
     setProductQuantity(productId, Math.max(0, quantity - 1));
+  };
 
   return (
     <div className="flex items-center mx-auto">

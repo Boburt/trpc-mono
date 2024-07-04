@@ -104,6 +104,7 @@ export const ProductMakeRequest = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleRequestSubmit}
+        productId={productId}
       />
     </>
   );
