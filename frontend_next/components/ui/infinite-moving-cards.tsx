@@ -20,7 +20,7 @@ export const InfiniteMovingCards = ({
   className?: string;
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const scrollerRef = React.useRef<HTMLUListElement>(null);
+  const scrollerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     addAnimation();
@@ -72,11 +72,11 @@ export const InfiniteMovingCards = ({
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20  max-w-7xl overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
+        "scroller relative z-20  overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
     >
-      <ul
+      <div
         ref={scrollerRef}
         className={cn(
           " flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap",
@@ -113,9 +113,11 @@ export const InfiniteMovingCards = ({
           //     </div>
           //   </blockquote>
           // </li>
-          <Image width={300} alt="NextUI hero Image" src={item.link} />
+          <div key={idx}>
+            <Image width={300} alt="NextUI hero Image" src={item.link} />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
