@@ -23,14 +23,14 @@ export default function Home() {
         {images.map((image) => (
           <div
             key={image}
-            className="relative h-full w-fit mx-[4rem] flex items-center justify-start"
+            className="relative h-full w-fit mx-[4rem] md:flex items-center justify-start"
           >
             <Image
               width={100}
               height={100}
               src={`/${image}`}
               alt="Groot with blue wisp"
-              className="rounded-full"
+              className="rounded-full aspect-square"
             />
           </div>
         ))}
