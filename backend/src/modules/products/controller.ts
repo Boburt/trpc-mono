@@ -408,6 +408,75 @@ export const productsController = new Elysia({
         properties: t.Optional(t.Nullable(t.String())),
       }),
     })
+  .get('/products/public/random', async ({ query: { limit }, drizzle }) => {
+    const count = Math.min(Math.max(parseInt(limit), 1), 10);
+
+    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
+    const indexName = `${process.env.PROJECT_PREFIX}products`;
+
+    const elasticQuery = {
+      size: count,
+      query: {
+        function_score: {
+          query: { term: { active: true } },
+          random_score: {}
+        }
+      }
+    };
+
+    try {
+      const response = await fetch(`${esUrl}/${indexName}/_search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+        body: JSON.stringify(elasticQuery)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Elasticsearch request failed: ${response.statusText}`);
+      }
+
+      const result = await response.json() as any;
+      const hits = result.hits.hits.map((hit: any) => ({
+        ...hit._source,
+        text_vector: undefined,
+        product_vector: undefined
+      })) as ProductsWithRelations[];
+
+      if (hits.length > 0) {
+        const images = await drizzle.query.assets.findMany({
+          where: and(
+            eq(assets.code, 'source'),
+            eq(assets.model, "products"),
+            inArray(
+              assets.model_id,
+              hits.map((p) => p.id)
+            )
+          )
+        });
+
+        hits.forEach((p) => {
+          p.images = images
+            .filter((i) => i.model_id === p.id)
+            .map((i) => ({
+              path: `/public/${i.path}/${i.id}/${i.name}`,
+              code: i.code ?? "",
+            }));
+        });
+      }
+
+      return hits;
+    } catch (error) {
+      console.error('Error fetching random products:', error);
+      throw new Error('Failed to fetch random products');
+    }
+  }, {
+    query: t.Object({
+      limit: t.String(),
+    }),
+  })
   .get('/products/public/by_ids', async ({ user, set, drizzle, query: {
     ids
   } }) => {

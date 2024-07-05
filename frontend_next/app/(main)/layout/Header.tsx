@@ -24,6 +24,7 @@ import {
 } from "@frontend_next/components/ui/navigation-menu";
 import CatalogMenu from "./CatalogMenu";
 import { cn } from "@frontend_next/lib/utils";
+import { HeaderSearchInput } from "./SearchInput";
 
 const menuItems = [
   {
@@ -124,6 +125,7 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
+        <HeaderSearchInput />
         <SignInButton />
         {/* <SignInButton userData={userData} permissions={permissions!} /> */}
       </NavbarContent>

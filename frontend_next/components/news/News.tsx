@@ -27,7 +27,7 @@ export default function News() {
 
   return (
     <div
-      className={cn("md:px-6 px-4 py-12", {
+      className={cn("py-12", {
         "container mx-auto": pathname != "/news",
       })}
     >
