@@ -1,5 +1,5 @@
 import { apiClient } from "@frontend_next/lib/eden";
-import { Card, CardBody } from "@nextui-org/react";
+import { Card, CardBody, ScrollShadow } from "@nextui-org/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
@@ -27,7 +27,7 @@ export default function ProductRequestModalProducts({
       <div className="pb-2 font-bold text-2xl text-content4-foreground uppercase">
         Выбрано
       </div>
-      <ScrollArea className="h-[420px]">
+      <ScrollShadow className="h-[420px]">
         <div className="grid grid-cols-1 gap-3">
           {data &&
             data.map((product) => (
@@ -65,7 +65,7 @@ export default function ProductRequestModalProducts({
               </Card>
             ))}
         </div>
-      </ScrollArea>
+      </ScrollShadow>
     </div>
   );
 }

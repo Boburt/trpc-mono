@@ -13,11 +13,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useProductRequestStore } from "@frontend_next/store/zustand/productRequest";
 import ProductRequestModalProducts from "./product-request-modal-products";
+import ProductRequestModalProductsSkeleton from "./product-request-modal-products-skeleton";
+import { useMutation } from "@tanstack/react-query";
+import { InferInsertModel } from "drizzle-orm";
+import { apiClient } from "@frontend_next/lib/eden";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 const schema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  firstName: z.string().min(1, "Имя обязательно"),
+  lastName: z.string().min(1, "Фамилия обязательно"),
+  phone: z.string().min(10, "Номер телефона должен содержать 10 цифр"),
   email: z.string().email().optional().or(z.literal("")),
 });
 
@@ -34,7 +40,9 @@ export default function ProductRequestModal({
   onSubmit,
   productId,
 }: ProductRequestModalProps) {
-  const { selectedProducts, isRequestMode } = useProductRequestStore();
+  const { data: session } = useSession();
+  const { selectedProducts, isRequestMode, clearSelectedProducts } =
+    useProductRequestStore();
   const {
     control,
     handleSubmit,
@@ -43,8 +51,47 @@ export default function ProductRequestModal({
     resolver: zodResolver(schema),
   });
 
+  const requestAddMutation = useMutation({
+    mutationFn: (newTodo: {
+      firstName: string;
+      lastName: string;
+      phone: string;
+      email?: string;
+      products: { id: string; quantity: number }[];
+    }) => {
+      return apiClient.api.product_requests.post(
+        {
+          ...newTodo,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      toast.success("Запрос отправлен");
+      clearSelectedProducts();
+    },
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
   const handleFormSubmit = (data: z.infer<typeof schema>) => {
-    onSubmit(data);
+    requestAddMutation.mutate({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      email: data.email,
+      products: isRequestMode
+        ? Object.keys(selectedProducts).map((id) => ({
+            id,
+            quantity: selectedProducts[id],
+          }))
+        : [{ id: productId!, quantity: 1 }],
+    });
   };
 
   return (
@@ -54,7 +101,15 @@ export default function ProductRequestModal({
         <ModalBody className="px-0 py-0">
           <div className="grid grid-cols-2">
             <div className="bg-content4 py-8 pl-6 pr-3">
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense
+                fallback={
+                  <ProductRequestModalProductsSkeleton
+                    itemsCount={
+                      isRequestMode ? Object.keys(selectedProducts).length : 1
+                    }
+                  ></ProductRequestModalProductsSkeleton>
+                }
+              >
                 <ProductRequestModalProducts
                   productIds={
                     isRequestMode ? Object.keys(selectedProducts) : [productId!]
@@ -74,8 +129,9 @@ export default function ProductRequestModal({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        label="First Name"
-                        placeholder="Enter your first name"
+                        label="Имя"
+                        placeholder="Введите ваше имя"
+                        isInvalid={!!errors.firstName}
                         errorMessage={errors.firstName?.message}
                       />
                     )}
@@ -86,8 +142,9 @@ export default function ProductRequestModal({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        label="Last Name"
-                        placeholder="Enter your last name"
+                        label="Фамилия"
+                        placeholder="Введите вашу фамилию"
+                        isInvalid={!!errors.lastName}
                         errorMessage={errors.lastName?.message}
                       />
                     )}
@@ -98,8 +155,9 @@ export default function ProductRequestModal({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        label="Phone"
-                        placeholder="Enter your phone number"
+                        label="Номер телефона"
+                        placeholder="Введите ваш номер телефона"
+                        isInvalid={!!errors.phone}
                         errorMessage={errors.phone?.message}
                       />
                     )}
@@ -110,23 +168,25 @@ export default function ProductRequestModal({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        label="Email (Optional)"
-                        placeholder="Enter your email"
+                        label="Email (необязательно)"
+                        placeholder="Введите ваш email"
+                        isInvalid={!!errors.email}
                         errorMessage={errors.email?.message}
                       />
                     )}
                   />
                 </div>
               </div>
-              <div className="flex mt-6 justify-end">
+              <div className="flex mt-6 justify-end space-x-3">
                 <Button color="danger" variant="light" onPress={onClose}>
-                  Cancel
+                  Отмена
                 </Button>
                 <Button
+                  isLoading={requestAddMutation.isPending}
                   color="primary"
                   onClick={handleSubmit(handleFormSubmit)}
                 >
-                  Submit Request
+                  Отправить
                 </Button>
               </div>
             </form>
