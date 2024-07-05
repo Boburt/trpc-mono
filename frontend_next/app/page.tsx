@@ -1,10 +1,7 @@
 import Cta from "@frontend_next/components/main/cta";
 import News from "@frontend_next/components/news/News";
 import ProductHome from "@frontend_next/components/products/home";
-// import { InfiniteMovingCards } from "@frontend_next/components/ui/infinite-moving-cards";
 import { Suspense } from "react";
-// import { Marquee } from "@devnomic/marquee";
-import "@devnomic/marquee/dist/index.css";
 import Image from "next/image";
 import { Marquee } from "@frontend_next/components/ui/marquee";
 import TopProductsTab from "@frontend_next/components/main/top-products-tab";
@@ -37,9 +34,6 @@ export default function Home() {
         ))}
       </Marquee>
       <TopProductsTab />
-      <Suspense>
-        <ProductHome />
-      </Suspense>
       <News />
     </>
   );
