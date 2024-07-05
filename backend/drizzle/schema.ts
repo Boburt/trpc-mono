@@ -985,10 +985,18 @@ export const products_properties = pgTable("products_properties", {
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  user_id: uuid("user_id").notNull(),
+  user_id: uuid("user_id")
+    .notNull()
+    .references(() => users.id, {
+      onUpdate: "cascade",
+    }),
   field_name: text("field_name").notNull(),
   field_value: text("field_value").notNull(),
-  reference_id: uuid("references_id"),
+  reference_id: uuid("references_id")
+    .notNull()
+    .references(() => memberships.id, {
+      onUpdate: "cascade",
+    }),
   created_at: timestamp("created_at", {
     precision: 5,
     withTimezone: true,
@@ -1007,8 +1015,8 @@ export const profiles = pgTable("profiles", {
 
 export const memberships = pgTable("memberships", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name"),
-  short_name: text("short_name"),
+  name: text("name").unique(),
+  short_name: text("short_name").unique(),
   description: text("description"),
   active: boolean("active").default(false).notNull(),
   rating: doublePrecision("rating"),
@@ -1016,6 +1024,38 @@ export const memberships = pgTable("memberships", {
   type: text("type").notNull(), // manufacturer, customer, etc.
   org_type: text("org_type"), // company, foundation, etc.
   city: text("city"),
+  ein: integer("ein"),
+  address: text("address"),
+  fact_address: text("fact_address"),
+  email: text("email"),
+  web_site: text("web_site"),
+  vat: boolean("vat").default(false).notNull(),
+  created_at: timestamp("created_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    precision: 5,
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+});
+
+export const membership_users = pgTable("membership_users", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  membership_id: uuid("membership_id")
+    .notNull()
+    .references(() => memberships.id, { onUpdate: "cascade" }),
+  user_id: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onUpdate: "cascade" }),
+  job_title: text("post"),
+  is_admin: boolean("is_admin").default(false).notNull(),
   created_at: timestamp("created_at", {
     precision: 5,
     withTimezone: true,

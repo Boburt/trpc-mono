@@ -36,6 +36,7 @@ const stepComponents: Record<string, React.FC> = {
 };
 
 export const StepperOrientation = () => {
+  const { hasCompletedAllSteps } = useStepper();
   const [orientation, setOrientation] =
     React.useState<StepperProps["orientation"]>("vertical");
   return (

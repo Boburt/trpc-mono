@@ -1,3 +1,4 @@
+"use client";
 import { Input } from "@frontend_next/components/ui/input";
 import { useForm } from "react-hook-form";
 import {
@@ -10,51 +11,96 @@ import {
   FormMessage,
 } from "@frontend_next/components/ui/form";
 import { Separator } from "@frontend_next/components/ui/separator";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@frontend_next/components/ui/radio-group";
 import { Button } from "@frontend_next/components/ui/button";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
+import { useSession } from "next-auth/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+import { apiClient } from "@frontend_next/lib/eden";
+import { toast } from "sonner";
+import { FinishAlert } from "./finish-alert";
+import { useRouter } from "next/navigation";
 
 export const IndividualFourthStep = () => {
   const orgType = signUpWizardStore((state) => state.orgType);
   const { nextStep, prevStep } = useStepper();
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
+  const [showFinishAlert, setShowFinishAlert] = useState(false);
+  const router = useRouter();
+
+  const values = useMemo(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data
+    ) {
+      return profileData.data.membership_data;
+    }
+  }, [profileData]);
+
   const form = useForm<{
-    org_full_name: string;
-    org_short_name: string;
-    legal_address: string;
+    address: string;
     fact_address: string;
     email: string;
-    web_site: string;
-    vat: boolean;
-    file: File | null;
   }>({
     defaultValues: {
-      org_full_name: "",
-      org_short_name: "",
-      legal_address: "",
+      address: "",
       fact_address: "",
       email: "",
-      web_site: "",
-      vat: undefined,
-      file: null,
     },
+    values,
   });
 
   const onSubmit = (data: {
-    org_full_name: string;
-    org_short_name: string;
-    legal_address: string;
+    address: string;
     fact_address: string;
     email: string;
-    web_site: string;
-    vat: boolean;
-    file: File | null;
   }) => {
-    console.log("data", data);
-    nextStep();
+    updateMutation.mutate(data);
+  };
+
+  const updateMutation = useMutation({
+    mutationFn: (updateMembership: {
+      address: string;
+      fact_address: string;
+      email: string;
+    }) => {
+      return apiClient.api
+        .memberships({ id: profileData.data.membership_data.id })
+        .put(
+          {
+            data: {
+              ...updateMembership,
+              active: true,
+            },
+            fields: ["id"],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken!}`,
+            },
+          }
+        );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+
+        toast.success("Регистрация успешно завершена");
+        setShowFinishAlert(true);
+        // nextStep();
+      } else {
+        toast.error("Роль не обновлена");
+      }
+    },
+  });
+
+  const handleFinish = () => {
+    router.push("/profile"); // Adjust this path as needed
   };
 
   return (
@@ -67,7 +113,7 @@ export const IndividualFourthStep = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
-            name="legal_address"
+            name="address"
             rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
@@ -122,6 +168,7 @@ export const IndividualFourthStep = () => {
             Завершить
           </Button>
         </div>
+        <FinishAlert isOpen={showFinishAlert} onFinish={handleFinish} />
       </form>
     </Form>
   );

@@ -17,45 +17,111 @@ import {
 import { Button } from "@frontend_next/components/ui/button";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
+import { useSession } from "next-auth/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { apiClient } from "@frontend_next/lib/eden";
+import { InferInsertModel } from "drizzle-orm";
+import { memberships } from "backend/drizzle/schema";
+import { toast } from "sonner";
 
 export const FourthStep = () => {
   const orgType = signUpWizardStore((state) => state.orgType);
   const { nextStep, prevStep } = useStepper();
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
+  const values = useMemo(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data
+    ) {
+      return {
+        ...profileData.data.membership_data,
+        vat: profileData.data.membership_data.vat.toString(),
+      };
+    }
+  }, [profileData]);
+
   const form = useForm<{
-    org_full_name: string;
-    org_short_name: string;
-    legal_address: string;
+    name: string;
+    short_name: string;
+    address: string;
     fact_address: string;
     email: string;
     web_site: string;
-    vat: boolean;
-    file: File | null;
+    vat: string;
   }>({
     defaultValues: {
-      org_full_name: "",
-      org_short_name: "",
-      legal_address: "",
+      name: "",
+      short_name: "",
+      address: "",
       fact_address: "",
       email: "",
       web_site: "",
-      vat: undefined,
-      file: null,
+      vat: "",
     },
+    values,
   });
 
   const onSubmit = (data: {
-    org_full_name: string;
-    org_short_name: string;
-    legal_address: string;
+    name: string;
+    short_name: string;
+    address: string;
     fact_address: string;
     email: string;
     web_site: string;
-    vat: boolean;
-    file: File | null;
+    vat: string;
   }) => {
-    console.log("data", data);
-    nextStep();
+    updateMutation.mutate({
+      name: data.name,
+      short_name: data.short_name,
+      address: data.address,
+      fact_address: data.fact_address,
+      email: data.email,
+      web_site: data.web_site,
+      vat: data.vat === "true" ? true : false,
+      active: true,
+    });
   };
+
+  const updateMutation = useMutation({
+    mutationFn: (updateMembership: {
+      name: string;
+      short_name: string;
+      address: string;
+      fact_address: string;
+      email: string;
+      web_site: string;
+      vat: boolean;
+      active: boolean;
+    }) => {
+      return apiClient.api
+        .memberships({ id: profileData.data.membership_data.id })
+        .put(
+          {
+            data: updateMembership,
+            fields: ["id"],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${session?.accessToken!}`,
+            },
+          }
+        );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Роль успешно обновлена");
+        nextStep();
+      } else {
+        toast.error("Роль не обновлена");
+      }
+    },
+  });
 
   return (
     <Form {...form}>
@@ -67,7 +133,7 @@ export const FourthStep = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="org_full_name"
+            name="name"
             rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
@@ -81,7 +147,7 @@ export const FourthStep = () => {
           />
           <FormField
             control={form.control}
-            name="org_short_name"
+            name="short_name"
             rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
@@ -103,7 +169,7 @@ export const FourthStep = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="legal_address"
+            name="address"
             rules={{ required: "Поле обязательно для заполнения" }}
             render={({ field }) => (
               <FormItem>
@@ -175,6 +241,7 @@ export const FourthStep = () => {
                   <RadioGroup
                     onValueChange={field.onChange}
                     className="flex space-x-6 space-y-0 border rounded-md py-2.5"
+                    value={field.value}
                   >
                     <FormItem className="flex items-center ml-4 space-x-1 space-y-0">
                       <FormControl>

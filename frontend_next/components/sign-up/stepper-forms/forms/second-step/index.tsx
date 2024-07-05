@@ -5,6 +5,8 @@ import { SoleProprietorshipSecondStep } from "./sole-proprietorship";
 import { LegalEntitySecondStep } from "./legal-entity";
 import { Button } from "@frontend_next/components/ui/button";
 import { Label } from "@radix-ui/react-label";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const orgTypes = [
   { label: "Индивидуальный предприниматель", value: "sole-proprietorship" },
@@ -13,6 +15,7 @@ const orgTypes = [
 ];
 
 export const SecondStep = () => {
+  const queryClient = useQueryClient();
   const role = signUpWizardStore((state) => state.role);
   const orgType = signUpWizardStore((state) => state.orgType);
   const setOrgType = signUpWizardStore((state) => state.setOrgType);
@@ -24,7 +27,23 @@ export const SecondStep = () => {
             type.value === "legal-entity"
         )
       : orgTypes;
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
 
+  useEffect(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data
+    ) {
+      setOrgType({
+        value: profileData.data.membership_data.org_type,
+        label: orgTypes.find(
+          (type) => type.value === profileData.data.membership_data.org_type
+        )?.label!,
+      });
+    }
+  }, [profileData]);
   return (
     <div className="flex flex-col px-4">
       <div className="grid grid-cols-1  justify-start items-center pt-6">
