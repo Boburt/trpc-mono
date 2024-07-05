@@ -3,7 +3,7 @@ import { Card, CardHeader, Skeleton } from "@nextui-org/react";
 export default function TopProductsTabSkeleton() {
   return (
     <div className="my-auto grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-      {Array.from({ length: 4 }).map((_, index) => (
+      {Array.from({ length: 5 }).map((_, index) => (
         <Card key={index} className="p-4">
           <Skeleton className="rounded-lg">
             <div className="h-[200px] rounded-lg bg-default-300"></div>
