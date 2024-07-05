@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import Image from "next/image";
 import { Marquee } from "@frontend_next/components/ui/marquee";
 import TopProductsTab from "@frontend_next/components/main/top-products-tab";
+import ProductsListByCategory from "@frontend_next/components/main/products-by-category";
+import ProductsListByCategorySkeleton from "@frontend_next/components/main/products-by-category-skeleton";
 
 export default function Home() {
   const images = [
@@ -34,6 +36,9 @@ export default function Home() {
         ))}
       </Marquee>
       <TopProductsTab />
+      <Suspense fallback={<ProductsListByCategorySkeleton />}>
+        <ProductsListByCategory category="kardnaya" />
+      </Suspense>
       <News />
     </>
   );
