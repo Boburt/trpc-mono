@@ -51,7 +51,7 @@ export default function News() {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid md:grid-cols-5 gap-4 grid-cols-2">
         {news &&
           news.map((item: any, index: any) => {
             return (
