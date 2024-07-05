@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import "@devnomic/marquee/dist/index.css";
 import Image from "next/image";
 import { Marquee } from "@frontend_next/components/ui/marquee";
+import TopProductsTab from "@frontend_next/components/main/top-products-tab";
 
 export default function Home() {
   const images = [
@@ -35,24 +36,7 @@ export default function Home() {
           </div>
         ))}
       </Marquee>
-      {/* <Marquee
-        fade={true}
-        direction="left"
-        reverse={false}
-        pauseOnHover={false}
-        className="" // pass class to change gap or speed
-        innerClassName="" // pass class to change gap or speed
-      >
-        {images.map((image) => (
-          <Image
-            width={100}
-            height={100}
-            src={`/${image}`}
-            alt="Groot with blue wisp"
-            className="rounded-full"
-          />
-        ))}
-      </Marquee> */}
+      <TopProductsTab />
       <Suspense>
         <ProductHome />
       </Suspense>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
@@ -13,13 +14,15 @@ import SessionProvider from "@frontend_next/components/providers/SessionProvider
 import ReactQueryClientProvider from "@frontend_next/components/providers/ReactQueryProvider";
 import { ProductSelectionSummary } from "./catalog/product-selection-summary";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+const robotoSans = Roboto({
+  weight: "400",
+  subsets: ["latin-ext", "cyrillic-ext", "cyrillic"],
+  variable: "--font-roboto-sans",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+const robotoMono = Roboto({
+  weight: "700",
+  subsets: ["latin-ext", "cyrillic-ext", "cyrillic"],
+  variable: "--font-roboto-roboto",
 });
 
 export const metadata: Metadata = {
@@ -48,16 +51,18 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-white dark:bg-slate-900 `}
-      >
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${robotoSans.variable} ${robotoMono.variable}`}
+    >
+      <body className={` bg-white dark:bg-slate-900 `}>
         <NextThemesProvider attribute="class">
           <SessionProvider session={session}>
             <ReactQueryClientProvider>
-              <NextUIProviderClient className="flex flex-col h-screen">
+              <NextUIProviderClient className="flex flex-col min-h-screen">
                 <Header />
-                <main className="py-4 shrink-0">
+                <main className="pb-4 shrink-0">
                   {/* {title && pathname != "/" && (
             <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
               {title}

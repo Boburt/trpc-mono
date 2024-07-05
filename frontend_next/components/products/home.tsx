@@ -13,7 +13,7 @@ export default function ProductHome() {
       const { data } = await apiClient.api.products.public.data.get({
         query: {
           limit: 8,
-          offset: 0,
+          page: 1,
           fields:
             "id,name,description,price,stock_quantity,manufacturers.name,images",
         },
@@ -22,7 +22,7 @@ export default function ProductHome() {
     },
   });
 
-  if (data && Array.isArray(data) && data.length > 0) {
+  if (data && Array.isArray(data.products) && data.products.length > 0) {
     return (
       <div className="my-10 container mx-auto">
         <div className="flex items-end justify-between mb-8">
@@ -34,7 +34,7 @@ export default function ProductHome() {
           </div>
         </div>
         <div className="my-auto grid grid-cols-1 gap-5 p-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
-          {data.map((product) => (
+          {data.products.map((product) => (
             <Card key={product.id} className="p-4">
               <Link href={`/product/${product.id}`}>
                 <Image

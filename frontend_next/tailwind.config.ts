@@ -1,8 +1,6 @@
 import type { Config } from "tailwindcss";
 const { nextui } = require("@nextui-org/react");
-const {
-  default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
+const { fontFamily } = require('tailwindcss/defaultTheme')
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -41,10 +39,10 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      fontFamily: {
-        sans: ["var(--font-geist-sans)"],
-        mono: ["var(--font-geist-mono)"],
-      },
+      // fontFamily: {
+      //   sans: ["var(--font-roboto-sans)", ...fontFamily.sans],
+      //   mono: ["var(--font-roboto-mono)", ...fontFamily.mono],
+      // },
     },
   },
   darkMode: "class",
@@ -322,16 +320,6 @@ const config: Config = {
       "dividerWeight": "1",
       "hoverOpacity": "0.9"
     }
-  }), addVariablesForColors],
+  })],
 };
-function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = flattenColorPalette(theme("colors"));
-  let newVars = Object.fromEntries(
-    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-  );
-
-  addBase({
-    ":root": newVars,
-  });
-}
 export default config;
