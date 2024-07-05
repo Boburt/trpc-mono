@@ -7,7 +7,7 @@ import { getProfileData } from "./queries";
 
 export default function SignUpPage() {
   const { data: session } = useSession();
-  const profileData = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ["profile_data"],
     queryFn: async () => await getProfileData(session?.accessToken!),
     enabled: !!session?.accessToken,

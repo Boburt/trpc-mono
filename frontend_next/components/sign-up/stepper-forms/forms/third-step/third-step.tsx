@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CountryDropdown } from "@frontend_next/components/country-select/country-select";
 import { Input } from "@frontend_next/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -34,12 +34,39 @@ import {
 
 import countryList from "@frontend_next/components/country-select/data/countries.json";
 import { Separator } from "@frontend_next/components/ui/separator";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@frontend_next/lib/eden";
+import { InferInsertModel } from "drizzle-orm";
+import { memberships } from "backend/drizzle/schema";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 export const ThirdStep = () => {
+  const { nextStep, prevStep } = useStepper();
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const orgType = signUpWizardStore((state) => state.orgType);
   const [open, setOpen] = React.useState(false);
+  const membership_id: string = signUpWizardStore(
+    (state) => state.membershipId
+  );
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
 
-  const { nextStep, prevStep } = useStepper();
+  const values = useMemo(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.membership_data &&
+      "country" in profileData.data.membership_data &&
+      "ein" in profileData.data.membership_data
+    ) {
+      return {
+        country: profileData.data.membership_data.country,
+        ein: profileData.data.membership_data.ein,
+      };
+    }
+  }, [profileData]);
+
   const form = useForm<{
     country: string;
     ein: number;
@@ -48,11 +75,56 @@ export const ThirdStep = () => {
       country: "",
       ein: undefined,
     },
+    values,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (updateMembership: {
+      id: string;
+      country: string;
+      ein: number;
+    }) => {
+      return apiClient.api.memberships({ id: updateMembership.id! }).put(
+        {
+          data: {
+            country: updateMembership.country!,
+            ein: updateMembership.ein!,
+          },
+          fields: ["id"],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken!}`,
+          },
+        }
+      );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Роль успешно обновлена");
+        nextStep();
+      } else {
+        toast.error("Роль не обновлена");
+      }
+    },
   });
 
   const onSubmit = (data: { country: string; ein: number }) => {
-    console.log("dataForMutation", data);
-    nextStep();
+    if (
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data &&
+      profileData.data.membership_data.country === data.country &&
+      profileData.data.membership_data.ein === data.ein
+    ) {
+      nextStep();
+    } else {
+      updateMutation.mutate({
+        id: profileData.data.membership_data.id,
+        country: data.country,
+        ein: data.ein,
+      });
+    }
   };
   return (
     <Form {...form}>
