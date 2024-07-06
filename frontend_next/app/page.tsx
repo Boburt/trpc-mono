@@ -39,6 +39,15 @@ export default function Home() {
       <Suspense fallback={<ProductsListByCategorySkeleton />}>
         <ProductsListByCategory category="kardnaya" />
       </Suspense>
+      <Suspense fallback={<ProductsListByCategorySkeleton />}>
+        <ProductsListByCategory category="dzhinsovaya-tkan-denim" />
+      </Suspense>
+      <Suspense fallback={<ProductsListByCategorySkeleton />}>
+        <ProductsListByCategory category="makhrovaya-tkan" />
+      </Suspense>
+      <Suspense fallback={<ProductsListByCategorySkeleton />}>
+        <ProductsListByCategory category="krashennaya" />
+      </Suspense>
       <News />
     </>
   );
