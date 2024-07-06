@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import ProductListSkeleton from "../product-list-skeleton";
 import ProductList from "../product-list";
 import ProductPaginationSkeleton from "../product-pagination-skeleton";
-import ProductPagination from "../product-pagination";
 import ProductFilter from "../product-filter";
 
 export default async function CatalogCategoryPage({

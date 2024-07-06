@@ -31,9 +31,11 @@ export default function ProductsListByCategory({
       <div className="py-12 container mx-auto">
         <div className="flex items-end justify-between mb-8">
           <h1 className="lg:text-4xl text-3xl font-bold text-gray-800 dark:text-white">
+            {/* @ts-ignore */}
             {data.categoryData.name}
           </h1>
           <div className="flex justify-end uppercase hover:text-default-600 dark:hover:text-default-500">
+            {/* @ts-ignore */}
             <Link href={`/catalog/${data.categoryData.code}`}>Перейти</Link>
           </div>
         </div>
