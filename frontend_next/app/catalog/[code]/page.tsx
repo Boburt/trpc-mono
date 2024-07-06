@@ -36,11 +36,15 @@ export default async function CatalogCategoryPage({
       </h1>
       {data.description && <p>{data.description}</p>}
       <div className="flex gap-x-6 mt-10">
-        <div className="hidden h-full overflow-x-hidden overflow-y-scroll sm:flex">
+        <div className="hidden h-full overflow-x-hidden overflow-y-scroll lg:flex">
           <ProductFilter category={code} properties={searchParams.properties} />
         </div>
         <div className="w-full flex-1 flex-col">
-          <ProductToolbar page_size={pageSize} />
+          <ProductToolbar
+            page_size={pageSize}
+            category={code}
+            properties={searchParams.properties}
+          />
           <Suspense
             key={searchParams.page + pageSize}
             fallback={<ProductListSkeleton />}

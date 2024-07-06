@@ -27,7 +27,7 @@ export default function News() {
 
   return (
     <div
-      className={cn("md:px-6 px-4 py-12", {
+      className={cn("py-12", {
         "container mx-auto": pathname != "/news",
       })}
     >
@@ -51,7 +51,7 @@ export default function News() {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid md:grid-cols-5 gap-4 grid-cols-2">
         {news &&
           news.map((item: any, index: any) => {
             return (

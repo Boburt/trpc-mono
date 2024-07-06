@@ -13,11 +13,37 @@ import { Separator } from "@frontend_next/components/ui/separator";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { Button } from "@frontend_next/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { useMemo } from "react";
+import { apiClient } from "@frontend_next/lib/eden";
+import { toast } from "sonner";
 
 export const SoleProprietorshipSecondStep = () => {
-  const role = signUpWizardStore((state) => state.role);
-  const orgType = signUpWizardStore((state) => state.orgType);
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
   const { nextStep, prevStep } = useStepper();
+  const membership_id: string = signUpWizardStore(
+    (state) => state.membershipId
+  );
+  const orgType: {
+    value: string;
+    label: string;
+  } = signUpWizardStore((state) => state.orgType);
+
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
+
+  const values = useMemo(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.profile_data &&
+      "email" in profileData.data.profile_data
+    ) {
+      return profileData.data.profile_data;
+    }
+  }, [profileData]);
+
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -32,6 +58,81 @@ export const SoleProprietorshipSecondStep = () => {
       phone: "",
       email: "",
     },
+    values,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async ({
+      newProfile,
+      token,
+      reference_id,
+      org_type,
+    }: {
+      newProfile: Record<string, any>;
+      token: string;
+      reference_id: string;
+      org_type: string;
+    }) => {
+      return await apiClient.api.profiles.post(
+        {
+          data: newProfile,
+          reference_id,
+          org_type,
+          fields: ["id"],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Профиль успешно создан");
+        nextStep();
+      } else {
+        toast.error("Профиль не создан");
+      }
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      updateProfile,
+      token,
+      reference_id,
+      org_type,
+    }: {
+      updateProfile: Record<string, any>;
+      token: string;
+      reference_id: string;
+      org_type: string;
+    }) => {
+      return await apiClient.api.profiles.put(
+        {
+          data: updateProfile,
+          reference_id,
+          org_type,
+          fields: ["id"],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Профиль успешно обновлен");
+        nextStep();
+      } else {
+        toast.error("Профиль не обновлен");
+      }
+    },
   });
 
   const onSubmit = (data: {
@@ -41,13 +142,36 @@ export const SoleProprietorshipSecondStep = () => {
     phone: string;
     email: string;
   }) => {
-    const dataForMutation = {
-      ...data,
-      role: role,
-      org_type: orgType,
-    };
-    console.log("dataForMutation", dataForMutation);
-    nextStep();
+    checkBeforeMutation(data);
+  };
+
+  const checkBeforeMutation = (data: {
+    first_name: string;
+    last_name: string;
+    sur_name: string;
+    phone: string;
+    email: string;
+  }) => {
+    if (
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data &&
+      profileData.data.profile_data &&
+      "email" in profileData.data.profile_data
+    ) {
+      updateMutation.mutate({
+        updateProfile: data,
+        token: session?.accessToken!,
+        reference_id: membership_id,
+        org_type: orgType.value,
+      });
+    } else {
+      createMutation.mutate({
+        newProfile: data,
+        token: session?.accessToken!,
+        reference_id: membership_id,
+        org_type: orgType.value,
+      });
+    }
   };
 
   return (

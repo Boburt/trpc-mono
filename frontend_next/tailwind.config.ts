@@ -1,8 +1,6 @@
 import type { Config } from "tailwindcss";
 const { nextui } = require("@nextui-org/react");
-const {
-  default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
+const { fontFamily } = require('tailwindcss/defaultTheme')
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,8 +12,7 @@ const config: Config = {
     extend: {
       animation: {
         aurora: "aurora 60s linear infinite",
-        marquee: "marquee var(--duration) linear infinite",
-        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+        marquee: 'marquee var(--duration, 30s) linear infinite',
         scroll:
           "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -31,16 +28,7 @@ const config: Config = {
           },
         },
         marquee: {
-          from: { transform: "translateX(0)" },
-          to: { transform: "translateX(calc(-100% - var(--gap)))" },
-        },
-        "marquee-vertical": {
-          from: { transform: "translateY(0)" },
-          to: { transform: "translateY(calc(-100% - var(--gap)))" },
-        },
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          to: { transform: 'translateX(-50%)' }
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
@@ -51,10 +39,10 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      fontFamily: {
-        sans: ["var(--font-geist-sans)"],
-        mono: ["var(--font-geist-mono)"],
-      },
+      // fontFamily: {
+      //   sans: ["var(--font-roboto-sans)", ...fontFamily.sans],
+      //   mono: ["var(--font-roboto-mono)", ...fontFamily.mono],
+      // },
     },
   },
   darkMode: "class",
@@ -332,16 +320,6 @@ const config: Config = {
       "dividerWeight": "1",
       "hoverOpacity": "0.9"
     }
-  }), addVariablesForColors],
+  })],
 };
-function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = flattenColorPalette(theme("colors"));
-  let newVars = Object.fromEntries(
-    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-  );
-
-  addBase({
-    ":root": newVars,
-  });
-}
 export default config;

@@ -1,8 +1,30 @@
 "use client";
+import { Button } from "@nextui-org/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
-export default function ProductFilterClear() {
+export default function ProductFilterClear({
+  variant,
+  className,
+  color,
+}: {
+  className?: string;
+  variant?:
+    | "flat"
+    | "shadow"
+    | "bordered"
+    | "solid"
+    | "light"
+    | "faded"
+    | "ghost";
+  color?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "danger";
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { push } = useRouter();
@@ -32,12 +54,14 @@ export default function ProductFilterClear() {
 
   return (
     <div className="">
-      <button
-        className="text-gray-500 hover:text-gray-700 text-sm"
+      <Button
+        className={className}
         onClick={clearFilters}
+        variant={variant || "light"}
+        color={color}
       >
         Очистить
-      </button>
+      </Button>
     </div>
   );
 }

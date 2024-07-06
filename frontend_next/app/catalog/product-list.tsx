@@ -1,6 +1,6 @@
 "use client";
 import { apiClient } from "@frontend_next/lib/eden";
-import { Card, CardHeader, Pagination } from "@nextui-org/react";
+import { Card, CardFooter, CardHeader, Pagination } from "@nextui-org/react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
@@ -8,17 +8,21 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ProductCounter } from "./product-counter";
+import { ProductMakeRequest } from "./product-make-request";
 
 export default function ProductList({
   page,
   page_size,
   category,
   properties,
+  query,
 }: {
   page?: string;
   page_size?: string;
   category?: string;
   properties?: string;
+  query?: string;
 }) {
   const pageSize = page_size ? +page_size : 24;
   const searchParams = useSearchParams();
@@ -32,6 +36,7 @@ export default function ProductList({
       fields: string;
       category?: string;
       properties?: string;
+      query?: string;
     } = {
       limit: pageSize,
       page: page ? +page : 1,
@@ -47,8 +52,12 @@ export default function ProductList({
       res.properties = properties;
     }
 
+    if (query) {
+      res.query = query;
+    }
+
     return res;
-  }, [page, pageSize, category, properties]);
+  }, [page, pageSize, category, properties, query]);
 
   const changePage = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -57,7 +66,7 @@ export default function ProductList({
   };
 
   const { data } = useSuspenseQuery({
-    queryKey: ["products", page, pageSize, category, properties],
+    queryKey: ["products", page, pageSize, category, properties, query],
     queryFn: async () => {
       const { data } = await apiClient.api.products.public.data.get({
         query: queryParams,
@@ -71,8 +80,8 @@ export default function ProductList({
       <div>
         <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {data.products.map((product) => (
-            <Card key={product.id} className="p-4">
-              <Link href={`/product/${product.id}`}>
+            <Card key={product.id} isFooterBlurred>
+              <Link href={`/product/${product.id}`} className="p-4">
                 <Image
                   as={NextImage}
                   isZoomed
@@ -84,15 +93,15 @@ export default function ProductList({
                   alt={product.name}
                 />
               </Link>
-              <CardHeader className="pb-0 pt-2 flex-col items-start">
-                <div className="flex flex-col gap-3">
+              <CardHeader className="py-2 px-4 flex-col items-start flex-1">
+                <div className="flex flex-col gap-3 flex-1">
                   <Link
                     className="text-medium font-medium text-default-700 leading-tight"
                     href={`/product/${product.id}`}
                   >
                     {product.name}
                   </Link>
-                  <div className="text-small text-default-600">
+                  <div className="text-small text-default-600 flex-1">
                     {product.description}
                   </div>
                   <p className="text-small font-medium text-default-700">
@@ -105,6 +114,10 @@ export default function ProductList({
                   </p>
                 </div>
               </CardHeader>
+              <CardFooter className="bg-content4/30 border-t-1 border-zinc-100/50 justify-around flex items-center flex-col">
+                <ProductCounter productId={product.id} />
+                <ProductMakeRequest productId={product.id} />
+              </CardFooter>
             </Card>
           ))}
         </div>

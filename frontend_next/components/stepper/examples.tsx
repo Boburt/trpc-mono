@@ -19,7 +19,6 @@ import { SignupWizardFirstStep } from "./steps/first";
 import { SignupWizardSecondStep } from "./steps/second";
 import { SignupWizardThirdStep } from "./steps/third";
 import { SignupWizardFourthStep } from "./steps/fourth";
-import { roleStore } from "@frontend_next/store/zustand/roleStore";
 import { toast } from "sonner";
 
 const steps = [
@@ -37,6 +36,7 @@ const stepComponents: Record<string, React.FC> = {
 };
 
 export const StepperOrientation = () => {
+  const { hasCompletedAllSteps } = useStepper();
   const [orientation, setOrientation] =
     React.useState<StepperProps["orientation"]>("vertical");
   return (

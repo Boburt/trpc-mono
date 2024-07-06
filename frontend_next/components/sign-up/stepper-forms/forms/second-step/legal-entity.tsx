@@ -14,15 +14,51 @@ import { Separator } from "@frontend_next/components/ui/separator";
 
 import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { Button } from "@frontend_next/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
-import useToken from "@admin/store/get-token";
-import { createProfileQuery } from "@frontend_next/components/sign-up/stepper-forms/queries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { useMemo } from "react";
+import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
+import { apiClient } from "@frontend_next/lib/eden";
 
 export const LegalEntitySecondStep = () => {
+  const queryClient = useQueryClient();
   const { data: session } = useSession();
   const { nextStep, prevStep } = useStepper();
+  const membership_id: string = signUpWizardStore(
+    (state) => state.membershipId
+  );
+  const orgType: {
+    value: string;
+    label: string;
+  } = signUpWizardStore((state) => state.orgType);
+
+  const profileData: any = queryClient.getQueryData(["profile_data"]);
+
+  // useEffect(() => {
+  //   if (
+  //     profileData &&
+  //     profileData.data &&
+  //     profileData.data.profile_data &&
+  //     "email" in profileData.data.profile_data
+  //   ) {
+  //     values = profileData.data.profile_data;
+  //   }
+  // }, [profileData]);
+
+  const values = useMemo(() => {
+    if (
+      profileData &&
+      profileData.data &&
+      profileData.data.profile_data &&
+      "email" in profileData.data.profile_data
+    ) {
+      return profileData.data.profile_data;
+    }
+  }, [profileData]);
+
+  // console.log("values", values);
+
   const form = useForm<{
     first_name: string;
     last_name: string;
@@ -51,28 +87,86 @@ export const LegalEntitySecondStep = () => {
       extra_email: "",
       extra_phone: "",
     },
+    values,
   });
 
   const createMutation = useMutation({
-    mutationFn: (newTodo: Record<string, any>) =>
-      createProfileQuery({
-        newProfile: newTodo,
-        token: session?.accessToken!,
-      }),
-    onSuccess: () => {
-      nextStep();
+    mutationFn: ({
+      newProfile,
+      token,
+      reference_id,
+      org_type,
+    }: {
+      newProfile: Record<string, any>;
+      token: string;
+      reference_id: string;
+      org_type: string;
+    }) => {
+      return apiClient.api.profiles.post(
+        {
+          data: newProfile,
+          reference_id,
+          org_type,
+          fields: ["id"],
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
     },
-    onError: () => {
-      toast.error("Ошибка создания профиля");
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Профиль успешно создан");
+        nextStep();
+      } else {
+        toast.error("Профиль не создан");
+      }
     },
   });
 
-  const onSubmit = (data: {
+  const updateMutation = useMutation({
+    mutationFn: ({
+      updateProfile,
+      token,
+      reference_id,
+      org_type,
+    }: {
+      updateProfile: Record<string, any>;
+      token: string;
+      reference_id: string;
+      org_type: string;
+    }) => {
+      return apiClient.api.profiles.put(
+        {
+          data: updateProfile,
+          reference_id,
+          org_type,
+          fields: ["id"],
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    },
+    onSuccess: (data) => {
+      if (data.data && "id" in data.data) {
+        queryClient.invalidateQueries({ queryKey: ["profile_data"] });
+        toast.success("Профиль успешно обновлен");
+        nextStep();
+      } else {
+        toast.error("Профиль не обновлен");
+      }
+    },
+  });
+
+  const checkBeforeMutation = (data: {
     first_name: string;
     last_name: string;
     sur_name: string;
-    phone: string;
+    job_title: string;
     email: string;
+    phone: string;
     extra_first_name: string;
     extra_last_name: string;
     extra_sur_name: string;
@@ -80,7 +174,43 @@ export const LegalEntitySecondStep = () => {
     extra_email: string;
     extra_phone: string;
   }) => {
-    createMutation.mutate(data);
+    if (
+      profileData.data.membership_data &&
+      "id" in profileData.data.membership_data &&
+      profileData.data.profile_data &&
+      "email" in profileData.data.profile_data
+    ) {
+      updateMutation.mutate({
+        updateProfile: data,
+        token: session?.accessToken!,
+        reference_id: membership_id,
+        org_type: orgType.value,
+      });
+    } else {
+      createMutation.mutate({
+        newProfile: data,
+        token: session?.accessToken!,
+        reference_id: membership_id,
+        org_type: orgType.value,
+      });
+    }
+  };
+
+  const onSubmit = (data: {
+    first_name: string;
+    last_name: string;
+    sur_name: string;
+    phone: string;
+    email: string;
+    job_title: string;
+    extra_first_name: string;
+    extra_last_name: string;
+    extra_sur_name: string;
+    extra_job_title: string;
+    extra_email: string;
+    extra_phone: string;
+  }) => {
+    checkBeforeMutation(data);
   };
 
   return (

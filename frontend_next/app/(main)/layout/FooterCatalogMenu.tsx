@@ -27,7 +27,7 @@ export default function FooterCatalogMenu() {
           {data.map((category) => (
             <p key={category.id}>
               <Link
-                className="inline-flex gap-x-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                className="inline-flex gap-x-2 text-gray-600 hover:text-gray-800 dark:text-content4-foreground dark:hover:text-gray-200 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                 href={`/catalog/${category.code}`}
               >
                 {category.name}

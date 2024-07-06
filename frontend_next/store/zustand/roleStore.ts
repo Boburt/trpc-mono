@@ -8,6 +8,8 @@ interface signUpWizardStore {
     label: string;
   };
   setOrgType: (orgType: { value: string; label: string }) => void;
+  membershipId: string;
+  setMembershipId: (membershipId: string) => void;
 }
 
 export const signUpWizardStore = create<signUpWizardStore>((set) => ({
@@ -21,4 +23,6 @@ export const signUpWizardStore = create<signUpWizardStore>((set) => ({
     label: "Индивидуальный предприниматель",
   },
   setOrgType: (orgType: { value: string; label: string }) => set({ orgType }),
+  membershipId: "",
+  setMembershipId: (membershipId?: string) => set({ membershipId }),
 }));

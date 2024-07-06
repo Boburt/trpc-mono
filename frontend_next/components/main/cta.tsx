@@ -3,8 +3,12 @@ import { motion } from "framer-motion";
 import { AuroraBackground } from "../ui/aurora-background";
 import { FlipWords } from "../ui/flip-words";
 import { PlaceholdersAndVanishInput } from "../ui/placeholders-and-vanish-input";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Cta() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
   const words = ["тканями", "текстилем", "изделиями"];
   const placeholders = [
     "Детская одежда из органического хлопка",
@@ -16,11 +20,12 @@ export default function Cta() {
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
+    setSearchTerm(e.target.value);
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submitted");
+
+    router.push(`/catalog/?query=${searchTerm}`);
   };
 
   return (
