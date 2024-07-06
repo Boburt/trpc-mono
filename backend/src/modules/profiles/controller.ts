@@ -104,7 +104,7 @@ export const profilesController = new Elysia({
         .where(eq(membership_users.user_id, user.user.id))
         .execute();
 
-      let membership;
+      let membership: InferSelectModel<typeof memberships>;
       if (resMembershipsId.length === 0) {
         return [];
       } else {
