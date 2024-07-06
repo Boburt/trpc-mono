@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import ProductList from "./product-list";
-import ProductPagination from "./product-pagination";
 import ProductListSkeleton from "./product-list-skeleton";
 import ProductPaginationSkeleton from "./product-pagination-skeleton";
 import ProductToolbar from "./product-toolbar";

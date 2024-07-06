@@ -113,6 +113,7 @@ export const SignupWizardFirstStep: React.FC = () => {
   };
 
   const updateMutation = useMutation({
+    // @ts-ignore
     mutationFn: (updateMembership: InferInsertModel<typeof memberships>) => {
       return apiClient.api.memberships({ id: updateMembership.id! }).put(
         {
@@ -140,10 +141,12 @@ export const SignupWizardFirstStep: React.FC = () => {
   });
 
   const createMutation = useMutation({
+    // @ts-ignore
     mutationFn: (newMembership: InferInsertModel<typeof memberships>) => {
       return apiClient.api.memberships.post(
         {
           data: {
+            // @ts-ignore
             type: newMembership.type,
           },
           fields: ["id"],

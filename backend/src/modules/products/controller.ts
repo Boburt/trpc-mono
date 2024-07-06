@@ -69,7 +69,7 @@ export const productsController = new Elysia({
       if (category) {
         try {
           categoryCode = JSON.parse(category);
-        } catch (e) {}
+        } catch (e) { }
       }
       let categoryIds = [];
       if (categoryCode && categoryCode != null) {
@@ -256,7 +256,7 @@ export const productsController = new Elysia({
       if (category) {
         try {
           categoryCode = JSON.parse(category);
-        } catch (e) {}
+        } catch (e) { }
       }
       let categoryIds = [];
       if (categoryCode && categoryCode != null) {
@@ -409,6 +409,7 @@ export const productsController = new Elysia({
 
       let categoryData: InferSelectModel<typeof categories> | null = null;
       if (category) {
+        // @ts-ignore
         categoryData = await drizzle.query.categories.findFirst({
           where: eq(categories.code, category),
           columns: {
@@ -921,11 +922,17 @@ export const productsController = new Elysia({
       let res = product[0];
 
       res.properties = {
+        /** @ts-ignore */
         fabric_type: res.properties?.fabric_type ?? "",
+        /** @ts-ignore */
         raw_material: res.properties?.raw_material ?? "",
+        /** @ts-ignore */
         fabric_density: res.properties?.fabric_density ?? "",
+        /** @ts-ignore */
         color_and_design: res.properties?.color_and_design ?? "",
+        /** @ts-ignore */
         strength_resistance: res.properties?.strength_resistance ?? "",
+        /** @ts-ignore */
         product_tech: res.properties?.product_tech ?? "",
       } as ProductProperties;
 
