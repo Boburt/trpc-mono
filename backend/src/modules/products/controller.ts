@@ -18,33 +18,36 @@ import fs from "fs";
 import path from "path";
 import { ProductProperties } from "./dtos/one.dto";
 import { ProductsWithRelations } from "./dtos/list.dto";
+import { ElasticsearchAggregations } from "./dtos/facets.dto";
 
 export const productsController = new Elysia({
   name: "@api/products",
 })
   .use(ctx)
-  .get('/products/public/data', async ({ user, set, drizzle, query: {
-    limit,
-    offset,
-    sort,
-    filters,
-    fields,
-    category
-  } }) => {
+  .get('/products/public/facets', async ({
+    user, set, drizzle, query: {
+      filters,
+      category,
+      properties
+    }
+  }) => {
 
-    let selectFields: SelectedFields = {};
-    if (fields) {
-      selectFields = parseSelectFields(fields, products, {
-        manufacturers,
-      });
-    }
-    let whereClause: (SQLWrapper | undefined)[] = [];
-    if (filters) {
-      whereClause = parseFilterFields(filters, products, {
-        manufacturers,
-      });
-    }
-    whereClause.push(eq(products.active, true));
+    const propertiesFilter = properties ? properties.split(",") : [];
+    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
+    const indexName = `${process.env.PROJECT_PREFIX}products`;
+    const filter: any[] = [
+      {
+        bool: {
+          must: [
+            {
+              term: {
+                active: true,
+              },
+            },
+          ],
+        },
+      },
+    ];
     let categoryCode = category;
     if (category) {
       try {
@@ -54,6 +57,7 @@ export const productsController = new Elysia({
       }
 
     }
+    let categoryIds = [];
     if (categoryCode && categoryCode != null) {
       const categoryHierarchyQuery = sql.raw(`
         WITH RECURSIVE category_hierarchy AS (
@@ -75,37 +79,306 @@ export const productsController = new Elysia({
         name: string;
         parent_id: string;
       }>(categoryHierarchyQuery);
-      const categoryIds = categoryHierarchyResult.map(row => row.id);
-      whereClause.push(inArray(products_categories.category_id, categoryIds));
+      categoryIds.push(...categoryHierarchyResult.map(row => row.id));
+      filter.push({ terms: { category_id: categoryIds } });
     }
-    const rolesList = await drizzle
-      .select(selectFields)
-      .from(products)
-      .leftJoin(
-        manufacturers,
-        eq(products.manufacturer_id, manufacturers.id)
-      )
-      .innerJoin(
-        products_categories,
-        eq(products.id, products_categories.product_id)
-      )
-      .where(and(...whereClause))
-      .limit(limit)
-      .offset(offset)
-      .execute() as ProductsWithRelations[];
-    if (rolesList.length > 0) {
+
+
+    // if (propertiesFilter.length > 0) {
+    //   for (const prop of propertiesFilter) {
+    //     const [propName, propValue] = prop.split(":");
+    //     filter.push({
+    //       nested: {
+    //         path: 'properties',
+    //         query: {
+    //           bool: {
+    //             must: [
+    //               { match: { 'properties.name': propName } },
+    //               { match: { 'properties.value': propValue } },
+    //             ],
+    //           },
+    //         },
+    //       },
+    //     });
+    //   }
+    // }
+
+    const query = {
+      query: {
+        bool: {
+          filter: filter.length ? filter : undefined,
+        }
+      },
+      size: 0,
+      aggs: {
+        // manufacturers: {
+        //   terms: { field: 'manufacturer_name.keyword' },
+        // },
+        properties: {
+          nested: { path: 'properties' },
+          aggs: {
+            names: {
+              terms: { field: 'properties.name' },
+              aggs: {
+                values: {
+                  terms: { field: 'properties.value.keyword' },
+                },
+              },
+            },
+          },
+        },
+        price_range: {
+          stats: { field: 'price' }
+        }
+      }
+    } as any;
+
+
+    if (propertiesFilter.length > 0) {
+      for (const prop of propertiesFilter) {
+        const [propName, propValue] = prop.split(":");
+        if (query.query.bool.must === undefined) {
+          query.query.bool.must = [];
+        }
+        query.query.bool.must.push({
+          nested: {
+            path: 'properties',
+            query: {
+              bool: {
+                must: [
+                  {
+                    "match": {
+                      "properties.name": {
+                        "query": propName,
+                        "minimum_should_match": "80%"
+                      }
+                    }
+                  },
+                  {
+                    "match_phrase": {
+                      "properties.value": propValue
+                    }
+                  }
+                ],
+              },
+            },
+          },
+        });
+      }
+    }
+
+    try {
+      const response = await fetch(`${esUrl}/${indexName}/_search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+        body: JSON.stringify(query)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Elasticsearch request failed: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const aggregations = data.aggregations as ElasticsearchAggregations
+      console.log('aggregations', aggregations)
+      return {
+        // manufacturers: aggregations.manufacturers.buckets.map(bucket => ({
+        //   key: bucket.key,
+        //   doc_count: bucket.doc_count
+        // })),
+        properties: aggregations.properties.names.buckets.map(keyBucket => ({
+          key: keyBucket.key,
+          values: keyBucket.values.buckets.map(valueBucket => ({
+            key: valueBucket.key,
+            doc_count: valueBucket.doc_count
+          }))
+        })),
+        priceRange: {
+          min: aggregations.price_range.min,
+          max: aggregations.price_range.max
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching facets:', error)
+      throw new Error('Failed to fetch facets')
+    }
+  },
+    {
+      query: t.Object({
+        filters: t.Optional(t.String()),
+        category: t.Optional(t.String()),
+        properties: t.Optional(t.Nullable(t.String())),
+      }),
+    })
+  .get('/products/public/data', async ({ user, set, drizzle, query: {
+    limit,
+    page,
+    sort,
+    properties,
+    fields,
+    category
+  } }) => {
+    const propertiesFilter = properties ? properties.split(",") : [];
+    const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`
+    const indexName = `${process.env.PROJECT_PREFIX}products`;
+    const filter: any[] = [
+      {
+        bool: {
+          must: [
+            {
+              term: {
+                active: true,
+              },
+            },
+          ],
+        },
+      },
+    ];
+    let categoryCode = category;
+    if (category) {
+      try {
+        categoryCode = JSON.parse(category);
+      } catch (e) {
+
+      }
+
+    }
+    let categoryIds = [];
+    if (categoryCode && categoryCode != null) {
+      const categoryHierarchyQuery = sql.raw(`
+        WITH RECURSIVE category_hierarchy AS (
+          SELECT id, name, parent_id
+          FROM categories
+          WHERE code = '${category}' AND active = true
+          UNION ALL
+          SELECT c.id, c.name, c.parent_id
+          FROM categories c
+          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
+          WHERE c.active = true
+        )
+        SELECT id FROM category_hierarchy;
+      `);
+
+      // Execute the query to get category IDs
+      const categoryHierarchyResult = await drizzle.execute<{
+        id: string;
+        name: string;
+        parent_id: string;
+      }>(categoryHierarchyQuery);
+      categoryIds.push(...categoryHierarchyResult.map(row => row.id));
+      filter.push({ terms: { category_id: categoryIds } });
+    }
+
+    const elasticQuery = {
+      size: limit,
+      from: (page - 1) * limit,
+      query: {
+        bool: {
+          filter: filter.length ? filter : undefined,
+        }
+      },
+      aggs: {
+        // manufacturers: {
+        //   terms: { field: 'manufacturer_name.keyword' },
+        // },
+        properties: {
+          nested: { path: 'properties' },
+          aggs: {
+            names: {
+              terms: { field: 'properties.name' },
+              aggs: {
+                values: {
+                  terms: { field: 'properties.value.keyword' },
+                },
+              },
+            },
+          },
+        },
+        price_range: {
+          stats: { field: 'price' }
+        }
+      }
+    } as any;
+
+    if (propertiesFilter.length > 0) {
+      for (const prop of propertiesFilter) {
+        const [propName, propValue] = prop.split(":");
+        if (elasticQuery.query.bool.must === undefined) {
+          elasticQuery.query.bool.must = [];
+        }
+        elasticQuery.query.bool.must.push({
+          nested: {
+            path: 'properties',
+            query: {
+              bool: {
+                must: [
+                  {
+                    "match": {
+                      "properties.name": {
+                        "query": propName,
+                        "minimum_should_match": "80%"
+                      }
+                    }
+                  },
+                  {
+                    "match_phrase": {
+                      "properties.value": propValue
+                    }
+                  }
+                ],
+              },
+            },
+          },
+        });
+      }
+    }
+    const response = await fetch(`${esUrl}/${indexName}/_search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify(elasticQuery)
+    })
+
+    if (!response.ok) {
+      throw new Error(`Elasticsearch request failed: ${response.statusText}`)
+    }
+
+    const result = await response.json()
+    const hits = result.hits.hits.map((hit) => hit._source) as ProductsWithRelations[];
+
+    // const rolesList = await drizzle
+    //   .select(selectFields)
+    //   .from(products)
+    //   .leftJoin(
+    //     manufacturers,
+    //     eq(products.manufacturer_id, manufacturers.id)
+    //   )
+    //   .innerJoin(
+    //     products_categories,
+    //     eq(products.id, products_categories.product_id)
+    //   )
+    //   .where(and(...whereClause))
+    //   .limit(limit)
+    //   .offset(offset)
+    //   .execute() as ProductsWithRelations[];
+    if (hits.length > 0) {
       const images = await drizzle.query.assets.findMany({
         where: and(
           eq(assets.code, 'source'),
           eq(assets.model, "products"),
           inArray(
             assets.model_id,
-            rolesList.map((m) => m.id)
+            hits.map((m) => m.id)
           )
         )
       });
 
-      rolesList.forEach((p) => {
+      hits.forEach((p) => {
         p.images = images
           .filter((i) => i.model_id === p.id)
           .map((i) => ({
@@ -114,17 +387,17 @@ export const productsController = new Elysia({
           }));
       });
     }
-
-    return rolesList;
+    const total = result.hits.total.value;
+    return { products: hits, total, totalPages: Math.ceil(total / limit), };
   },
     {
       query: t.Object({
         limit: t.Numeric(),
-        offset: t.Numeric(),
+        page: t.Numeric(),
         sort: t.Optional(t.String()),
-        filters: t.Optional(t.String()),
         fields: t.Optional(t.String()),
         category: t.Optional(t.String()),
+        properties: t.Optional(t.Nullable(t.String())),
       }),
     })
   .get('/products/public/count', async ({ user, set, drizzle, query: {
@@ -564,6 +837,21 @@ export const productsController = new Elysia({
       }),
     }
   )
+  .post('/products/index', async ({ user, set, drizzle, indexProductsQueue }) => {
+    const productsList = await drizzle.select({
+      id: products.id,
+    }).from(products).execute();
+
+    for (const product of productsList) {
+      console.log('indexing product', product.id);
+      await indexProductsQueue.add(product.id, {
+        id: product.id,
+      }, {
+        removeOnComplete: true,
+        removeOnFail: true,
+      })
+    }
+  })
   .post('/products/batch', async ({ user, set, drizzle, body: { data } }) => {
     // if (!user) {
     //   return {
