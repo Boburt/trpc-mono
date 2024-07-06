@@ -18,17 +18,95 @@ import {
   Globe,
   Hash,
   DollarSign,
+  Phone,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Infer } from "next/dist/compiled/superstruct";
-import { memberships, profiles } from "backend/drizzle/schema";
-import { InferSelectModel } from "drizzle-orm";
 
+type Profile = {
+  first_name: string;
+  last_name: string;
+  sur_name: string;
+  job_title: string;
+  phone: string;
+  email: string;
+  extra_first_name: string;
+  extra_last_name: string;
+  extra_sur_name: string;
+  extra_job_title: string;
+  extra_email: string;
+  extra_phone: string;
+};
+
+type Membership = {
+  name: string;
+  short_name: string;
+  description: string;
+  active: boolean;
+  rating: number;
+  country: string;
+  type: string;
+  org_type: string;
+  city: string;
+  ein: number;
+  address: string;
+  fact_address: string;
+  email: string;
+  web_site: string;
+  vat: boolean;
+};
+
+type ProfileInfo = {
+  data: {
+    profile_data: Profile;
+    membership_data: Membership;
+  };
+};
+
+const defaultProfileInfo: ProfileInfo = {
+  data: {
+    profile_data: {
+      first_name: "",
+      last_name: "",
+      sur_name: "",
+      job_title: "",
+      phone: "",
+      email: "",
+      extra_first_name: "",
+      extra_last_name: "",
+      extra_sur_name: "",
+      extra_job_title: "",
+      extra_email: "",
+      extra_phone: "",
+    },
+    membership_data: {
+      name: "",
+      short_name: "",
+      description: "",
+      active: false,
+      rating: 0,
+      country: "",
+      type: "",
+      org_type: "",
+      city: "",
+      ein: 0,
+      address: "",
+      fact_address: "",
+      email: "",
+      web_site: "",
+      vat: false,
+    },
+  },
+};
+
+type InfoItemProps = {
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  value: string | number;
+};
 const ProfileCard = () => {
   const queryClient = useQueryClient();
-  const profile_info: any = queryClient.getQueryData(["profile_info"]);
-
-  console.log("info from card", profile_info);
+  const profile_info: ProfileInfo =
+    queryClient.getQueryData(["profile_info"]) || defaultProfileInfo;
 
   const values = useMemo(() => {
     if (
@@ -46,36 +124,45 @@ const ProfileCard = () => {
     }
   }, [profile_info]);
 
-  console.log("values", values);
-
   const user = {
-    name: "Иван Иванов",
-    email: "ivan@example.com",
-    location: "Москва, Россия",
-    occupation: "Разработчик программного обеспечения",
-    joinDate: "2023-01-15",
+    name:
+      values?.profile?.last_name +
+      " " +
+      values?.profile?.first_name +
+      " " +
+      values?.profile?.sur_name,
+    email: values?.profile?.email,
+    phone: values?.profile?.phone,
+    occupation: values?.profile?.job_title,
   };
 
   const businessInfo = {
-    name: "ТехноИнновации ООО",
-    short_name: "ТехИнно",
-    description:
-      "Ведущая компания в области разработки инновационного программного обеспечения",
-    active: true,
-    rating: 4.8,
-    country: "Россия",
-    type: "manufacturer",
-    org_type: "company",
-    city: "Москва",
-    ein: 1234567890,
-    address: "ул. Пушкина, д. 10",
-    fact_address: "ул. Лермонтова, д. 15, офис 301",
-    email: "info@techinnov.ru",
-    web_site: "www.techinnov.ru",
-    vat: true,
+    name: values?.business?.name,
+    short_name: values?.business?.short_name,
+    description: values?.business?.description,
+    active: values?.business?.active,
+    rating: values?.business?.rating,
+    country: values?.business?.country,
+    type: values?.business?.type,
+    org_type: values?.business?.org_type,
+    city: values?.business?.city,
+    ein: values?.business?.ein,
+    address: values?.business?.address,
+    fact_address: values?.business?.fact_address,
+    email: values?.business?.email,
+    web_site: values?.business?.web_site,
+    vat: values?.business?.vat,
   };
 
-  const InfoItem = ({ icon: Icon, label, value }) => (
+  const InfoItem = ({
+    icon: Icon,
+    label,
+    value,
+  }: {
+    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    label: string;
+    value: string | number | boolean | undefined;
+  }) => (
     <div className="flex items-center space-x-2">
       <Icon className="w-5 h-5 text-muted-foreground" />
       <span className="text-sm font-medium">{label}:</span>
@@ -101,20 +188,11 @@ const ProfileCard = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InfoItem icon={Mail} label="Email" value={user.email} />
-            <InfoItem
-              icon={MapPin}
-              label="Местоположение"
-              value={user.location}
-            />
+            <InfoItem icon={Phone} label="номер Телефона" value={user.phone} />
             <InfoItem
               icon={Briefcase}
               label="Должность"
               value={user.occupation}
-            />
-            <InfoItem
-              icon={Calendar}
-              label="Дата регистрации"
-              value={new Date(user.joinDate).toLocaleDateString()}
             />
           </div>
         </CardContent>
@@ -135,7 +213,7 @@ const ProfileCard = () => {
             <InfoItem
               icon={MapPin}
               label="Местоположение"
-              value={`${businessInfo.city}, ${businessInfo.country}`}
+              value={`${businessInfo.city ?? ""} ${businessInfo.country}`}
             />
             <InfoItem icon={Mail} label="Email" value={businessInfo.email} />
             <InfoItem
@@ -146,7 +224,7 @@ const ProfileCard = () => {
             <InfoItem icon={Hash} label="EIN" value={businessInfo.ein} />
             <InfoItem
               icon={DollarSign}
-              label="VAT"
+              label="Плательщик НДС"
               value={businessInfo.vat ? "Да" : "Нет"}
             />
             <InfoItem
@@ -158,6 +236,11 @@ const ProfileCard = () => {
               icon={MapPin}
               label="Адрес"
               value={businessInfo.address}
+            />
+            <InfoItem
+              icon={MapPin}
+              label="Фактический адрес"
+              value={businessInfo.fact_address}
             />
           </div>
           <Separator className="my-4" />
