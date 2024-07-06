@@ -101,7 +101,9 @@ export const usersController = new Elysia({
 
       const res = await cacheController.cacheUserDataByToken(accessToken,
         refreshToken, user.id);
-      return res;
+      // @ts-ignore
+      const { permissions, ...result } = res;
+      return result;
     },
     {
       body: t.Object({
@@ -325,7 +327,10 @@ export const usersController = new Elysia({
       }
       const res = await cacheController.cacheUserDataByToken(accessToken,
         refreshToken, user[0].id);
-      return res;
+
+      // @ts-ignore
+      const { permissions: permissionsList, ...result } = res;
+      return result;
 
     },
     {
@@ -439,6 +444,15 @@ export const usersController = new Elysia({
       }),
     }
   )
+  .get('/users/my_permissions', async ({ user, set, drizzle }) => {
+    if (!user) {
+      set.status = 401;
+      return {
+        message: "User not found",
+      };
+    }
+    return user.permissions;
+  })
   .get("/users/me", async ({ user, set, cacheController }) => {
     if (!user) {
       set.status = 401;
