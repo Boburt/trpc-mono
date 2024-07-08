@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "next build",
-    "start": "next start -p 4000",
-    "lint": "next lint"
+    "start": "next start",
+    "lint": "next lint",
+    "start:with-env": "node -r dotenv/config ./node_modules/.bin/next start"
   },
   "dependencies": {
     "@devnomic/marquee": "^1.0.2",
@@ -53,6 +54,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
     "drizzle-orm": "^0.31.2",
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",

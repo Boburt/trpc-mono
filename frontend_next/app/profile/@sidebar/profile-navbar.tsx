@@ -68,6 +68,7 @@ export default function ProfileNavbar() {
   return (
     <ListboxWrapper>
       <Listbox variant="shadow" aria-label="Listbox menu with sections">
+        {/* @ts-ignore */}
         <ListboxSection showDivider>
           <ListboxItem
             key="profile"

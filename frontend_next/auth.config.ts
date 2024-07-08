@@ -31,11 +31,14 @@ const providers: Provider[] = [
         authorize: async (credentials) => {
             if (typeof credentials !== "undefined") {
                 const { login, password } = credentials;
+                console.log('credentials', credentials);
                 try {
                     const { data: res, status } = await apiClient.api.users.login.post({
                         login: login!.toString(),
                         password: password!.toString(),
                     });
+                    console.log('status', status);
+                    console.log('res', res);
                     if (status == 200 && res && "accessToken" in res) {
                         return {
                             ...res.user,
@@ -69,6 +72,7 @@ export const providerMap = providers.find(provider => {
 export default {
     debug: true,
     basePath: "/api/auth",
+    trustHost: true,
     callbacks: {
         signIn: async ({
             user,
