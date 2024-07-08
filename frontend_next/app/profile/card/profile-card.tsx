@@ -21,6 +21,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 type Profile = {
   first_name: string;
@@ -105,6 +106,7 @@ type InfoItemProps = {
 };
 const ProfileCard = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const profile_info: ProfileInfo =
     queryClient.getQueryData(["profile_info"]) || defaultProfileInfo;
 
@@ -137,21 +139,21 @@ const ProfileCard = () => {
   };
 
   const businessInfo = {
-    name: values?.business?.name,
-    short_name: values?.business?.short_name,
-    description: values?.business?.description,
-    active: values?.business?.active,
-    rating: values?.business?.rating,
-    country: values?.business?.country,
-    type: values?.business?.type,
-    org_type: values?.business?.org_type,
-    city: values?.business?.city,
-    ein: values?.business?.ein,
-    address: values?.business?.address,
-    fact_address: values?.business?.fact_address,
-    email: values?.business?.email,
-    web_site: values?.business?.web_site,
-    vat: values?.business?.vat,
+    name: values?.business?.name ?? "",
+    short_name: values?.business?.short_name ?? "",
+    description: values?.business?.description ?? "",
+    active: values?.business?.active ?? false,
+    rating: values?.business?.rating ?? 0,
+    country: values?.business?.country ?? "",
+    type: values?.business?.type ?? "",
+    org_type: values?.business?.org_type ?? "",
+    city: values?.business?.city ?? "",
+    ein: values?.business?.ein ?? 0,
+    address: values?.business?.address ?? "",
+    fact_address: values?.business?.fact_address ?? "",
+    email: values?.business?.email ?? "",
+    web_site: values?.business?.web_site ?? "",
+    vat: values?.business?.vat ?? false,
   };
 
   const InfoItem = ({
@@ -179,7 +181,11 @@ const ProfileCard = () => {
               <CardTitle>{user.name}</CardTitle>
               <CardDescription>{user.occupation}</CardDescription>
             </div>
-            <Button variant="outline" size="sm">
+            <Button
+              onClick={() => router.push("/sign-up")}
+              variant="outline"
+              size="sm"
+            >
               <Edit className="w-4 h-4 mr-2" />
               Редактировать
             </Button>
