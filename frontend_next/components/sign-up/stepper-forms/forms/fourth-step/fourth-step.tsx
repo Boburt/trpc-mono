@@ -19,11 +19,13 @@ import { useStepper } from "@frontend_next/components/stepper/use-stepper";
 import { signUpWizardStore } from "@frontend_next/store/zustand/roleStore";
 import { useSession } from "next-auth/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { apiClient } from "@frontend_next/lib/eden";
 import { InferInsertModel } from "drizzle-orm";
 import { memberships } from "backend/drizzle/schema";
 import { toast } from "sonner";
+import { FinishAlert } from "./finish-alert";
+import { useRouter } from "next/navigation";
 
 export const FourthStep = () => {
   const orgType = signUpWizardStore((state) => state.orgType);
@@ -31,6 +33,7 @@ export const FourthStep = () => {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const profileData: any = queryClient.getQueryData(["profile_data"]);
+  const [showFinishAlert, setShowFinishAlert] = useState(false);
   const values = useMemo(() => {
     if (
       profileData &&
@@ -44,6 +47,7 @@ export const FourthStep = () => {
       };
     }
   }, [profileData]);
+  const router = useRouter();
 
   const form = useForm<{
     name: string;
@@ -116,7 +120,7 @@ export const FourthStep = () => {
       if (data.data && "id" in data.data) {
         queryClient.invalidateQueries({ queryKey: ["profile_data"] });
         toast.success("Роль успешно обновлена");
-        nextStep();
+        setShowFinishAlert(true);
       } else {
         toast.error("Роль не обновлена");
       }
@@ -271,6 +275,10 @@ export const FourthStep = () => {
             Завершить
           </Button>
         </div>
+        <FinishAlert
+          isOpen={showFinishAlert}
+          onFinish={() => router.push("/profile")}
+        />
       </form>
     </Form>
   );
