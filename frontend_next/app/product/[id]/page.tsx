@@ -10,6 +10,9 @@ import { Suspense } from "react";
 import ProductRelated from "./product-related";
 import { ProductMakeRequest } from "@frontend_next/app/catalog/product-make-request";
 import { ProductCounter } from "@frontend_next/app/catalog/product-counter";
+import { CustomHead } from "@frontend_next/components/custom-head/Custom-head";
+import { Product } from "schema-dts";
+import { JsonLd } from "react-schemaorg";
 
 export default async function ProductPage({
   params: { id },
@@ -29,6 +32,31 @@ export default async function ProductPage({
   }
   return (
     <div>
+      {data && "id" in data && (
+        <CustomHead
+          title={`${data.name} | Портал легкой промышленности`}
+          description={`${data.description} | Портал легкой промышленности`}
+        />
+      )}
+
+      {data && "id" in data && (
+        <JsonLd<Product>
+          item={{
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: data.name,
+            image: `${process.env.NEXT_PUBLIC_API_URL}${data.images?.[0]?.path}`,
+            description: data.description ?? data.name,
+            sku: data.id,
+            offers: {
+              "@type": "Offer",
+              price: data.price!,
+              priceCurrency: "UZS",
+            },
+          }}
+        />
+      )}
+
       {data && "id" in data && (
         <>
           <div className="relative flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
