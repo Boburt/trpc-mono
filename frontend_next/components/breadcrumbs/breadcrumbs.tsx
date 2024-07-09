@@ -36,7 +36,7 @@ const BreadcrumbsContainer = ({
   separator = "/",
 }: BreadcrumbsContainerProps) => (
   <nav className="min-h-6 pb-6">
-    <ol className="flex items-center space-x-4">
+    <ol className="flex items-center">
       {Children.map(children, (child, index) => (
         <>
           {child}
