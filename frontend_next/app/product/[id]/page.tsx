@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import ProductRelated from "./product-related";
 import { ProductMakeRequest } from "@frontend_next/app/catalog/product-make-request";
 import { ProductCounter } from "@frontend_next/app/catalog/product-counter";
-import { CustomHead } from "@frontend_next/components/custom-head/Custom-head";
+import { CustomHead } from "@frontend_next/components/custom-head/custom-head";
 import { Product } from "schema-dts";
 import { JsonLd } from "react-schemaorg";
 
