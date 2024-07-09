@@ -41,7 +41,6 @@ const providers: Provider[] = [
                             ...res.user,
                             accessToken: res.accessToken,
                             refreshToken: res.refreshToken,
-                            permissions: res.permissions,
                             // @ts-ignore
                             role: res.role,
                         };

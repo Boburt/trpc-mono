@@ -7,7 +7,6 @@ import { DefaultJWT } from "@auth/core/jwt";
 interface ExtendedUser extends InferSelectModel<typeof users> {
   accessToken: string;
   refreshToken: string;
-  permissions: string[];
   role: {
     id: string;
     code: string;
@@ -20,7 +19,6 @@ declare module "next-auth" {
   interface User extends ExtendedUser { }
   interface Session {
     user: User | AdapterUser;
-    permissions: string[];
     accessToken: string;
     refreshToken: string;
     exp: number;
@@ -37,7 +35,6 @@ declare module "next-auth/jwt" {
   interface User extends ExtendedUser { }
   interface JWT {
     user: User | AdapterUser;
-    permissions: string[];
     accessToken: string;
     refreshToken: string;
     role: {
