@@ -7,10 +7,10 @@
     "start": "bun run ./src/index.ts"
   },
   "dependencies": {
-    "@elysiajs/bearer": "^1.0.2",
-    "@elysiajs/cors": "^1.0.2",
-    "@elysiajs/jwt": "^1.0.2",
-    "@elysiajs/server-timing": "^1.0.2",
+    "@elysiajs/bearer": "1.0.2",
+    "@elysiajs/cors": "1.0.2",
+    "@elysiajs/jwt": "1.0.2",
+    "@elysiajs/server-timing": "1.0.2",
     "@elysiajs/static": "^1.0.3",
     "@elysiajs/trpc": "^0.7.0",
     "@elysiajs/websocket": "^0.2.8",

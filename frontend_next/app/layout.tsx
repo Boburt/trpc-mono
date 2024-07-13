@@ -8,7 +8,7 @@ import Container from "./(main)/layout/Container";
 import Header from "./(main)/layout/Header";
 import Footer from "./(main)/layout/Footer";
 import dynamic from "next/dynamic";
-import { BreadCrumbs } from "../components/breadcrumbs/breadcrumbs";
+import { BreadCrumbs } from "@frontend_next/components/breadcrumbs/breadcrumbs";
 import { auth } from "@frontend_next/auth";
 import SessionProvider from "@frontend_next/components/providers/SessionProvider";
 import ReactQueryClientProvider from "@frontend_next/components/providers/ReactQueryProvider";
@@ -88,14 +88,10 @@ export default async function RootLayout({
               {title}
             </h1>
           )} */}
-                  {/* {pathname !== "/" && disableBreadcrumbs == false && (
-                    <BreadCrumbs
-                      indexText="Главная"
-                      mainBemClass="breadcrumbs"
-                      crumbs={customCrumbs}
-                    />
-                  )} */}
-                  <Container>{children}</Container>
+
+                  <Container>
+                    <BreadCrumbs>{children}</BreadCrumbs>
+                  </Container>
                 </main>
                 <Footer />
                 <Toaster richColors />

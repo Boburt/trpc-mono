@@ -22,10 +22,10 @@ export default function TopProductList() {
   });
   if (data && Array.isArray(data) && data.length > 0) {
     return (
-      <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="my-auto grid grid-cols-2 gap-2 py-4 sm:grid-cols-2 md:grid-cols-3 md:gap-5 lg:grid-cols-5">
         {data.map((product) => (
           <Card key={product.id} isFooterBlurred>
-            <Link href={`/product/${product.id}`} className="p-4">
+            <Link href={`/product/${product.id}`} className="p-2">
               <Image
                 as={NextImage}
                 isZoomed
@@ -45,10 +45,10 @@ export default function TopProductList() {
                 >
                   {product.name}
                 </Link>
-                <div className="text-small text-default-600 flex-1">
+                <div className="text-small text-default-600 flex-1 hidden md:block">
                   {product.description}
                 </div>
-                <p className="text-small font-medium text-default-700">
+                <p className="text-small font-medium text-default-700 align-bottom">
                   {Intl.NumberFormat("ru-RU", {
                     style: "currency",
                     currency: "UZS",
