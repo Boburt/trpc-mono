@@ -24,10 +24,10 @@ export default function ProductRequestModalProducts({
 
   return (
     <div>
-      <div className="pb-2 font-bold text-2xl text-content4-foreground uppercase">
+      <div className="pb-2 font-bold text-sm md:text-2xl text-content4-foreground uppercase">
         Выбрано
       </div>
-      <ScrollShadow className="h-[420px]">
+      <ScrollShadow className="md:h-[420px]">
         <div className="grid grid-cols-1 gap-3">
           {data &&
             data.map((product) => (

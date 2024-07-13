@@ -69,7 +69,7 @@ export const productsController = new Elysia({
       if (category) {
         try {
           categoryCode = JSON.parse(category);
-        } catch (e) { }
+        } catch (e) {}
       }
       let categoryIds = [];
       if (categoryCode && categoryCode != null) {
@@ -256,7 +256,7 @@ export const productsController = new Elysia({
       if (category) {
         try {
           categoryCode = JSON.parse(category);
-        } catch (e) { }
+        } catch (e) {}
       }
       let categoryIds = [];
       if (categoryCode && categoryCode != null) {
@@ -444,6 +444,8 @@ export const productsController = new Elysia({
     async ({ query: { limit }, drizzle }) => {
       const count = Math.min(Math.max(parseInt(limit), 1), 10);
 
+      console.log("count", count);
+
       const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
       const indexName = `${process.env.PROJECT_PREFIX}products`;
 
@@ -501,6 +503,8 @@ export const productsController = new Elysia({
               }));
           });
         }
+
+        console.log("hits", hits);
 
         return hits;
       } catch (error) {
