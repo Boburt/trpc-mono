@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://api.fungeek.net
+
+# Sitemaps
+Sitemap: https://api.fungeek.net/sitemap.xml

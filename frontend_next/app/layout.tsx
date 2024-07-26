@@ -69,6 +69,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  // const pathname = usePathname();
   return (
     <html
       lang="en"
@@ -88,12 +89,12 @@ export default async function RootLayout({
             </h1>
           )} */}
                   {/* {pathname !== "/" && disableBreadcrumbs == false && (
-            <Breadcrumbs
-              indexText="Главная"
-              mainBemClass="breadcrumbs"
-              crumbs={customCrumbs}
-            />
-          )} */}
+                    <BreadCrumbs
+                      indexText="Главная"
+                      mainBemClass="breadcrumbs"
+                      crumbs={customCrumbs}
+                    />
+                  )} */}
                   <Container>{children}</Container>
                 </main>
                 <Footer />
