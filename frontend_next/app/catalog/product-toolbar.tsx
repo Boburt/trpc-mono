@@ -37,23 +37,22 @@ export default function ProductToolbar({
   const closeDrawer = () => setIsDrawerOpen(false);
 
   return (
-    <header className="relative z-20 flex flex-wrap gap-2 rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 justify-between items-end">
-      <div className="flex items-center gap-2">
-        <Button
-          className="lg:hidden"
-          variant="bordered"
-          onClick={openDrawer}
-          startContent={<ListFilter size={24} />}
-        >
-          Фильтры
-        </Button>
-        <ProductSearchInput />
-        <RequestModeSwitcher />
-      </div>
+    <header className="z-20 gap-2 flex rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 items-baseline">
+      <Button
+        className="lg:hidden"
+        variant="bordered"
+        onClick={openDrawer}
+        startContent={<ListFilter size={24} />}
+      >
+        Фильтры
+      </Button>
+      <ProductSearchInput />
+      <RequestModeSwitcher />
+      <div className="flex-1"></div>
       <Select
         labelPlacement="outside"
-        label="На странице: "
-        className="max-w-xs"
+        label="На странице:"
+        className="w-28"
         selectedKeys={[page_size]}
         onSelectionChange={(value) => {
           const newSearchParams = new URLSearchParams(searchParams);

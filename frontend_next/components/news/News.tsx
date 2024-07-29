@@ -28,7 +28,7 @@ export default function News() {
   return (
     <div
       className={cn("py-12", {
-        "container mx-auto": pathname != "/news",
+        "container mx-auto px-2": pathname != "/news",
       })}
     >
       <div
@@ -40,25 +40,25 @@ export default function News() {
       >
         <h1
           className={cn(
-            "lg:text-4xl text-3xl font-bold text-gray-800 dark:text-white "
+            "lg:text-4xl md:text-3xl text-2xl font-bold text-gray-800 dark:text-white "
           )}
         >
           Новости
         </h1>
         {pathname !== "/news" && (
-          <div className="flex justify-end uppercase hover:text-default-600 dark:hover:text-default-500">
+          <div className="flex justify-end text-xs md:text-base uppercase hover:text-default-600 dark:hover:text-default-500">
             <Link href="/news">Все новости</Link>
           </div>
         )}
       </div>
-      <div className="grid md:grid-cols-5 gap-4 grid-cols-2">
+      <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 grid-cols-2">
         {news &&
           news.map((item: any, index: any) => {
             return (
               <Card className="h-[300px]" isBlurred key={index} isFooterBlurred>
-                <CardFooter className="absolute bottom-0 z-10 pb-0 pt-2 px-4 flex-col items-start bg-black/60 border-b-1 border-default-600 dark:border-default-100">
+                <CardFooter className="absolute bottom-0 z-10 pb-0 pt-2 px-4 flex-col  items-start bg-black/60 border-b-1 border-default-600 dark:border-default-100">
                   <Link
-                    className="uppercase font-bold text-default-100 dark:text-default-900"
+                    className="uppercase font-bold text-xs md:text-base text-default-100 dark:text-default-900"
                     href={`/news/${item.id}`}
                   >
                     {item.title}

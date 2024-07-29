@@ -17,11 +17,11 @@ export default function Catalog({
 }) {
   const pageSize = searchParams.page_size ?? "24";
   return (
-    <div className="">
-      <h1 className="text-3xl font-bold lg:text-5xl dark:text-white">
+    <div className="px-2 md:px-0">
+      <h1 className="text-xl font-bold md:text-3xl lg:text-5xl dark:text-white">
         Каталог
       </h1>
-      <div className="flex gap-x-6 mt-10">
+      <div className="flex gap-x-6 mt-2 md:mt-10">
         <div className="hidden h-full overflow-x-hidden overflow-y-scroll lg:flex">
           <ProductFilter properties={searchParams.properties} />
         </div>

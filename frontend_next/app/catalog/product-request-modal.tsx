@@ -99,8 +99,8 @@ export default function ProductRequestModal({
       <ModalContent>
         {/* <ModalHeader>Product Request</ModalHeader> */}
         <ModalBody className="px-0 py-0">
-          <div className="grid grid-cols-2">
-            <div className="bg-content4 py-8 pl-6 pr-3">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="bg-content4 py-4 pl-2 pr-2 md:py-8 md:pl-6 md:pr-3">
               <Suspense
                 fallback={
                   <ProductRequestModalProductsSkeleton
@@ -119,7 +119,7 @@ export default function ProductRequestModal({
             </div>
             <form
               onSubmit={handleSubmit(handleFormSubmit)}
-              className="pb-4 pr-6 pl-3 flex flex-col h-full"
+              className="pt-4 md:pt-0 pb-4 pr-6 pl-3 flex flex-col h-full"
             >
               <div className="flex-1 flex flex-col justify-center w-full">
                 <div className="space-y-4">

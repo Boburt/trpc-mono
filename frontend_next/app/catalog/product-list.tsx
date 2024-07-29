@@ -78,7 +78,7 @@ export default function ProductList({
   if (data && Array.isArray(data.products) && data.products.length > 0) {
     return (
       <div>
-        <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="my-auto grid  gap-2 py-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {data.products.map((product) => (
             <Card key={product.id} isFooterBlurred>
               <Link href={`/product/${product.id}`} className="p-4">
@@ -101,7 +101,7 @@ export default function ProductList({
                   >
                     {product.name}
                   </Link>
-                  <div className="text-small text-default-600 flex-1">
+                  <div className="text-small text-default-600 hidden md:block flex-1">
                     {product.description}
                   </div>
                   <p className="text-small font-medium text-default-700">

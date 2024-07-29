@@ -21,7 +21,7 @@ export default function NewProductList() {
   });
   if (data && Array.isArray(data) && data.length > 0) {
     return (
-      <div className="my-auto grid grid-cols-1 gap-5 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="my-auto grid  gap-5 py-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {data.map((product) => (
           <Card key={product.id} isFooterBlurred>
             <Link href={`/product/${product.id}`} className="p-4">
@@ -44,7 +44,7 @@ export default function NewProductList() {
                 >
                   {product.name}
                 </Link>
-                <div className="text-small text-default-600 flex-1">
+                <div className="text-small hidden md:block text-default-600 flex-1">
                   {product.description}
                 </div>
                 <p className="text-small font-medium text-default-700">

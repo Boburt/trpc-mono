@@ -9,7 +9,7 @@ export const productRequestsController = new Elysia({
     .use(ctx)
     .post(
         "/product_requests",
-        async ({ body, user, set, drizzle }) => {
+        async ({ body, user, set, drizzle, notifyAboutNewProductRequestQueue }) => {
             const { firstName, lastName, phone, email, products } = body;
 
             const newRequest = await drizzle
@@ -36,7 +36,12 @@ export const productRequestsController = new Elysia({
                 .insert(productRequestItems)
                 .values(requestItems)
                 .execute();
+            await notifyAboutNewProductRequestQueue.add(`product_request_${requestId}`, { id: requestId },
+                {
+                    removeOnComplete: true,
+                    removeOnFail: true,
 
+                });
             return {
                 message: "Product request submitted successfully",
                 requestId,
