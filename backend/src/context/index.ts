@@ -104,6 +104,13 @@ const indexProductsQueue = new Queue(
   }
 );
 
+const notifyAboutNewProductRequestQueue = new Queue(
+  `${process.env.PROJECT_PREFIX}notify_about_new_product_request`,
+  {
+    connection: client,
+  }
+);
+
 
 export const ctx = new Elysia({
   name: "@app/ctx",
@@ -119,6 +126,7 @@ export const ctx = new Elysia({
   .decorate("newTicketQueue", newTicketQueue)
   .decorate("ticketStatusChangedQueue", ticketStatusChangedQueue)
   .decorate("indexProductsQueue", indexProductsQueue)
+  .decorate("notifyAboutNewProductRequestQueue", notifyAboutNewProductRequestQueue)
   .use(
     cors({
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
