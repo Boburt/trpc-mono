@@ -4,6 +4,7 @@ import processFormSendTg from "./processors/form_send_tg";
 import processNewTicket from "./processors/new_ticket";
 import processTicketStatusChange from "./processors/ticket_status_change";
 import processIndexProducts from "./processors/index_products";
+import { processNewProductRequest } from "./processors/new_product_request";
 // import processNewImages from "./processors/new_assets_added";
 // import processIndexManufacturer from "./processors/index_manufacturers";
 // import processDeleteManufacturer from "./processors/delete_manufacturers";
@@ -22,6 +23,7 @@ const deleteManufacturersQueueName = `${process.env.PROJECT_PREFIX}delete_manufa
 const indexManufacturerReview = `${process.env.PROJECT_PREFIX}index_manufacturer_review`;
 const formSendTgQueueName = `${process.env.PROJECT_PREFIX}form_send_tg`;
 const indexProductsQueueName = `${process.env.PROJECT_PREFIX}index_products`;
+const notifyAboutNewProductRequest = `${process.env.PROJECT_PREFIX}notify_about_new_product_request`;
 
 // const imageProcessQueueWorker = new Worker(
 //   imageProcessQueueName,
@@ -112,6 +114,18 @@ const indexProductsQueueWorker = new Worker(
     const { data } = job;
     console.log("job data", data);
     await processIndexProducts(data.id);
+  },
+  {
+    connection: redisClient,
+  }
+);
+
+const notifyAboutNewProductRequestWorker = new Worker(
+  notifyAboutNewProductRequest,
+  async (job) => {
+    const { data } = job;
+    console.log("job data", data);
+    await processNewProductRequest(data.id);
   },
   {
     connection: redisClient,

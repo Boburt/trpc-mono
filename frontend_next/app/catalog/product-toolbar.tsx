@@ -48,6 +48,7 @@ export default function ProductToolbar({
       </Button>
       <ProductSearchInput />
       <RequestModeSwitcher />
+      <div className="flex-1"></div>
       <Select
         labelPlacement="outside"
         label="На странице:"
