@@ -133,6 +133,7 @@ export const productRequestsController = new Elysia({
 
         const request = await drizzle.select({
             id: productRequests.id,
+            requestNumber: productRequests.requestNumber,
             status: productRequests.status,
             created_at: productRequests.created_at,
             firstName: productRequests.firstName,

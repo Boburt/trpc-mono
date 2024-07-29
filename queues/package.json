@@ -16,6 +16,7 @@
     "agentkeepalive": "^4.5.0",
     "bull": "^4.11.3",
     "bullmq": "^5.8.3",
+    "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "drizzle-orm": "^0.32.1",
     "https": "^1.0.0",
