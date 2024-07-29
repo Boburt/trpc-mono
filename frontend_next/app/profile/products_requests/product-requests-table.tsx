@@ -14,7 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@frontend_next/lib/eden";
 import { Eye } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Select, SelectItem } from "@nextui-org/react";
 import {
   Sheet,
@@ -43,6 +43,7 @@ const columns = [
 
 export default function ProductRequestsTable() {
   const [page, setPage] = React.useState(1);
+  const { push } = useRouter();
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [selectedRequest, setSelectedRequest] = React.useState<
     typeof productRequests.$inferSelect | null
@@ -140,7 +141,7 @@ export default function ProductRequestsTable() {
           return (
             <Button
               isIconOnly
-              onClick={() => handleViewRequest(request)}
+              onClick={() => push(`/profile/products_requests/${request.id}`)}
               size="sm"
             >
               <Eye />
