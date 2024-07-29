@@ -1093,6 +1093,7 @@ export const productRequests = pgTable(
   {
     id: uuid("id").defaultRandom().notNull(),
     userId: uuid("user_id"),
+    requestNumber: integer("request_number").default(sql`nextval('request_number_seq')`),
     firstName: varchar("first_name", { length: 100 }).notNull(),
     lastName: varchar("last_name", { length: 100 }).notNull(),
     phone: varchar("phone", { length: 20 }).notNull(),
