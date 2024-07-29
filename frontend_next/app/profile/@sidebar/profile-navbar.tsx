@@ -70,48 +70,16 @@ export default function ProfileNavbar() {
       <Listbox variant="shadow" aria-label="Listbox menu with sections">
         {/* @ts-ignore */}
         <ListboxSection showDivider>
-          <ListboxItem
-            key="profile"
-            href="/profile"
-            startContent={<CircleUser />}
-            as={Link}
-          >
-            Профиль
-          </ListboxItem>
-          <ListboxItem
-            key="products"
-            href="/profile/products"
-            startContent={<Barcode />}
-            as={Link}
-          >
-            Мои продукты
-          </ListboxItem>
-          <ListboxItem
-            key="messages"
-            href="/profile/messages"
-            startContent={<MessageSquareText />}
-            as={Link}
-          >
-            Сообщения
-          </ListboxItem>
-          <ListboxItem
-            key="requests"
-            href="/profile/requests"
-            startContent={<MessageCircleQuestion />}
-            as={Link}
-          >
-            Обращения
-          </ListboxItem>
-          {canEditProductsRequests && (
+          {dropDownItemsDynamic.map((item) => (
             <ListboxItem
-              key="products_requests"
-              href="/profile/products_requests"
-              startContent={<MessageCircleQuestion />}
-              as={Link}
+              key={item.key}
+              href={item.href}
+              as={item.as}
+              startContent={item.startContent}
             >
-              Запросы на продукты
+              {item.textValue}
             </ListboxItem>
-          )}
+          ))}
         </ListboxSection>
         <ListboxItem
           key="logout"
