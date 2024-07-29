@@ -57,7 +57,7 @@ export default function Header() {
     <Navbar
       // isBordered
       onMenuOpenChange={setIsMenuOpen}
-      maxWidth="2xl"
+      // maxWidth=""
       classNames={{
         item: [
           "flex",
@@ -73,6 +73,7 @@ export default function Header() {
           "data-[active=true]:after:rounded-[2px]",
           "data-[active=true]:after:bg-primary",
         ],
+        content: ["flex", "items-center", "justify-between"],
       }}
     >
       <NavbarContent>
@@ -125,10 +126,12 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <HeaderSearchInput />
         <SignInButton />
+        {/* <HeaderSearchInput /> */}
+
         {/* <SignInButton userData={userData} permissions={permissions!} /> */}
       </NavbarContent>
+
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem

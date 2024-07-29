@@ -7,17 +7,22 @@ import { InferSelectModel } from "drizzle-orm";
 import ProfileCard from "@frontend_next/app/profile/card/profile-card";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useBreadCrumbs } from "@frontend_next/components/breadcrumbs/breadcrumbs-context";
 
 export default function Profile() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const router = useRouter();
 
+  useBreadCrumbs("Профиль");
+
   const { data: profileInfo, isLoading } = useQuery({
     queryKey: ["profile_info"],
     queryFn: async () => await getProfileData(session?.accessToken!),
     enabled: !!session?.accessToken,
   });
+
+  console.log(profileInfo);
 
   useEffect(() => {
     if (
