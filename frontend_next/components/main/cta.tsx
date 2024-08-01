@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function Cta() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
-  const words = ["тканями", "текстилем", "изделиями"];
+  const words = ["нашими тканями", "нашим текстилем", "нашими изделиями"];
   const placeholders = [
     "Детская одежда из органического хлопка",
     "Спортивные костюмы для фитнеса",
@@ -41,7 +41,7 @@ export default function Cta() {
         className="relative flex flex-col gap-4 items-center justify-center px-4"
       >
         <div className="text-4xl md:text-6xl mx-auto font-normal text-center text-neutral-600 dark:text-neutral-400">
-          Откройте новые возможности <br /> с нашими
+          Откройте новые возможности <br /> с
           <FlipWords words={words} />
         </div>
         <div className="my-4 max-w-2xl w-full">
