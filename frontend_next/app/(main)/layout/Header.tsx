@@ -36,10 +36,6 @@ const menuItems = [
     href: "/manufacturers",
   },
   {
-    label: "Заказчики",
-    href: "/customers",
-  },
-  {
     label: "Юристы",
     href: "/lawyers",
   },

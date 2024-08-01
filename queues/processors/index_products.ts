@@ -76,7 +76,7 @@ export default async function processIndexProducts(id: string) {
                                     "asciifolding",
                                     "russian_morphology",
                                     "english_morphology",
-                                    "my_edge_ngram"
+                                    "my_edge_ngram"  // Ensuring edge n-gram filter is applied
                                 ]
                             },
                             "search_analyzer": {
@@ -94,6 +94,14 @@ export default async function processIndexProducts(id: string) {
                                 "type": "edge_ngram",
                                 "min_gram": 2,
                                 "max_gram": 20
+                            },
+                            "russian_morphology": {
+                                "type": "icu_collation",
+                                "language": "ru"
+                            },
+                            "english_morphology": {
+                                "type": "icu_collation",
+                                "language": "en"
                             }
                         }
                     }
@@ -146,19 +154,10 @@ export default async function processIndexProducts(id: string) {
                         "properties": {
                             "type": "nested",
                             "properties": {
-                                "id": { "type": "keyword" },
                                 "name": { "type": "keyword" },
+                                "value": { "type": "keyword" },
                                 "property_type": { "type": "keyword" },
-                                "value": {
-                                    "type": "text",
-                                    "analyzer": "text_analyzer",
-                                    "search_analyzer": "search_analyzer",
-                                    "fields": {
-                                        "keyword": {
-                                            "type": "keyword"
-                                        }
-                                    }
-                                },
+                                "id": { "type": "keyword" },
                                 "code": { "type": "keyword" }
                             }
                         },
@@ -185,8 +184,10 @@ export default async function processIndexProducts(id: string) {
                     Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
                 },
                 body: JSON.stringify(indexMapping),
-                verbose: true,
             });
+            console.log(await response.text());
+            console.log(JSON.stringify(indexMapping));
+            // process.exit(0);
         }
         console.time('productSelect');
         const existingProduct = await drizzleDb.select({

@@ -119,8 +119,11 @@ export default function ProductRequestModal({
             </div>
             <form
               onSubmit={handleSubmit(handleFormSubmit)}
-              className="pt-4 md:pt-0 pb-4 pr-6 pl-3 flex flex-col h-full"
+              className="pt-4 md:pt-8 pb-4 pr-6 pl-3 flex flex-col h-full"
             >
+              <div className="pb-2 font-bold text-2xl text-content4-foreground uppercase">
+                Оставить заявку
+              </div>
               <div className="flex-1 flex flex-col justify-center w-full">
                 <div className="space-y-4">
                   <Controller

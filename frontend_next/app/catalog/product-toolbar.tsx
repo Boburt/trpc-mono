@@ -37,7 +37,7 @@ export default function ProductToolbar({
   const closeDrawer = () => setIsDrawerOpen(false);
 
   return (
-    <header className="z-20 gap-2 flex rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 items-baseline">
+    <header className="z-20 gap-2 flex rounded-medium bg-default-50 px-4 pb-3 pt-2 md:pt-3 items-center">
       <Button
         className="lg:hidden"
         variant="bordered"

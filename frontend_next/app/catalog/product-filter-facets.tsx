@@ -21,9 +21,11 @@ import {
 export default function ProductFilterFacets({
   category,
   properties,
+  query,
 }: {
   category?: string;
   properties?: string;
+  query?: string;
 }) {
   const [value, setValue] = useState<SliderValue>([0, 0]);
   const debouncedPriceRange = useDebounce<SliderValue>(value, 300);
@@ -34,6 +36,7 @@ export default function ProductFilterFacets({
     let res: {
       category?: string;
       properties?: string;
+      query?: string;
     } = {};
 
     if (category) {
@@ -43,12 +46,15 @@ export default function ProductFilterFacets({
     if (properties) {
       res.properties = properties;
     }
+    if (query) {
+      res.query = query;
+    }
 
     return res;
-  }, [category, properties]);
+  }, [category, properties, query]);
 
   const { data: facets } = useSuspenseQuery({
-    queryKey: ["products_facets", category, properties],
+    queryKey: ["products_facets", category, properties, query],
     queryFn: async () => {
       const { data } = await apiClient.api.products.public.facets.get({
         query: queryParams,
@@ -104,16 +110,6 @@ export default function ProductFilterFacets({
       scroll: false,
     });
   };
-
-  // useEffect(() => {
-  //   let res = [0, 0];
-  //   if (searchMinPrice && searchMaxPrice) {
-  //     res = [parseInt(searchMinPrice), parseInt(searchMaxPrice)];
-  //   } else if (facets && facets.priceRange) {
-  //     res = [facets.priceRange.min, facets.priceRange.max];
-  //   }
-  //   setValue(res);
-  // }, [facets, searchMinPrice, searchMaxPrice]);
 
   useEffect(() => {
     if (debouncedPriceRange) {

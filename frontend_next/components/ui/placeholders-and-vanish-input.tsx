@@ -321,7 +321,7 @@ export function PlaceholdersAndVanishInput({
               }}
               className="w-full text-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
-              All results
+              все результаты
             </button>
           </div>
         </div>

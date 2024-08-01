@@ -95,7 +95,7 @@ export const ProductMakeRequest = ({
             onPress={() => setIsModalOpen(true)}
             className={cn(className)}
           >
-            Оставить отзыв
+            Оставить заявку
           </Button>
         )}
       </div>

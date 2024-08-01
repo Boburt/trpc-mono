@@ -10,7 +10,7 @@ export function RequestModeSwitcher() {
       isSelected={isRequestMode}
       onValueChange={(value) => setRequestMode(value)}
     >
-      Оптом
+      Выбрать несколько
     </Switch>
   );
 }

@@ -49,7 +49,7 @@ export const productsController = new Elysia({
       user,
       set,
       drizzle,
-      query: { filters, category, properties },
+      query: { filters, category, properties, query },
     }) => {
       const propertiesFilter = properties ? properties.split(",") : [];
       const filter: any[] = [
@@ -65,14 +65,9 @@ export const productsController = new Elysia({
           },
         },
       ];
-      let categoryCode = category;
+
+      // Handle category filtering
       if (category) {
-        try {
-          categoryCode = JSON.parse(category);
-        } catch (e) { }
-      }
-      let categoryIds = [];
-      if (categoryCode && categoryCode != null) {
         const categoryHierarchyQuery = sql.raw(`
         WITH RECURSIVE category_hierarchy AS (
           SELECT id, name, parent_id
@@ -87,46 +82,37 @@ export const productsController = new Elysia({
         SELECT id FROM category_hierarchy;
       `);
 
-        // Execute the query to get category IDs
         const categoryHierarchyResult = await drizzle.execute<{
           id: string;
           name: string;
           parent_id: string;
         }>(categoryHierarchyQuery);
-        categoryIds.push(...categoryHierarchyResult.map((row) => row.id));
+        const categoryIds = categoryHierarchyResult.map((row) => row.id);
         filter.push({ terms: { category_id: categoryIds } });
       }
 
-      // if (propertiesFilter.length > 0) {
-      //   for (const prop of propertiesFilter) {
-      //     const [propName, propValue] = prop.split(":");
-      //     filter.push({
-      //       nested: {
-      //         path: 'properties',
-      //         query: {
-      //           bool: {
-      //             must: [
-      //               { match: { 'properties.name': propName } },
-      //               { match: { 'properties.value': propValue } },
-      //             ],
-      //           },
-      //         },
-      //       },
-      //     });
-      //   }
-      // }
+      // Handle search query
+      if (query && query.length > 0) {
+        filter.push({
+          multi_match: {
+            query: query,
+            fields: ["name^3", "description^2", "manufacturer_name", "category"],
+            type: "best_fields",
+            operator: "and",
+            fuzziness: "AUTO",
+            prefix_length: 1
+          },
+        });
+      }
 
-      const query = {
+      const elasticQuery = {
         query: {
           bool: {
-            filter: filter.length ? filter : undefined,
+            filter: filter,
           },
         },
         size: 0,
         aggs: {
-          // manufacturers: {
-          //   terms: { field: 'manufacturer_name.keyword' },
-          // },
           properties: {
             nested: { path: "properties" },
             aggs: {
@@ -134,7 +120,7 @@ export const productsController = new Elysia({
                 terms: { field: "properties.name" },
                 aggs: {
                   values: {
-                    terms: { field: "properties.value.keyword" },
+                    terms: { field: "properties.value" },
                   },
                 },
               },
@@ -146,30 +132,22 @@ export const productsController = new Elysia({
         },
       } as any;
 
+      // Handle property filtering
       if (propertiesFilter.length > 0) {
+        elasticQuery.query.bool.must = elasticQuery.query.bool.must || [];
         for (const prop of propertiesFilter) {
           const [propName, propValue] = prop.split(":");
-          if (query.query.bool.must === undefined) {
-            query.query.bool.must = [];
-          }
-          query.query.bool.must.push({
+          elasticQuery.query.bool.must.push({
             nested: {
               path: "properties",
               query: {
                 bool: {
                   must: [
                     {
-                      match: {
-                        "properties.name": {
-                          query: propName,
-                          minimum_should_match: "80%",
-                        },
-                      },
+                      term: { "properties.name": propName },
                     },
                     {
-                      match_phrase: {
-                        "properties.value": propValue,
-                      },
+                      term: { "properties.value": propValue },
                     },
                   ],
                 },
@@ -179,6 +157,8 @@ export const productsController = new Elysia({
         }
       }
 
+      // console.log("Elasticsearch Query:", JSON.stringify(elasticQuery, null, 2));
+
       try {
         const response = await fetch(`${esUrl}/${indexName}/_search`, {
           method: "POST",
@@ -186,32 +166,25 @@ export const productsController = new Elysia({
             "Content-Type": "application/json",
             Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
           },
-          body: JSON.stringify(query),
+          body: JSON.stringify(elasticQuery),
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Elasticsearch request failed: ${response.statusText}`
-          );
+          throw new Error(`Elasticsearch request failed: ${response.statusText}`);
         }
 
         const data = await response.json();
+        // console.log("Elasticsearch Response:", JSON.stringify(data, null, 2));
         const aggregations = data.aggregations as ElasticsearchAggregations;
-        console.log("aggregations", aggregations);
+
         return {
-          // manufacturers: aggregations.manufacturers.buckets.map(bucket => ({
-          //   key: bucket.key,
-          //   doc_count: bucket.doc_count
-          // })),
-          properties: aggregations.properties.names.buckets.map(
-            (keyBucket) => ({
-              key: keyBucket.key,
-              values: keyBucket.values.buckets.map((valueBucket) => ({
-                key: valueBucket.key,
-                doc_count: valueBucket.doc_count,
-              })),
-            })
-          ),
+          properties: aggregations.properties.names.buckets.map((keyBucket) => ({
+            key: keyBucket.key,
+            values: keyBucket.values.buckets.map((valueBucket) => ({
+              key: valueBucket.key,
+              doc_count: valueBucket.doc_count,
+            })),
+          })),
           priceRange: {
             min: aggregations.price_range.min,
             max: aggregations.price_range.max,
@@ -227,6 +200,7 @@ export const productsController = new Elysia({
         filters: t.Optional(t.String()),
         category: t.Optional(t.String()),
         properties: t.Optional(t.Nullable(t.String())),
+        query: t.Optional(t.String()),
       }),
     }
   )
@@ -303,7 +277,7 @@ export const productsController = new Elysia({
                 terms: { field: "properties.name" },
                 aggs: {
                   values: {
-                    terms: { field: "properties.value.keyword" },
+                    terms: { field: "properties.value" },
                   },
                 },
               },
@@ -324,9 +298,9 @@ export const productsController = new Elysia({
             query: query,
             fields: ["name^3", "description^2", "manufacturer_name", "category"],
             type: "best_fields",
+            operator: "and",
             fuzziness: "AUTO",
-            prefix_length: 1,
-            minimum_should_match: "75%"
+            prefix_length: 1
           },
         });
       }
@@ -341,18 +315,14 @@ export const productsController = new Elysia({
                 bool: {
                   must: [
                     {
-                      match: {
-                        "properties.name": {
-                          query: propName,
-                          fuzziness: "AUTO",
-                        },
-                      },
+                      term: {
+                        "properties.name": propName
+                      }
                     },
                     {
                       match: {
                         "properties.value": {
-                          query: propValue,
-                          fuzziness: "AUTO",
+                          query: propValue
                         },
                       },
                     },
@@ -372,9 +342,10 @@ export const productsController = new Elysia({
         },
         body: JSON.stringify(elasticQuery),
       });
-
+      console.log('elastic data query', JSON.stringify(elasticQuery))
       if (!response.ok) {
-        throw new Error(`Elasticsearch request failed: ${response.statusText}`);
+        let responseText = await response.text();
+        throw new Error(`Elasticsearch request failed: ${response.statusText} ${responseText}`);
       }
 
       const result = await response.json();
