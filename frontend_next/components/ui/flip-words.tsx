@@ -28,7 +28,6 @@ export const FlipWords = ({
         startAnimation();
       }, duration);
   }, [isAnimating, duration, startAnimation]);
-
   return (
     <AnimatePresence
       onExitComplete={() => {
@@ -74,7 +73,7 @@ export const FlipWords = ({
               delay: index * 0.08,
               duration: 0.4,
             }}
-            className="inline-block"
+            className="inline-block min-w-4"
           >
             {letter}
           </motion.span>

@@ -19,7 +19,7 @@ export function ProductSelectionSummary() {
       <div className="fixed bottom-0 left-0 right-0 bg-content3 p-4 shadow-md z-50">
         <div className="container mx-auto flex justify-between items-center">
           <p>Выбрано: {totalSelectedProducts}</p>
-          <div className="w-2/12">
+          <div className="w-4/12 md:w-2/12">
             <ProductMakeRequest />
           </div>
         </div>

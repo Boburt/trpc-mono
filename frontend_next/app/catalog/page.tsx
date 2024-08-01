@@ -23,7 +23,10 @@ export default function Catalog({
       </h1>
       <div className="flex gap-x-6 mt-2 md:mt-10">
         <div className="hidden h-full overflow-x-hidden overflow-y-scroll lg:flex">
-          <ProductFilter properties={searchParams.properties} />
+          <ProductFilter
+            properties={searchParams.properties}
+            query={searchParams.query}
+          />
         </div>
         <div className="w-full flex-1 flex-col">
           <ProductToolbar

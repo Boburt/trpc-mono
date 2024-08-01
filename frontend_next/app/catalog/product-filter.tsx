@@ -11,11 +11,13 @@ export default function ProductFilter({
   properties,
   hideTitle = false,
   className,
+  query,
 }: {
   category?: string;
   properties?: string;
   hideTitle?: boolean;
   className?: string;
+  query?: string;
 }) {
   return (
     <Card
@@ -34,7 +36,11 @@ export default function ProductFilter({
       {/* <ScrollArea className="h-[calc(80vh-12rem)] mt-4"> */}
       <ProductFilterCategories />
       <Suspense key={category}>
-        <ProductFilterFacets category={category} properties={properties} />
+        <ProductFilterFacets
+          category={category}
+          properties={properties}
+          query={query}
+        />
       </Suspense>
       {/* </ScrollArea> */}
     </Card>
