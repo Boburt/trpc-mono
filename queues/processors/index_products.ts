@@ -64,130 +64,39 @@ export default async function processIndexProducts(id: string) {
             console.log("index does not exist, creating");
 
             const indexMapping = {
-                settings: {
-                    number_of_shards: 1,
-                    number_of_replicas: 0,
-                    analysis: {
-                        filter: {
-                            front_ngram: {
-                                type: "edge_ngram",
-                                min_gram: "1",
-                                max_gram: "12",
+                "settings": {
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0,
+                    "analysis": {
+                        "analyzer": {
+                            "text_analyzer": {
+                                "tokenizer": "standard",
+                                "filter": [
+                                    "lowercase",
+                                    "asciifolding",
+                                    "russian_morphology",
+                                    "english_morphology",
+                                    "my_edge_ngram"
+                                ]
                             },
-                            bigram_joiner: {
-                                max_shingle_size: "2",
-                                token_separator: "",
-                                output_unigrams: "false",
-                                type: "shingle",
-                            },
-                            bigram_max_size: {
-                                type: "length",
-                                max: "16",
-                                min: "0",
-                            },
-                            "en-stem-filter": {
-                                name: "light_english",
-                                type: "stemmer",
-                                language: "light_english",
-                            },
-                            bigram_joiner_unigrams: {
-                                max_shingle_size: "2",
-                                token_separator: "",
-                                output_unigrams: "true",
-                                type: "shingle",
-                            },
-                            delimiter: {
-                                split_on_numerics: "true",
-                                generate_word_parts: "true",
-                                preserve_original: "false",
-                                catenate_words: "true",
-                                generate_number_parts: "true",
-                                catenate_all: "true",
-                                split_on_case_change: "true",
-                                type: "word_delimiter_graph",
-                                catenate_numbers: "true",
-                                stem_english_possessive: "true",
-                            },
-                            "en-stop-words-filter": {
-                                type: "stop",
-                                stopwords: "_english_",
-                            },
+                            "search_analyzer": {
+                                "tokenizer": "standard",
+                                "filter": [
+                                    "lowercase",
+                                    "asciifolding",
+                                    "russian_morphology",
+                                    "english_morphology"
+                                ]
+                            }
                         },
-                        analyzer: {
-                            i_prefix: {
-                                filter: [
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "front_ngram",
-                                ],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                            iq_text_delimiter: {
-                                filter: [
-                                    "delimiter",
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "en-stop-words-filter",
-                                    "en-stem-filter",
-                                ],
-                                type: "custom",
-                                tokenizer: "whitespace",
-                            },
-                            q_prefix: {
-                                filter: ["cjk_width", "lowercase", "asciifolding"],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                            iq_text_base: {
-                                filter: [
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "en-stop-words-filter",
-                                ],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                            iq_text_stem: {
-                                filter: [
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "en-stop-words-filter",
-                                    "en-stem-filter",
-                                ],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                            i_text_bigram: {
-                                filter: [
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "en-stem-filter",
-                                    "bigram_joiner",
-                                    "bigram_max_size",
-                                ],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                            q_text_bigram: {
-                                filter: [
-                                    "cjk_width",
-                                    "lowercase",
-                                    "asciifolding",
-                                    "en-stem-filter",
-                                    "bigram_joiner_unigrams",
-                                    "bigram_max_size",
-                                ],
-                                type: "custom",
-                                tokenizer: "standard",
-                            },
-                        },
-                    },
+                        "filter": {
+                            "my_edge_ngram": {
+                                "type": "edge_ngram",
+                                "min_gram": 2,
+                                "max_gram": 20
+                            }
+                        }
+                    }
                 },
                 "mappings": {
                     "properties": {
@@ -195,6 +104,8 @@ export default async function processIndexProducts(id: string) {
                         "manufacturer_id": { "type": "keyword" },
                         "manufacturer_name": {
                             "type": "text",
+                            "analyzer": "text_analyzer",
+                            "search_analyzer": "search_analyzer",
                             "fields": {
                                 "keyword": {
                                     "type": "keyword"
@@ -203,24 +114,30 @@ export default async function processIndexProducts(id: string) {
                         },
                         "category": {
                             "type": "text",
+                            "analyzer": "text_analyzer",
+                            "search_analyzer": "search_analyzer",
                             "fields": {
                                 "keyword": {
                                     "type": "keyword"
                                 }
                             }
                         },
-                        "category_id": {
-                            "type": "keyword"
-                        },
+                        "category_id": { "type": "keyword" },
                         "name": {
                             "type": "text",
+                            "analyzer": "text_analyzer",
+                            "search_analyzer": "search_analyzer",
                             "fields": {
                                 "keyword": {
                                     "type": "keyword"
                                 }
                             }
                         },
-                        "description": { "type": "text" },
+                        "description": {
+                            "type": "text",
+                            "analyzer": "text_analyzer",
+                            "search_analyzer": "search_analyzer"
+                        },
                         "active": { "type": "boolean" },
                         "price": { "type": "integer" },
                         "stock_quantity": { "type": "integer" },
@@ -234,6 +151,8 @@ export default async function processIndexProducts(id: string) {
                                 "property_type": { "type": "keyword" },
                                 "value": {
                                     "type": "text",
+                                    "analyzer": "text_analyzer",
+                                    "search_analyzer": "search_analyzer",
                                     "fields": {
                                         "keyword": {
                                             "type": "keyword"
@@ -243,17 +162,17 @@ export default async function processIndexProducts(id: string) {
                                 "code": { "type": "keyword" }
                             }
                         },
-                        text_vector: {
-                            type: 'dense_vector',
-                            dims: 384,
-                            index: true,
-                            similarity: 'cosine'
+                        "text_vector": {
+                            "type": "dense_vector",
+                            "dims": 384,
+                            "index": true,
+                            "similarity": "cosine"
                         },
-                        product_vector: {
-                            type: 'dense_vector',
-                            dims: 384,
-                            index: true,
-                            similarity: 'cosine'
+                        "product_vector": {
+                            "type": "dense_vector",
+                            "dims": 384,
+                            "index": true,
+                            "similarity": "cosine"
                         }
                     }
                 }
