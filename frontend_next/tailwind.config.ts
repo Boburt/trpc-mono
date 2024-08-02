@@ -59,10 +59,10 @@ const config: Config = {
   darkMode: "class",
   plugins: [
     nextui({
-      themes: {
-        light: {
-          colors: {
-            default: {
+      "themes": {
+        "light": {
+          "colors": {
+            "default": {
               "50": "#fafafa",
               "100": "#f2f2f3",
               "200": "#ebebec",
@@ -73,24 +73,24 @@ const config: Config = {
               "700": "#8a8a8c",
               "800": "#656567",
               "900": "#404041",
-              foreground: "#000",
-              DEFAULT: "#d4d4d8",
+              "foreground": "#000",
+              "DEFAULT": "#d4d4d8"
             },
-            primary: {
-              "50": "#dfedfd",
-              "100": "#b3d4fa",
-              "200": "#86bbf7",
-              "300": "#59a1f4",
-              "400": "#2d88f1",
-              "500": "#006fee",
-              "600": "#005cc4",
-              "700": "#00489b",
-              "800": "#003571",
-              "900": "#002147",
-              foreground: "#fff",
-              DEFAULT: "#006fee",
+            "primary": {
+              "50": "#e4f9f9",
+              "100": "#bff1f1",
+              "200": "#9ae9e9",
+              "300": "#75e0e1",
+              "400": "#4fd8d9",
+              "500": "#2ad0d1",
+              "600": "#23acac",
+              "700": "#1b8788",
+              "800": "#146363",
+              "900": "#0d3e3f",
+              "foreground": "#000",
+              "DEFAULT": "#2ad0d1"
             },
-            secondary: {
+            "secondary": {
               "50": "#eee4f8",
               "100": "#d7bfef",
               "200": "#bf99e5",
@@ -101,10 +101,10 @@ const config: Config = {
               "700": "#4e1a82",
               "800": "#39135f",
               "900": "#240c3c",
-              foreground: "#fff",
-              DEFAULT: "#7828c8",
+              "foreground": "#fff",
+              "DEFAULT": "#7828c8"
             },
-            success: {
+            "success": {
               "50": "#e2f8ec",
               "100": "#b9efd1",
               "200": "#91e5b5",
@@ -115,10 +115,10 @@ const config: Config = {
               "700": "#0f8341",
               "800": "#0b5f30",
               "900": "#073c1e",
-              foreground: "#000",
-              DEFAULT: "#17c964",
+              "foreground": "#000",
+              "DEFAULT": "#17c964"
             },
-            warning: {
+            "warning": {
               "50": "#fef4e4",
               "100": "#fce4bd",
               "200": "#fad497",
@@ -129,10 +129,10 @@ const config: Config = {
               "700": "#9f6b17",
               "800": "#744e11",
               "900": "#4a320b",
-              foreground: "#000",
-              DEFAULT: "#f5a524",
+              "foreground": "#000",
+              "DEFAULT": "#f5a524"
             },
-            danger: {
+            "danger": {
               "50": "#fee1eb",
               "100": "#fbb8cf",
               "200": "#f98eb3",
@@ -143,11 +143,11 @@ const config: Config = {
               "700": "#9e0c3e",
               "800": "#73092e",
               "900": "#49051d",
-              foreground: "#000",
-              DEFAULT: "#f31260",
+              "foreground": "#000",
+              "DEFAULT": "#f31260"
             },
-            background: "#ffffff",
-            foreground: {
+            "background": "#ffffff",
+            "foreground": {
               "50": "#dfdfdf",
               "100": "#b3b3b3",
               "200": "#868686",
@@ -158,33 +158,33 @@ const config: Config = {
               "700": "#000000",
               "800": "#000000",
               "900": "#000000",
-              foreground: "#fff",
-              DEFAULT: "#000000",
+              "foreground": "#fff",
+              "DEFAULT": "#000000"
             },
-            content1: {
-              DEFAULT: "#ffffff",
-              foreground: "#000",
+            "content1": {
+              "DEFAULT": "#ffffff",
+              "foreground": "#000"
             },
-            content2: {
-              DEFAULT: "#f4f4f5",
-              foreground: "#000",
+            "content2": {
+              "DEFAULT": "#f4f4f5",
+              "foreground": "#000"
             },
-            content3: {
-              DEFAULT: "#e4e4e7",
-              foreground: "#000",
+            "content3": {
+              "DEFAULT": "#e4e4e7",
+              "foreground": "#000"
             },
-            content4: {
-              DEFAULT: "#d4d4d8",
-              foreground: "#000",
+            "content4": {
+              "DEFAULT": "#d4d4d8",
+              "foreground": "#000"
             },
-            focus: "#006FEE",
-            overlay: "#000000",
-            divider: "#111111",
-          },
+            "focus": "#2ad0d1",
+            "overlay": "#000000",
+            "divider": "#111111"
+          }
         },
-        dark: {
-          colors: {
-            default: {
+        "dark": {
+          "colors": {
+            "default": {
               "50": "#131315",
               "100": "#1e1e21",
               "200": "#29292e",
@@ -195,24 +195,24 @@ const config: Config = {
               "700": "#a4a4a7",
               "800": "#c5c5c8",
               "900": "#e7e7e8",
-              foreground: "#fff",
-              DEFAULT: "#3f3f46",
+              "foreground": "#fff",
+              "DEFAULT": "#3f3f46"
             },
-            primary: {
-              "50": "#002147",
-              "100": "#003571",
-              "200": "#00489b",
-              "300": "#005cc4",
-              "400": "#006fee",
-              "500": "#2d88f1",
-              "600": "#59a1f4",
-              "700": "#86bbf7",
-              "800": "#b3d4fa",
-              "900": "#dfedfd",
-              foreground: "#fff",
-              DEFAULT: "#006fee",
+            "primary": {
+              "50": "#0d3e3f",
+              "100": "#146363",
+              "200": "#1b8788",
+              "300": "#23acac",
+              "400": "#2ad0d1",
+              "500": "#4fd8d9",
+              "600": "#75e0e1",
+              "700": "#9ae9e9",
+              "800": "#bff1f1",
+              "900": "#e4f9f9",
+              "foreground": "#000",
+              "DEFAULT": "#2ad0d1"
             },
-            secondary: {
+            "secondary": {
               "50": "#240c3c",
               "100": "#39135f",
               "200": "#4e1a82",
@@ -223,10 +223,10 @@ const config: Config = {
               "700": "#bf99e5",
               "800": "#d7bfef",
               "900": "#eee4f8",
-              foreground: "#fff",
-              DEFAULT: "#7828c8",
+              "foreground": "#fff",
+              "DEFAULT": "#7828c8"
             },
-            success: {
+            "success": {
               "50": "#073c1e",
               "100": "#0b5f30",
               "200": "#0f8341",
@@ -237,10 +237,10 @@ const config: Config = {
               "700": "#91e5b5",
               "800": "#b9efd1",
               "900": "#e2f8ec",
-              foreground: "#000",
-              DEFAULT: "#17c964",
+              "foreground": "#000",
+              "DEFAULT": "#17c964"
             },
-            warning: {
+            "warning": {
               "50": "#4a320b",
               "100": "#744e11",
               "200": "#9f6b17",
@@ -251,10 +251,10 @@ const config: Config = {
               "700": "#fad497",
               "800": "#fce4bd",
               "900": "#fef4e4",
-              foreground: "#000",
-              DEFAULT: "#f5a524",
+              "foreground": "#000",
+              "DEFAULT": "#f5a524"
             },
-            danger: {
+            "danger": {
               "50": "#49051d",
               "100": "#73092e",
               "200": "#9e0c3e",
@@ -265,11 +265,11 @@ const config: Config = {
               "700": "#f98eb3",
               "800": "#fbb8cf",
               "900": "#fee1eb",
-              foreground: "#000",
-              DEFAULT: "#f31260",
+              "foreground": "#000",
+              "DEFAULT": "#f31260"
             },
-            background: "#000000",
-            foreground: {
+            "background": "#000000",
+            "foreground": {
               "50": "#4d4d4d",
               "100": "#797979",
               "200": "#a6a6a6",
@@ -280,58 +280,58 @@ const config: Config = {
               "700": "#ffffff",
               "800": "#ffffff",
               "900": "#ffffff",
-              foreground: "#000",
-              DEFAULT: "#ffffff",
+              "foreground": "#000",
+              "DEFAULT": "#ffffff"
             },
-            content1: {
-              DEFAULT: "#18181b",
-              foreground: "#fff",
+            "content1": {
+              "DEFAULT": "#18181b",
+              "foreground": "#fff"
             },
-            content2: {
-              DEFAULT: "#27272a",
-              foreground: "#fff",
+            "content2": {
+              "DEFAULT": "#27272a",
+              "foreground": "#fff"
             },
-            content3: {
-              DEFAULT: "#3f3f46",
-              foreground: "#fff",
+            "content3": {
+              "DEFAULT": "#3f3f46",
+              "foreground": "#fff"
             },
-            content4: {
-              DEFAULT: "#52525b",
-              foreground: "#fff",
+            "content4": {
+              "DEFAULT": "#52525b",
+              "foreground": "#fff"
             },
-            focus: "#006FEE",
-            overlay: "#ffffff",
-            divider: "#ffffff",
-          },
-        },
+            "focus": "#2ad0d1",
+            "overlay": "#ffffff",
+            "divider": "#ffffff"
+          }
+        }
       },
-      layout: {
-        fontSize: {
-          tiny: "0.75rem",
-          small: "0.875rem",
-          medium: "1rem",
-          large: "1.125rem",
+      "layout": {
+        "fontSize": {
+          "tiny": "0.75rem",
+          "small": "0.875rem",
+          "medium": "1rem",
+          "large": "1.125rem"
         },
-        lineHeight: {
-          tiny: "1rem",
-          small: "1.25rem",
-          medium: "1.5rem",
-          large: "1.75rem",
+        "lineHeight": {
+          "tiny": "1rem",
+          "small": "1.25rem",
+          "medium": "1.5rem",
+          "large": "1.75rem"
         },
-        radius: {
-          small: "0.5rem",
-          medium: "0.75rem",
-          large: "0.875rem",
+        "radius": {
+          "small": "0.5rem",
+          "medium": "0.75rem",
+          "large": "0.875rem"
         },
-        borderWidth: {
-          small: "1px",
-          medium: "2px",
-          large: "3px",
+        "borderWidth": {
+          "small": "1px",
+          "medium": "2px",
+          "large": "3px"
         },
-        disabledOpacity: "0.5",
-        dividerWeight: "1",
-        hoverOpacity: "0.9",
-      },
+        "disabledOpacity": "0.5",
+        "dividerWeight": "1",
+        "hoverOpacity": "0.9"
+      }
     }),
   ],
 };
