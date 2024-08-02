@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { SignInButton } from "@frontend_next/components/auth/SignInButton";
+import Image from "next/image";
 import { useMediaQuery } from "@frontend_next/lib/hooks";
 import { NavbarMenu, NavbarMenuItem } from "@nextui-org/react";
 import {
@@ -78,8 +79,12 @@ export default function Header() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <Link className="font-bold text-inherit" href="/">
-            Brand
+          <Link
+            className="font-bold text-inherit flex items-center space-x-2"
+            href="/"
+          >
+            <Image src="/logo.png" alt="Logo" width={40} height={40} />
+            <span className="hidden md:block">TextileHub</span>
           </Link>
         </NavbarBrand>
       </NavbarContent>
