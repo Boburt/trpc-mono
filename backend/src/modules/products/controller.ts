@@ -575,7 +575,6 @@ export const productsController = new Elysia({
         })
         .prepare("one_product_prepared");
       const product = await oneProductPrepared.execute({ id });
-
       if (!product) {
         set.status = 404;
         return {
@@ -628,7 +627,7 @@ export const productsController = new Elysia({
         .where(eq(products_properties.product_id, id));
 
       productWithManufacturer.properties = propertiesList;
-
+      console.log('productWithManufacturer', productWithManufacturer)
       return productWithManufacturer;
     },
     {

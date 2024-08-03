@@ -4,6 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
 import { ScrollArea } from "@frontend_next/components/ui/scroll-area";
+import { ProductPrice } from "@frontend_next/components/products/product-price";
 
 export default function ProductRequestModalProducts({
   productIds,
@@ -52,14 +53,10 @@ export default function ProductRequestModalProducts({
                     <div className="text-small text-default-600 flex-1">
                       {product.description}
                     </div>
-                    <div className="text-small font-medium text-default-700">
-                      {Intl.NumberFormat("ru-RU", {
-                        style: "currency",
-                        currency: "UZS",
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2,
-                      }).format(+product.price!)}
-                    </div>
+                    <ProductPrice
+                      {...product}
+                      className="text-small font-medium text-default-700"
+                    />
                   </div>
                 </CardBody>
               </Card>
