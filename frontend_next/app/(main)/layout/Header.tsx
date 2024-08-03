@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
 import { SignInButton } from "@frontend_next/components/auth/SignInButton";
+import Image from "next/image";
 import { useMediaQuery } from "@frontend_next/lib/hooks";
 import { NavbarMenu, NavbarMenuItem } from "@nextui-org/react";
 import {
@@ -25,6 +26,8 @@ import {
 import CatalogMenu from "./CatalogMenu";
 import { cn } from "@frontend_next/lib/utils";
 import { HeaderSearchInput } from "./SearchInput";
+import { Lato } from "next/font/google";
+import { CurrencyToggler } from "@frontend_next/components/CurrencyToggler";
 
 const menuItems = [
   {
@@ -44,6 +47,11 @@ const menuItems = [
     href: "/logistics",
   },
 ];
+
+const lato = Lato({
+  weight: "700",
+  subsets: ["latin"],
+});
 
 export default function Header() {
   const pathname = usePathname();
@@ -78,8 +86,14 @@ export default function Header() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <Link className="font-bold text-inherit" href="/">
-            Brand
+          <Link
+            className="font-bold text-inherit flex items-center space-x-2"
+            href="/"
+          >
+            <Image src="/logo.png" alt="Logo" width={40} height={40} />
+            <span className={cn(["hidden md:block text-2xl", lato.className])}>
+              TextileHub
+            </span>
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -122,6 +136,7 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
+        <CurrencyToggler />
         <SignInButton />
         {/* <HeaderSearchInput /> */}
 
