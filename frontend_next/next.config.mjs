@@ -18,6 +18,12 @@ const nextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "http",
+        hostname: "192.168.0.213",
+        port: "3000",
+        pathname: "/**",
+      },
+      {
         protocol: "https",
         hostname: "api.fungeek.net",
         port: "",
