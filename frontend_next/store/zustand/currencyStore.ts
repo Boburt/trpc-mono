@@ -9,7 +9,7 @@ type CurrencyStore = {
 export const useCurrencyStore = create<CurrencyStore>()(
   persistNSync(
     (set) => ({
-      currency: 'usd',
+      currency: 'rub',
       setCurrency: (currency) => set({ currency }),
     }),
     {
