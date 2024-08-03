@@ -15,17 +15,31 @@ import {
   FileUploaderItem,
 } from "@frontend_next/components/ui/file-uploader";
 import { DropzoneOptions } from "react-dropzone";
-import { UploadCloud } from "lucide-react";
+import { ChevronDown, RefreshCw, UploadCloud } from "lucide-react";
 import { AspectRatio } from "@frontend_next/components/ui/aspect-ratio";
 import { useSession } from "next-auth/react";
 import { ProductProperties } from "@backend/modules/products/dtos/one.dto";
-import { ModalFooter } from "@nextui-org/react";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  ModalFooter,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
+import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { TreeCategoryDto } from "@backend/modules/categories/dtos/tree.dto";
+
+type TreeCategoriesWithLevel = TreeCategoryDto & { level: number };
 
 interface ProductFormValues {
   active: boolean;
   name: string;
   description: string | null;
-  price?: number | null;
+  price_rub?: string | null;
+  price_usd?: string | null;
+  category_id: string;
   files?: File[] | null;
   properties: ProductProperties | null;
 }
@@ -91,9 +105,22 @@ export const ProductAddingFormWithData = ({
   recordId?: string;
   defaultValues?: ProductFormValues;
 }) => {
+  const formRef = useRef<HTMLFormElement | null>(null);
   const { data: session } = useSession();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
+  const [isConverting, setIsConverting] = useState(false);
+
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () =>
+      apiClient.api.categories.public.tree.get({
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }),
+  });
+
   const dropzone = {
     multiple: true,
     maxFiles: 10,
@@ -105,14 +132,17 @@ export const ProductAddingFormWithData = ({
   const {
     control,
     handleSubmit,
-    reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     defaultValues: defaultValues ?? {
       active: false,
       name: "",
       description: "",
-      price: undefined,
+      price_rub: undefined,
+      price_usd: undefined,
+      category_id: "",
       files: [],
       properties: {
         fabric_type: "",
@@ -125,7 +155,52 @@ export const ProductAddingFormWithData = ({
     },
   });
 
+  const priceRub = watch("price_rub");
+  const priceUsd = watch("price_usd");
+
+  const convertCurrency = async (
+    fromCurrency: string,
+    toCurrency: string,
+    amount: number
+  ) => {
+    setIsConverting(true);
+    try {
+      const response = await fetch(
+        `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
+      );
+      const data = await response.json();
+      const rate = data.rates[toCurrency];
+      const convertedAmount = amount * rate;
+      setIsConverting(false);
+      return convertedAmount;
+    } catch (error) {
+      console.error("Error converting currency:", error);
+      toast.error("Failed to convert currency. Please try again.");
+      setIsConverting(false);
+      return null;
+    }
+  };
+
+  const handleConvertToUSD = async () => {
+    if (priceRub) {
+      const convertedAmount = await convertCurrency("RUB", "USD", +priceRub);
+      if (convertedAmount !== null) {
+        setValue("price_usd", convertedAmount.toFixed(2).toString());
+      }
+    }
+  };
+
+  const handleConvertToRUB = async () => {
+    if (priceUsd) {
+      const convertedAmount = await convertCurrency("USD", "RUB", +priceUsd);
+      if (convertedAmount !== null) {
+        setValue("price_rub", convertedAmount.toFixed(2).toString());
+      }
+    }
+  };
+
   const onSubmit: SubmitHandler<ProductFormValues> = (value) => {
+    console.log("submit", value.category_id);
     if (recordId) {
       updateMutation.mutate({
         data: {
@@ -134,7 +209,9 @@ export const ProductAddingFormWithData = ({
           // @ts-ignore
           files: value.files,
           description: value.description ?? "",
-          price: value.price,
+          price_rub: value.price_rub ? value.price_rub.toString() : "0",
+          price_usd: value.price_usd ? value.price_usd.toString() : "0",
+          category_id: value.category_id,
           properties: value.properties,
         },
         id: recordId,
@@ -146,7 +223,9 @@ export const ProductAddingFormWithData = ({
         // @ts-ignore
         files: value.files,
         description: value.description ?? "",
-        price: value.price,
+        price_rub: value.price_rub ? value.price_rub.toString() : "0",
+        price_usd: value.price_usd ? value.price_usd.toString() : "0",
+        category_id: value.category_id,
         properties: value.properties,
       });
     }
@@ -172,7 +251,9 @@ export const ProductAddingFormWithData = ({
       active: boolean;
       name: string;
       description?: string;
-      price?: number | null;
+      price_rub?: string | null;
+      price_usd?: string | null;
+      category_id: string;
       properties: ProductProperties | null;
     }) => {
       return apiClient.api.products.post(
@@ -205,7 +286,9 @@ export const ProductAddingFormWithData = ({
         active: boolean;
         name: string;
         description?: string;
-        price?: number | null;
+        price_rub?: string | null;
+        price_usd?: string | null;
+        category_id?: string;
         properties: ProductProperties | null;
       };
       id: string;
@@ -242,9 +325,29 @@ export const ProductAddingFormWithData = ({
     onError,
   });
 
+  const categoriesWithLevel = useMemo(() => {
+    const categoriesWithLevel: TreeCategoriesWithLevel[] = [];
+    const traverse = (categories: TreeCategoryDto[], level = 0) => {
+      categories.forEach((category) => {
+        categoriesWithLevel.push({ ...category, level });
+        if (category.children) {
+          traverse(category.children, level + 1);
+        }
+      });
+    };
+    if (categories && "data" in categories && Array.isArray(categories.data)) {
+      traverse(categories.data);
+    }
+    return categoriesWithLevel;
+  }, [categories]);
+
   return (
     <div className="flex w-full flex-col flex-grow">
-      <form className="flex flex-col h-full" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex flex-col h-full"
+        onSubmit={handleSubmit(onSubmit)}
+        ref={formRef}
+      >
         <div className="flex-grow">
           <Tabs aria-label="Options">
             <Tab key="photos" title="Общие">
@@ -265,6 +368,7 @@ export const ProductAddingFormWithData = ({
                     <Input
                       label="Название продукта"
                       placeholder="Введите название продукта"
+                      isRequired
                       onChange={field.onChange}
                       value={field.value}
                       isInvalid={!!errors.name}
@@ -280,6 +384,7 @@ export const ProductAddingFormWithData = ({
                     <Textarea
                       label="Описание продукта"
                       placeholder="Введите описание продукта"
+                      isRequired
                       onChange={field.onChange}
                       value={field.value ?? ""}
                       isInvalid={!!errors.description}
@@ -289,23 +394,107 @@ export const ProductAddingFormWithData = ({
                   )}
                 />
                 <Controller
-                  name="price"
+                  name="category_id"
+                  control={control}
+                  rules={{ required: "Категория обязательная для зап" }}
+                  render={({ field }) => (
+                    <div className="space-y-2">
+                      <Select
+                        items={categoriesWithLevel}
+                        label="Категория"
+                        placeholder="Выберите категорию"
+                        isRequired
+                        variant="bordered"
+                        selectedKeys={field.value}
+                        popoverProps={{
+                          portalContainer: formRef.current!,
+                          offset: 0,
+                          containerPadding: 0,
+                        }}
+                        onSelectionChange={(selectedKeys) => {
+                          field.onChange([...selectedKeys][0]);
+                        }}
+                      >
+                        {(category) => (
+                          <SelectItem
+                            key={category.id}
+                            value={category.id}
+                            textValue={`${"\u00A0".repeat(
+                              category.level * 2
+                            )} ${category.name}`}
+                          >
+                            {"\u00A0\u00A0".repeat(category.level * 2)}
+                            {category.name}
+                          </SelectItem>
+                        )}
+                      </Select>
+                      {errors.category_id && (
+                        <p className="text-sm font-medium text-destructive">
+                          {errors.category_id.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                />
+                <Controller
+                  name="price_rub"
                   control={control}
                   render={({ field }) => (
                     <Input
-                      label="Цена"
+                      label="Цена в рублях"
                       placeholder="Цена"
                       type="number"
                       onChange={field.onChange}
                       value={field.value ? field.value.toString() : ""}
-                      isInvalid={!!errors.price}
-                      errorMessage={errors.price?.message}
-                      endContent={
+                      isInvalid={!!errors.price_rub}
+                      errorMessage={errors.price_rub?.message}
+                      startContent={
                         <div className="pointer-events-none flex items-center">
-                          <span className="text-default-400 text-small">
-                            сум
-                          </span>
+                          <span className="text-default-400 text-small">₽</span>
                         </div>
+                      }
+                      endContent={
+                        <Button
+                          isIconOnly
+                          color="primary"
+                          size="sm"
+                          onClick={handleConvertToUSD}
+                          isLoading={isConverting}
+                        >
+                          <RefreshCw size={16} />
+                        </Button>
+                      }
+                      variant="bordered"
+                    />
+                  )}
+                />
+                <Controller
+                  name="price_usd"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      label="Цена в долларах"
+                      placeholder="Цена"
+                      type="number"
+                      onChange={field.onChange}
+                      value={field.value ? field.value.toString() : ""}
+                      isInvalid={!!errors.price_usd}
+                      errorMessage={errors.price_usd?.message}
+                      startContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">$</span>
+                        </div>
+                      }
+                      endContent={
+                        <Button
+                          isIconOnly
+                          color="primary"
+                          size="sm"
+                          onClick={handleConvertToRUB}
+                          isLoading={isConverting}
+                        >
+                          <RefreshCw size={16} />
+                        </Button>
                       }
                       variant="bordered"
                     />

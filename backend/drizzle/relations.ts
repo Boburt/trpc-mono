@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, assets, conversations, forms, forms_sent_items, cities, manufacturers, categories, manufacturers_categories, manufacturers_properties_values, manufacturers_properties, manufacturers_reviews, manufacturers_users, permissions, products, products_categories, products_properties, properties, roles, sessions, sp_tickets, sp_tickets_comments, manufacturers_properties_categories, scheduled_reports, scheduled_reports_subscription, roles_permissions, users_permissions, users_roles } from "./schema";
+import { users, assets, conversations, forms, forms_sent_items, cities, manufacturers, categories, manufacturers_categories, manufacturers_properties_values, manufacturers_properties, manufacturers_reviews, manufacturers_users, permissions, products_categories, products, products_properties, properties, roles, sessions, sp_tickets, sp_tickets_comments, manufacturers_properties_categories, scheduled_reports, scheduled_reports_subscription, memberships, profiles, membership_users, roles_permissions, users_permissions, users_roles } from "./schema";
 
 export const assetsRelations = relations(assets, ({one}) => ({
 	user_created_by: one(users, {
@@ -62,6 +62,8 @@ export const usersRelations = relations(users, ({many}) => ({
 	}),
 	sp_tickets_comments: many(sp_tickets_comments),
 	scheduled_reports_subscriptions: many(scheduled_reports_subscription),
+	profiles: many(profiles),
+	membership_users: many(membership_users),
 	roles_permissions_created_by: many(roles_permissions, {
 		relationName: "roles_permissions_created_by_users_id"
 	}),
@@ -215,15 +217,6 @@ export const permissionsRelations = relations(permissions, ({one, many}) => ({
 	users_permissions: many(users_permissions),
 }));
 
-export const productsRelations = relations(products, ({one, many}) => ({
-	manufacturer: one(manufacturers, {
-		fields: [products.manufacturer_id],
-		references: [manufacturers.id]
-	}),
-	products_categories: many(products_categories),
-	products_properties: many(products_properties),
-}));
-
 export const products_categoriesRelations = relations(products_categories, ({one}) => ({
 	category: one(categories, {
 		fields: [products_categories.category_id],
@@ -232,6 +225,15 @@ export const products_categoriesRelations = relations(products_categories, ({one
 	product: one(products, {
 		fields: [products_categories.product_id],
 		references: [products.id]
+	}),
+}));
+
+export const productsRelations = relations(products, ({one, many}) => ({
+	products_categories: many(products_categories),
+	products_properties: many(products_properties),
+	manufacturer: one(manufacturers, {
+		fields: [products.manufacturer_id],
+		references: [manufacturers.id]
 	}),
 }));
 
@@ -309,6 +311,33 @@ export const scheduled_reports_subscriptionRelations = relations(scheduled_repor
 
 export const scheduled_reportsRelations = relations(scheduled_reports, ({many}) => ({
 	scheduled_reports_subscriptions: many(scheduled_reports_subscription),
+}));
+
+export const profilesRelations = relations(profiles, ({one}) => ({
+	membership: one(memberships, {
+		fields: [profiles.references_id],
+		references: [memberships.id]
+	}),
+	user: one(users, {
+		fields: [profiles.user_id],
+		references: [users.id]
+	}),
+}));
+
+export const membershipsRelations = relations(memberships, ({many}) => ({
+	profiles: many(profiles),
+	membership_users: many(membership_users),
+}));
+
+export const membership_usersRelations = relations(membership_users, ({one}) => ({
+	membership: one(memberships, {
+		fields: [membership_users.membership_id],
+		references: [memberships.id]
+	}),
+	user: one(users, {
+		fields: [membership_users.user_id],
+		references: [users.id]
+	}),
 }));
 
 export const roles_permissionsRelations = relations(roles_permissions, ({one}) => ({
