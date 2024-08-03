@@ -24,7 +24,7 @@ export function ProductDrawer({ record_id }: { record_id?: string }) {
         endContent={!record_id && <PlusIcon />}
       >
         {record_id ? (
-          <Edit2Icon className="text-default-500 h-4 w-4" />
+          <Edit2Icon className="text-white h-4 w-4" />
         ) : (
           "Добавить новый продукт"
         )}

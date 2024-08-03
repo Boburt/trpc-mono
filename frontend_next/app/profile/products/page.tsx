@@ -18,8 +18,21 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@frontend_next/lib/eden";
 import { products } from "backend/drizzle/schema";
 import { InferSelectModel } from "drizzle-orm";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, ChartNoAxesGantt } from "lucide-react";
 import { useSession } from "next-auth/react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@frontend_next/components/ui/hover-card";
+import { ProductEventsTimeline } from "./products-events-timeline";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@frontend_next/components/ui/sheet";
+import { Button } from "@nextui-org/button";
 
 //@ts-ignore
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -28,12 +41,13 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const columns = [
-  { name: "PRODUCT NAME", uid: "name", sortable: true },
-  { name: "DESCRIPTION", uid: "description", sortable: true },
-  { name: "PRICE", uid: "price", sortable: true },
-  { name: "QUANTITY", uid: "stock_quantity" },
-  { name: "ACTIVE", uid: "active", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "Название", uid: "name", sortable: true },
+  { name: "Описание", uid: "description", sortable: true },
+  { name: "Цена в рублях", uid: "price_rub", sortable: true },
+  { name: "Цена в долларах", uid: "price_usd", sortable: true },
+  // { name: "QUANTITY", uid: "stock_quantity" },
+  { name: "Активность", uid: "active", sortable: true },
+  { name: "Действия", uid: "actions" },
 ];
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -45,7 +59,14 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
+type ProductEventsData = {
+  productId: string;
+  created_at: string;
+};
+
 export default function ProductsList() {
+  const [selectedProductId, setSelectedProductId] =
+    React.useState<ProductEventsData | null>(null);
   const [filterValue, setFilterValue] = React.useState("");
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -76,7 +97,8 @@ export default function ProductsList() {
         query: {
           limit: rowsPerPage,
           offset: (page - 1) * rowsPerPage,
-          fields: "id,name,description,active,price,properties,stock_quantity",
+          fields:
+            "id,name,description,created_at,active,price_rub,price_usd,properties,stock_quantity",
           filters: JSON.stringify([
             {
               operator: "contains",
@@ -153,7 +175,15 @@ export default function ProductsList() {
               </span>
             </div>
           );
-        case "price":
+        case "price_rub":
+          return (
+            <div className="flex flex-col">
+              <span className="text-bold text-small capitalize">
+                {cellValue?.toString()}
+              </span>
+            </div>
+          );
+        case "price_usd":
           return (
             <div className="flex flex-col">
               <span className="text-bold text-small capitalize">
@@ -170,20 +200,48 @@ export default function ProductsList() {
             </div>
           );
         case "active":
-          return (
+          return cellValue ? (
             <Chip
               className="capitalize"
               color={statusColorMap[product.active.toString()]}
               size="sm"
               variant="flat"
             >
-              {cellValue ? "Активен" : "Не активен"}
+              Активен
             </Chip>
+          ) : (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Chip
+                  color={statusColorMap[product.active.toString()]}
+                  size="sm"
+                  variant="flat"
+                >
+                  Не активен
+                </Chip>
+              </HoverCardTrigger>
+              <HoverCardContent className="bg-white">
+                Продукт находится в модерации или неактивен
+              </HoverCardContent>
+            </HoverCard>
           );
         case "actions":
           return (
             <div className="relative flex justify-end items-center gap-2">
               <ProductDrawer record_id={product.id} />
+              <Button
+                isIconOnly
+                size="sm"
+                onPress={() =>
+                  setSelectedProductId({
+                    productId: product.id,
+                    created_at: product.created_at,
+                  })
+                }
+                color="primary"
+              >
+                <ChartNoAxesGantt className="text-white h-4 w-4" />
+              </Button>
             </div>
           );
         default:
@@ -284,39 +342,54 @@ export default function ProductsList() {
   }, [page, pages]);
 
   return (
-    <Table
-      aria-label="Example table with custom cells, pagination and sorting"
-      isHeaderSticky
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[670px]",
-      }}
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No product found"} items={items}>
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        aria-label="Example table with custom cells, pagination and sorting"
+        isHeaderSticky
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: "max-h-[670px]",
+        }}
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"No product found"} items={items}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Sheet
+        open={!!selectedProductId}
+        onOpenChange={(open) => !open && setSelectedProductId(null)}
+      >
+        <SheetContent side="right" className="bg-white w-full sm:max-w-2xl">
+          <SheetHeader className="mb-4">
+            <SheetTitle>История</SheetTitle>
+          </SheetHeader>
+          {selectedProductId && (
+            <ProductEventsTimeline {...selectedProductId} />
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

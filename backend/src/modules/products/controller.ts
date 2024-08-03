@@ -10,6 +10,7 @@ import {
   assets,
   properties,
   categories,
+  product_events,
 } from "../../../drizzle/schema";
 import {
   InferSelectModel,
@@ -781,6 +782,19 @@ export const productsController = new Elysia({
         })
         .returning()
         .execute();
+
+      await drizzle.insert(products_categories).values({
+        product_id: newProduct[0].id,
+        category_id: body.data.category_id,
+      }).execute();
+
+      await drizzle.insert(product_events).values({
+        product_id: newProduct[0].id,
+        event_name: "created_new_product",
+        created_at: new Date(),
+        user_id: user.user.id,
+      }).execute();
+
       return newProduct[0];
     },
     {
@@ -789,8 +803,10 @@ export const productsController = new Elysia({
           active: t.Boolean(),
           name: t.String(),
           description: t.Optional(t.Nullable(t.String())),
-          price: t.Optional(t.Nullable(t.Number())),
+          price_rub: t.Optional(t.Nullable(t.String())),
+          price_usd: t.Optional(t.Nullable(t.String())),
           properties: t.Optional(t.Record(t.String(), t.Any())),
+          category_id: t.String(),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
@@ -944,6 +960,18 @@ export const productsController = new Elysia({
         .returning()
         .execute();
 
+      if (body.data.category_id) {
+        await drizzle
+          .delete(products_categories)
+          .where(eq(products_categories.product_id, id))
+          .execute();
+
+        await drizzle.insert(products_categories).values({
+          product_id: id,
+          category_id: body.data.category_id,
+        }).execute();
+      }
+
       return updatedProduct[0];
     },
     {
@@ -955,7 +983,9 @@ export const productsController = new Elysia({
           active: t.Optional(t.Boolean()),
           name: t.Optional(t.String()),
           description: t.Optional(t.Nullable(t.String())),
-          price: t.Optional(t.Nullable(t.Number())),
+          price_rub: t.Optional(t.Nullable(t.String())),
+          price_usd: t.Optional(t.Nullable(t.String())),
+          category_id: t.Optional(t.String()),
         }),
         fields: t.Optional(t.Array(t.String())),
       }),
