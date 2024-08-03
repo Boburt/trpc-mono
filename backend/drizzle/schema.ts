@@ -467,6 +467,8 @@ export const products = pgTable(
     description: text("description"),
     active: boolean("active").default(true).notNull(),
     price: integer("price"),
+    price_rub: integer("price_rub"),
+    price_usd: integer("price_usd"),
     stock_quantity: integer("stock_quantity"),
     created_at: timestamp("created_at", {
       precision: 5,
@@ -1093,7 +1095,9 @@ export const productRequests = pgTable(
   {
     id: uuid("id").defaultRandom().notNull(),
     userId: uuid("user_id"),
-    requestNumber: integer("request_number").default(sql`nextval('request_number_seq')`),
+    requestNumber: integer("request_number").default(
+      sql`nextval('request_number_seq')`
+    ),
     firstName: varchar("first_name", { length: 100 }).notNull(),
     lastName: varchar("last_name", { length: 100 }).notNull(),
     phone: varchar("phone", { length: 20 }).notNull(),
