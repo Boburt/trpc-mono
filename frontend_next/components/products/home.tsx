@@ -5,6 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
 import Link from "next/link";
+import { ProductPrice } from "./product-price";
 
 export default function ProductHome() {
   const { data } = useSuspenseQuery({
@@ -48,25 +49,21 @@ export default function ProductHome() {
                   alt={product.name}
                 />
               </Link>
-              <CardHeader className="pb-0 pt-2 flex-col items-start">
-                <div className="flex flex-col gap-3">
+              <CardHeader className="py-2 px-4 flex-col items-start flex-1">
+                <div className="flex flex-col gap-3 flex-1">
                   <Link
                     className="text-medium font-medium text-default-700 leading-tight"
                     href={`/product/${product.id}`}
                   >
                     {product.name}
                   </Link>
-                  <div className="text-small text-default-600">
+                  <div className="text-small text-default-600 flex-1 hidden md:block">
                     {product.description}
                   </div>
-                  <p className="text-small font-medium text-default-700">
-                    {Intl.NumberFormat("ru-RU", {
-                      style: "currency",
-                      currency: "UZS",
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    }).format(+product.price!)}
-                  </p>
+                  <ProductPrice
+                    {...product}
+                    className="text-small font-medium text-default-700 align-bottom"
+                  />
                 </div>
               </CardHeader>
             </Card>

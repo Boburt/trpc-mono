@@ -61,7 +61,7 @@ export default function Header() {
     <Navbar
       // isBordered
       onMenuOpenChange={setIsMenuOpen}
-      // maxWidth=""
+      maxWidth="2xl"
       classNames={{
         item: [
           "flex",
@@ -78,6 +78,7 @@ export default function Header() {
           "data-[active=true]:after:bg-primary",
         ],
         content: ["flex", "items-center", "justify-between"],
+        wrapper: ["container"],
       }}
     >
       <NavbarContent>

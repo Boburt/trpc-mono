@@ -14,6 +14,7 @@ import { ProductCounter } from "@frontend_next/app/catalog/product-counter";
 import { Product } from "schema-dts";
 import { JsonLd } from "react-schemaorg";
 import Head from "next/head";
+import { ProductPrice } from "@frontend_next/components/products/product-price";
 
 type Props = {
   params: { id: string };
@@ -30,7 +31,6 @@ export async function generateMetadata(
       id,
     })
     .get();
-
   if (data && "id" in data) {
     const imageUrl = data.images?.[0]?.path
       ? `${process.env.NEXT_PUBLIC_API_URL}${data.images?.[0]?.path}`
@@ -135,14 +135,7 @@ export default async function ProductPage({
                 <h1 className="text-2xl font-bold tracking-tight">
                   {data.name}
                 </h1>
-                <p className="text-xl font-medium tracking-tight my-2">
-                  {Intl.NumberFormat("ru-RU", {
-                    style: "currency",
-                    currency: "UZS",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  }).format(+data.price!)}
-                </p>
+                <ProductPrice {...data} />
                 <div className="line-clamp-3 text-medium text-default-700 mt-4">
                   {data.description}
                 </div>

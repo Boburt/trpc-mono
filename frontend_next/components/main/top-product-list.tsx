@@ -7,6 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import NextImage from "next/image";
 import { Image } from "@nextui-org/image";
 import Link from "next/link";
+import { ProductPrice } from "../products/product-price";
 
 export default function TopProductList() {
   const { data } = useSuspenseQuery({
@@ -48,14 +49,10 @@ export default function TopProductList() {
                 <div className="text-small text-default-600 flex-1 hidden md:block">
                   {product.description}
                 </div>
-                <p className="text-small font-medium text-default-700 align-bottom">
-                  {Intl.NumberFormat("ru-RU", {
-                    style: "currency",
-                    currency: "UZS",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  }).format(+product.price!)}
-                </p>
+                <ProductPrice
+                  {...product}
+                  className="text-small font-medium text-default-700 align-bottom"
+                />
               </div>
             </CardHeader>
             <CardFooter className="bg-content4/30 border-t-1 border-zinc-100/50 justify-around flex items-center flex-col">

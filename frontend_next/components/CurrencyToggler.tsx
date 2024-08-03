@@ -9,10 +9,6 @@ import { cn } from "@frontend_next/lib/utils";
 export const CurrencyToggler = () => {
   const { currency, setCurrency } = useCurrencyStore();
 
-  const toggleCurrency = () => {
-    setCurrency(currency === "usd" ? "rub" : "usd");
-  };
-
   return (
     <div className="relative flex items-center bg-muted rounded-full p-0.5 w-[90px] h-[36px] border border-primary">
       <Button

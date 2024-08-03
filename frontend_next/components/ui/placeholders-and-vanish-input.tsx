@@ -6,6 +6,7 @@ import { cn } from "@frontend_next/lib/utils";
 import { useDebounce } from "use-debounce";
 import { apiClient } from "@frontend_next/lib/eden";
 import Link from "next/link";
+import { ProductPrice } from "../products/product-price";
 
 export function PlaceholdersAndVanishInput({
   placeholders,
@@ -305,9 +306,7 @@ export function PlaceholdersAndVanishInput({
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {product.name}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                    {product.price} UZS
-                  </span>
+                  <ProductPrice {...product} />
                 </Link>
               </li>
             ))}
