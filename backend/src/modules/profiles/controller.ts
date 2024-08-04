@@ -49,6 +49,7 @@ export const profilesController = new Elysia({
       const result = (await drizzle
         .insert(profiles)
         .values(
+          // @ts-ignore
           Object.keys(data).map((key) => ({
             field_name: key,
             field_value: data[key],
@@ -213,7 +214,7 @@ export const profilesController = new Elysia({
               .update(profiles)
               .set({
                 field_value: value,
-                reference_id: reference_id,
+                references_id: reference_id,
               })
               .where(
                 and(
@@ -239,7 +240,7 @@ export const profilesController = new Elysia({
           .where(
             and(
               eq(profiles.user_id, user.user.id),
-              eq(profiles.reference_id, reference_id)
+              eq(profiles.references_id, reference_id)
             )
           )
           .execute();
