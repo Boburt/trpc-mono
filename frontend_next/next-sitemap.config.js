@@ -1,4 +1,4 @@
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_API_URL,
+  siteUrl: process.env.NEXTAUTH_URL,
   generateRobotsTxt: true,
 };
