@@ -9,8 +9,6 @@ export const ProductPrice: React.FC<
     className?: string;
   }
 > = ({ price_rub, price_usd, className }) => {
-  console.log("price_rub", price_rub);
-  console.log("price_usd", price_usd);
   const { currency } = useCurrencyStore();
   const displayPrice =
     currency === "usd"
