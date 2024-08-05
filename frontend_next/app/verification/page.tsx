@@ -5,9 +5,7 @@ import Image from "next/image";
 export default function VerificationPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-6">
-        Верификация предприятий (производителей)
-      </h1>
+      <h1 className="text-4xl font-bold mb-6">Верификация предприятий</h1>
 
       <div className="mb-12">
         <Image
