@@ -30,7 +30,7 @@ const features = [
     // cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute top-0 left-0 w-full [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]">
+      <div className="absolute -top-48 left-0 w-full [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]">
         <Image
           src="/bento-grid/design.webp"
           alt="Услуги модельер-конструктор"
