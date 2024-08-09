@@ -15,6 +15,7 @@ import {
   numeric,
   unique,
   primaryKey,
+  json,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -940,24 +941,24 @@ export const memberships = pgTable(
     email: text("email"),
     web_site: text("web_site"),
     vat: boolean("vat").default(false).notNull(),
+    verified: boolean("verified").default(false).notNull(),
+    verified_date: timestamp("verified_date", {
+      precision: 5,
+      withTimezone: true,
+      mode: "string",
+    }),
   },
   (table) => {
     return {
-      memberships_name_unique: unique("memberships_name_unique").on(table.name),
-      memberships_short_name_unique: unique("memberships_short_name_unique").on(
-        table.short_name
-      ),
+      memberships_name_unique: unique("memberships_name_unique").on(table.name)
     };
   }
 );
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  user_id: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onUpdate: "cascade" }),
   field_name: text("field_name").notNull(),
-  field_value: text("field_value").notNull(),
+  field_value: jsonb("field_value").notNull(),
   references_id: uuid("references_id")
     .notNull()
     .references(() => memberships.id, { onUpdate: "cascade" }),

@@ -1,30 +1,48 @@
-import { db } from "@backend/db";
+import { drizzleDb } from "@backend/lib/db";
+import {
+  memberships,
+  profiles
+} from "@backend/../drizzle/schema";
+import { eq, and } from "drizzle-orm";
+import dayjs from "dayjs";
+import { pipeline } from "@xenova/transformers";
+
+const HttpsAgent = require("agentkeepalive").HttpsAgent;
+const agent = new HttpsAgent({
+  maxSockets: 100,
+  maxFreeSockets: 10,
+  timeout: 60000,
+  freeSocketTimeout: 30000,
+});
+
+const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
 
 export default async function processIndexManufacturer(id: string) {
   try {
-    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
-    // check if index in elasticsearch exists
-    //   const indexExists = await elasticClient.indices.exists({
-    //     index: indexManufacturers,
-    //   });
-    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}`;
-    // const agent = new Agent({
-    //   connect: {
-    //     rejectUnauthorized: false,
-    //   },
-    // });
+    const manufacturer = await drizzleDb.query.memberships.findFirst({
+      where: eq(memberships.id, id),
+      columns: {
+        id: true,
+      },
+    });
 
-    // setGlobalDispatcher(agent);
+    if (!manufacturer) {
+      return;
+    }
+
+    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
+    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}`;
+
     const response = await fetch(elasticUrl, {
       method: "HEAD",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
       },
+      verbose: true,
     });
-    console.log("response", response);
+
     if (response.status == 404) {
-      // create index with mapping and settings using fetch
       console.log("index does not exist, creating");
 
       const indexMapping = {
@@ -32,184 +50,101 @@ export default async function processIndexManufacturer(id: string) {
           number_of_shards: 1,
           number_of_replicas: 0,
           analysis: {
-            filter: {
-              front_ngram: {
-                type: "edge_ngram",
-                min_gram: "1",
-                max_gram: "12",
+            analyzer: {
+              text_analyzer: {
+                tokenizer: "standard",
+                filter: [
+                  "lowercase",
+                  "asciifolding",
+                  "russian_morphology",
+                  "english_morphology",
+                  "my_edge_ngram",
+                ],
               },
-              bigram_joiner: {
-                max_shingle_size: "2",
-                token_separator: "",
-                output_unigrams: "false",
-                type: "shingle",
-              },
-              bigram_max_size: {
-                type: "length",
-                max: "16",
-                min: "0",
-              },
-              "en-stem-filter": {
-                name: "light_english",
-                type: "stemmer",
-                language: "light_english",
-              },
-              bigram_joiner_unigrams: {
-                max_shingle_size: "2",
-                token_separator: "",
-                output_unigrams: "true",
-                type: "shingle",
-              },
-              delimiter: {
-                split_on_numerics: "true",
-                generate_word_parts: "true",
-                preserve_original: "false",
-                catenate_words: "true",
-                generate_number_parts: "true",
-                catenate_all: "true",
-                split_on_case_change: "true",
-                type: "word_delimiter_graph",
-                catenate_numbers: "true",
-                stem_english_possessive: "true",
-              },
-              "en-stop-words-filter": {
-                type: "stop",
-                stopwords: "_english_",
+              search_analyzer: {
+                tokenizer: "standard",
+                filter: [
+                  "lowercase",
+                  "asciifolding",
+                  "russian_morphology",
+                  "english_morphology",
+                ],
               },
             },
-            analyzer: {
-              i_prefix: {
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "front_ngram",
-                ],
-                type: "custom",
-                tokenizer: "standard",
+            filter: {
+              my_edge_ngram: {
+                type: "edge_ngram",
+                min_gram: 2,
+                max_gram: 20,
               },
-              iq_text_delimiter: {
-                filter: [
-                  "delimiter",
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "en-stop-words-filter",
-                  "en-stem-filter",
-                ],
-                type: "custom",
-                tokenizer: "whitespace",
+              russian_morphology: {
+                type: "icu_collation",
+                language: "ru",
               },
-              q_prefix: {
-                filter: ["cjk_width", "lowercase", "asciifolding"],
-                type: "custom",
-                tokenizer: "standard",
-              },
-              iq_text_base: {
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "en-stop-words-filter",
-                ],
-                type: "custom",
-                tokenizer: "standard",
-              },
-              iq_text_stem: {
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "en-stop-words-filter",
-                  "en-stem-filter",
-                ],
-                type: "custom",
-                tokenizer: "standard",
-              },
-              i_text_bigram: {
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "en-stem-filter",
-                  "bigram_joiner",
-                  "bigram_max_size",
-                ],
-                type: "custom",
-                tokenizer: "standard",
-              },
-              q_text_bigram: {
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "asciifolding",
-                  "en-stem-filter",
-                  "bigram_joiner_unigrams",
-                  "bigram_max_size",
-                ],
-                type: "custom",
-                tokenizer: "standard",
+              english_morphology: {
+                type: "icu_collation",
+                language: "en",
               },
             },
           },
         },
         mappings: {
           properties: {
-            id: {
-              type: "keyword",
-            },
+            id: { type: "keyword" },
             name: {
               type: "text",
+              analyzer: "text_analyzer",
+              search_analyzer: "search_analyzer",
+              fields: {
+                keyword: {
+                  type: "keyword",
+                },
+              },
             },
             short_name: {
               type: "text",
+              analyzer: "text_analyzer",
+              search_analyzer: "search_analyzer",
             },
             description: {
               type: "text",
+              analyzer: "text_analyzer",
+              search_analyzer: "search_analyzer",
             },
-            city: {
+            active: { type: "boolean" },
+            rating: { type: "float" },
+            country: { type: "keyword" },
+            type: { type: "keyword" },
+            org_type: { type: "keyword" },
+            city: { type: "keyword" },
+            ein: { type: "integer" },
+            address: { type: "text" },
+            fact_address: { type: "text" },
+            email: { type: "keyword" },
+            web_site: { type: "keyword" },
+            vat: { type: "boolean" },
+            verified: { type: "boolean" },
+            verified_date: { type: "date" },
+            created_at: { type: "date" },
+            updated_at: { type: "date" },
+            profiles: {
               type: "nested",
               properties: {
-                name: {
-                  type: "text",
-                },
-                name_keyword: {
-                  type: "keyword",
-                },
-                slug: {
-                  type: "keyword",
-                },
-                id: {
-                  type: "keyword",
-                },
+                field_name: { type: "keyword" },
+                field_value: { type: "object", dynamic: true },
               },
             },
-            categories: {
-              type: "nested",
-              properties: {
-                id: {
-                  type: "keyword",
-                },
-                name: {
-                  type: "text",
-                },
-                keyword_name: {
-                  type: "keyword",
-                },
-                code: {
-                  type: "keyword",
-                },
-              },
-            },
-            properties: {
-              type: "object",
-              dynamic: true,
+            text_vector: {
+              type: "dense_vector",
+              dims: 384,
+              index: true,
+              similarity: "cosine",
             },
           },
         },
       };
 
-      const response = await fetch(elasticUrl, {
+      const createIndexResponse = await fetch(elasticUrl, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -217,114 +152,62 @@ export default async function processIndexManufacturer(id: string) {
         },
         body: JSON.stringify(indexMapping),
       });
-    } else {
-      console.log("index exists, updating");
+      console.log(await createIndexResponse.text());
     }
-    console.log("console is created");
-    const manufacturer = await db.manufacturers.findFirst({
-      where: {
-        id,
-      },
-      include: {
-        cities: {
-          select: {
-            name: true,
-            slug: true,
-            id: true,
-          },
-        },
-        manufacturers_categories: {
-          select: {
-            manufacturers_categories_categories: {
-              select: {
-                name: true,
-                code: true,
-                id: true,
-              },
-            },
-          },
-        },
-        manyfacturers_properties_values_manufacturers_properties: {
-          select: {
-            property_id: true,
-            value: true,
-            manufacturers_properties_values_manufacturers_properties: {
-              select: {
-                name: true,
-                code: true,
-                id: true,
-                show_in_filter: true,
-                show_in_list: true,
-                type: true,
-              },
-            },
-          },
-        },
-      },
+
+    console.time("manufacturerSelect");
+    const existingManufacturer = await drizzleDb
+      .select()
+      .from(memberships)
+      .where(eq(memberships.id, id))
+      .execute();
+
+    const currentManufacturer = existingManufacturer[0];
+
+    const manufacturerProfiles = await drizzleDb
+      .select({
+        field_name: profiles.field_name,
+        field_value: profiles.field_value,
+      })
+      .from(profiles)
+      .where(eq(profiles.references_id, id))
+      .execute();
+
+    console.timeEnd("manufacturerSelect");
+
+    const textToEmbed = `${currentManufacturer.name} ${currentManufacturer.description || ''} ${currentManufacturer.short_name || ''}`;
+    const textEmbedding = await model(textToEmbed, {
+      pooling: "mean",
+      normalize: true,
     });
-    console.log("manufacturer", manufacturer);
-    if (manufacturer) {
-      // index manufacturer in elasticsearch using fetch
-      const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}/_doc/${manufacturer.id}`;
-      let properties: { [key: string]: any } = {};
-      manufacturer.manyfacturers_properties_values_manufacturers_properties.forEach(
-        (property) => {
-          if (
-            property.manufacturers_properties_values_manufacturers_properties
-              .show_in_filter
-          ) {
-            let val: any = property.value;
-            console.log(
-              property.manufacturers_properties_values_manufacturers_properties
-                .type
-            );
-            if (
-              property.manufacturers_properties_values_manufacturers_properties
-                .type == "number"
-            ) {
-              val = parseFloat(val);
-            }
-            properties[
-              property.manufacturers_properties_values_manufacturers_properties.code
-            ] = val;
-          }
-        }
-      );
-      const indexBody = {
-        id: manufacturer.id,
-        name: manufacturer.name,
-        short_name: manufacturer.short_name,
-        description: manufacturer.description,
-        city: manufacturer.cities
-          ? {
-              id: manufacturer.cities.id,
-              name: manufacturer.cities.name,
-              keyword_name: manufacturer.cities.name,
-              slug: manufacturer.cities.slug,
-            }
-          : null,
-        categories: manufacturer.manufacturers_categories.map((item) => {
-          return {
-            id: item.manufacturers_categories_categories.id,
-            name: item.manufacturers_categories_categories.name,
-            keyword_name: item.manufacturers_categories_categories.name,
-            code: item.manufacturers_categories_categories.code,
-          };
-        }),
-        properties,
-      };
-      console.log("before indexing");
-      const response = await fetch(indexUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(indexBody),
-      });
-      console.log("data is indexed");
-    }
-  } catch (error) {
-    console.log("error", error);
+
+    const indexUrl = `${elasticUrl}/_doc/${currentManufacturer.id}`;
+
+    const indexBody = {
+      ...currentManufacturer,
+      created_at: dayjs(currentManufacturer.created_at).toISOString(),
+      updated_at: dayjs(currentManufacturer.updated_at).toISOString(),
+      verified_date: currentManufacturer.verified_date
+        ? dayjs(currentManufacturer.verified_date).toISOString()
+        : null,
+      profiles: manufacturerProfiles,
+      text_vector: Array.from(textEmbedding.data),
+    };
+
+    console.time("indexing");
+    const indexResponse = await fetch(indexUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+      },
+      body: JSON.stringify(indexBody),
+    });
+    console.timeEnd("indexing");
+
+    const indexResponseText = await indexResponse.text();
+    console.log("Indexing response:", indexResponseText);
+  } catch (e) {
+    console.error("Error indexing manufacturer:", e);
   }
 }
