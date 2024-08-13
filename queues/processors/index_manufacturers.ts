@@ -127,12 +127,39 @@ export default async function processIndexManufacturer(id: string) {
             verified_date: { type: "date" },
             created_at: { type: "date" },
             updated_at: { type: "date" },
-            profiles: {
-              type: "nested",
-              properties: {
-                field_name: { type: "keyword" },
-                field_value: { type: "object", dynamic: true },
-              },
+            "profiles": {
+              "type": "nested",
+              "properties": {
+                "field_name": {
+                  "type": "keyword"
+                },
+                "field_value": {
+                  "dynamic": "true",
+                  "properties": {
+                    "measure": {
+                      "type": "text",
+                      "fields": {
+                        "keyword": {
+                          "type": "keyword",
+                          "ignore_above": 256
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "text",
+                      "fields": {
+                        "keyword": {
+                          "type": "keyword",
+                          "ignore_above": 256
+                        }
+                      }
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
             },
             text_vector: {
               type: "dense_vector",

@@ -23,6 +23,7 @@
     "ioredis": "^5.4.1",
     "redis": "^4.6.8",
     "sharp": "^0.33.2",
+    "typesense": "^1.8.2",
     "undici": "^6.4.0"
   },
   "devDependencies": {

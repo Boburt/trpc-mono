@@ -10,6 +10,7 @@ import {
 import { SQLWrapper, and, eq, gt, gte, isNotNull, lt, lte } from "drizzle-orm";
 import dayjs from "dayjs";
 import { pipeline, env } from "@xenova/transformers";
+import typesenseClient from "@backend/lib/typesense";
 // env.cacheDir = './model_cache';
 
 // const embeddingPipeline = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
@@ -19,15 +20,31 @@ import { pipeline, env } from "@xenova/transformers";
 //     return Array.from(output.data);
 // }
 
-const HttpsAgent = require("agentkeepalive").HttpsAgent;
-const agent = new HttpsAgent({
-  maxSockets: 100,
-  maxFreeSockets: 10,
-  timeout: 60000,
-  freeSocketTimeout: 30000,
-});
+const indexProducts = `${process.env.PROJECT_PREFIX}products`;
+const productSchema = {
+  name: indexProducts,
+  fields: [
+    { name: 'id', type: "string" },
+    { name: 'manufacturer_id', type: "string" },
+    { name: 'manufacturer_name', type: "string", facet: true },
+    { name: 'name', type: "string" },
+    { name: 'description', type: "string" },
+    { name: 'active', type: 'bool' },
+    { name: 'price_rub', type: 'float', facet: true },
+    { name: 'price_usd', type: 'float', facet: true },
+    { name: 'stock_quantity', type: 'int32' },
+    { name: 'created_at', type: 'string' },
+    { name: 'updated_at', type: 'string' },
+    { name: 'created_at_timestamp', type: 'int64' }, // New sortable field
+    { name: 'updated_at_timestamp', type: 'int64' }, // New sortable field
+    { name: 'category', type: "string" },
+    { name: 'category_id', type: "string" },
+    { name: 'properties', type: 'string[]', facet: true },
+  ],
+  default_sorting_field: 'created_at_timestamp',
+  enable_nested_fields: true
+};
 
-const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
 
 export default async function processIndexProducts(id: string) {
   try {
@@ -42,160 +59,19 @@ export default async function processIndexProducts(id: string) {
       return;
     }
 
-    const indexProducts = `${process.env.PROJECT_PREFIX}products`;
-    // check if index in elasticsearch exists
-    //   const indexExists = await elasticClient.indices.exists({
-    //     index: indexProducts,
-    //   });
-    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexProducts}`;
-    // const agent = new Agent({
-    //   connect: {
-    //     rejectUnauthorized: false,
-    //   },
-    // });
 
-    // setGlobalDispatcher(agent);
-    const response = await fetch(elasticUrl, {
-      method: "HEAD",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-      },
-      verbose: true,
-    });
-    console.log("response", response);
-    if (response.status == 404) {
-      // create index with mapping and settings using fetch
-      console.log("index does not exist, creating");
-
-      const indexMapping = {
-        settings: {
-          number_of_shards: 1,
-          number_of_replicas: 0,
-          analysis: {
-            analyzer: {
-              text_analyzer: {
-                tokenizer: "standard",
-                filter: [
-                  "lowercase",
-                  "asciifolding",
-                  "russian_morphology",
-                  "english_morphology",
-                  "my_edge_ngram", // Ensuring edge n-gram filter is applied
-                ],
-              },
-              search_analyzer: {
-                tokenizer: "standard",
-                filter: [
-                  "lowercase",
-                  "asciifolding",
-                  "russian_morphology",
-                  "english_morphology",
-                ],
-              },
-            },
-            filter: {
-              my_edge_ngram: {
-                type: "edge_ngram",
-                min_gram: 2,
-                max_gram: 20,
-              },
-              russian_morphology: {
-                type: "icu_collation",
-                language: "ru",
-              },
-              english_morphology: {
-                type: "icu_collation",
-                language: "en",
-              },
-            },
-          },
-        },
-        mappings: {
-          properties: {
-            id: { type: "keyword" },
-            manufacturer_id: { type: "keyword" },
-            manufacturer_name: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
-            category: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
-            category_id: { type: "keyword" },
-            name: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
-            description: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-            },
-            active: { type: "boolean" },
-            price: { type: "integer" },
-            price_rub: { type: "integer" },
-            price_usd: { type: "integer" },
-            stock_quantity: { type: "integer" },
-            created_at: { type: "date" },
-            updated_at: { type: "date" },
-            properties: {
-              type: "nested",
-              properties: {
-                name: { type: "keyword" },
-                value: { type: "keyword" },
-                property_type: { type: "keyword" },
-                id: { type: "keyword" },
-                code: { type: "keyword" },
-              },
-            },
-            text_vector: {
-              type: "dense_vector",
-              dims: 384,
-              index: true,
-              similarity: "cosine",
-            },
-            product_vector: {
-              type: "dense_vector",
-              dims: 384,
-              index: true,
-              similarity: "cosine",
-            },
-          },
-        },
-      };
-
-      const response = await fetch(elasticUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(indexMapping),
-      });
-      console.log(await response.text());
-      console.log(JSON.stringify(indexMapping));
-      // process.exit(0);
+    try {
+      await typesenseClient.collections(indexProducts).retrieve();
+      console.log('Collection already exists');
+    } catch (err) {
+      if (err.httpStatus === 404) {
+        await typesenseClient.collections().create(productSchema);
+        console.log('Created schema');
+      } else {
+        console.error('Error creating schema:', err);
+      }
     }
+
     console.time("productSelect");
     const existingProduct = await drizzleDb
       .select({
@@ -218,12 +94,6 @@ export default async function processIndexProducts(id: string) {
       .execute();
 
     const currentProduct = existingProduct[0];
-    const textToEmbed = `${currentProduct.name} ${currentProduct.description}`;
-    const textEmbedding = await model(textToEmbed, {
-      pooling: "mean",
-      normalize: true,
-    });
-
     // get category name
     const productCategory = await drizzleDb
       .select({
@@ -251,39 +121,33 @@ export default async function processIndexProducts(id: string) {
       .execute();
 
     console.timeEnd("productSelect");
-    const indexUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexProducts}/_doc/${currentProduct.id}`;
-
-    // For product_vector, we might want to include more fields
-    const productToEmbed = `${currentProduct.name} ${currentProduct.description} ${productCategory[0].name} ${currentProduct.manufacturer_name}`;
-    const productEmbedding = await model(productToEmbed, {
-      pooling: "mean",
-      normalize: true,
-    });
+    const propertyNames = productPropertiesList.map(prop => prop.name);
+    const propertyValues = productPropertiesList.map(prop => prop.value);
 
     const indexBody = {
       ...currentProduct,
       created_at: dayjs(currentProduct.created_at).toISOString(),
       updated_at: dayjs(currentProduct.updated_at).toISOString(),
+      created_at_timestamp: dayjs(currentProduct.created_at).unix(),
+      updated_at_timestamp: dayjs(currentProduct.updated_at).unix(),
       category: productCategory[0].name ?? "",
       category_id: productCategory[0].category_id ?? "",
-      properties: productPropertiesList,
-      text_vector: Array.from(textEmbedding.data),
-      product_vector: Array.from(productEmbedding.data),
+      properties: productPropertiesList.map(prop => `${prop.name}:${prop.value}`),
+      price_rub: currentProduct.price_rub ? +currentProduct.price_rub : 0,
+      price_usd: currentProduct.price_usd ? +currentProduct.price_usd : 0,
+      stock_quantity: currentProduct.stock_quantity ? +currentProduct.stock_quantity : 0,
     };
     // console.log('indexing', indexBody);
     console.time("indexing");
-    const indexResponse = await fetch(indexUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-      },
-      body: JSON.stringify(indexBody),
-      verbose: true,
-    });
-    console.timeEnd("indexing");
 
-    const indexResponseText = await indexResponse.text();
+    try {
+      await typesenseClient.collections(indexProducts).documents().upsert(indexBody);
+      console.log(`Indexed product ${id}`);
+
+    } catch (e) {
+      console.log('indexBody', indexBody)
+      console.error(`Error indexing product ${id}:`, e);
+    }
     // console.log("indexResponseText", indexResponseText);
   } catch (e) {
     console.log("davr", e);
