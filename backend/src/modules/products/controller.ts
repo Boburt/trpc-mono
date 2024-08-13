@@ -34,11 +34,16 @@ import { ProductProperties } from "./dtos/one.dto";
 import { ProductsWithRelations } from "./dtos/list.dto";
 import { ElasticsearchAggregations } from "./dtos/facets.dto";
 import { pipeline } from "@xenova/transformers";
+import typesenseClient from "@backend/lib/typesense";
 
 const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
 
 const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
 const indexName = `${process.env.PROJECT_PREFIX}products`;
+
+const indexProducts = `${process.env.PROJECT_PREFIX}products`;
+
+type CategoryDataType = Pick<typeof categories.$inferSelect, "code" | "name"> | null;
 
 export const productsController = new Elysia({
   name: "@api/products",
@@ -47,149 +52,91 @@ export const productsController = new Elysia({
   .get(
     "/products/public/facets",
     async ({
-      user,
-      set,
       drizzle,
       query: { filters, category, properties, query },
     }) => {
-      const propertiesFilter = properties ? properties.split(",") : [];
-      const filter: any[] = [
-        {
-          bool: {
-            must: [
-              {
-                term: {
-                  active: true,
-                },
-              },
-            ],
-          },
-        },
-      ];
+      const searchParameters: any = {
+        q: query || '*',
+        query_by: 'name,description,manufacturer_name,category',
+        filter_by: 'active:=true',
+        facet_by: 'properties',
+        max_facet_values: 100,
+        per_page: 0
+      };
 
       // Handle category filtering
       if (category) {
         const categoryHierarchyQuery = sql.raw(`
-        WITH RECURSIVE category_hierarchy AS (
-          SELECT id, name, parent_id
-          FROM categories
-          WHERE code = '${category}' AND active = true
-          UNION ALL
-          SELECT c.id, c.name, c.parent_id
-          FROM categories c
-          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
-          WHERE c.active = true
-        )
-        SELECT id FROM category_hierarchy;
-      `);
+          WITH RECURSIVE category_hierarchy AS (
+            SELECT id, name, parent_id
+            FROM categories
+            WHERE code = '${category}' AND active = true
+            UNION ALL
+            SELECT c.id, c.name, c.parent_id
+            FROM categories c
+            INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
+            WHERE c.active = true
+          )
+          SELECT id FROM category_hierarchy;
+        `);
 
         const categoryHierarchyResult = await drizzle.execute<{
           id: string;
-          name: string;
-          parent_id: string;
         }>(categoryHierarchyQuery);
+
         const categoryIds = categoryHierarchyResult.map((row) => row.id);
-        filter.push({ terms: { category_id: categoryIds } });
+        if (categoryIds.length > 0) {
+          searchParameters.filter_by += ` && category_id:=[${categoryIds.join(',')}]`;
+        }
       }
-
-      // Handle search query
-      if (query && query.length > 0) {
-        filter.push({
-          multi_match: {
-            query: query,
-            fields: ["name^3", "description^2", "manufacturer_name", "category"],
-            type: "best_fields",
-            operator: "and",
-            fuzziness: "AUTO",
-            prefix_length: 1
-          },
-        });
-      }
-
-      const elasticQuery = {
-        query: {
-          bool: {
-            filter: filter,
-          },
-        },
-        size: 0,
-        aggs: {
-          properties: {
-            nested: { path: "properties" },
-            aggs: {
-              names: {
-                terms: { field: "properties.name" },
-                aggs: {
-                  values: {
-                    terms: { field: "properties.value" },
-                  },
-                },
-              },
-            },
-          },
-          price_range: {
-            stats: { field: "price" },
-          },
-        },
-      } as any;
 
       // Handle property filtering
-      if (propertiesFilter.length > 0) {
-        elasticQuery.query.bool.must = elasticQuery.query.bool.must || [];
-        for (const prop of propertiesFilter) {
-          const [propName, propValue] = prop.split(":");
-          elasticQuery.query.bool.must.push({
-            nested: {
-              path: "properties",
-              query: {
-                bool: {
-                  must: [
-                    {
-                      term: { "properties.name": propName },
-                    },
-                    {
-                      term: { "properties.value": propValue },
-                    },
-                  ],
-                },
-              },
-            },
-          });
-        }
+      if (properties) {
+        const propertiesFilter = properties.split(',').map(prop => `properties:=${prop}`).join(' && ');
+        searchParameters.filter_by += ` && (${propertiesFilter})`;
       }
 
-      // console.log("Elasticsearch Query:", JSON.stringify(elasticQuery, null, 2));
-
       try {
-        const response = await fetch(`${esUrl}/${indexName}/_search`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-          },
-          body: JSON.stringify(elasticQuery),
-        });
+        const searchResults = await typesenseClient
+          .collections(indexProducts)
+          .documents()
+          .search(searchParameters);
 
-        if (!response.ok) {
-          throw new Error(`Elasticsearch request failed: ${response.statusText}`);
-        }
+        const facets = searchResults.facet_counts
+          .find(facet => facet.field_name === 'properties')?.counts || [];
 
-        const data = await response.json();
-        // console.log("Elasticsearch Response:", JSON.stringify(data, null, 2));
-        const aggregations = data.aggregations as ElasticsearchAggregations;
+        const processedFacets = facets.reduce((acc, facet) => {
+          const [name, value] = facet.value.split(':');
+          if (!acc[name]) {
+            acc[name] = [];
+          }
+          acc[name].push({ key: value, doc_count: facet.count });
+          return acc;
+        }, {});
+
+        const propertiesFacet = Object.entries(processedFacets).map(([key, values]) => ({
+          key,
+          values
+        }));
+
+        const priceStats = await typesenseClient
+          .collections(indexProducts)
+          .documents()
+          .search({
+            ...searchParameters,
+            facet_by: 'price_rub',
+            per_page: 0
+          });
+
+        const priceRange = priceStats.facet_counts
+          .find(facet => facet.field_name === 'price_rub')?.stats || { min: 0, max: 0 };
 
         return {
-          properties: aggregations.properties.names.buckets.map((keyBucket) => ({
-            key: keyBucket.key,
-            values: keyBucket.values.buckets.map((valueBucket) => ({
-              key: valueBucket.key,
-              doc_count: valueBucket.doc_count,
-            })),
-          })),
+          properties: propertiesFacet,
           priceRange: {
-            min: aggregations.price_range.min,
-            max: aggregations.price_range.max,
-          },
+            min: priceRange.min / 100, // Convert cents to dollars
+            max: priceRange.max / 100
+          }
         };
       } catch (error) {
         console.error("Error fetching facets:", error);
@@ -208,196 +155,128 @@ export const productsController = new Elysia({
   .get(
     "/products/public/data",
     async ({
-      user,
-      set,
       drizzle,
       query: { limit, page, sort, properties, fields, category, query },
     }) => {
-      const propertiesFilter = properties ? properties.split(",") : [];
-      const filter: any[] = [
-        {
-          bool: {
-            must: [
-              {
-                term: {
-                  active: true,
-                },
-              },
-            ],
-          },
-        },
-      ];
-      let categoryCode = category;
-      if (category) {
-        try {
-          categoryCode = JSON.parse(category);
-        } catch (e) { }
-      }
-      let categoryIds = [];
-      if (categoryCode && categoryCode != null) {
-        const categoryHierarchyQuery = sql.raw(`
-        WITH RECURSIVE category_hierarchy AS (
-          SELECT id, name, parent_id
-          FROM categories
-          WHERE code = '${category}' AND active = true
-          UNION ALL
-          SELECT c.id, c.name, c.parent_id
-          FROM categories c
-          INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
-          WHERE c.active = true
-        )
-        SELECT id FROM category_hierarchy;
-      `);
+      const searchParameters: any = {
+        q: query || '*',
+        query_by: 'name,description,manufacturer_name,category',
+        filter_by: 'active:=true',
+        per_page: limit,
+        page: page,
+        sort_by: sort || 'created_at_timestamp:desc'
+      };
 
-        // Execute the query to get category IDs
+      // Handle category filtering
+      if (category) {
+        const categoryHierarchyQuery = sql.raw(`
+          WITH RECURSIVE category_hierarchy AS (
+            SELECT id, name, parent_id
+            FROM categories
+            WHERE code = '${category}' AND active = true
+            UNION ALL
+            SELECT c.id, c.name, c.parent_id
+            FROM categories c
+            INNER JOIN category_hierarchy ch ON ch.id = c.parent_id
+            WHERE c.active = true
+          )
+          SELECT id FROM category_hierarchy;
+        `);
+
         const categoryHierarchyResult = await drizzle.execute<{
           id: string;
-          name: string;
-          parent_id: string;
         }>(categoryHierarchyQuery);
-        categoryIds.push(...categoryHierarchyResult.map((row) => row.id));
-        filter.push({ terms: { category_id: categoryIds } });
-      }
 
-      const elasticQuery = {
-        size: limit,
-        from: (page - 1) * limit,
-        query: {
-          bool: {
-            must: filter.length ? filter : undefined,
-          },
-        },
-        aggs: {
-          // manufacturers: {
-          //   terms: { field: 'manufacturer_name.keyword' },
-          // },
-          properties: {
-            nested: { path: "properties" },
-            aggs: {
-              names: {
-                terms: { field: "properties.name" },
-                aggs: {
-                  values: {
-                    terms: { field: "properties.value" },
-                  },
-                },
-              },
-            },
-          },
-          price_range: {
-            stats: { field: "price" },
-          },
-        },
-        _source: {
-          excludes: ["text_vector", "product_vector"], // Optionally exclude large vector fields
-        },
-      } as any;
-
-      if (query && query.length > 0) {
-        elasticQuery.query.bool.must.push({
-          multi_match: {
-            query: query,
-            fields: ["name^3", "description^2", "manufacturer_name", "category"],
-            type: "best_fields",
-            operator: "and",
-            fuzziness: "AUTO",
-            prefix_length: 1
-          },
-        });
-      }
-
-      if (propertiesFilter.length > 0) {
-        for (const prop of propertiesFilter) {
-          const [propName, propValue] = prop.split(":");
-          elasticQuery.query.bool.must.push({
-            nested: {
-              path: "properties",
-              query: {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        "properties.name": propName
-                      }
-                    },
-                    {
-                      match: {
-                        "properties.value": {
-                          query: propValue
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          });
+        const categoryIds = categoryHierarchyResult.map((row) => row.id);
+        if (categoryIds.length > 0) {
+          searchParameters.filter_by += ` && category_id:=[${categoryIds.join(',')}]`;
         }
       }
 
-      const response = await fetch(`${esUrl}/${indexName}/_search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(elasticQuery),
-      });
-      console.log('elastic data query', JSON.stringify(elasticQuery))
-      if (!response.ok) {
-        let responseText = await response.text();
-        throw new Error(`Elasticsearch request failed: ${response.statusText} ${responseText}`);
+      // Handle property filtering
+      if (properties) {
+        const propertiesFilter = properties.split(',').map(prop => {
+          const [propName, propValue] = prop.split(':');
+          return `properties:=${propName}:${propValue}`;
+        }).join(' && ');
+        searchParameters.filter_by += ` && (${propertiesFilter})`;
       }
 
-      const result = await response.json();
+      try {
+        const searchResults = await typesenseClient
+          .collections(indexProducts)
+          .documents()
+          .search(searchParameters);
 
-      const hits = result.hits.hits.map((hit: any) => ({
-        ...hit._source,
-        text_vector: undefined,
-        product_vector: undefined,
-      })) as ProductsWithRelations[];
+        const products = searchResults.hits.map(hit => {
+          const document = hit.document;
+          const processedProperties = document.properties.reduce((acc, prop) => {
+            const [name, value] = prop.split(':');
+            if (!acc[name]) {
+              acc[name] = [];
+            }
+            acc[name].push(value);
+            return acc;
+          }, {});
 
-      if (hits.length > 0) {
-        const images = await drizzle.query.assets.findMany({
-          where: and(
-            eq(assets.code, "source"),
-            eq(assets.model, "products"),
-            inArray(
-              assets.model_id,
-              hits.map((m) => m.id)
-            )
-          ),
+          return {
+            ...document,
+            price: document.price_cents / 100, // Convert cents to dollars
+            created_at: new Date(document.created_at).toISOString(),
+            updated_at: new Date(document.updated_at).toISOString(),
+            properties: Object.entries(processedProperties).map(([name, values]) => ({
+              name,
+              value: values.join(', ') // Join multiple values if they exist
+            })),
+            images: [] // We'll populate this later
+          };
         });
 
-        hits.forEach((p) => {
-          p.images = images
-            .filter((i) => i.model_id === p.id)
-            .map((i) => ({
-              path: `/public/${i.path}/${i.id}/${i.name}`,
-              code: i.code ?? "",
-            }));
-        });
+        // Fetch images for the products
+        if (products.length > 0) {
+          const images = await drizzle.query.assets.findMany({
+            where: and(
+              eq(assets.code, "source"),
+              eq(assets.model, "products"),
+              inArray(
+                assets.model_id,
+                products.map((p) => p.id)
+              )
+            ),
+          });
+
+          products.forEach((p) => {
+            p.images = images
+              .filter((i) => i.model_id === p.id)
+              .map((i) => ({
+                path: `/public/${i.path}/${i.id}/${i.name}`,
+                code: i.code ?? "",
+              }));
+          });
+        }
+
+        // Fetch category data if category is specified
+        let categoryData: CategoryDataType = null;
+        if (category) {
+          categoryData = await drizzle.query.categories.findFirst({
+            where: eq(categories.code, category),
+            columns: {
+              code: true,
+              name: true,
+            },
+          }) as CategoryDataType;
+        }
+
+        return {
+          products,
+          total: searchResults.found,
+          totalPages: Math.ceil(searchResults.found / limit),
+          categoryData,
+        };
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        throw new Error("Failed to fetch products");
       }
-
-      let categoryData: InferSelectModel<typeof categories> | null = null;
-      if (category) {
-        // @ts-ignore
-        categoryData = await drizzle.query.categories.findFirst({
-          where: eq(categories.code, category),
-          columns: {
-            code: true,
-            name: true,
-          },
-        });
-      }
-
-      const total = result.hits.total.value;
-      return {
-        products: hits,
-        total,
-        totalPages: Math.ceil(total / limit),
-        categoryData,
-      };
     },
     {
       query: t.Object({

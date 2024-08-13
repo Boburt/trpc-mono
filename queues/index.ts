@@ -6,7 +6,7 @@ import processTicketStatusChange from "./processors/ticket_status_change";
 import processIndexProducts from "./processors/index_products";
 import { processNewProductRequest } from "./processors/new_product_request";
 // import processNewImages from "./processors/new_assets_added";
-// import processIndexManufacturer from "./processors/index_manufacturers";
+import processIndexManufacturer from "./processors/index_manufacturers";
 // import processDeleteManufacturer from "./processors/delete_manufacturers";
 // import processIndexManufacturerReview from "./processors/index_manufacturer_review";
 
@@ -36,17 +36,17 @@ const notifyAboutNewProductRequest = `${process.env.PROJECT_PREFIX}notify_about_
 //   }
 // );
 
-// const indexManufacturersQueueWorker = new Worker(
-//   indexManufacturersQueueName,
-//   async (job) => {
-//     const { data } = job;
-//     console.log("job data", data);
-//     await processIndexManufacturer(data.id);
-//   },
-//   {
-//     connection: redisClient,
-//   }
-// );
+const indexManufacturersQueueWorker = new Worker(
+  indexManufacturersQueueName,
+  async (job) => {
+    const { data } = job;
+    console.log("job data", data);
+    await processIndexManufacturer(data.id);
+  },
+  {
+    connection: redisClient,
+  }
+);
 
 // const deleteManufacturersQueueWorker = new Worker(
 //   deleteManufacturersQueueName,
