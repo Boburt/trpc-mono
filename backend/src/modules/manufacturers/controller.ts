@@ -9,6 +9,7 @@ import {
   assets,
   categories,
   manufacturers_reviews,
+  memberships,
 } from "backend/drizzle/schema";
 import {
   sql,
@@ -22,11 +23,149 @@ import {
 import { SelectedFields } from "drizzle-orm/pg-core";
 import Elysia, { t } from "elysia";
 import { PublicManufacturer } from "./dto/list.dto";
-
+const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
+const indexName = `${process.env.PROJECT_PREFIX}manufacturers`;
 export const manufacturersController = new Elysia({
   name: "@api/manufacturers",
 })
   .use(ctx)
+  .get("/manufacturers/facets", async ({ set }) => {
+    const esQuery = {
+      size: 0,
+      query: {
+        bool: {
+          must: [
+            { term: { type: 'manufacturer' } }
+          ]
+        }
+      },
+      aggs: {
+        cities: {
+          terms: { field: 'city' }
+        },
+        profile_fields: {
+          nested: { path: 'profiles' },
+          aggs: {
+            field_names: {
+              terms: { field: 'profiles.field_name' },
+              aggs: {
+                field_values: {
+                  terms: { field: 'profiles.field_value.name' }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    try {
+      const response = await fetch(`${esUrl}/${indexName}/_search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+        body: JSON.stringify(esQuery)
+      });
+      console.log('request', JSON.stringify(esQuery));
+      if (!response.ok) {
+        throw new Error(`Elasticsearch request failed: ${await response.text()}`);
+      }
+
+      const result = await response.json();
+
+      return {
+        cities: result.aggregations.cities.buckets,
+        profiles: result.aggregations.profile_fields.field_names.buckets.reduce((acc, bucket) => {
+          acc[bucket.key] = bucket.field_values.buckets;
+          return acc;
+        }, {})
+      };
+    } catch (error) {
+      console.error('Error fetching facets:', error);
+      set.status = 500;
+      return { error: 'Failed to fetch facets' };
+    }
+  })
+  .get("/manufacturers/list", async ({ query, set }) => {
+    const { page = 1, pageSize = 10, sort, filters } = query;
+
+    const esQuery = {
+      from: (page - 1) * pageSize,
+      size: pageSize,
+      query: {
+        bool: {
+          must: [
+            { term: { type: 'manufacturer' } }
+          ]
+        }
+      }
+    };
+
+    if (filters) {
+      const parsedFilters = JSON.parse(filters);
+      Object.entries(parsedFilters).forEach(([key, value]) => {
+        if (key === 'city') {
+          esQuery.query.bool.must.push({ terms: { city: value } });
+        } else if (key === 'profiles') {
+          esQuery.query.bool.must.push({
+            nested: {
+              path: 'profiles',
+              query: {
+                bool: {
+                  must: [
+                    { terms: { 'profiles.field_name': Object.keys(value) } },
+                    { terms: { 'profiles.field_value.name': Object.values(value).flat() } }
+                  ]
+                }
+              }
+            }
+          });
+        } else {
+          esQuery.query.bool.must.push({ match: { [key]: value } });
+        }
+      });
+    }
+
+    if (sort) {
+      const [field, order] = sort.split('-');
+      esQuery.sort = [{ [field]: { order } }];
+    }
+
+    try {
+      const response = await fetch(`${esUrl}/${indexName}/_search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
+        },
+        body: JSON.stringify(esQuery)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Elasticsearch request failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      return {
+        total: result.hits.total.value,
+        manufacturers: result.hits.hits.map(hit => hit._source)
+      };
+    } catch (error) {
+      console.error('Error fetching manufacturers:', error);
+      set.status = 500;
+      return { error: 'Failed to fetch manufacturers' };
+    }
+  }, {
+    query: t.Object({
+      page: t.Optional(t.Number()),
+      pageSize: t.Optional(t.Number()),
+      sort: t.Optional(t.String()),
+      filters: t.Optional(t.String())
+    })
+  })
   .get(
     "/manufacturers",
     async ({
@@ -701,6 +840,33 @@ export const manufacturersController = new Elysia({
         rating: t.Number(),
         review: t.String(),
       }),
+    }
+  )
+
+  .post(
+    "/manufacturers/index",
+    async ({ user, set, drizzle, newIndexManufacturersQueue }) => {
+      const productsList = await drizzle
+        .select({
+          id: memberships.id,
+        })
+        .from(memberships)
+        .where(eq(memberships.type, "manufacturer"))
+        .execute();
+
+      for (const product of productsList) {
+        console.log("indexing manufacturer", product.id);
+        await newIndexManufacturersQueue.add(
+          product.id,
+          {
+            id: product.id,
+          },
+          {
+            removeOnComplete: true,
+            removeOnFail: true,
+          }
+        );
+      }
     }
   )
   .put(
