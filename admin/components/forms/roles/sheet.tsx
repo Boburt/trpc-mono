@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@components/ui/sheet";
-import RolesCreateInputSchema from "./_form";
+import RolesForm from "./_form";
 
 export default function RolesFormSheet({
   children,
@@ -39,9 +39,7 @@ export default function RolesFormSheet({
         <SheetHeader>
           <SheetTitle>{recordId ? "Edit" : "Add"} Roles</SheetTitle>
         </SheetHeader>
-        {open && (
-          <RolesCreateInputSchema setOpen={setOpen} recordId={recordId} />
-        )}
+        {open && <RolesForm setOpen={setOpen} recordId={recordId} />}
       </SheetContent>
     </Sheet>
   );

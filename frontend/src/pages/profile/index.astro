@@ -1,0 +1,17 @@
+---
+import ProfileLayout from "@frontend/src/layouts/ProfileLayout.astro";
+const customCrumbs = [
+  {
+    text: "Главная",
+    href: "/",
+  },
+  {
+    text: "Профиль",
+    href: "/profile",
+  },
+];
+---
+
+<ProfileLayout title="Профиль" customCrumbs={customCrumbs}>
+  <h1>Profile</h1>
+</ProfileLayout>

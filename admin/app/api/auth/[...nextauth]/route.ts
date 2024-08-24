@@ -2,6 +2,8 @@ import { trpcClient } from "@admin/utils/trpc-server";
 import NextAuth from "next-auth";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import dayjs from "dayjs";
+import { apiClient } from "@admin/utils/eden";
 
 const authOptions: AuthOptions = {
   debug: true,
@@ -12,18 +14,28 @@ const authOptions: AuthOptions = {
         login: { label: "Login", type: "text" },
         password: { label: "Password", type: "password" },
       },
+      // @ts-ignore
       async authorize(credentials, req) {
         if (typeof credentials !== "undefined") {
           const { login, password } = credentials;
-          const res = await trpcClient.users.login.mutate({ login, password });
-          if (typeof res !== "undefined") {
-            return {
-              ...res.data,
-              accessToken: res.accessToken,
-              refreshToken: res.refreshToken,
-              rights: res.rights,
-            };
-          } else {
+          try {
+            const { data: res, status } = await apiClient.api.users.login.post({
+              login,
+              password,
+            });
+            if (status == 200 && res && "accessToken" in res) {
+              return {
+                ...res.user,
+                accessToken: res.accessToken,
+                refreshToken: res.refreshToken,
+                rights: res.permissions,
+              };
+            } else if (status == 401) {
+              throw new Error(res?.message);
+            } else {
+              return null;
+            }
+          } catch (error) {
             return null;
           }
         } else {
@@ -32,9 +44,30 @@ const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 2 * 60 * 60 },
   callbacks: {
     async jwt({ token, user }) {
+      if (token && token.exp) {
+        const differenceInMinutes = dayjs
+          .unix(token!.exp!)
+          .diff(dayjs(), "minute");
+
+        if (differenceInMinutes < 30) {
+          const res = await trpcClient.users.refreshToken.mutate({
+            refreshToken: token.refreshToken as string,
+          });
+          if (typeof res !== "undefined") {
+            /** @ts-ignore */
+            token = {
+              ...token,
+              ...res.data,
+              accessToken: res.accessToken,
+              refreshToken: res.refreshToken,
+              rights: res.rights,
+            };
+          }
+        }
+      }
       if (typeof user !== "undefined") {
         token = {
           ...token,

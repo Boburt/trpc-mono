@@ -1,0 +1,70 @@
+---
+import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
+import { apiClient } from "../utils/eden";
+export const prerender = false;
+const accessToken = Astro.cookies.get("x-token")?.value;
+if (!accessToken) {
+  return Astro.redirect("/login");
+}
+
+const { data } = await apiClient.api.conversations.get({
+  $headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
+const pathname = new URL(Astro.request.url).pathname;
+let { title, customCrumbs = [] } = Astro.props;
+---
+
+<BaseLayout title={title} customCrumbs={customCrumbs}>
+  {
+    data && data.length == 0 && (
+      <main id="content" role="main">
+        <div class="text-center py-10 px-4 sm:px-6 lg:px-8">
+          <h1 class="block text-2xl font-bold text-white sm:text-4xl">
+            Список диалогов пуст
+          </h1>
+          <p class="mt-3 text-lg text-gray-300">
+            Начните новый диалог, чтобы продолжить
+          </p>
+        </div>
+      </main>
+    )
+  }
+  <div class="h-[80vh] flex">
+    <div class="flex flex-row h-full w-full space-x-5">
+      <div class="w-1/4 bg-white overflow-y-auto rounded-xl shadow-lg">
+        <div class="p-4 font-bold text-lg">Список диалогов</div>
+        <ul class="divide-y divide-gray-200">
+          {
+            data &&
+              Array.isArray(data) &&
+              data.map((conversation) => (
+                <li
+                  class={`p-4  cursor-pointer ${
+                    pathname == "/profile/messages/" + conversation.id
+                      ? "bg-blue-100 border-l-4 border-blue-500"
+                      : "hover:bg-gray-200"
+                  }`}
+                >
+                  <a
+                    class="flex flex-row items-center"
+                    href={`/profile/messages/${conversation.id}`}
+                  >
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-gray-700">
+                        {conversation.name}
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+      <div class="flex-1 bg-gray-50 p-4 rounded-xl shadow-lg">
+        <slot />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

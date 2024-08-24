@@ -1,0 +1,8 @@
+---
+import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
+import { ProductsListPage } from "@frontend/src/components/profile/products/page";
+---
+
+<BaseLayout>
+  <ProductsListPage client:only="react" />
+</BaseLayout>
