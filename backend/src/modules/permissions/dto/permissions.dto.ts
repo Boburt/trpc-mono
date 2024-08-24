@@ -20,14 +20,3 @@ export const permissionsFindManyZod = paginatedZodObj.extend({
     })
     .optional(),
 });
-
-
-export interface PermissionResponseDto {
-  id: number;
-
-  slug: string;
-
-  description: string;
-
-  active: boolean;
-}

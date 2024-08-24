@@ -12,7 +12,6 @@ const nextConfig = {
     //   ],
     // ],
   },
-  ssg:false,
   env: {
     TRPC_API_URL: process.env.TRPC_API_URL,
   },

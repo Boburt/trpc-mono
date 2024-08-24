@@ -15,14 +15,10 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@backend/*": ["./backend/src/*"],
-      "@drizzle/*": ["./drizzle/*"],
       "@frontend/*": ["./frontend/*"],
       "@admin/*": ["./admin/*"],
       "@lib/*": ["./lib/*"],
-      "@components/*": ["./admin/components/*"],
-      "@/*": ["./b2b/*"],
-      "@uploads/*": ["./uploads/*"],
-      "@frontend_next/*": ["./frontend_next/*"]
+      "@components/*": ["./admin/components/*"]
     }
   }
 }

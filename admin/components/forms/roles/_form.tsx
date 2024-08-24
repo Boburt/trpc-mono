@@ -7,15 +7,17 @@ import { RolesCreateInputSchema } from "@backend/lib/zod";
 import { useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
-import { useForm } from "@tanstack/react-form";
+import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
-import { toast } from "sonner";
-import { roles } from "backend/drizzle/schema";
-import { apiClient } from "@admin/utils/eden";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { InferInsertModel } from "drizzle-orm";
-import useToken from "@admin/store/get-token";
+
+const formFactory = createFormFactory<z.infer<typeof RolesCreateInputSchema>>({
+  defaultValues: {
+    active: true,
+    name: "",
+    code: "",
+  },
+});
 
 export default function RolesForm({
   setOpen,
@@ -24,108 +26,80 @@ export default function RolesForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const token = useToken();
-  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const onAddSuccess = (actionText: string) => {
-    toast.success(`Role ${actionText}`);
-    queryClient.invalidateQueries({ queryKey: ["roles"] });
+    toast({
+      title: "Success",
+      description: `Role ${actionText}`,
+      duration: 5000,
+    });
     // form.reset();
     setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast.error(error.message);
+    toast({
+      title: "Error",
+      description: error.message,
+      variant: "destructive",
+      duration: 5000,
+    });
   };
 
-  const createMutation = useMutation({
-    mutationFn: (newTodo: InferInsertModel<typeof roles>) => {
-      return apiClient.api.roles.post({
-        data: newTodo,
-        fields: ["id", "name", "code", "active"],
-        $headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
+  const {
+    mutateAsync: createRole,
+    isLoading: isAddLoading,
+    data,
+    error,
+  } = useRolesCreate({
     onSuccess: () => onAddSuccess("added"),
     onError,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: (newTodo: {
-      data: InferInsertModel<typeof roles>;
-      id: string;
-    }) => {
-      return apiClient.api.roles[newTodo.id].put({
-        data: newTodo.data,
-        fields: ["id", "name", "code", "active"],
-        $headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
+  const {
+    mutateAsync: updateRole,
+    isLoading: isUpdateLoading,
+    error: updateError,
+  } = useRolesUpdate({
     onSuccess: () => onAddSuccess("updated"),
     onError,
   });
 
-  const form = useForm<{
-    active: boolean;
-    name: string;
-    code: string;
-  }>({
-    defaultValues: {
-      active: true,
-      name: "",
-      code: "",
-    },
-    onSubmit: async ({ value, formApi }) => {
-      console.log(value);
+  const form = formFactory.useForm({
+    onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateMutation.mutate({ data: value, id: recordId });
+        updateRole({ data: values, where: { id: recordId } });
       } else {
-        createMutation.mutate(value);
+        createRole({ data: values });
       }
     },
   });
 
-  const { data: record, isLoading: isRecordLoading } = useQuery({
-    queryKey: ["one_role", recordId],
-    queryFn: () => {
-      if (recordId) {
-        return apiClient.api.roles[recordId].get({
-          $headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        return null;
-      }
+  const { data: record, isLoading: isRecordLoading } = trpc.roles.one.useQuery(
+    {
+      where: { id: recordId },
     },
-    enabled: !!recordId && !!token,
-  });
+    {
+      enabled: !!recordId,
+    }
+  );
 
   const isLoading = useMemo(() => {
-    return createMutation.isPending || updateMutation.isPending;
-  }, [createMutation.isPending, updateMutation.isPending]);
+    return isAddLoading || isUpdateLoading;
+  }, [isAddLoading, isUpdateLoading]);
 
   useEffect(() => {
-    if (record?.data && "id" in record.data) {
-      form.setFieldValue("active", record.data.active);
-      form.setFieldValue("name", record.data.name);
-      form.setFieldValue("code", record.data?.code ?? "");
+    if (record) {
+      form.setFieldValue("active", record.active);
+      form.setFieldValue("name", record.name);
+      form.setFieldValue("code", record.code);
     }
   }, [record]);
 
   return (
     <form.Provider>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          void form.handleSubmit();
-        }}
-        className="space-y-8"
-      >
+      <form {...form.getFormProps()} className="space-y-8">
         <div className="space-y-2">
           <div>
             <Label>Активность</Label>
@@ -147,25 +121,13 @@ export default function RolesForm({
           <div>
             <Label>Название</Label>
           </div>
-          <form.Field
-            name="name"
-            validators={{
-              onChange({ value }) {
-                if (!value) {
-                  return "Required";
-                }
-              },
-            }}
-          >
+          <form.Field name="name">
             {(field) => {
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    {...field.getInputProps()}
+                    value={field.getValue() ?? ""}
                   />
                 </>
               );
@@ -176,25 +138,14 @@ export default function RolesForm({
           <div>
             <Label>Код</Label>
           </div>
-          <form.Field
-            name="code"
-            validators={{
-              onChange({ value }) {
-                if (!value) {
-                  return "Required";
-                }
-              },
-            }}
-          >
+          <form.Field name="code">
             {(field) => {
+              console.log(field);
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value!}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    {...field.getInputProps()}
+                    value={field.getValue() ?? ""}
                   />
                 </>
               );

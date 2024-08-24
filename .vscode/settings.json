@@ -1,5 +1,3 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "editor.fontSize": 13,
-  "CodeGPT.apiKey": "CodeGPT Plus Beta"
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

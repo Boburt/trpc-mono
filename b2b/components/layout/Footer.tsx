@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export default function Footer() {
   return (
     <>
@@ -14,9 +12,7 @@ export default function Footer() {
         <div>
           <span className="footer-title">Company</span>
           <a className="link link-hover">About us</a>
-          <Link href="/contact" className="link link-hover">
-            Contact
-          </Link>
+          <a className="link link-hover">Contact</a>
           <a className="link link-hover">Jobs</a>
           <a className="link link-hover">Press kit</a>
         </div>

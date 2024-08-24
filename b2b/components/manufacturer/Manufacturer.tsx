@@ -69,6 +69,7 @@ export default function Manufacturer11() {
                   Contact us
                 </button>
               </div>
+              <Slider />
             </div>
           </div>
         ))}

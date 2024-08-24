@@ -1,9 +1,6 @@
-import bio from "../../public/images/frank-cone.jpg";
-import imho from "../../public/images/magda-ehlers.jpg";
-import mach from "../../public/images/scott-webb.jpg";
-import audi from "../../public/images/audi.jpg";
-import bmw from "../../public/images/bmw.jpg";
-import mers from "../../public/images/mercedes.jpg";
+import bio from "./img/frank-cone.jpg";
+import imho from "./img/magda-ehlers.jpg";
+import mach from "./img/scott-webb.jpg";
 
 const manufacturers = [
   {
@@ -15,11 +12,6 @@ const manufacturers = [
     image: bio,
     logo: bio,
     reviews: "3",
-    slider: {
-      image1: audi,
-      image2: bmw,
-      image3: mers,
-    },
   },
   {
     id: 2,
@@ -30,11 +22,6 @@ const manufacturers = [
     image: imho,
     logo: imho,
     reviews: "10+",
-    slider: {
-      image1: audi,
-      image2: bmw,
-      image3: mers,
-    },
   },
   {
     id: 3,
@@ -45,11 +32,7 @@ const manufacturers = [
     image: mach,
     logo: mach,
     reviews: "50+",
-    slider: {
-      image1: audi,
-      image2: bmw,
-      image3: mers,
-    },
+
   },
 ];
 

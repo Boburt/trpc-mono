@@ -19,12 +19,6 @@ export default function Header() {
               <li>
                 <Link href="/about">About</Link>
               </li>
-              <li>
-                <Link href="/contact">Contact</Link>
-              </li>
-              <li>
-                <Link href="/auth">Sing Up</Link>
-              </li>
             </ul>
           </nav>
         </div>
@@ -42,6 +36,14 @@ export default function Header() {
           <button className="btn join-item">Search</button>
         </div>
       </div>
+      <Link
+        href="/manufacturer"
+        className="flex mx-auto justify-center text-white"
+      >
+        <h1 className="text-xl font-extrabold text-indigo-600 hover:text-black hover:underline active:underline">
+          Manufacturer
+        </h1>
+      </Link>
     </div>
   );
 }

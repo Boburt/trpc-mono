@@ -1,5 +1,4 @@
 node_modules
 .env
 .idea
-dump.rdb
-uploads
+dumo.rdb
