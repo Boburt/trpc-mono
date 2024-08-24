@@ -11,7 +11,7 @@ import {
 import { useMemo, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
-import { createFormFactory, useForm } from "@tanstack/react-form";
+import { createFormFactory } from "@tanstack/react-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { useCallback, useState } from "react";
@@ -22,12 +22,14 @@ import {
   SelectContent,
   SelectItem,
 } from "@components/ui/select";
-import { toast } from "sonner";
-import { InferInsertModel } from "drizzle-orm";
-import { users } from "backend/drizzle/schema";
-import useToken from "@admin/store/get-token";
-import { apiClient } from "@admin/utils/eden";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+
+const formFactory = createFormFactory<z.infer<typeof UsersCreateInputSchema>>({
+  defaultValues: {
+    status: "active",
+    login: "",
+    password: "",
+  },
+});
 
 export default function UsersForm({
   setOpen,
@@ -36,7 +38,7 @@ export default function UsersForm({
   setOpen: (open: boolean) => void;
   recordId?: string;
 }) {
-  const token = useToken();
+  const { toast } = useToast();
   const [changedRoleId, setChangedRoleId] = useState<string | null>(null);
 
   const closeForm = () => {
@@ -45,85 +47,53 @@ export default function UsersForm({
   };
 
   const onAddSuccess = (actionText: string, successData: any) => {
-    toast.success(`Role ${actionText}`);
+    toast({
+      title: "Success",
+      description: `Role ${actionText}`,
+      duration: 5000,
+    });
     assignRole(successData);
   };
 
   const onError = (error: any) => {
-    toast.error(error.message);
+    toast({
+      title: "Error",
+      description: error.message,
+      variant: "destructive",
+      duration: 5000,
+    });
   };
 
-  const createMutation = useMutation({
-    mutationFn: (newTodo: InferInsertModel<typeof users>) => {
-      return apiClient.api.users.post({
-        data: newTodo,
-        fields: [
-          "id",
-          "status",
-          "login",
-          "password",
-          "first_name",
-          "last_name",
-        ],
-        $headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
+  const {
+    mutateAsync: createUser,
+    isLoading: isAddLoading,
+    data,
+    error,
+  } = useUsersCreate({
     onSuccess: (data) => onAddSuccess("added", data),
     onError,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: (newTodo: {
-      data: InferInsertModel<typeof users>;
-      id: string;
-    }) => {
-      return apiClient.api.users[newTodo.id].put({
-        data: newTodo.data,
-        fields: [
-          "id",
-          "status",
-          "login",
-          "password",
-          "first_name",
-          "last_name",
-        ],
-        $headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
+  const {
+    mutateAsync: updateUser,
+    isLoading: isUpdateLoading,
+    error: updateError,
+  } = useUsersUpdate({
     onSuccess: (data) => onAddSuccess("updated", data),
     onError,
   });
 
-  const assignRoleMutation = useMutation({
-    mutationFn: (newTodo: { role_id: string; user_id: string }) => {
-      return apiClient.api.users.assign_role.post({
-        ...newTodo,
-        $headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    },
-    onSuccess: (data) => closeForm(),
+  const { mutateAsync: asyncAssignRole } = trpc.users.assignRole.useMutation({
+    onSuccess: () => closeForm(),
     onError,
   });
 
-  const form = useForm<InferInsertModel<typeof users>>({
-    defaultValues: {
-      status: "active",
-      login: "",
-      password: "",
-      first_name: "",
-      last_name: "",
-    },
-    onSubmit: async ({ value }) => {
+  const form = formFactory.useForm({
+    onSubmit: async (values, formApi) => {
       if (recordId) {
-        updateMutation.mutate({ data: value, id: recordId });
+        updateUser({ data: values, where: { id: recordId } });
       } else {
-        createMutation.mutate(value);
+        createUser({ data: values });
       }
     },
   });
@@ -132,73 +102,32 @@ export default function UsersForm({
     { data: record, isLoading: isRecordLoading },
     { data: rolesData, isLoading: isRolesLoading },
     { data: userRolesData, isLoading: isUserRolesLoading },
-  ] = useQueries({
-    queries: [
+  ] = trpc.useQueries((t) => [
+    t.users.one(
       {
-        queryKey: ["one_user", recordId],
-        queryFn: async () => {
-          if (recordId) {
-            const { data } = await apiClient.api.users[recordId].get({
-              $headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            return data;
-          } else {
-            return null;
-          }
-        },
-        enabled: !!recordId && !!token,
+        where: { id: recordId },
       },
       {
-        enabled: !!token,
-        queryKey: ["roles_cached"],
-        queryFn: async () => {
-          const { data } = await apiClient.api.roles.cached.get({
-            $headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          return data;
+        enabled: !!recordId,
+      }
+    ),
+    t.roles.list({}),
+    t.usersRoles.list(
+      {
+        where: {
+          user_id: {
+            equals: recordId,
+          },
         },
       },
       {
-        enabled: !!recordId && !!token,
-        queryKey: ["users_roles", recordId],
-        queryFn: async () => {
-          if (recordId) {
-            const { data } = await apiClient.api.users_roles.get({
-              $query: {
-                limit: "30",
-                offset: "0",
-                filters: JSON.stringify([
-                  {
-                    field: "user_id",
-                    operator: "=",
-                    value: recordId,
-                  },
-                ]),
-                fields: "role_id,user_id",
-              },
-              $headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            return data;
-          } else {
-            return null;
-          }
-        },
-      },
-    ],
-  });
+        enabled: !!recordId,
+      }
+    ),
+  ]);
 
   const userRoleId = useMemo(() => {
-    if (userRolesData && userRolesData.data && userRolesData.data.length > 0) {
-      return userRolesData.data[0].role_id;
-    } else {
-      return null;
-    }
+    return userRolesData?.[0].role_id;
   }, [userRolesData]);
 
   const assignRole = useCallback(
@@ -208,7 +137,7 @@ export default function UsersForm({
         if (recordId) {
           userId = recordId;
         }
-        await assignRoleMutation.mutate({
+        await asyncAssignRole({
           user_id: userId,
           role_id: changedRoleId!,
         });
@@ -219,17 +148,16 @@ export default function UsersForm({
   );
 
   const isLoading = useMemo(() => {
-    return (
-      createMutation.isPending || updateMutation.isPending || isRolesLoading
-    );
-  }, [createMutation.isPending, updateMutation.isPending, isRolesLoading]);
+    return isAddLoading || isUpdateLoading || isRolesLoading;
+  }, [isAddLoading, isUpdateLoading, isRolesLoading]);
 
   useEffect(() => {
-    if (record?.data && "id" in record.data) {
-      Object.keys(record.data).forEach((key) => {
+    if (record) {
+      Object.keys(record).forEach((key) => {
         form.setFieldValue(
-          key as keyof typeof record.data,
-          record.data[key as keyof typeof record.data]
+          key as keyof typeof record,
+          // @ts-ignore
+          record[key as keyof typeof record]
         );
       });
     }
@@ -237,14 +165,7 @@ export default function UsersForm({
 
   return (
     <form.Provider>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          void form.handleSubmit();
-        }}
-        className="space-y-8"
-      >
+      <form {...form.getFormProps()} className="space-y-8">
         <div className="space-y-2">
           <div>
             <Label>Статус</Label>
@@ -254,22 +175,20 @@ export default function UsersForm({
               return (
                 <>
                   <Select
-                    onValueChange={(value) => field.setValue(value as any)}
+                    onValueChange={(value) =>
+                      field.setValue(value as z.infer<typeof user_statusSchema>)
+                    }
                     defaultValue={field.getValue() ?? ""}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem key="active" value="active">
-                        active
-                      </SelectItem>
-                      <SelectItem key="blocked" value="blocked">
-                        blocked
-                      </SelectItem>
-                      <SelectItem key="inactive" value="inactive">
-                        inactive
-                      </SelectItem>
+                      {user_statusSchema.options.map((item) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </>
@@ -286,11 +205,8 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
+                    {...field.getInputProps()}
                     value={field.getValue() ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -306,11 +222,8 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
+                    {...field.getInputProps()}
                     value={field.getValue() ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -321,20 +234,16 @@ export default function UsersForm({
           <div>
             <Label>Роль</Label>
           </div>
-          <Select
-            onValueChange={setChangedRoleId}
-            defaultValue={userRoleId ?? ""}
-          >
+          <Select onValueChange={setChangedRoleId} defaultValue={userRoleId}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.isArray(rolesData) &&
-                rolesData?.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
+              {rolesData?.items.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -347,11 +256,8 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
+                    {...field.getInputProps()}
                     value={field.getValue() ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );
@@ -367,11 +273,8 @@ export default function UsersForm({
               return (
                 <>
                   <Input
-                    id={field.name}
-                    name={field.name}
+                    {...field.getInputProps()}
                     value={field.getValue() ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </>
               );

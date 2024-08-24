@@ -6,7 +6,7 @@ import { NavigationMenuDemo } from "@components/layout/main-nav";
 import { Search } from "lucide-react";
 import { UserNav } from "@components/layout/user-nav";
 import { ModeToggle } from "@components/layout/mode-toggle";
-import { Toaster } from "sonner";
+import { Toaster } from "@components/ui/toaster";
 import { Providers } from "@admin/store/provider";
 import SessionLocalProvider from "@admin/store/session-provider";
 
@@ -22,7 +22,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log("davr");
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -42,7 +41,7 @@ export default function RootLayout({
                 </div>
                 <div className="mx-4 mt-10 mb-4">{children}</div>
               </div>
-              <Toaster richColors />
+              <Toaster />
             </ThemeProvider>
           </Providers>
         </SessionLocalProvider>
