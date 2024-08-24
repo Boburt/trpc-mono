@@ -23,147 +23,119 @@ import {
 import { SelectedFields } from "drizzle-orm/pg-core";
 import Elysia, { t } from "elysia";
 import { PublicManufacturer } from "./dto/list.dto";
+import typesenseClient from "@backend/lib/typesense";
+import { TypesenseManufacturer, TypesenseManufacturerWithRelations } from "./typesense_schema";
 const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
 const indexName = `${process.env.PROJECT_PREFIX}manufacturers`;
+
+
+const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
+
 export const manufacturersController = new Elysia({
   name: "@api/manufacturers",
 })
   .use(ctx)
-  .get("/manufacturers/facets", async ({ set }) => {
-    const esQuery = {
-      size: 0,
-      query: {
-        bool: {
-          must: [
-            { term: { type: 'manufacturer' } }
-          ]
-        }
-      },
-      aggs: {
-        cities: {
-          terms: { field: 'city' }
-        },
-        profile_fields: {
-          nested: { path: 'profiles' },
-          aggs: {
-            field_names: {
-              terms: { field: 'profiles.field_name' },
-              aggs: {
-                field_values: {
-                  terms: { field: 'profiles.field_value.name' }
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-
+  .get("/manufacturers/facets", async ({ set, query: {
+    search
+  } }) => {
     try {
-      const response = await fetch(`${esUrl}/${indexName}/_search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(esQuery)
-      });
-      console.log('request', JSON.stringify(esQuery));
-      if (!response.ok) {
-        throw new Error(`Elasticsearch request failed: ${await response.text()}`);
-      }
+      const searchParameters = {
+        q: search || '*',
+        query_by: 'name,description,short_name',
+        facet_by: 'city,capacity,certificates,staff_count',
+        max_facet_values: 100,
+        per_page: 0
+      };
 
-      const result = await response.json();
+      const result = await typesenseClient
+        .collections(indexManufacturers)
+        .documents()
+        .search(searchParameters);
 
       return {
-        cities: result.aggregations.cities.buckets,
-        profiles: result.aggregations.profile_fields.field_names.buckets.reduce((acc, bucket) => {
-          acc[bucket.key] = bucket.field_values.buckets;
-          return acc;
-        }, {})
+        cities: result.facet_counts.find(facet => facet.field_name === 'city')?.counts || [],
+        capacity: result.facet_counts.find(facet => facet.field_name === 'capacity')?.counts || [],
+        certificates: result.facet_counts.find(facet => facet.field_name === 'certificates')?.counts || [],
+        staff_count: result.facet_counts.find(facet => facet.field_name === 'staff_count')?.counts || []
       };
     } catch (error) {
       console.error('Error fetching facets:', error);
       set.status = 500;
       return { error: 'Failed to fetch facets' };
     }
+  }, {
+    query: t.Object({
+      search: t.Optional(t.String())
+    })
   })
-  .get("/manufacturers/list", async ({ query, set }) => {
-    const { page = 1, pageSize = 10, sort, filters } = query;
+  .post("/manufacturers/list", async ({ body: {
+    limit, page, sort, city, capacity, fields, query
+  }, set, drizzle }) => {
 
-    const esQuery = {
-      from: (page - 1) * pageSize,
-      size: pageSize,
-      query: {
-        bool: {
-          must: [
-            { term: { type: 'manufacturer' } }
-          ]
-        }
-      }
+    const searchParameters = {
+      q: query || '*',
+      query_by: 'name,description,short_name',
+      filter_by: 'active:true',
+      sort_by: sort || 'created_at_timestamp:desc',
+      per_page: limit,
+      page: page,
     };
 
-    if (filters) {
-      const parsedFilters = JSON.parse(filters);
-      Object.entries(parsedFilters).forEach(([key, value]) => {
-        if (key === 'city') {
-          esQuery.query.bool.must.push({ terms: { city: value } });
-        } else if (key === 'profiles') {
-          esQuery.query.bool.must.push({
-            nested: {
-              path: 'profiles',
-              query: {
-                bool: {
-                  must: [
-                    { terms: { 'profiles.field_name': Object.keys(value) } },
-                    { terms: { 'profiles.field_value.name': Object.values(value).flat() } }
-                  ]
-                }
-              }
-            }
-          });
-        } else {
-          esQuery.query.bool.must.push({ match: { [key]: value } });
-        }
-      });
+    if (city && city.length > 0) {
+      searchParameters.filter_by += ` && city:=${JSON.stringify(city)}`;
     }
 
-    if (sort) {
-      const [field, order] = sort.split('-');
-      esQuery.sort = [{ [field]: { order } }];
+    if (capacity && capacity.length > 0) {
+      searchParameters.filter_by += ` && capacity:=${JSON.stringify(capacity)}`;
     }
-
     try {
-      const response = await fetch(`${esUrl}/${indexName}/_search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(esQuery)
-      });
+      const searchResults = await typesenseClient
+        .collections<TypesenseManufacturerWithRelations>(indexManufacturers)
+        .documents()
+        .search(searchParameters);
 
-      if (!response.ok) {
-        throw new Error(`Elasticsearch request failed: ${response.statusText}`);
+      let manufacturers = searchResults?.hits?.map(hit => hit.document);
+
+      if (manufacturers && manufacturers.length > 0) {
+        const images = await drizzle.query.assets.findMany({
+          where: and(
+            eq(assets.code, "source"),
+            eq(assets.model, "manufacturers"),
+            inArray(
+              assets.model_id,
+              manufacturers.map((p) => p.id)
+            )
+          ),
+        });
+
+        manufacturers.forEach((p) => {
+          p.images = images
+            .filter((i) => i.model_id === p.id)
+            .map((i) => ({
+              path: `/public/${i.path}/${i.id}/${i.name}`,
+              code: i.code ?? "",
+            }));
+        });
       }
 
-      const result = await response.json();
-
       return {
-        total: result.hits.total.value,
-        manufacturers: result.hits.hits.map(hit => hit._source)
+        total: searchResults.found,
+        totalPages: Math.ceil(searchResults.found / limit),
+        manufacturers
       };
     } catch (error) {
       console.error('Error fetching manufacturers:', error);
-      set.status = 500;
-      return { error: 'Failed to fetch manufacturers' };
+      throw new Error("Failed to fetch products");
     }
   }, {
-    query: t.Object({
-      page: t.Optional(t.Number()),
-      pageSize: t.Optional(t.Number()),
+    body: t.Object({
+      limit: t.Numeric(),
+      page: t.Numeric(),
       sort: t.Optional(t.String()),
-      filters: t.Optional(t.String())
+      fields: t.Optional(t.String()),
+      query: t.Optional(t.String()),
+      city: t.Optional(t.Nullable(t.Array(t.String()))),
+      capacity: t.Optional(t.Nullable(t.Array(t.String()))),
     })
   })
   .get(

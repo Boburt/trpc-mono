@@ -3,19 +3,26 @@ import {
   memberships,
   profiles
 } from "@backend/../drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import dayjs from "dayjs";
-import { pipeline } from "@xenova/transformers";
+import typesenseClient from "@backend/lib/typesense";
+import { indexManufacturers, manufacturerSchema } from "@backend/modules/manufacturers/typesense_schema";
 
-const HttpsAgent = require("agentkeepalive").HttpsAgent;
-const agent = new HttpsAgent({
-  maxSockets: 100,
-  maxFreeSockets: 10,
-  timeout: 60000,
-  freeSocketTimeout: 30000,
-});
 
-const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+const cityCodes = {
+  "UZTAS": "Тошкент вилояти",
+  "UZAZN": "Андижон вилояти",
+  "UZJIZ": "Жиззах вилояти",
+  "UZNMA": "Наманган вилояти",
+  "UZSKD": "Самарқанд вилояти",
+  "UZKHO": "Хоразм вилояти",
+  "UZBHK": "Бухоро вилояти",
+  "UZQAS": "Қашқадарё вилояти",
+  "UZFEG": "Фарғона вилояти",
+  "UZNWY": "Навоий вилояти",
+  "UZKPA": "Қорақалпоғистон Республикаси",
+  "UZSIR": "Сирдарё вилояти",
+};
 
 export default async function processIndexManufacturer(id: string) {
   try {
@@ -29,157 +36,16 @@ export default async function processIndexManufacturer(id: string) {
     if (!manufacturer) {
       return;
     }
-
-    const indexManufacturers = `${process.env.PROJECT_PREFIX}manufacturers`;
-    const elasticUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/${indexManufacturers}`;
-
-    const response = await fetch(elasticUrl, {
-      method: "HEAD",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-      },
-      verbose: true,
-    });
-
-    if (response.status == 404) {
-      console.log("index does not exist, creating");
-
-      const indexMapping = {
-        settings: {
-          number_of_shards: 1,
-          number_of_replicas: 0,
-          analysis: {
-            analyzer: {
-              text_analyzer: {
-                tokenizer: "standard",
-                filter: [
-                  "lowercase",
-                  "asciifolding",
-                  "russian_morphology",
-                  "english_morphology",
-                  "my_edge_ngram",
-                ],
-              },
-              search_analyzer: {
-                tokenizer: "standard",
-                filter: [
-                  "lowercase",
-                  "asciifolding",
-                  "russian_morphology",
-                  "english_morphology",
-                ],
-              },
-            },
-            filter: {
-              my_edge_ngram: {
-                type: "edge_ngram",
-                min_gram: 2,
-                max_gram: 20,
-              },
-              russian_morphology: {
-                type: "icu_collation",
-                language: "ru",
-              },
-              english_morphology: {
-                type: "icu_collation",
-                language: "en",
-              },
-            },
-          },
-        },
-        mappings: {
-          properties: {
-            id: { type: "keyword" },
-            name: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
-            short_name: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-            },
-            description: {
-              type: "text",
-              analyzer: "text_analyzer",
-              search_analyzer: "search_analyzer",
-            },
-            active: { type: "boolean" },
-            rating: { type: "float" },
-            country: { type: "keyword" },
-            type: { type: "keyword" },
-            org_type: { type: "keyword" },
-            city: { type: "keyword" },
-            ein: { type: "integer" },
-            address: { type: "text" },
-            fact_address: { type: "text" },
-            email: { type: "keyword" },
-            web_site: { type: "keyword" },
-            vat: { type: "boolean" },
-            verified: { type: "boolean" },
-            verified_date: { type: "date" },
-            created_at: { type: "date" },
-            updated_at: { type: "date" },
-            "profiles": {
-              "type": "nested",
-              "properties": {
-                "field_name": {
-                  "type": "keyword"
-                },
-                "field_value": {
-                  "dynamic": "true",
-                  "properties": {
-                    "measure": {
-                      "type": "text",
-                      "fields": {
-                        "keyword": {
-                          "type": "keyword",
-                          "ignore_above": 256
-                        }
-                      }
-                    },
-                    "name": {
-                      "type": "text",
-                      "fields": {
-                        "keyword": {
-                          "type": "keyword",
-                          "ignore_above": 256
-                        }
-                      }
-                    },
-                    "value": {
-                      "type": "long"
-                    }
-                  }
-                }
-              }
-            },
-            text_vector: {
-              type: "dense_vector",
-              dims: 384,
-              index: true,
-              similarity: "cosine",
-            },
-          },
-        },
-      };
-
-      const createIndexResponse = await fetch(elasticUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-        },
-        body: JSON.stringify(indexMapping),
-      });
-      console.log(await createIndexResponse.text());
+    try {
+      await typesenseClient.collections(indexManufacturers).retrieve();
+      console.log('Collection already exists');
+    } catch (err) {
+      if (err.httpStatus === 404) {
+        await typesenseClient.collections().create(manufacturerSchema);
+        console.log('Created schema');
+      } else {
+        console.error('Error creating schema:', err);
+      }
     }
 
     console.time("manufacturerSelect");
@@ -202,38 +68,64 @@ export default async function processIndexManufacturer(id: string) {
 
     console.timeEnd("manufacturerSelect");
 
-    const textToEmbed = `${currentManufacturer.name} ${currentManufacturer.description || ''} ${currentManufacturer.short_name || ''}`;
-    const textEmbedding = await model(textToEmbed, {
-      pooling: "mean",
-      normalize: true,
+    const capacity: string[] = [];
+    let staff_count = 0;
+    const certificates: string[] = [];
+
+    manufacturerProfiles.forEach(profile => {
+      if (profile.field_name === 'capacity') {
+        const capacityValues = profile.field_value as { name: string, value: string, measure: string }[];
+        capacityValues.forEach(cap => {
+          capacity.push(`${cap.name}:${cap.value}:${cap.measure}`);
+        });
+      } else if (profile.field_name === 'staff_count') {
+        staff_count = parseInt(profile.field_value as string);
+      } else if (profile.field_name === 'certificates') {
+        const certificateValues = profile.field_value as { name: string }[];
+        certificateValues.forEach(cert => {
+          certificates.push(cert.name);
+        });
+      }
     });
 
-    const indexUrl = `${elasticUrl}/_doc/${currentManufacturer.id}`;
-
-    const indexBody = {
-      ...currentManufacturer,
-      created_at: dayjs(currentManufacturer.created_at).toISOString(),
-      updated_at: dayjs(currentManufacturer.updated_at).toISOString(),
-      verified_date: currentManufacturer.verified_date
-        ? dayjs(currentManufacturer.verified_date).toISOString()
-        : null,
-      profiles: manufacturerProfiles,
-      text_vector: Array.from(textEmbedding.data),
+    const typesenseManufacturer = {
+      id: currentManufacturer.id,
+      name: currentManufacturer.name,
+      short_name: currentManufacturer.short_name,
+      description: currentManufacturer.description,
+      active: currentManufacturer.active,
+      rating: currentManufacturer.rating,
+      country: currentManufacturer.country,
+      type: currentManufacturer.type,
+      org_type: currentManufacturer.org_type,
+      city: currentManufacturer.city ? cityCodes[currentManufacturer.city] : null,
+      ein: currentManufacturer.ein,
+      address: currentManufacturer.address,
+      fact_address: currentManufacturer.fact_address,
+      email: currentManufacturer.email,
+      web_site: currentManufacturer.web_site,
+      vat: currentManufacturer.vat,
+      verified: currentManufacturer.verified,
+      verified_date: currentManufacturer.verified_date ? new Date(currentManufacturer.verified_date).getTime() : null,
+      created_at: new Date(currentManufacturer.created_at).toISOString(),
+      updated_at: new Date(currentManufacturer.updated_at).toISOString(),
+      created_at_timestamp: dayjs(currentManufacturer.created_at).unix(),
+      updated_at_timestamp: dayjs(currentManufacturer.updated_at).unix(),
+      capacity,
+      staff_count,
+      certificates
     };
 
-    console.time("indexing");
-    const indexResponse = await fetch(indexUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(process.env.ELASTIC_AUTH!)}`,
-      },
-      body: JSON.stringify(indexBody),
-    });
-    console.timeEnd("indexing");
 
-    const indexResponseText = await indexResponse.text();
-    console.log("Indexing response:", indexResponseText);
+
+    try {
+      await typesenseClient.collections(indexManufacturers).documents().upsert(typesenseManufacturer);
+      console.log(`Indexed product ${id}`);
+
+    } catch (e) {
+      console.log('indexBody', typesenseManufacturer)
+      console.error(`Error indexing product ${id}:`, e);
+    }
   } catch (e) {
     console.error("Error indexing manufacturer:", e);
   }

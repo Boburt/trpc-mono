@@ -11,6 +11,7 @@ import { SQLWrapper, and, eq, gt, gte, isNotNull, lt, lte } from "drizzle-orm";
 import dayjs from "dayjs";
 import { pipeline, env } from "@xenova/transformers";
 import typesenseClient from "@backend/lib/typesense";
+import { indexProducts, productSchema } from "@backend/modules/products/typesense_schema";
 // env.cacheDir = './model_cache';
 
 // const embeddingPipeline = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
@@ -20,30 +21,8 @@ import typesenseClient from "@backend/lib/typesense";
 //     return Array.from(output.data);
 // }
 
-const indexProducts = `${process.env.PROJECT_PREFIX}products`;
-const productSchema = {
-  name: indexProducts,
-  fields: [
-    { name: 'id', type: "string" },
-    { name: 'manufacturer_id', type: "string" },
-    { name: 'manufacturer_name', type: "string", facet: true },
-    { name: 'name', type: "string" },
-    { name: 'description', type: "string" },
-    { name: 'active', type: 'bool' },
-    { name: 'price_rub', type: 'float', facet: true },
-    { name: 'price_usd', type: 'float', facet: true },
-    { name: 'stock_quantity', type: 'int32' },
-    { name: 'created_at', type: 'string' },
-    { name: 'updated_at', type: 'string' },
-    { name: 'created_at_timestamp', type: 'int64' }, // New sortable field
-    { name: 'updated_at_timestamp', type: 'int64' }, // New sortable field
-    { name: 'category', type: "string" },
-    { name: 'category_id', type: "string" },
-    { name: 'properties', type: 'string[]', facet: true },
-  ],
-  default_sorting_field: 'created_at_timestamp',
-  enable_nested_fields: true
-};
+
+
 
 
 export default async function processIndexProducts(id: string) {

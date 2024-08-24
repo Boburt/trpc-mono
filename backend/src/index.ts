@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 
 
 const app = new Elysia()
-  .use(serverTiming())
+  // .use(serverTiming())
   .use(
     staticPlugin({
       assets: "../uploads",

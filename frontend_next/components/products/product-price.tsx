@@ -5,7 +5,7 @@ import { cn } from "@frontend_next/lib/utils";
 import { useCurrencyStore } from "@frontend_next/store/zustand/currencyStore";
 
 export const ProductPrice: React.FC<
-  ProductsWithRelations & {
+  Omit<ProductsWithRelations, "price"> & {
     className?: string;
   }
 > = ({ price_rub, price_usd, className }) => {

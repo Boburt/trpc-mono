@@ -1,135 +1,117 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Input, Select, Checkbox, Button, SelectItem } from "@nextui-org/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { apiClient } from "@frontend_next/lib/eden";
 import { Card, CardContent } from "@frontend_next/components/ui/card";
+import { FacetedFilter } from "@frontend_next/components/ui/faceted-filter";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { searchParams, searchParamsCache } from "./searchParams";
+import { useQueryState } from "nuqs";
+
+const measureCodes = {
+  million_piece: "млн.дона",
+  thousand_ton: "минг тонна",
+  million_pair: "млн.жуфт",
+  million_square_meter: "млн.кв.м",
+};
+
+const getCapacityLabel = (capacity: string) => {
+  let [label, count, measure] = capacity.split(":");
+
+  return `${label}: ${count} ${measureCodes[measure]}`;
+};
 
 export function ManufacturerFilterSort() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [facets, setFacets] = useState<{
-    cities: { key: string; doc_count: number }[];
-    profiles: { [key: string]: { key: string; doc_count: number }[] };
-  }>({ cities: [], profiles: {} });
+  const [page, setPage] = useQueryState("page", searchParams.page);
+  const [sort, setSort] = useQueryState("sort", searchParams.sort);
+  const [city, setCity] = useQueryState("city", searchParams.city);
+  const [capacity, setCapacity] = useQueryState(
+    "capacity",
+    searchParams.capacity
+  );
 
-  useEffect(() => {
-    fetchFacets();
+  const changeCityCallback = useCallback((value: string[]) => {
+    setPage(1);
+    setCity(value);
   }, []);
 
-  const fetchFacets = async () => {
-    try {
-      const { data } = await apiClient.api.manufacturers.facets.get();
-      if (data && ("cities" in data || "profiles" in data)) {
-        setFacets({
-          cities: data.cities || [],
-          profiles: data.profiles || {},
-        });
-      }
-    } catch (error) {
-      console.error("Failed to fetch facets:", error);
-    }
-  };
+  const changeCapacityCallback = useCallback((value: string[]) => {
+    setPage(1);
+    setCapacity(value);
+  }, []);
 
-  const updateSearchParams = (key: string, value) => {
-    const current = new URLSearchParams(searchParams.toString());
-    if (
-      value &&
-      (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0)
-    ) {
-      console.log("value", value);
-      current.set(key, JSON.stringify(value));
-    } else {
-      current.delete(key);
-    }
-    const search = current.toString();
-    const query = search ? `?${search}` : "";
-    router.push(`${pathname}${query}`, {
-      scroll: false,
-    });
-  };
-
-  const getSelectedValues = (key) => {
-    const value = searchParams.get(key);
-    return value ? JSON.parse(value) : key === "profiles" ? {} : [];
-  };
+  const { data: facets } = useSuspenseQuery({
+    queryKey: ["manufacturers_facets"],
+    queryFn: async () => {
+      const { data } = await apiClient.api.manufacturers.facets.get({
+        query: {},
+      });
+      return data;
+    },
+  });
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-8 gap-4 mb-4">
-          <Input
-            placeholder="Search by name"
-            value={searchParams.get("name") || ""}
-            onChange={(e) => updateSearchParams("name", e.target.value)}
-          />
-          <Select
-            placeholder="Sort by"
-            value={searchParams.get("sort") || "rating-desc"}
-            onChange={(value) => updateSearchParams("sort", value.target.value)}
-          >
-            <SelectItem value="rating-desc" key="rating-desc">
-              Rating (High to Low)
-            </SelectItem>
-            <SelectItem value="rating-asc" key="rating-asc">
-              Rating (Low to High)
-            </SelectItem>
-            <SelectItem value="name-asc" key="name-asc">
-              Name (A-Z)
-            </SelectItem>
-            <SelectItem value="name-desc" key="name-desc">
-              Name (Z-A)
-            </SelectItem>
-          </Select>
-
-          <div>
-            <h3 className="font-bold mb-2">Cities</h3>
-            {facets.cities.map((city) => (
-              <Checkbox
-                key={city.key}
-                isSelected={getSelectedValues("city").includes(city.key)}
-                onChange={(isSelected) => {
-                  const current = getSelectedValues("city");
-                  const updated = isSelected
-                    ? [...current, city.key]
-                    : current.filter((c) => c !== city.key);
-                  updateSearchParams("city", updated);
-                }}
-              >
-                {city.key} ({city.doc_count})
-              </Checkbox>
-            ))}
+      <CardContent className="pt-6 ">
+        <div className="flex items-center justify-between">
+          <div className="flex space-x-4 items-center">
+            {facets && facets.cities && facets.cities.length > 0 && (
+              <FacetedFilter
+                title="Город"
+                options={facets.cities.map((city) => ({
+                  label: city.value,
+                  value: city.value,
+                  count: city.count,
+                }))}
+                value={city}
+                onChange={(value) => changeCityCallback(value)}
+              />
+            )}
+            {facets && facets.capacity && facets.capacity.length > 0 && (
+              <FacetedFilter
+                title="Производственная мощность"
+                options={facets.capacity.map((capacity) => ({
+                  label: getCapacityLabel(capacity.value),
+                  value: capacity.value,
+                  count: capacity.count,
+                }))}
+                value={capacity}
+                onChange={(value) => changeCapacityCallback(value)}
+              />
+            )}
           </div>
-
-          {Object.entries(facets.profiles).map(([fieldName, values]) => (
-            <div key={fieldName}>
-              <h3 className="font-bold mb-2">{fieldName}</h3>
-              {values.map((value) => (
-                <Checkbox
-                  key={value.key}
-                  isSelected={getSelectedValues("profiles")[
-                    fieldName
-                  ]?.includes(value.key)}
-                  onChange={(isSelected) => {
-                    const current = getSelectedValues("profiles");
-                    const fieldValues = current[fieldName] || [];
-                    const updatedFieldValues = isSelected
-                      ? [...fieldValues, value.key]
-                      : fieldValues.filter((v) => v !== value.key);
-                    updateSearchParams("profiles", {
-                      ...current,
-                      [fieldName]: updatedFieldValues,
-                    });
-                  }}
-                >
-                  {value.key} ({value.doc_count})
-                </Checkbox>
-              ))}
-            </div>
-          ))}
+          <div>
+            <Select
+              placeholder="Сортировка"
+              value={sort}
+              onChange={(value) => setSort(value.target.value)}
+              className="w-48"
+            >
+              <SelectItem value="rating:desc" key="rating:desc">
+                Рейтинг (по убыванию)
+              </SelectItem>
+              <SelectItem value="rating:asc" key="rating:asc">
+                Рейтинг (по возрастанию)
+              </SelectItem>
+              <SelectItem value="name:asc" key="name:asc">
+                Название (А-Я)
+              </SelectItem>
+              <SelectItem value="name:desc" key="name:desc">
+                Название (Я-А)
+              </SelectItem>
+            </Select>
+          </div>
         </div>
+        {/* <div className="flex space-x-2">
+        <Input
+          placeholder="Search manufacturers"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <Button onClick={handleSearch}>Search</Button>
+      </div> */}
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import Elysia, { error, t } from "elysia";
+import Elysia, { t } from "elysia";
 import { ctx } from "@backend/context";
 import {
   manufacturers_users,
@@ -17,13 +17,9 @@ import {
   eq,
   sql,
   SQLWrapper,
-  and,
-  asc,
-  desc,
+  and, desc,
   inArray,
-  getTableColumns,
-  not,
-  ne,
+  getTableColumns
 } from "drizzle-orm";
 import { parseFilterFields } from "@backend/lib/parseFilterFields";
 import { parseSelectFields } from "@backend/lib/parseSelectFields";
@@ -32,11 +28,9 @@ import fs from "fs";
 import path from "path";
 import { ProductProperties } from "./dtos/one.dto";
 import { ProductsWithRelations } from "./dtos/list.dto";
-import { ElasticsearchAggregations } from "./dtos/facets.dto";
-import { pipeline } from "@xenova/transformers";
 import typesenseClient from "@backend/lib/typesense";
+import { TypesenseProduct, TypesenseProductWithRelations } from "./typesense_schema";
 
-const model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
 
 const esUrl = `https://${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}/`;
 const indexName = `${process.env.PROJECT_PREFIX}products`;
@@ -204,11 +198,11 @@ export const productsController = new Elysia({
 
       try {
         const searchResults = await typesenseClient
-          .collections(indexProducts)
+          .collections<TypesenseProductWithRelations>(indexProducts)
           .documents()
           .search(searchParameters);
 
-        const products = searchResults.hits.map(hit => {
+        const products = searchResults?.hits?.map(hit => {
           const document = hit.document;
           const processedProperties = document.properties.reduce((acc, prop) => {
             const [name, value] = prop.split(':');
@@ -221,7 +215,6 @@ export const productsController = new Elysia({
 
           return {
             ...document,
-            price: document.price_cents / 100, // Convert cents to dollars
             created_at: new Date(document.created_at).toISOString(),
             updated_at: new Date(document.updated_at).toISOString(),
             properties: Object.entries(processedProperties).map(([name, values]) => ({
@@ -233,7 +226,7 @@ export const productsController = new Elysia({
         });
 
         // Fetch images for the products
-        if (products.length > 0) {
+        if (products && products.length > 0) {
           const images = await drizzle.query.assets.findMany({
             where: and(
               eq(assets.code, "source"),
