@@ -1,0 +1,15 @@
+---
+import AuthForm from "@frontend/src/components/auth/form";
+import BaseLayout from "@frontend/src/layouts/BaseLayout.astro";
+
+const url = new URL(Astro.request.url);
+const params = new URLSearchParams(url.search);
+const token = params.get("token");
+const error = params.get("error");
+const { user } = Astro.locals;
+export const prerender = false;
+---
+
+<BaseLayout disableBreadcrumbs={true}>
+  <AuthForm client:load userData={user} token={token} error={error} />
+</BaseLayout>

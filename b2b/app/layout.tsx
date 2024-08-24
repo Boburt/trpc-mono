@@ -3,6 +3,9 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Footer from "@/components/layout/Footer";
+import Filter from "@/components/Filter";
+import { Providers } from "@/store/provider";
+import { CategoriesFilterServer } from "@/components/manufacturers/filter/CategoriesServer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +22,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <div className="container min-h-screen mx-auto py-4">{children}</div>
-        <Footer />
+        <Providers>
+          <>
+            <Header />
+            <div className="container min-h-screen mx-auto py-4">
+              <CategoriesFilterServer />
+              {children}
+            </div>
+            <Footer />
+          </>
+        </Providers>
       </body>
     </html>
   );

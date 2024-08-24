@@ -1,0 +1,30 @@
+---
+import CategoriesClientProvider from "./CategoriesClientProvider";
+import { parseQueryParams } from "@frontend/src/utils/manufacturers_filter_fn";
+import { apiClient } from "@frontend/src/utils/eden";
+
+const { data: categories } = await apiClient.api.categories.public.get({
+  $query: {
+    take: 100,
+  },
+});
+
+const { slug } = Astro.params;
+
+const pathname = new URL(Astro.request.url).pathname;
+const searchParams = new URL(Astro.request.url).search;
+const { data: facets } = await apiClient.api.manufacturers.facet_filter.get({
+  $query: {
+    category: slug ?? null,
+  },
+});
+const manufacturersFilterValues = parseQueryParams(searchParams);
+---
+
+<CategoriesClientProvider
+  categories={categories}
+  pathname={pathname}
+  facets={facets}
+  filterValues={manufacturersFilterValues?.manufacturers_filter ?? {}}
+  client:load
+/>

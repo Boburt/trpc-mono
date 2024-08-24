@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import React from "react";
+import FormElement from "../../components/Map/FormElement";
+import { Controller, useForm } from "react-hook-form";
+import { meta } from '@app/meta.astro'
+---
+
+
+<BaseLayout title="Contacts">
+
+    <h1>Contacts 111</h1>
+<h2>Test123</h2>
+    <p>Test 123</p>
+    <p>If you have any questions or comments, feel free to reach out to us:</p>
+    <form action="/submit-contact" method="post">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+        </div>
+        <div>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+</BaseLayout>

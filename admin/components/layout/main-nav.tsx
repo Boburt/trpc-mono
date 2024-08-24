@@ -13,6 +13,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@components/ui/navigation-menu";
+import CanAccess from "../can-access";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -55,16 +56,36 @@ const components: { title: string; href: string; description: string }[] = [
 const settingsMenu: { title: string; href: string }[] = [
   {
     title: "Разрешения",
-    href: "/settings/permissions",
+    href: "/system/permissions",
   },
   {
     title: "Роли",
-    href: "/settings/roles",
+    href: "/system/roles",
   },
   {
     title: "Пользователи",
-    href: "/settings/users"
-  }
+    href: "/system/users",
+  },
+  {
+    title: "Языки",
+    href: "/system/langs",
+  },
+  {
+    title: "Размеры изображений",
+    href: "/system/image_sizes",
+  },
+  {
+    title: "Города",
+    href: "/system/cities",
+  },
+  {
+    title: "Свойства производителей",
+    href: "/system/manufacturers_properties",
+  },
+  {
+    title: "СЕО ссылки",
+    href: "/system/seo_links",
+  },
 ];
 
 export function NavigationMenuDemo() {
@@ -85,6 +106,42 @@ export function NavigationMenuDemo() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <CanAccess permission="sp_tickets.list">
+          <NavigationMenuItem>
+            <Link href="/sp_tickets" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Обращения
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
+        <CanAccess permission="categories.list">
+          <NavigationMenuItem>
+            <Link href="/categories" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Категории
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
+        <CanAccess permission="manufacturers.list">
+          <NavigationMenuItem>
+            <Link href="/manufacturers" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Производители
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
+        <CanAccess permission="manufacturers_reviews.list">
+          <NavigationMenuItem>
+            <Link href="/manufacturers_reviews" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Отзывы производителей
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </CanAccess>
       </NavigationMenuList>
     </NavigationMenu>
   );

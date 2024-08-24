@@ -1,0 +1,23 @@
+---
+import ProfileLayout from "@frontend/src/layouts/ProfileLayout.astro";
+import { TicketsPage } from "@frontend/src/components/profile/tickets/TicketsPage";
+const { permissions } = Astro.locals;
+const customCrumbs = [
+  {
+    text: "Главная",
+    href: "/",
+  },
+  {
+    text: "Профиль",
+    href: "/profile",
+  },
+  {
+    text: "Обращения",
+    href: "/profile/tickets",
+  },
+];
+---
+
+<ProfileLayout title="Обращения" customCrumbs={customCrumbs}>
+  <TicketsPage client:only permissions={permissions} />
+</ProfileLayout>

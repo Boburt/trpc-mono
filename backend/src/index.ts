@@ -1,48 +1,35 @@
-import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
-import { trpc } from "@elysiajs/trpc";
 
-import { publicRouter, createContext } from "./trpc";
-import { router } from "./_routes";
-import jwt from "./jwt";
+import cluster from "node:cluster";
+import { cpus } from "node:os";
+import process from "node:process";
+import app from "./app";
 
-const app = new Elysia()
-  .use(cors())
-  .use(jwt)
-  .get("/", () => ({ hello: "world" }))
-  .use(
-    trpc(router, {
-      createContext,
-      // responseMeta: (opts) => {
-      //   const { ctx, paths, errors, type } = opts;
-      //   // assuming you have all your public routes with the keyword `public` in them
-      //   const allPublic =
-      //     paths && paths.every((path: string) => path.includes("public"));
-      //   // checking that no procedures errored
-      //   const allOk = errors.length === 0;
-      //   // checking we're doing a query request
-      //   const isQuery = type === "query";
-      //   if (ctx?.res && allPublic && allOk && isQuery) {
-      //     // cache request for 1 day + revalidate once every second
-      //     const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
-      //     return {
-      //       headers: {
-      //         "cache-control": `s-maxage=1, stale-while-revalidate=${ONE_DAY_IN_SECONDS}`,
-      //       },
-      //     };
-      //   }
-      //   return {};
-      // },
-    })
-  )
-  .listen(3000);
+if (process.env.NODE_ENV === "development") {
+  app.listen(3000);
+  console.log(
+    `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  );
+} else {
+  if (cluster.isPrimary) {
+    console.log(`Primary ${process.pid} is running`);
 
-export type App = typeof app;
+    // Start N workers for the number of CPUs
+    for (let i = 0; i < cpus().length; i++) {
+      cluster.fork();
+    }
 
-app.onStop(() => {
-  console.log("🦊 Elysia is stopping...");
-});
+    cluster.on("exit", (worker, code, signal) => {
+      console.log(`Worker ${worker.process.pid} exited`);
+    });
+  } else {
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+    app.listen(3000);
+
+    console.log(
+      `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+    );
+  }
+
+}
+
+

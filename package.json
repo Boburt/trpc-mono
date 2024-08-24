@@ -6,7 +6,9 @@
     "dev": "pnpm run --parallel dev"
   },
   "dependencies": {
-    "typescript": "4.6.2-insiders.20220225",
-    "zod": "3.21.1"
+    "bull": "^4.11.3",
+    "cluster": "^0.7.7",
+    "typescript": "5.3.3",
+    "undici": "^5.25.2"
   }
 }
