@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://api.fungeek.net
+Host: https://dev.fungeek.net
 
 # Sitemaps
-Sitemap: https://api.fungeek.net/sitemap.xml
+Sitemap: https://dev.fungeek.net/sitemap.xml
