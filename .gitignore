@@ -3,3 +3,4 @@ node_modules
 .idea
 dump.rdb
 uploads
+backend/app
